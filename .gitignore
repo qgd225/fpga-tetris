@@ -1,0 +1,36 @@
+# ===== Vivado 生成物 =====
+*.jou
+*.log
+.Xil/
+
+# 工程级生成目录（Vivado 按 <project>.<kind> 命名）
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.gen/
+
+# ===== IP 输出产物（保留 .xci 与 ip/ 根下的 .coe）=====
+**/sources_1/ip/*/hdl/
+**/sources_1/ip/*/sim/
+**/sources_1/ip/*/synth/
+**/sources_1/ip/*/doc/
+**/sources_1/ip/*/misc/
+**/sources_1/ip/*/simulation/
+**/sources_1/ip/*/*.xml
+**/sources_1/ip/*/*.dcp
+**/sources_1/ip/*/*_sim_netlist.*
+**/sources_1/ip/*/*_stub.*
+**/sources_1/ip/*/*.veo
+**/sources_1/ip/*/*.vho
+**/sources_1/ip/*/*.mif
+**/sources_1/ip/*/*.v
+**/sources_1/ip/*/*.vh
+**/sources_1/ip/*/*.xdc
+
+# ===== 未被工程引用的遗留文件（保留在磁盘，不纳入版本管理）=====
+/Tetris_text2.srcs/sources_1/new/clock.v
+/Tetris_text2.srcs/sources_1/new/num.v
+/Tetris_text2.srcs/sources_1/ip/blk_mem_gen_0/
+/Tetris_text2.srcs/sources_1/ip/number/
