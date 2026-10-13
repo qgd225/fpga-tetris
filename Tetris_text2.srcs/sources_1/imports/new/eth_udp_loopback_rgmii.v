@@ -1,5 +1,6 @@
 module eth_udp_loopback_rgmii(
   input         reset_n,
+  input         clk_74m,       // 74.25MHz 像素时钟（给跨时钟 FIFO 用）
   //eth_rx
   input         rgmii_rx_clk_i,
   input  [3:0]  rgmii_rxd,
@@ -34,14 +35,14 @@ module eth_udp_loopback_rgmii(
   output        msg_empty,      // 1 = 没有报文信息
   output        rx_pkt_done,    // 收完一包，1 拍
   output        rx_pkt_err,     // 这一包有错
-  output        pll_locked      // clk_wiz_0 锁定
+  output        pll_locked,     // clk_wiz_0 锁定
+  output        clk125m         // 125MHz（来自 PHY RXC），给上层做跨时钟同步用
 );
 parameter LOCAL_MAC  = 48'h00_0a_35_01_fe_c0;
 parameter LOCAL_IP   = 32'hc0_a8_00_02;
 parameter LOCAL_PORT = 16'd5000;
 
 wire        reset_p;
-wire        clk125m;
 wire [47:0] exter_mac;
 wire [31:0] exter_ip;
 wire [15:0] exter_port;
@@ -113,7 +114,9 @@ eth_udp_rx_gmii eth_udp_rx_gmii(
 
 //对以太网接收数据缓存（你在这里读出去）
 eth_data_buf eth_rx_data_buf (
-  .clk   (clk125m          ), // input wire clk
+  .rst   (reset_p          ), // input wire rst
+  .wr_clk(clk125m          ), // input wire wr_clk  (rx 模块写)
+  .rd_clk(clk_74m          ), // input wire rd_clk  (你读)
   .din   (rx_payload_dat   ), // input wire [7 : 0] din
   .wr_en (rx_payload_valid ), // input wire wr_en
   .rd_en (rx_rd_en         ), // input wire rd_en
@@ -124,6 +127,7 @@ eth_data_buf eth_rx_data_buf (
 
 //同时对报文中MAC、IP等消息数据缓存
 eth_msg_buf eth_msg_buf (
+  .rst        (reset_p                                     ), // input wire rst
   .clk        (clk125m                                     ), // input wire clk
   .din        ({exter_mac,exter_ip,exter_port,rx_data_length}),// input wire [111 : 0] din
   .wr_en      (rx_pkt_done                                 ), // input wire wr_en
@@ -136,7 +140,9 @@ eth_msg_buf eth_msg_buf (
 
 //对以太网发出数据缓存（你把要发的东西写进来）
 eth_data_buf eth_tx_data_buf (
-  .clk   (clk125m          ), // input wire clk
+  .rst   (reset_p          ), // input wire rst
+  .wr_clk(clk_74m          ), // input wire wr_clk  (打包逻辑写)
+  .rd_clk(clk125m          ), // input wire rd_clk  (mac 读)
   .din   (tx               ), // input wire [7 : 0] din
   .wr_en (tx_wr_en         ), // input wire wr_en
   .rd_en (tx_payload_req   ), // input wire rd_en
