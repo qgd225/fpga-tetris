@@ -14,7 +14,17 @@ module Tetris(
     output [2:0]hdmi_data_n,
     output hdmi_oe,
     output buzz_main,
-    output buzz_else
+    output buzz_else,
+    
+    input         rgmii_rx_clk_i,
+    input  [3:0]  rgmii_rxd,
+    input         rgmii_rxdv,
+    output        rgmii_tx_clk,
+    output  [3:0] rgmii_txd,
+    output        rgmii_txen,
+    output        eth_rstn,
+    output        eth_mdc,
+    output        eth_mdio
     );
     
     //上电复位
@@ -36,6 +46,7 @@ module Tetris(
     wire [10:0]hcounter;
     wire [10:0]vcounter;
     wire [23:0]rgb;
+    wire hdmi_de;
     wire Clk_74M;
     
     hdmi hdmi_inst(
@@ -50,7 +61,8 @@ module Tetris(
     .rgb(rgb),
     
     .hcounter(hcounter),
-    .vcounter(vcounter)
+    .vcounter(vcounter),
+    .de(hdmi_de)
     );
     
 //    按键输入及消抖
@@ -160,4 +172,25 @@ module Tetris(
     .buzz_else(buzz_else)
     );
     
+
+//    以太网画面输出（逐像素颜色标号 -> UDP，一行一包）
+    net_screen_tx net_screen_tx_inst(
+    .Clk_74M(Clk_74M),
+    .Reset_n(Reset_n),
+    .de(hdmi_de),
+    .hcounter(hcounter),
+    .vcounter(vcounter),
+    .rgb(rgb),
+    
+    .rgmii_rx_clk_i(rgmii_rx_clk_i),
+    .rgmii_rxd(rgmii_rxd),
+    .rgmii_rxdv(rgmii_rxdv),
+    .rgmii_tx_clk(rgmii_tx_clk),
+    .rgmii_txd(rgmii_txd),
+    .rgmii_txen(rgmii_txen),
+    .eth_rstn(eth_rstn),
+    .eth_mdc(eth_mdc),
+    .eth_mdio(eth_mdio)
+    );
+
 endmodule

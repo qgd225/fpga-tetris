@@ -9,7 +9,8 @@ module hdmi(
     hdmi_oe,
     hcounter,
     vcounter,
-    rgb
+    rgb,
+    de
     );
     
     input Clk;
@@ -26,8 +27,8 @@ module hdmi(
     output wire [10:0]hcounter;
     output wire [10:0]vcounter;
     output wire Clk_74M;
+    output wire de;
     
-    wire hdmi_de;
     wire Clk_371M;
     wire Clk_50M;
     wire hdmi_hs;
@@ -44,7 +45,7 @@ module hdmi(
     hdmi_vs_r <= 1'b0;
     end
     else begin
-    hdmi_de_r <= hdmi_de;
+    hdmi_de_r <= de;
     hdmi_hs_r <= hdmi_hs;
     hdmi_vs_r <= hdmi_vs;
     end
@@ -71,7 +72,7 @@ module hdmi(
     .vcounter(vcounter),
     .VGA_HS(hdmi_hs),
     .VGA_VS(hdmi_vs),
-    .VGA_BLK(hdmi_de),
+    .VGA_BLK(de),
     .VGA_CLK(),
     .VGA_DATA()
     );
