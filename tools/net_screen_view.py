@@ -124,7 +124,11 @@ def rx_loop():
         s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 8 * 1024 * 1024)
     except OSError:
         pass
-    s.bind(("0.0.0.0", LISTEN_PORT))
+    try:
+        s.bind(("0.0.0.0", LISTEN_PORT))
+    except Exception as e:
+        print("[提示] 端口 %d 占用中(%s)，画面显示关闭。是不是已经开了一个本程序？" % (LISTEN_PORT, e))
+        return
     print("画面监听 udp 0.0.0.0:%d ..." % LISTEN_PORT)
     t0 = time.time(); n0 = 0
     while True:
