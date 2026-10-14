@@ -71,20 +71,46 @@ def kb_set(bit, down):
     kb_ev.set()
 
 
+def key_vk(key):
+    # 方向键回来的是 Key 枚举成员, 它没有 .vk (vk 在 key.value.vk 里)
+    vk = getattr(key, "vk", None)
+    if vk is None:
+        vk = getattr(getattr(key, "value", None), "vk", None)
+    return vk
+
+
 def start_listener():
     try:
         from pynput import keyboard
     except Exception as e:
         print("[提示] 没有 pynput，键盘发送功能关闭（画面照常显示）。原因: %s" % e)
         return
+    keymap = {
+        keyboard.Key.left : 0,
+        keyboard.Key.right: 1,
+        keyboard.Key.down : 2,
+        keyboard.Key.up   : 3,
+    }
+    seen = set()
+
+    def one_key(key, down):
+        b = None
+        if key in keymap:
+            b = keymap[key]
+        else:
+            vk = key_vk(key)
+            if vk in VK_BITS:
+                b = VK_BITS[vk]
+            elif vk is not None and vk not in seen:
+                seen.add(vk)
+                print("[未识别] %r  vk=%s  (要用它就把 vk 加进脚本顶部的 VK_BITS)" % (key, vk))
+        if b is not None:
+            kb_set(b, down)
+
     def on_press(key):
-        vk = getattr(key, "vk", None)
-        if vk in VK_BITS:
-            kb_set(VK_BITS[vk], True)
+        one_key(key, True)
     def on_release(key):
-        vk = getattr(key, "vk", None)
-        if vk in VK_BITS:
-            kb_set(VK_BITS[vk], False)
+        one_key(key, False)
     lis = keyboard.Listener(on_press=on_press, on_release=on_release)
     lis.daemon = True
     lis.start()
