@@ -143,6 +143,9 @@ wire hold_p     = hold_p_flag   | kb_hold_p;
 //    ª≠√Ê ‰≥ˆ
     wire clear;
     wire [2:0]speed_level;
+    wire [19:0]score;
+    wire [15:0]lines;
+    wire [13:0]time_sec;
    
    frame frame_inst(
     .Clk_74M(Clk_74M),
@@ -164,7 +167,10 @@ wire hold_p     = hold_p_flag   | kb_hold_p;
     .over(over),
     .rgb(rgb),
     .clear(clear),
-    .speed_level(speed_level)
+    .speed_level(speed_level),
+    .score(score),
+    .lines(lines),
+    .time_sec(time_sec)
     );
     
 //   “Ù∆µ ‰≥ˆ
@@ -202,6 +208,11 @@ wire hold_p     = hold_p_flag   | kb_hold_p;
     .hcounter(hcounter),
     .vcounter(vcounter),
     .rgb(rgb),
+    .Finalize(Finalize),
+    .res_score(score),
+    .res_level(speed_level),
+    .res_lines(lines),
+    .res_time(time_sec),
     
     .rgmii_rx_clk_i(rgmii_rx_clk_i),
     .rgmii_rxd(rgmii_rxd),

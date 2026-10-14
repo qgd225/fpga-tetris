@@ -9,7 +9,8 @@ module timer(
     input Finalize,
     input switch_r_flag,
     
-    output lit
+    output lit,
+    output [13:0] seconds
     );
     
     wire point = ( (hcounter >= 396) && (hcounter < 400) && (vcounter >= 32) && (vcounter < 36) )||
@@ -108,6 +109,8 @@ module timer(
     end
     end
     
+    assign seconds = counter3*14'd600 + counter2*14'd60 + counter1*14'd10 + counter0;
+
     integer i;
     
     reg [10:0]X;

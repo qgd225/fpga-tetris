@@ -18,7 +18,10 @@ module frame(
     output reg [23:0]rgb,
     output over,
     output clear,
-    output [2:0]speed_level
+    output [2:0]speed_level,
+    output [19:0]score,
+    output [15:0]lines,
+    output [13:0]time_sec
     );
     
     
@@ -44,11 +47,33 @@ module frame(
     wire [2:0]type_d;
     wire [2:0]hold_type;
     wire en_hold;
-    wire [19:0]score;
     wire land_we;
     wire [19:0]line_t;
     wire clear_flash;
     
+    reg [15:0]lines_total;
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)
+    lines_total <= 16'd0;
+    else if(Finalize)begin
+        if(switch_r_flag)
+        lines_total <= 16'd0;
+        else
+        lines_total <= lines_total;
+        end
+    else if(Stop)
+    lines_total <= lines_total;
+    else if(Playing)begin
+        if(clear_t_t)
+        lines_total <= lines_total + 16'd1;
+        end
+    else
+    lines_total <= 16'd0;
+    end
+
+    assign lines = lines_total;
+
     wire [4:0]cc_t [0:3];
     wire [4:0]rr_t [0:3];
     
@@ -153,7 +178,8 @@ module frame(
     .Stop(Stop),
     .Finalize(Finalize),
     
-    .lit(time_lit)
+    .lit(time_lit),
+    .seconds(time_sec)
     );
     
     wire score_lit;

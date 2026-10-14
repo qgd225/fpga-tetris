@@ -7,6 +7,9 @@ Tetris_text2 以太网：PC 端画面显示 + 键盘按键发送
 FPGA 发来的包：
   行包   : A5 5A 01 | 帧号2B | 行号2B | 1280 个颜色标号(每像素 1B)   共 1287 字节
   调色板 : A5 5A 02 | N | N*(标号,R,G,B)                            共 4+4N 字节
+FPGA 发来的结果包（每局结束进结束画面时发，之后每 500ms 重发一次）：
+  A5 5A 04 | 局序号1B | 分数3B | 等级1B | 累计消行2B | 用时秒2B | 异或校验1B    共 13 字节
+
 本程序发给 FPGA 的按键包：
   A5 5A 03 | 位图1B
     位图: bit0=左  bit1=右  bit2=下  bit3=旋转(上)
@@ -15,13 +18,16 @@ FPGA 发来的包：
 
 注意：FPGA 不回 ARP，所以要先双击一次 tools\一次性-设置静态ARP.bat。
 """
-import socket, sys, threading, time
+import os, socket, sys, threading, time
 
 # ======== 默认参数（要改就改这里）========
 FPGA_IP     = "192.168.0.2"     # FPGA 的 IP（和 net_screen_tx 里 LOCAL_IP 一致）
 FPGA_PORT   = 5000              # FPGA 的 UDP 端口
 LISTEN_PORT = 5000              # 本机监听画面包的端口（不要和别的程序抢）
 RESEND_S    = 0.02              # 按键包重发周期 20ms
+RANK_W      = 260               # 右侧排行榜面板宽度(像素)
+SHOW_RANK   = True              # 屏幕不够宽时自动退回"状态行文字显示"
+DEDUP_SEC   = 10.0              # 同一局序号在这个秒数内的重发只记一条
 # ========================================
 
 W, H = 1280, 720
@@ -40,7 +46,14 @@ pal = dict(DEFAULT_PAL)
 buf = bytearray(W * H)
 line_ok = [0] * H
 lock = threading.Lock()
-stat = {"pkt":0, "line":0, "pal":0, "last_frame":-1, "fps":0.0, "kb":0}
+stat = {"pkt":0, "line":0, "pal":0, "last_frame":-1, "fps":0.0, "kb":0,
+        "res":0, "res_dup":0, "res_bad":0}
+
+res_lock = threading.Lock()
+scores = []
+last_res = {"seq": None, "t": 0.0}
+cur_res = {"got":False, "seq":0, "score":0, "level":0, "lines":0, "secs":0}
+SCORE_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scoreboard.csv")
 
 kb_lock = threading.Lock()
 kb_bits = 0
@@ -180,6 +193,8 @@ def rx_loop():
                     if b+3 < len(d):
                         pal[d[b]] = (d[b+1], d[b+2], d[b+3])
             stat["pal"] += 1
+        elif typ == 4:
+            res_handle(d)
         now = time.time()
         if now - t0 >= 1.0:
             stat["fps"] = (stat["pkt"] - n0) / (now - t0)
@@ -195,7 +210,82 @@ def pal_bytes():
     return bytes(p)
 
 
+def mmss(secs):
+    return "%d:%02d" % (secs // 60, secs % 60)
+
+
+def res_csv_load():
+    try:
+        with open(SCORE_CSV, "r", encoding="utf-8") as f:
+            for ln in f:
+                p = ln.strip().split(",")
+                if len(p) != 6 or p[0] == "time":
+                    continue
+                scores.append({"time":p[0], "seq":int(p[1]), "score":int(p[2]),
+                               "level":int(p[3]), "lines":int(p[4]), "secs":int(p[5])})
+    except Exception:
+        pass
+
+
+def res_csv_append(rec):
+    newfile = not os.path.exists(SCORE_CSV)
+    try:
+        with open(SCORE_CSV, "a", encoding="utf-8") as f:
+            if newfile:
+                f.write("time,seq,score,level,lines,seconds\n")
+            f.write("%s,%d,%d,%d,%d,%d\n" % (rec["time"], rec["seq"], rec["score"],
+                                             rec["level"], rec["lines"], rec["secs"]))
+    except Exception as e:
+        print("[提示] 写成绩文件失败: %s" % e)
+
+
+def top5_text():
+    with res_lock:
+        if not scores:
+            return "还没有成绩"
+        best = sorted(scores, key=lambda r: r["score"], reverse=True)[:5]
+    out = []
+    for i, r in enumerate(best):
+        out.append("%d. %6d 分  L%d  %3d 行  %s" % (i+1, r["score"], r["level"], r["lines"], mmss(r["secs"])))
+    return "\n".join(out)
+
+
+def res_handle(d):
+    if len(d) != 13:
+        stat["res_bad"] += 1
+        return
+    x = 0
+    for b in d[3:12]:
+        x ^= b
+    if x != d[12]:
+        stat["res_bad"] += 1
+        return
+    seq = d[3]
+    rec = {"time": time.strftime("%Y-%m-%d %H:%M:%S"), "seq": seq,
+           "score": (d[4] << 16) | (d[5] << 8) | d[6],
+           "level": d[7] & 7,
+           "lines": (d[8] << 8) | d[9],
+           "secs":  (d[10] << 8) | d[11]}
+    now = time.time()
+    with res_lock:
+        dup = (seq == last_res["seq"]) and ((now - last_res["t"]) < DEDUP_SEC)
+        if dup:
+            stat["res_dup"] += 1
+        else:
+            last_res["seq"] = seq
+            last_res["t"] = now
+            scores.append(rec)
+            stat["res"] += 1
+        cur_res.update(rec)
+        cur_res["got"] = True
+    if not dup:
+        res_csv_append(rec)
+        print("收到成绩: 第%d局  分数=%d  等级=%d  消行=%d  用时=%s" % (seq, rec["score"], rec["level"], rec["lines"], mmss(rec["secs"])))
+
+
 def main():
+    res_csv_load()
+    print("成绩文件: %s" % SCORE_CSV)
     print("画面目标: 监听 %d 端口 <- FPGA" % LISTEN_PORT)
     print("按键目标: 发给 %s:%d（要先跑一次 一次性-设置静态ARP.bat）" % (FPGA_IP, FPGA_PORT))
     threading.Thread(target=rx_loop, daemon=True).start()
@@ -206,11 +296,32 @@ def main():
     root.title("Tetris_text2  (画面 udp:%d  ->  按键 %s:%d)" % (LISTEN_PORT, FPGA_IP, FPGA_PORT))
     label = tk.Label(root, text="等待画面...", fg="white", bg="black", font=("Consolas", 12), anchor="w")
     label.pack(fill="x")
+    cur_lab = None
+    top_lab = None
+    if SHOW_RANK and (root.winfo_screenwidth() >= W + RANK_W + 20):
+        body = tk.Frame(root)
+        body.pack()
+        canvas = tk.Canvas(body, width=W, height=H, highlightthickness=0, bg="black")
+        canvas.pack(side="left")
+        panel = tk.Frame(body, width=RANK_W, height=H, bg="#101010")
+        panel.pack(side="left", fill="y")
+        panel.pack_propagate(False)
+        tk.Label(panel, text="排行榜 Top5", fg="#00E5FF", bg="#101010",
+                 font=("Consolas", 14, "bold")).pack(pady=(12, 8))
+        cur_lab = tk.Label(panel, text="本局: 等待结束...", fg="white", bg="#101010",
+                           font=("Consolas", 11), justify="left", anchor="w")
+        cur_lab.pack(fill="x", padx=10, pady=(0, 12))
+        top_lab = tk.Label(panel, text=top5_text(), fg="#EEEEEE", bg="#101010",
+                           font=("Consolas", 11), justify="left", anchor="nw")
+        top_lab.pack(fill="both", expand=True, padx=10)
+        root.geometry("+0+0")
+    else:
+        canvas = tk.Canvas(root, width=W, height=H, highlightthickness=0, bg="black")
+        canvas.pack()
+
     img = Image.new("P", (W, H), 0)
     img.putpalette(pal_bytes())
     imgtk = ImageTk.PhotoImage(img)
-    canvas = tk.Canvas(root, width=W, height=H, highlightthickness=0, bg="black")
-    canvas.pack()
     item = canvas.create_image(0, 0, anchor="nw", image=imgtk)
 
     def tick():
@@ -221,9 +332,18 @@ def main():
         imgtk.paste(im)
         canvas.itemconfigure(item, image=imgtk)
         missing = line_ok.count(0)
-        label.config(text="pkt=%d 行包=%d pkt/s=%.0f 调色板包=%d 帧号=%d 未收到的行=%d | 按键:%s 已发按键包=%d"
+        with res_lock:
+            best = max([r["score"] for r in scores]) if scores else 0
+        label.config(text="pkt=%d 行包=%d pkt/s=%.0f 调色板包=%d 帧号=%d 未收到的行=%d | 按键:%s 已发按键包=%d | 成绩包=%d 本局=%d分 最高=%d"
                           % (stat["pkt"], stat["line"], stat["fps"], stat["pal"],
-                             stat["last_frame"], missing, kb_text(), stat["kb"]))
+                             stat["last_frame"], missing, kb_text(), stat["kb"],
+                             stat["res"], cur_res["score"], best))
+        if cur_lab is not None:
+            if cur_res["got"]:
+                cur_lab.config(text="本局: %d 分\n等级 %d   消行 %d\n用时 %s\n(第 %d 局)"
+                                    % (cur_res["score"], cur_res["level"], cur_res["lines"],
+                                       mmss(cur_res["secs"]), cur_res["seq"]))
+            top_lab.config(text=top5_text())
         root.after(33, tick)
 
     tick()

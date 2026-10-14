@@ -38,3 +38,6 @@
 # ===== Python 缓存 =====
 __pycache__/
 *.pyc
+
+# ===== 运行时成绩文件 =====
+tools/scoreboard.csv

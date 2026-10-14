@@ -30,7 +30,14 @@ module net_screen_tx(
   output        kb_switch_en,
   output        kb_hold_p,
   output        kb_reset_en,
-  output        kb_activity
+  output        kb_activity,
+
+  //-------- ½á¹ûÊý¾Ý£¨À´×Ô frame£©--------
+  input         Finalize,
+  input  [19:0] res_score,
+  input  [2:0]  res_level,
+  input  [15:0] res_lines,
+  input  [13:0] res_time
 );
 parameter DST_MAC    = 48'hFF_FF_FF_FF_FF_FF;   // Ä¬ÈÏ¹ã²¥£¬PC ¶Ë²»ÓÃÏÈÖªµÀÒ²ÐÐ
 parameter DST_IP     = 32'hFF_FF_FF_FF;
@@ -44,6 +51,8 @@ parameter KB_TIMEOUT = 24'd14_850_000;              // 200ms @74.25MHz Ã»ÓÐ°´¼ü°
 parameter KB_RST_CNT = 25'd1_485_000;               // Ð¡¼üÅÌ9¸´Î»°Ñ Reset_n À­µÍ 20ms
 parameter KB_ACT_CNT = 25'd22_275_000;              // ÊÕµ½°´¼ü°üºó kb_activity ÁÁ 0.3s
 parameter KB_GAP_MAX = 8'd255;                     // °üÄÚ×Ö½Ú¼ä¸ô³¬Ê±=°ü²»ÍêÕû£¬ÖØÐÂÍ¬²½
+parameter RES_LEN    = 16'd13;                     // ½á¹û°ü³¤¶È
+parameter RES_PERIOD = 26'd37_125_000;             // ½áÊø»­ÃæÀïÃ¿ 500ms ÖØ·¢Ò»´Î½á¹û°ü
 
 assign eth_rstn = 1'b1;
 assign eth_mdc  = 1'b1;
@@ -57,13 +66,14 @@ wire       kb_rd_en;
 //============================================================
 reg         tog_line;
 reg         tog_pal;
+reg         tog_res;
 reg  [7:0]  tx_fifo_din;
 wire        tx_fifo_we;
 wire        tx_start_125;
 wire [15:0] tx_len_125;
 wire        pll_locked;
 wire        clk125m;
-reg         len_sel;          // 0=ÐÐ°ü(1287)  1=µ÷É«°å°ü(112)
+reg  [1:0]  len_sel;          // 0=ÐÐ°ü(1287)  1=µ÷É«°å°ü(112)  2=½á¹û°ü(13)
 
 eth_udp_loopback_rgmii eth_udp_loopback_rgmii_inst(
   .reset_n        (Reset_n        ),
@@ -94,6 +104,7 @@ eth_udp_loopback_rgmii eth_udp_loopback_rgmii_inst(
 //============================================================
 reg  gl1, gl2, gl3;
 reg  gp1, gp2, gp3;
+reg  gr1, gr2, gr3;
 
 always@(posedge clk125m or negedge Reset_n)begin
   if(!Reset_n) gl1 <= 1'b0;
@@ -119,12 +130,25 @@ always@(posedge clk125m or negedge Reset_n)begin
   if(!Reset_n) gp3 <= 1'b0;
   else         gp3 <= gp2;
 end
+always@(posedge clk125m or negedge Reset_n)begin
+  if(!Reset_n) gr1 <= 1'b0;
+  else         gr1 <= tog_res;
+end
+always@(posedge clk125m or negedge Reset_n)begin
+  if(!Reset_n) gr2 <= 1'b0;
+  else         gr2 <= gr1;
+end
+always@(posedge clk125m or negedge Reset_n)begin
+  if(!Reset_n) gr3 <= 1'b0;
+  else         gr3 <= gr2;
+end
 
 wire p_line = gl2 ^ gl3;
 wire p_pal  = gp2 ^ gp3;
+wire p_res  = gr2 ^ gr3;
 
-assign tx_start_125 = p_line | p_pal;
-assign tx_len_125   = p_pal ? PAL_LEN : LINE_LEN;
+assign tx_start_125 = p_line | p_pal | p_res;
+assign tx_len_125   = p_pal ? PAL_LEN : (p_res ? RES_LEN : LINE_LEN);
 
 //============================================================
 //    pll_locked Í¬²½µ½ 74.25 Óò
@@ -205,15 +229,17 @@ end
 //============================================================
 //    ÐÐÄ©/³¡Ä© ´ò°üÐòÁÐÆ÷
 //============================================================
-localparam SEQ_IDLE = 3'd0;
-localparam SEQ_HDR  = 3'd1;   // Ð´ÏÂÒ»ÐÐ°üÍ· 7 ×Ö½Ú
-localparam SEQ_TOG  = 3'd2;   // tx_start£¨ÐÐ°ü£©
-localparam SEQ_PAL  = 3'd3;   // Ð´µ÷É«°å°ü
-localparam SEQ_PTOG = 3'd4;   // tx_start£¨µ÷É«°å°ü£©
-localparam SEQ_H0   = 3'd5;   // Ð´ÏÂÒ»Ö¡µÚ 0 ÐÐ°üÍ·
-localparam SEQ_WAIT = 3'd6;   // µÈ MAC ·¢ÍêÉÏÒ»°ü£¨µ÷É«°å°üÓÃ£©
+localparam SEQ_IDLE = 4'd0;
+localparam SEQ_HDR  = 4'd1;   // Ð´ÏÂÒ»ÐÐ°üÍ· 7 ×Ö½Ú
+localparam SEQ_TOG  = 4'd2;   // tx_start£¨ÐÐ°ü£©
+localparam SEQ_PAL  = 4'd3;   // Ð´µ÷É«°å°ü
+localparam SEQ_PTOG = 4'd4;   // tx_start£¨µ÷É«°å°ü£©
+localparam SEQ_H0   = 4'd5;   // Ð´ÏÂÒ»Ö¡µÚ 0 ÐÐ°üÍ·
+localparam SEQ_WAIT = 4'd6;   // µÈ MAC ·¢ÍêÉÏÒ»°ü£¨µ÷É«°å°ü/½á¹û°üÓÃ£©
+localparam SEQ_RES  = 4'd7;   // Ð´½á¹û°ü 13 ×Ö½Ú
+localparam SEQ_RTOG = 4'd8;   // tx_start£¨½á¹û°ü£©
 
-reg [2:0]  seq;
+reg [3:0]  seq;
 reg [6:0]  seq_idx;
 reg [15:0] frame_cnt;
 reg [3:0]  fps_cnt;
@@ -229,6 +255,80 @@ wire frame_on  = (fps_cnt == 4'd0);
 wire pal_due   = (pal_cnt == PAL_FRAMES - 1);
 wire send_pal  = line_719 && pal_due && frame_on;
 
+//============================================================
+//    ½á¹û°ü£º½ø½áÊø»­ÃæºóÃ¿ 500ms ·¢Ò»´Î£¬Ö±µ½Íæ¼ÒÖØ¿ª
+//============================================================
+reg         h0_lat;
+reg         pal_lat;
+reg         res_lat;
+reg         res_done;
+reg         fin_d;
+reg  [7:0]  res_no;
+reg  [25:0] res_cnt;
+
+wire fin_rise = Finalize && (!fin_d);
+wire res_due  = Finalize && (res_cnt == 26'd0);
+
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n) h0_lat <= 1'b0;
+  else if(seq == SEQ_TOG) h0_lat <= line_719;
+end
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n) pal_lat <= 1'b0;
+  else if(seq == SEQ_TOG) pal_lat <= send_pal;
+end
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n) res_lat <= 1'b0;
+  else if(seq == SEQ_TOG) res_lat <= res_due && line_719 && frame_on;
+end
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n) res_done <= 1'b0;
+  else if(seq == SEQ_TOG) res_done <= 1'b0;
+  else if(seq == SEQ_RTOG) res_done <= 1'b1;
+end
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n) fin_d <= 1'b0;
+  else fin_d <= Finalize;
+end
+
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n) res_no <= 8'd0;
+  else if(fin_rise) res_no <= res_no + 8'd1;
+end
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n) res_cnt <= 26'd0;
+  else if(!Finalize) res_cnt <= 26'd0;
+  else if(seq == SEQ_RTOG) res_cnt <= RES_PERIOD;
+  else if(res_cnt != 26'd0) res_cnt <= res_cnt - 26'd1;
+end
+
+reg [7:0] xor_res;
+always@(*)begin
+  xor_res = res_no ^ {4'd0,res_score[19:16]} ^ res_score[15:8] ^ res_score[7:0]
+          ^ {5'd0,res_level} ^ res_lines[15:8] ^ res_lines[7:0]
+          ^ {2'd0,res_time[13:8]} ^ res_time[7:0];
+end
+
+reg [7:0] res_byte;
+always@(*)begin
+  case(seq_idx)
+  7'd0:  res_byte = 8'hA5;
+  7'd1:  res_byte = 8'h5A;
+  7'd2:  res_byte = 8'd4;
+  7'd3:  res_byte = res_no;
+  7'd4:  res_byte = {4'd0,res_score[19:16]};
+  7'd5:  res_byte = res_score[15:8];
+  7'd6:  res_byte = res_score[7:0];
+  7'd7:  res_byte = {5'd0,res_level};
+  7'd8:  res_byte = res_lines[15:8];
+  7'd9:  res_byte = res_lines[7:0];
+  7'd10: res_byte = {2'd0,res_time[13:8]};
+  7'd11: res_byte = res_time[7:0];
+  7'd12: res_byte = xor_res;
+  default: res_byte = 8'h00;
+  endcase
+end
+
 always@(posedge Clk_74M or negedge Reset_n)begin
   if(!Reset_n)
   seq <= SEQ_IDLE;
@@ -236,10 +336,19 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   case(seq)
   SEQ_IDLE: if(de_fall && frame_on && link_up)
             seq <= SEQ_TOG;
-  SEQ_TOG:  if(send_pal)        seq <= SEQ_WAIT;
-            else if(line_719)   seq <= SEQ_H0;
-            else                seq <= SEQ_HDR;
-  SEQ_WAIT: if(wait_cnt == 11'd1023 && (!de_r)) seq <= SEQ_PAL;
+  SEQ_TOG:  if((res_due && line_719 && frame_on) || send_pal) seq <= SEQ_WAIT;
+            else if(line_719)                                 seq <= SEQ_H0;
+            else                                              seq <= SEQ_HDR;
+  SEQ_WAIT: if(wait_cnt == 11'd1023 && (!de_r))begin
+                if(res_lat && (!res_done)) seq <= SEQ_RES;
+                else if(pal_lat)           seq <= SEQ_PAL;
+                else if(h0_lat)            seq <= SEQ_H0;
+                else                       seq <= SEQ_HDR;
+            end
+  SEQ_RES:  if(seq_idx == 7'd12) seq <= SEQ_RTOG;
+  SEQ_RTOG: if(pal_lat)          seq <= SEQ_WAIT;
+            else if(h0_lat)      seq <= SEQ_H0;
+            else                 seq <= SEQ_HDR;
   SEQ_HDR:  if(seq_idx == 7'd6)   seq <= SEQ_IDLE;
   SEQ_PAL:  if(seq_idx == 7'd111) seq <= SEQ_PTOG;
   SEQ_PTOG: seq <= SEQ_H0;
@@ -251,10 +360,12 @@ end
 always@(posedge Clk_74M or negedge Reset_n)begin
   if(!Reset_n)
   seq_idx <= 7'd0;
-  else if(seq == SEQ_IDLE || seq == SEQ_TOG || seq == SEQ_PTOG || seq == SEQ_WAIT)
+  else if(seq == SEQ_IDLE || seq == SEQ_TOG || seq == SEQ_PTOG || seq == SEQ_WAIT || seq == SEQ_RTOG)
   seq_idx <= 7'd0;
   else if(seq == SEQ_PAL)
   seq_idx <= (seq_idx == 7'd111) ? 7'd0 : (seq_idx + 7'd1);
+  else if(seq == SEQ_RES)
+  seq_idx <= (seq_idx == 7'd12) ? 7'd0 : (seq_idx + 7'd1);
   else
   seq_idx <= (seq_idx == 7'd6) ? 7'd0 : (seq_idx + 7'd1);
 end
@@ -262,7 +373,7 @@ end
 always@(posedge Clk_74M or negedge Reset_n)begin
   if(!Reset_n)
   start_pulse_74 <= 1'b0;
-  else if((seq == SEQ_TOG || seq == SEQ_PTOG) && (!first))
+  else if((seq == SEQ_TOG || seq == SEQ_PTOG || seq == SEQ_RTOG) && (!first))
   start_pulse_74 <= 1'b1;
   else
   start_pulse_74 <= 1'b0;
@@ -278,20 +389,26 @@ always@(posedge Clk_74M or negedge Reset_n)begin
 end
 always@(posedge Clk_74M or negedge Reset_n)begin
   if(!Reset_n) tog_line <= 1'b0;
-  else if(start_pulse_74 && (!len_sel)) tog_line <= ~tog_line;
+  else if(start_pulse_74 && (len_sel == 2'd0)) tog_line <= ~tog_line;
 end
 always@(posedge Clk_74M or negedge Reset_n)begin
   if(!Reset_n) tog_pal <= 1'b0;
-  else if(start_pulse_74 && len_sel) tog_pal <= ~tog_pal;
+  else if(start_pulse_74 && (len_sel == 2'd1)) tog_pal <= ~tog_pal;
+end
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n) tog_res <= 1'b0;
+  else if(start_pulse_74 && (len_sel == 2'd2)) tog_res <= ~tog_res;
 end
 
 always@(posedge Clk_74M or negedge Reset_n)begin
   if(!Reset_n)
-  len_sel <= 1'b0;
+  len_sel <= 2'd0;
   else if(seq == SEQ_PAL)
-  len_sel <= 1'b1;
+  len_sel <= 2'd1;
+  else if(seq == SEQ_RES)
+  len_sel <= 2'd2;
   else if(seq == SEQ_HDR || seq == SEQ_H0)
-  len_sel <= 1'b0;
+  len_sel <= 2'd0;
 end
 
 always@(posedge Clk_74M or negedge Reset_n)begin
@@ -397,13 +514,15 @@ always@(*)begin
 end
 
 //============================================================
-//    FIFO Ð´£ºÏñËØ / °üÍ· / µ÷É«°å
+//    FIFO Ð´£ºÏñËØ / °üÍ· / µ÷É«°å / ½á¹û°ü
 //============================================================
 always@(*)begin
   if(seq == SEQ_HDR || seq == SEQ_H0)
   tx_fifo_din = hdr_byte;
   else if(seq == SEQ_PAL)
   tx_fifo_din = pal_byte;
+  else if(seq == SEQ_RES)
+  tx_fifo_din = res_byte;
   else if(de_r)
   tx_fifo_din = code_r;
   else
@@ -411,7 +530,7 @@ always@(*)begin
 end
 
 assign tx_fifo_we = ((de_r && frame_on && link_up && armed)
-                  || (seq == SEQ_HDR) || (seq == SEQ_PAL) || (seq == SEQ_H0));
+                  || (seq == SEQ_HDR) || (seq == SEQ_PAL) || (seq == SEQ_H0) || (seq == SEQ_RES));
 
 always@(posedge Clk_74M or negedge Reset_n)begin
   if(!Reset_n) wait_cnt <= 11'd0;
