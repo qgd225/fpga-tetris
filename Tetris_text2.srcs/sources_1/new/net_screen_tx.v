@@ -17,7 +17,19 @@ module net_screen_tx(
   output        rgmii_txen,
   output        eth_rstn,
   output        eth_mdc,
-  output        eth_mdio
+  output        eth_mdio,
+
+  //-------- 键盘(网络)按键：形状与物理按键一致 --------
+  output        kb_left_p,
+  output        kb_right_p,
+  output        kb_drop_r,
+  output        kb_drop_en,
+  output        kb_rotate_p,
+  output        kb_switch_r,
+  output        kb_switch_en,
+  output        kb_hold_p,
+  output        kb_reset_en,
+  output        kb_activity
 );
 parameter DST_MAC    = 48'hFF_FF_FF_FF_FF_FF;   // 默认广播，PC 端不用先知道也行
 parameter DST_IP     = 32'hFF_FF_FF_FF;
@@ -27,6 +39,7 @@ parameter PAL_FRAMES = 60;                       // 每 60 帧插一个调色板包(=1s@6
 parameter LINE_LEN   = 16'd1287;                 // 7 字节包头 + 1280 个标号
 parameter PAL_LEN    = 16'd112;                  // 4 + 27*4
 parameter PAL_N      = 8'd27;
+parameter KB_TIMEOUT = 24'd14_850_000;              // 200ms @74.25MHz 没有按键包就全部松开
 
 assign eth_rstn = 1'b1;
 assign eth_mdc  = 1'b1;
