@@ -125,18 +125,24 @@ wire hold_p     = hold_p_flag   | kb_hold_p;
     wire Stop;
     wire Finalize;
     wire over;
+    wire choose;
+    wire [3:0]choose_cnt;
     
     Game_state_machine Game_state_machine_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
+    .left_p(left_p),
+    .right_p(right_p),
     .switch_r_flag(switch_r_f),
     .switch_en(switch_e),
     .over(over),
     
+    .Choose(choose),
     .Idle(Idle),
     .Playing(Playing),
     .Stop(Stop),
-    .Finalize(Finalize)
+    .Finalize(Finalize),
+    .choose_cnt(choose_cnt)
     );
 
     
@@ -159,7 +165,7 @@ wire hold_p     = hold_p_flag   | kb_hold_p;
     .rotate_p_flag(rotate_p),
     .switch_r_flag(switch_r_f),
     .hold_p_flag(hold_p),
-    .Idle(Idle),
+    .Idle(Idle | choose),
     .Playing(Playing),
     .Stop(Stop),
     .Finalize(Finalize),
@@ -179,7 +185,7 @@ wire hold_p     = hold_p_flag   | kb_hold_p;
     music music_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
-    .Idle(Idle),
+    .Idle(Idle | choose),
     .speed_level(speed_level),
     
     .buzz_main(buzz_main)

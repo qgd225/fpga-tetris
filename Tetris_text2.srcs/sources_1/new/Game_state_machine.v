@@ -2,22 +2,27 @@ module Game_state_machine(
     input Clk_74M,
     input Reset_n,
     
+    input left_p,
+    input right_p,
     input switch_r_flag,
     input switch_en,
     input over,
     
+    output wire Choose,
     output wire Idle,
     output wire Playing,
     output wire Stop,
-    output wire Finalize
+    output wire Finalize,
+    output reg [3:0]choose_cnt
     );
     
+    
+    parameter MCNT = 74_250_000;
+    parameter [3:0]CHOOSE_MAX = 4'd2;
     
 //    按键信号处理
     reg [26:0]counter;
     reg short_press_ok;
-    
-    parameter MCNT = 74_250_000;
     
     wire hold_pulse  = (counter == MCNT) && (short_press_ok); 
     wire short_press = (short_press_ok) && (switch_r_flag);
@@ -29,7 +34,7 @@ module Game_state_machine(
     counter <= 30'd0;
     else if(counter < MCNT)
     counter <= counter + 30'd1;
-
+    
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     short_press_ok <= 1'b1;
@@ -39,28 +44,48 @@ module Game_state_machine(
     short_press_ok <= 1'b1;
     end
     
+//    模式选择计数器
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)
+    choose_cnt <= 4'd0;
+    else if(Choose)begin
+        if(left_p)
+        choose_cnt <= (choose_cnt == 4'd0) ? CHOOSE_MAX : (choose_cnt - 4'd1);
+        else if(right_p)
+        choose_cnt <= (choose_cnt == CHOOSE_MAX) ? 4'd0 : (choose_cnt + 4'd1);
+    end
+    else if(Idle && hold_pulse)
+    choose_cnt <= 4'd0;
+    end
+    
 //    状态转换
-    localparam Idle_en = 4'b0001;
-    localparam Playing_en = 4'b0010;
-    localparam Stop_en = 4'b0100;
-    localparam Finalize_en = 4'b1000;
+    localparam Choose_en   = 5'b00001;
+    localparam Idle_en     = 5'b00010;
+    localparam Playing_en  = 5'b00100;
+    localparam Stop_en     = 5'b01000;
+    localparam Finalize_en = 5'b10000;
     
-    reg [3:0]state;
+    reg [4:0]state;
     
     
-    assign Idle = state[0];
-    assign Playing = state[1];
-    assign Stop = state[2];
-    assign Finalize = state[3];
+    assign Choose   = state[0];
+    assign Idle     = state[1];
+    assign Playing  = state[2];
+    assign Stop     = state[3];
+    assign Finalize = state[4];
     
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
-    state <= Idle_en;
+    state <= Choose_en;
     else 
     case(state)
-    Idle_en:    if(short_press)
+    Choose_en:  if(short_press)
+                state <= Idle_en;
+    Idle_en:    if(hold_pulse)
+                state <= Choose_en;
+                else if(short_press)
                 state <= Playing_en;
-    Playing_en:if(hold_pulse)
+    Playing_en: if(hold_pulse)
                 state <= Idle_en;
                 else if(short_press)
                 state <= Stop_en;
@@ -74,8 +99,8 @@ module Game_state_machine(
                 state <= Idle_en;
                 else if(short_press)
                 state <= Playing_en;
-    default:    state <= Playing_en;
+    default:    state <= Idle_en;
     endcase
     end
-      
+       
 endmodule
