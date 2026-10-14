@@ -1,22 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Tetris_text2  以太网画面接收端（验收用最小版本）
+Tetris_text2 以太网：PC 端画面显示 + 键盘按键发送
+双击 tools\启动-画面和按键.bat 即可运行（无需命令行参数）
+
 FPGA 发来的包：
   行包   : A5 5A 01 | 帧号2B | 行号2B | 1280 个颜色标号(每像素 1B)   共 1287 字节
   调色板 : A5 5A 02 | N | N*(标号,R,G,B)                            共 4+4N 字节
-用法：
-  pip install pillow
-  python net_screen_view.py [监听端口]      # 默认 5000（要和 FPGA 的 tx_dst_port 一致）
+本程序发给 FPGA 的按键包：
+  A5 5A 03 | 位图1B
+    位图: bit0=左  bit1=右  bit2=下  bit3=旋转(上)
+          bit4=小键盘0(保持)  bit5=小键盘5(开始/暂停)  bit6=小键盘9(复位)
+  按下/松开立刻发一包，另外每 20ms 无条件重发一包（丢包 20ms 自愈）
+
+注意：FPGA 不回 ARP，所以要先双击一次 tools\一次性-设置静态ARP.bat。
 """
 import socket, sys, threading, time
-import tkinter as tk
-from PIL import Image, ImageTk
+
+# ======== 默认参数（要改就改这里）========
+FPGA_IP     = "192.168.0.2"     # FPGA 的 IP（和 net_screen_tx 里 LOCAL_IP 一致）
+FPGA_PORT   = 5000              # FPGA 的 UDP 端口
+LISTEN_PORT = 5000              # 本机监听画面包的端口（不要和别的程序抢）
+RESEND_S    = 0.02              # 按键包重发周期 20ms
+# ========================================
 
 W, H = 1280, 720
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5000
 
-# 默认调色板（与 frame.v 的 27 种颜色一致，收到 FPGA 的调色板包会自动覆盖）
 DEFAULT_PAL = {
     0:(0x00,0x00,0x00), 1:(0x00,0xCC,0xFF), 2:(0x99,0x33,0xCC), 3:(0xFF,0xFF,0x00),
     4:(0xE6,0x39,0x46), 5:(0x55,0xA6,0x30), 6:(0xF7,0x7F,0x24), 7:(0xFF,0x4D,0xA6),
@@ -26,21 +35,97 @@ DEFAULT_PAL = {
     20:(0x60,0x60,0x60),21:(0x90,0x90,0x90),22:(0xB0,0xB0,0xB0), 23:(0xD8,0xD8,0xD8),
     24:(0x30,0x30,0x30),25:(0x00,0xE5,0xFF),26:(0x00,0x69,0x7F),
 }
+
 pal = dict(DEFAULT_PAL)
-buf = bytearray(W * H)          # 每字节一个标号
-line_ok = [0] * H               # 每行是否收到过
+buf = bytearray(W * H)
+line_ok = [0] * H
 lock = threading.Lock()
-stat = {"pkt":0, "line":0, "pal":0, "last_frame":-1, "fps":0.0}
+stat = {"pkt":0, "line":0, "pal":0, "last_frame":-1, "fps":0.0, "kb":0}
+
+kb_lock = threading.Lock()
+kb_bits = 0
+kb_ev = threading.Event()
+
+VK_BITS = {37:0, 39:1, 40:2, 38:3, 96:4, 101:5, 105:6}
+BIT_NAME = ["左", "右", "下", "旋转(上)", "小键盘0 保持", "小键盘5 开始/暂停", "小键盘9 复位", "-"]
+
+
+def kb_packet(bits):
+    return bytes(bytearray([0xA5, 0x5A, 0x03, bits & 0xFF]))
+
+
+def kb_text():
+    with kb_lock:
+        b = kb_bits
+    s = [BIT_NAME[i] for i in range(7) if (b >> i) & 1]
+    return ("+".join(s)) if s else "无"
+
+
+def kb_set(bit, down):
+    global kb_bits
+    with kb_lock:
+        if down:
+            kb_bits |= (1 << bit)
+        else:
+            kb_bits &= ~(1 << bit)
+    kb_ev.set()
+
+
+def start_listener():
+    try:
+        from pynput import keyboard
+    except Exception as e:
+        print("[提示] 没有 pynput，键盘发送功能关闭（画面照常显示）。原因: %s" % e)
+        return
+    def on_press(key):
+        vk = getattr(key, "vk", None)
+        if vk in VK_BITS:
+            kb_set(VK_BITS[vk], True)
+    def on_release(key):
+        vk = getattr(key, "vk", None)
+        if vk in VK_BITS:
+            kb_set(VK_BITS[vk], False)
+    lis = keyboard.Listener(on_press=on_press, on_release=on_release)
+    lis.daemon = True
+    lis.start()
+    print("键盘已接管: 方向键=左/右/下/上(上=旋转), 小键盘 5=开始暂停 0=保持 9=复位 (请打开 NumLock)")
+
+
+try:
+    import ctypes
+    ctypes.windll.winmm.timeBeginPeriod(1)     # 让 20ms 定时/重发更准
+except Exception:
+    pass
+
+
+def tx_loop():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    nxt = time.time()
+    while True:
+        now = time.time()
+        if kb_ev.is_set() or now >= nxt:
+            kb_ev.clear()
+            nxt = now + RESEND_S
+            with kb_lock:
+                bits = kb_bits
+            try:
+                s.sendto(kb_packet(bits), (FPGA_IP, FPGA_PORT))
+                stat["kb"] += 1
+            except Exception:
+                pass
+        else:
+            time.sleep(0.002)
+
 
 def rx_loop():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 8*1024*1024)  # 关键：接收缓冲调大
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 8 * 1024 * 1024)
     except OSError:
         pass
-    s.bind(("0.0.0.0", PORT))
-    print("listening udp 0.0.0.0:%d ..." % PORT)
+    s.bind(("0.0.0.0", LISTEN_PORT))
+    print("画面监听 udp 0.0.0.0:%d ..." % LISTEN_PORT)
     t0 = time.time(); n0 = 0
     while True:
         d, addr = s.recvfrom(2048)
@@ -70,6 +155,7 @@ def rx_loop():
             stat["fps"] = (stat["pkt"] - n0) / (now - t0)
             n0 = stat["pkt"]; t0 = now
 
+
 def pal_bytes():
     p = bytearray(768)
     with lock:
@@ -78,11 +164,17 @@ def pal_bytes():
                 p[k*3] = v[0]; p[k*3+1] = v[1]; p[k*3+2] = v[2]
     return bytes(p)
 
+
 def main():
+    print("画面目标: 监听 %d 端口 <- FPGA" % LISTEN_PORT)
+    print("按键目标: 发给 %s:%d（要先跑一次 一次性-设置静态ARP.bat）" % (FPGA_IP, FPGA_PORT))
     threading.Thread(target=rx_loop, daemon=True).start()
+    start_listener()
+    threading.Thread(target=tx_loop, daemon=True).start()
+
     root = tk.Tk()
-    root.title("Tetris net screen  (udp:%d)" % PORT)
-    label = tk.Label(root, text="waiting...", fg="white", bg="black", font=("Consolas", 12), anchor="w")
+    root.title("Tetris_text2  (画面 udp:%d  ->  按键 %s:%d)" % (LISTEN_PORT, FPGA_IP, FPGA_PORT))
+    label = tk.Label(root, text="等待画面...", fg="white", bg="black", font=("Consolas", 12), anchor="w")
     label.pack(fill="x")
     img = Image.new("P", (W, H), 0)
     img.putpalette(pal_bytes())
@@ -99,12 +191,36 @@ def main():
         imgtk.paste(im)
         canvas.itemconfigure(item, image=imgtk)
         missing = line_ok.count(0)
-        label.config(text="pkt=%d  行包=%d pkt/s=%.0f  调色板包=%d  帧号=%d  未收到的行=%d"
-                          % (stat["pkt"], stat["line"], stat["fps"], stat["pal"], stat["last_frame"], missing))
+        label.config(text="pkt=%d 行包=%d pkt/s=%.0f 调色板包=%d 帧号=%d 未收到的行=%d | 按键:%s 已发按键包=%d"
+                          % (stat["pkt"], stat["line"], stat["fps"], stat["pal"],
+                             stat["last_frame"], missing, kb_text(), stat["kb"]))
         root.after(33, tick)
 
     tick()
     root.mainloop()
 
+
+try:
+    import tkinter as tk
+    from PIL import Image, ImageTk
+except Exception as _e:
+    print("启动失败: 缺少图形依赖（%s）" % _e)
+    print("请双击 启动-画面和按键.bat，它会自动 pip install pillow pynput")
+    try:
+        input("按回车退出...")
+    except Exception:
+        pass
+    sys.exit(1)
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as _e:
+        import traceback
+        traceback.print_exc()
+        print("出错了: %s" % _e)
+        try:
+            input("按回车退出...")
+        except Exception:
+            pass
+        sys.exit(1)

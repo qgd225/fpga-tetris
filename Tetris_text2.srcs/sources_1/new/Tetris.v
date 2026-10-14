@@ -38,7 +38,18 @@ module Tetris(
     wire por_n = por_cnt[19];
     wire rst_key_en;
     
-    wire Reset_n = (por_n) && (!rst_key_en);
+    wire kb_left_p;
+    wire kb_right_p;
+    wire kb_drop_r;
+    wire kb_drop_en;
+    wire kb_rotate_p;
+    wire kb_switch_r;
+    wire kb_switch_en;
+    wire kb_hold_p;
+    wire kb_reset_en;
+    wire kb_activity;
+
+    wire Reset_n = (por_n) && (!rst_key_en) && (!kb_reset_en);
     
  
     
@@ -98,6 +109,15 @@ module Tetris(
     .rst_key_en(rst_key_en),
     .hold_p_flag(hold_p_flag)
     );
+
+wire left_p     = left_p_flag   | kb_left_p;
+wire right_p    = right_p_flag  | kb_right_p;
+wire drop_r_f   = drop_r_flag   | kb_drop_r;
+wire drop_e     = drop_en       | kb_drop_en;
+wire rotate_p   = rotate_p_flag | kb_rotate_p;
+wire switch_r_f = switch_r_flag | kb_switch_r;
+wire switch_e   = switch_en     | kb_switch_en;
+wire hold_p     = hold_p_flag   | kb_hold_p;
     
 //    ÓÎÏ·×´Ì¬»ú
     wire Idle;  
@@ -109,8 +129,8 @@ module Tetris(
     Game_state_machine Game_state_machine_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
-    .switch_r_flag(switch_r_flag),
-    .switch_en(switch_en),
+    .switch_r_flag(switch_r_f),
+    .switch_en(switch_e),
     .over(over),
     
     .Idle(Idle),
@@ -129,13 +149,13 @@ module Tetris(
     .Reset_n(Reset_n),
     .hcounter(hcounter),
     .vcounter(vcounter),
-    .left_p_flag(left_p_flag),
-    .right_p_flag(right_p_flag),
-    .drop_r_flag(drop_r_flag),
-    .drop_en(drop_en),
-    .rotate_p_flag(rotate_p_flag),
-    .switch_r_flag(switch_r_flag),
-    .hold_p_flag(hold_p_flag),
+    .left_p_flag(left_p),
+    .right_p_flag(right_p),
+    .drop_r_flag(drop_r_f),
+    .drop_en(drop_e),
+    .rotate_p_flag(rotate_p),
+    .switch_r_flag(switch_r_f),
+    .hold_p_flag(hold_p),
     .Idle(Idle),
     .Playing(Playing),
     .Stop(Stop),
@@ -164,10 +184,10 @@ module Tetris(
     .Reset_n(Reset_n),
     .over(over),
     .clear(clear),
-    .drop(drop_r_flag),
-    .rotate(rotate_p_flag),
-    .right(right_p_flag),
-    .left(left_p_flag),
+    .drop(drop_r_f),
+    .rotate(rotate_p),
+    .right(right_p),
+    .left(left_p),
     
     .buzz_else(buzz_else)
     );
@@ -177,6 +197,7 @@ module Tetris(
     net_screen_tx net_screen_tx_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
+    .por_n(por_n),
     .de(hdmi_de),
     .hcounter(hcounter),
     .vcounter(vcounter),
@@ -190,7 +211,18 @@ module Tetris(
     .rgmii_txen(rgmii_txen),
     .eth_rstn(eth_rstn),
     .eth_mdc(eth_mdc),
-    .eth_mdio(eth_mdio)
+    .eth_mdio(eth_mdio),
+
+    .kb_left_p(kb_left_p),
+    .kb_right_p(kb_right_p),
+    .kb_drop_r(kb_drop_r),
+    .kb_drop_en(kb_drop_en),
+    .kb_rotate_p(kb_rotate_p),
+    .kb_switch_r(kb_switch_r),
+    .kb_switch_en(kb_switch_en),
+    .kb_hold_p(kb_hold_p),
+    .kb_reset_en(kb_reset_en),
+    .kb_activity(kb_activity)
     );
 
 endmodule

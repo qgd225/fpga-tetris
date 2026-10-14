@@ -34,3 +34,7 @@
 /Tetris_text2.srcs/sources_1/new/num.v
 /Tetris_text2.srcs/sources_1/ip/blk_mem_gen_0/
 /Tetris_text2.srcs/sources_1/ip/number/
+
+# ===== Python 缓存 =====
+__pycache__/
+*.pyc

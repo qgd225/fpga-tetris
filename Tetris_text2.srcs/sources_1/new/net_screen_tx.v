@@ -1,6 +1,7 @@
 module net_screen_tx(
   input         Clk_74M,
   input         Reset_n,
+  input         por_n,
 
   //-------- 画面输入（来自 hdmi / frame）--------
   input         de,             // 1 = 当前像素在有效区(1280x720)
@@ -40,10 +41,16 @@ parameter LINE_LEN   = 16'd1287;                 // 7 字节包头 + 1280 个标号
 parameter PAL_LEN    = 16'd112;                  // 4 + 27*4
 parameter PAL_N      = 8'd27;
 parameter KB_TIMEOUT = 24'd14_850_000;              // 200ms @74.25MHz 没有按键包就全部松开
+parameter KB_RST_CNT = 25'd1_485_000;               // 小键盘9复位把 Reset_n 拉低 20ms
+parameter KB_ACT_CNT = 25'd22_275_000;              // 收到按键包后 kb_activity 亮 0.3s
+parameter KB_GAP_MAX = 8'd255;                     // 包内字节间隔超时=包不完整，重新同步
 
 assign eth_rstn = 1'b1;
 assign eth_mdc  = 1'b1;
 assign eth_mdio = 1'b1;
+wire [7:0] rx_byte;
+wire       rx_empty;
+wire       kb_rd_en;
 
 //============================================================
 //    eth_udp_loopback_rgmii 例化
@@ -68,7 +75,9 @@ eth_udp_loopback_rgmii eth_udp_loopback_rgmii_inst(
   .rgmii_tx_clk   (rgmii_tx_clk   ),
   .rgmii_txd      (rgmii_txd      ),
   .rgmii_txen     (rgmii_txen     ),
-  .rx_rd_en       (1'b0           ),          // 键盘以后再加
+  .rx             (rx_byte        ),
+  .rx_empty       (rx_empty       ),
+  .rx_rd_en       (kb_rd_en       ),
   .tx             (tx_fifo_din    ),
   .tx_wr_en       (tx_fifo_we     ),
   .tx_start       (tx_start_125   ),
@@ -409,4 +418,117 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else if(seq == SEQ_WAIT) wait_cnt <= wait_cnt + 11'd1;
   else wait_cnt <= 11'd0;
 end
+//============================================================
+//    网络按键：从接收 FIFO 解析 A5 5A 03 | 位图
+//============================================================
+localparam KB_WA5 = 2'd0;
+localparam KB_W5A = 2'd1;
+localparam KB_W03 = 2'd2;
+localparam KB_BIT = 2'd3;
+
+reg  [1:0]  kb_st;
+reg  [7:0]  kb_bits;
+reg  [7:0]  kb_bits_d;
+reg  [23:0] kb_timer;
+reg  [24:0] kb_act_cnt;
+reg  [24:0] kb_rst_cnt;
+reg  [7:0]  kb_gap;
+reg         kb_rst_hold;
+
+wire kb_hit      = kb_rd_en && (kb_st == KB_BIT);
+wire kb_gap_done = (kb_gap >= KB_GAP_MAX);
+wire kb_tout     = (kb_timer >= KB_TIMEOUT);
+wire kb_rst_trig = kb_bits[6] && (!kb_bits_d[6]);
+
+assign kb_rd_en = (!rx_empty);
+
+
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n)
+  kb_st <= KB_WA5;
+  else if(kb_rd_en)
+  case(kb_st)
+  KB_WA5: kb_st <= (rx_byte == 8'hA5) ? KB_W5A : KB_WA5;
+  KB_W5A: kb_st <= (rx_byte == 8'h5A) ? KB_W03 : ((rx_byte == 8'hA5) ? KB_W5A : KB_WA5);
+  KB_W03: kb_st <= (rx_byte == 8'd3)  ? KB_BIT : ((rx_byte == 8'hA5) ? KB_W5A : KB_WA5);
+  KB_BIT: kb_st <= KB_WA5;
+  default:kb_st <= KB_WA5;
+  endcase
+  else if(kb_gap_done)
+  kb_st <= KB_WA5;
+end
+
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n)
+  kb_gap <= 8'd0;
+  else if(kb_rd_en)
+  kb_gap <= 8'd0;
+  else if(kb_gap < KB_GAP_MAX)
+  kb_gap <= kb_gap + 8'd1;
+end
+
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n)
+  kb_bits <= 8'd0;
+  else if(kb_hit)
+  kb_bits <= rx_byte;
+  else if(kb_tout)
+  kb_bits <= 8'd0;
+end
+
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n)
+  kb_bits_d <= 8'd0;
+  else
+  kb_bits_d <= kb_bits;
+end
+
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n)
+  kb_timer <= 24'd0;
+  else if(kb_hit)
+  kb_timer <= 24'd0;
+  else if(kb_timer < KB_TIMEOUT)
+  kb_timer <= kb_timer + 24'd1;
+end
+
+always@(posedge Clk_74M or negedge Reset_n)begin
+  if(!Reset_n)
+  kb_act_cnt <= 25'd0;
+  else if(kb_hit)
+  kb_act_cnt <= KB_ACT_CNT;
+  else if(kb_act_cnt != 25'd0)
+  kb_act_cnt <= kb_act_cnt - 25'd1;
+end
+
+//    小键盘9复位：把 Reset_n 拉低一段时间，等效按板上复位键
+always@(posedge Clk_74M or negedge por_n)begin
+  if(!por_n)
+  kb_rst_cnt <= 25'd0;
+  else if(kb_rst_trig)
+  kb_rst_cnt <= 25'd0;
+  else if(kb_rst_hold && (kb_rst_cnt < KB_RST_CNT))
+  kb_rst_cnt <= kb_rst_cnt + 25'd1;
+end
+
+always@(posedge Clk_74M or negedge por_n)begin
+  if(!por_n)
+  kb_rst_hold <= 1'b0;
+  else if(kb_rst_trig)
+  kb_rst_hold <= 1'b1;
+  else if(kb_rst_cnt == KB_RST_CNT)
+  kb_rst_hold <= 1'b0;
+end
+
+assign kb_reset_en = kb_rst_hold;
+assign kb_activity = (kb_act_cnt != 25'd0);
+
+assign kb_left_p    = kb_bits[0] && (!kb_bits_d[0]);
+assign kb_right_p   = kb_bits[1] && (!kb_bits_d[1]);
+assign kb_rotate_p  = kb_bits[3] && (!kb_bits_d[3]);
+assign kb_hold_p    = kb_bits[4] && (!kb_bits_d[4]);
+assign kb_drop_en   = kb_bits[2];
+assign kb_drop_r    = (!kb_bits[2]) && kb_bits_d[2];
+assign kb_switch_en = kb_bits[5];
+assign kb_switch_r  = (!kb_bits[5]) && kb_bits_d[5];
 endmodule
