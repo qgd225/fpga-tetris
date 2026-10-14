@@ -17,6 +17,12 @@ module Playfield(
     input [19:0]score,
     input [13:0]time_sec,
     input duo,
+    input left_p_flag2,
+    input right_p_flag2,
+    input drop_r_flag2,
+    input drop_en2,
+    input rotate_p_flag2,
+    input hold_p_flag2,
 
     output reg [479:0]state,
     output reg Piece,
@@ -44,7 +50,15 @@ module Playfield(
     output reg [2:0]speed_level,
     output wire land_we,
     output reg [19:0]line_t,
-    output reg clear_flash
+    output reg clear_flash,
+    output reg Piece2,
+    output reg ghost2,
+    output reg [4:0]C_num2,
+    output reg [4:0]R_num2,
+    output wire [2:0]type2_out,
+    output wire [19:0]cc_d2,
+    output wire [19:0]rr_d2,
+    output wire [2:0]type_d2_out
     );
 
 
@@ -154,6 +168,49 @@ module Playfield(
     reg en_hold_t;
     wire hold_up = !en_hold_t && en_hold;
     wire hold_down = en_hold_t && !en_hold;
+
+//    P2 方块位置信息
+    reg [1:0]rot2;
+    reg [4:0]counter_c2;
+    reg [4:0]counter_r2;
+    reg [4:0]cc2;
+    reg [5:0]rr2;
+    reg land2;
+    reg boundary_collision_left2;
+    reg boundary_collision_right2;
+    reg touch_top2;
+    reg [5:0]rr_g2;
+    wire [31:0]Tetromino_dout2;
+    reg  [4:0]Tetromino_addr2;
+    reg [4:0]Tetromino_addr3;
+    wire [31:0]Tetromino_dout3;
+    wire [4:0]counter_ghost_r_t2;
+    wire land_pulse2;
+    wire land_pulse_t2;
+    wire land_we2;
+    reg [1:0]lock_cnt2;
+    reg [4:0]cc_t2 [0:3];
+    reg [4:0]rr_t2 [0:3];
+    reg [24:0]counter_land2;
+    reg [24:0]lock_counter2;
+    reg [2:0]type2;
+    reg [2:0]type_t2;
+    reg [2:0]type_d2;
+    reg [26:0]counter2;
+    reg drop_r_t2;
+    reg [26:0]counter_drop2;
+    reg en_rotate2;
+    reg [5:0]cc_r2, rr_r2;
+    reg rot_block2;
+    reg en_hold2;
+    reg en_hold_t2;
+    wire hold_up2 = !en_hold_t2 && en_hold2;
+    wire hold_down2 = en_hold_t2 && !en_hold2;
+    reg lock_t2;
+    wire lock_we2;
+    wire [1:0]lock_idx2;
+    wire [9:0]douta_dummy2;
+
 
 //    循环变量
     integer i;
@@ -577,9 +634,11 @@ module Playfield(
                 state <= state;
             end
         end
-        else if(lock_we)begin
-            if((cc_t[lock_idx] <= (COL - 1'b1)) && (rr_t[lock_idx] <= 19))
+        else if(lock_we || (duo && lock_we2))begin
+            if(lock_we && (cc_t[lock_idx] <= (COL - 1'b1)) && (rr_t[lock_idx] <= 19))
             state[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= 1'b1;
+            if(duo && lock_we2 && (cc_t2[lock_idx2] <= (COL - 1'b1)) && (rr_t2[lock_idx2] <= 19))
+            state[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= 1'b1;
         end
         else if(clear_time)begin
             if(clear_t)begin
@@ -803,10 +862,704 @@ module Playfield(
             else
             over <=1'b0;
         end
-        else if(touch_top && Playing && !lock_we)
+        else if((touch_top || (duo && touch_top2)) && Playing && !lock_we && !(duo && lock_we2))
         over <= 1'b1;
         else
         over <= 1'b0;
     end
+
+
+//    P2 形状 ROM
+    Tetromino Tetromino_inst2(
+        .clka(Clk_74M),
+        .addra(Tetromino_addr2),
+        .douta(Tetromino_dout2)
+    );
+
+    Tetromino Tetromino_inst3(
+        .clka(Clk_74M),
+        .addra(Tetromino_addr3),
+        .douta(Tetromino_dout3)
+    );
+
+    assign type2_out = type2;
+    assign type_d2_out = type_d2;
+
+    assign land_we2  = (lock_counter2 != 0) && (lock_counter2 != 5940000) && (lock_counter2[21]);
+    assign land_pulse2 = (lock_counter2 == 5940000) ? 1 : 0;
+    assign lock_we2  = (lock_t2) || (lock_cnt2 != 2'd0);
+    assign lock_idx2 = (lock_t2) ? 2'd0 : lock_cnt2;
+    assign cc_d2 = {cc_t2[0], cc_t2[1], cc_t2[2], cc_t2[3]};
+    assign rr_d2 = {rr_t2[0], rr_t2[1], rr_t2[2], rr_t2[3]};
+
+    Ghost_piece Ghost_piece_inst2(
+        .Clk_74M(Clk_74M),
+        .Reset_n(Reset_n),
+        .state(state),
+        .counter_ghost_r_t(counter_ghost_r_t2),
+        .counter_r(counter_r2),
+        .counter_c(counter_c2),
+        .type(type2),
+        .rot(rot2),
+        .C_num(C_num2),
+        .R_num(R_num2),
+        .rotate_p(en_rotate2),
+        .left_p(left_p_flag2),
+        .right_p(right_p_flag2),
+        .land_pulse(land_pulse2),
+        .switch_r_flag(switch_r_flag),
+        .clear_down(clear_down),
+        .Finalize(Finalize)
+    );
+
+//===================== P2 逻辑(自动生成) =====================
+//==== P2 block: Tetromino_addr = {type[2:0], rot[1:0]}; ====
+
+    always@(*)begin
+
+        Tetromino_addr2 = {type2[2:0], rot2[1:0]};
+
+        Piece2 = 1'b0;
+
+        land2 = 1'b0;
+
+        boundary_collision_left2 = 1'b0;
+
+        boundary_collision_right2 = 1'b0;
+
+        ghost2 = 1'b0;
+
+        touch_top2 = 1'b0;
+
+        if(Idle || Finalize)begin
+
+             Piece2 = 1'b0;
+
+             ghost2 = 1'b0;
+
+        end
+
+        else
+
+        for(i = 0; i < 4; i = i + 1)begin
+
+            cc2 = counter_c2 + { { 7{Tetromino_dout2[i*8+7]} }, Tetromino_dout2[(i*8+7)-:4] };
+
+            rr2 = counter_r2 + { { 7{Tetromino_dout2[i*8+3]} }, Tetromino_dout2[(i*8+3)-:4] };
+
+
+
+            if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && state[cc2*20 + (rr2 + 1)]))//落底检测
+
+            land2 = 1'b1;
+
+
+
+            if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && state[(cc2 - 1)*20 + rr2]))//左边界碰撞检测
+
+            boundary_collision_left2 = 1'b1;
+
+
+
+            if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && state[(cc2 + 1)*20 + rr2]))//右边界碰撞检测
+
+            boundary_collision_right2 = 1'b1;
+
+
+
+
+
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num2 == cc2) && (R_num2 == rr2) && !rr2[5]) //正在运动方块
+
+            Piece2 = 1'b1;
+
+
+
+            if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && state[cc2*20 + rr2])//和已锁方块重叠=顶到
+
+            touch_top2 = 1'b1;
+
+
+
+            rr_g2 = counter_ghost_r_t2 + { { 7{Tetromino_dout2[i*8+3]} }, Tetromino_dout2[(i*8+3)-:4] };
+
+
+
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num2 == cc2) && (R_num2 == rr_g2) && !rr_g2[5] && (counter_ghost_r_t2 - counter_r2) > 4)
+
+            ghost2 = 1'b1;
+
+
+
+        end
+
+    end
+
+
+
+//==== P2 block: C_num = 5'd20; ====
+
+    always@(*)begin
+
+        C_num2 = 5'd20;
+
+        for(o = 0; o < 24; o = o + 1)
+
+        for(p = 0; p < 20; p = p + 1)
+
+        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
+
+        C_num2 = o[4:0];
+
+    end
+
+
+
+//==== P2 block: R_num = 5'd20; ====
+
+    always@(*)begin
+
+        R_num2 = 5'd20;
+
+        for(p = 0; p < 20; p = p + 1)
+
+        for(o = 0; o < 24; o = o + 1)
+
+        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
+
+        R_num2 = p;
+
+    end
+
+
+
+//==== P2 block: type <= 3'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        type2 <= 3'd0;
+
+        else if(Idle)
+
+        type2 <= rnd_type_t;
+
+        else if((land_pulse2 || hold_up2) && Playing)
+
+        type2 <= type_t2;
+
+    end
+
+
+
+//==== P2 block: type_t <= 3'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        type_t2 <= 3'd0;
+
+        else if(Idle)
+
+        type_t2 <= rnd_type_n;
+
+        else if(hold_down2)
+
+        type_t2 <= hold_type;
+
+        else if(land_pulse2 && Playing)
+
+        type_t2 <= rnd_type_n;
+
+    end
+
+
+
+//==== P2 block: type_d <= 3'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        type_d2 <= 3'd0;
+
+        else if(land_pulse2 && Playing)
+
+        type_d2 <= type2;
+
+    end
+
+
+
+//==== P2 block: counter <= 30'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)
+
+    if(!Reset_n)
+
+    counter2 <= 30'd0;
+
+    else if(!drop_en2)
+
+    counter2 <= 30'd0;
+
+    else if(counter2 < MCNT)
+
+    counter2 <= counter2 + 30'd1;
+
+
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        drop_r_t2 <= 1'b1;
+
+        else if(drop_hold)
+
+        drop_r_t2 <= 1'b0;
+
+        else if(drop_r_flag2)
+
+        drop_r_t2 <= 1'b1;
+
+    end
+
+
+
+//==== P2 block: counter_drop <= 1'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        counter_drop2 <= 1'd0;
+
+        else if(Finalize)begin
+
+            if(switch_r_flag)
+
+            counter_drop2 <= 10'd0;
+
+            else
+
+            counter_drop2 <= counter_drop2;
+
+        end
+
+        else if(Stop)
+
+        counter_drop2 <= counter_drop2;
+
+        else if(Playing)begin
+
+            if(counter_drop2 == Drop)
+
+            counter_drop2 <= 1'd0;
+
+            else
+
+            counter_drop2 <= counter_drop2 + 1'd1;
+
+        end
+
+        else
+
+        counter_drop2 <= 1'd0;
+
+    end
+
+
+
+//==== P2 block: counter_r <= 5'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        counter_r2 <= 5'd0;
+
+        else if(Finalize)begin
+
+            if(switch_r_flag)
+
+            counter_r2 <= 5'd0;
+
+            else
+
+            counter_r2 <= counter_r2;
+
+        end
+
+        else if(Stop)
+
+        counter_r2 <= counter_r2;
+
+        else if(Playing)begin
+
+            if(land_we2)
+
+            counter_r2 <= counter_r2;
+
+            else if(land_pulse2 || hold_up2)//归位
+
+            counter_r2 <= 5'd0;
+
+            else if(drop_r && !land2 && !lock_we2)//软降
+
+            counter_r2 <= counter_r2 + 1'd1;
+
+            else if(drop_hold && !lock_we2)//硬降
+
+            counter_r2 <= counter_ghost_r_t2;
+
+            else if(en_rotate2)//旋转
+
+            counter_r2 <= counter_r2 + ddr_ext;
+
+            else if(counter_drop2 == Drop && !land2 && !lock_we2)//自动下落
+
+            counter_r2 <= counter_r2 + 1'd1;
+
+        end
+
+        else
+
+        counter_r2 <= 5'd0;
+
+    end
+
+
+
+//==== P2 block: counter_c <= 5'd9; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        counter_c2 <= 5'd9;
+
+        else if(Finalize)begin
+
+            if(switch_r_flag)
+
+            counter_c2 <= 5'd9;
+
+            else
+
+            counter_c2 <= counter_c2;
+
+        end
+
+        else if(Stop)
+
+        counter_c2 <= counter_c2;
+
+        else if(Playing)begin
+
+            if(land_we2)
+
+            counter_c2 <= counter_c2;
+
+            else if(land_pulse2 || hold_up2)//归位
+
+            counter_c2 <= 5'd9;
+
+            else if(en_rotate2)//旋转
+
+            counter_c2 <= counter_c2 + ddc_ext;
+
+            else if(!boundary_collision_left2 && left_p_flag2 && !lock_we2)//左移
+
+            counter_c2 <= counter_c2 - 1;
+
+            else if(!boundary_collision_right2 && right_p_flag2 && !lock_we2)//右移
+
+            counter_c2 <= counter_c2 + 1;
+
+        end
+
+        else
+
+        counter_c2 <= 5'd9;
+
+    end
+
+
+
+//==== P2 block: Tetromino_addr1 = {type[2:0], (rot[1:0] + 1)}; ====
+
+    always@(*)begin
+
+        Tetromino_addr3 = {type2[2:0], (rot2[1:0] + 1)};
+
+        rot_block2 = 1'b0;
+
+        for(k = 0; k < 4; k = k + 1)begin
+
+            cc_r2 = counter_c2 + ddc_ext + { { 7{Tetromino_dout3[k*8+7]} }, Tetromino_dout3[(k*8+7)-:4] };
+
+            rr_r2 = counter_r2 + ddr_ext + { { 7{Tetromino_dout3[k*8+3]} }, Tetromino_dout3[(k*8+3)-:4] };
+
+            if(cc_r2 > (COL - 1'b1))
+
+            rot_block2 = 1'b1;
+
+            else if(rr_r2 > 11'd19)
+
+            rot_block2 = 1'b1;
+
+            else if(state[cc_r2*20 + rr_r2])
+
+            rot_block2 = 1'b1;
+
+        end
+
+        en_rotate2 = (rotate_p_flag2) && (!rot_block2) && (!lock_we2);
+
+    end
+
+
+
+//==== P2 block: rot <= 2'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        rot2 <= 2'd0;
+
+        else if(Finalize)begin
+
+            if(switch_r_flag)
+
+            rot2 <= 2'd0;
+
+            else
+
+            rot2 <= rot2;
+
+        end
+
+        else if(Stop)
+
+        rot2 <= rot2;
+
+        else if(Playing)begin
+
+            if(land_we2)
+
+            rot2 <= rot2;
+
+            else if(en_rotate2)
+
+            rot2 <= rot2 + 2'd1;
+
+            else if(land_pulse2 || hold_up2)
+
+            rot2 <= 2'd0;
+
+        end
+
+        else
+
+        rot2 <= 2'd0;
+
+    end
+
+
+
+//==== P2 block: counter_land <= 1'b0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        counter_land2 <= 1'b0;
+
+        else if(Playing)begin
+
+            if(land2 && !lock_we2)
+
+            counter_land2 <= counter_land2 + 30'd1;
+
+            else
+
+            counter_land2 <= 1'b0;
+
+        end
+
+        else
+
+        counter_land2 <= 1'b0;
+
+    end
+
+
+
+//==== P2 block: lock_t <= 1'b0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        lock_t2 <= 1'b0;
+
+        else if(land_pulse2)
+
+        lock_t2 <= 1'b1;
+
+        else
+
+        lock_t2 <= 1'b0;
+
+    end
+
+
+
+//==== P2 block: lock_cnt <= 2'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        lock_cnt2 <= 2'd0;
+
+        else if(lock_t2)
+
+        lock_cnt2 <= 2'd1;
+
+        else if(lock_cnt2 == 2'd3)
+
+        lock_cnt2 <= 2'd0;
+
+        else if(lock_cnt2 != 2'd0)
+
+        lock_cnt2 <= lock_cnt2 + 2'd1;
+
+    end
+
+
+
+//==== P2 block: lock_counter <= 2'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        lock_counter2 <= 2'd0;
+
+        else if(land_pulse_t)
+
+        lock_counter2 <= 2'd1;
+
+        else if(lock_counter2 == 5940000)
+
+        lock_counter2 <= 2'd0;
+
+        else if(lock_counter2 != 2'd0)
+
+        lock_counter2 <= lock_counter2 + 2'd1;
+
+    end
+
+
+
+//==== P2 block: cc_t[0] <= 11'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)begin
+
+            cc_t2[0] <= 11'd0; cc_t2[1] <= 11'd0; cc_t2[2] <= 11'd0; cc_t2[3] <= 11'd0;
+
+        end
+
+        else if(land_pulse2)
+
+        for(y = 0; y < 4; y = y + 1)
+
+        cc_t2[y] <= counter_c2 + { {7{Tetromino_dout2[y*8+7]}}, Tetromino_dout2[y*8+7 -:4] };
+
+    end
+
+
+
+//==== P2 block: rr_t[0] <= 11'd0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)begin
+
+            rr_t2[0] <= 11'd0; rr_t2[1] <= 11'd0; rr_t2[2] <= 11'd0; rr_t2[3] <= 11'd0;
+
+        end
+
+        else if(land_pulse2)
+
+        for(y = 0; y < 4; y = y + 1)
+
+        rr_t2[y] <= counter_r2 + { {7{Tetromino_dout2[y*8+3]}}, Tetromino_dout2[y*8+3 -:4] };
+
+    end
+
+
+
+//==== P2 block: en_hold <= 0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        en_hold2 <= 0;
+
+        else if(Idle)
+
+        en_hold2 <= 1'b0;
+
+        else if(Stop)
+
+        en_hold2 <= en_hold2;
+
+        else if(Finalize)begin
+
+            if(switch_r_flag)
+
+            en_hold2 <=1'b0;
+
+            else
+
+            en_hold2 <= en_hold2;
+
+        end
+
+        else if(!en_hold2 && hold_p_flag2)
+
+        en_hold2 <= 1;
+
+        else if(en_hold2 && hold_p_flag2)
+
+        en_hold2 <= 0;
+
+    end
+
+
+
+//==== P2 block: en_hold_t <= 0; ====
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+
+        if(!Reset_n)
+
+        en_hold_t2 <= 0;
+
+        else
+
+        en_hold_t2 <= en_hold2;
+
+    end
+
 
 endmodule
