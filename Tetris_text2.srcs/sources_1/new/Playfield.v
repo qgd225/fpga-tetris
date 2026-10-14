@@ -16,8 +16,9 @@ module Playfield(
     input hold_p_flag,
     input [19:0]score,
     input [13:0]time_sec,
+    input duo,
 
-    output reg [399:0]state,
+    output reg [479:0]state,
     output reg Piece,
     output reg ghost,
     output reg [4:0]C_num,
@@ -70,6 +71,8 @@ module Playfield(
     parameter [13:0]TIME_LV6 = 14'd440;
     parameter [13:0]TIME_LV7 = 14'd600;
     parameter CLEAR_STEP = 6_311_250;//85ms
+
+    wire [4:0]COL = duo ? 5'd24 : 5'd20;
 
 
 //============================================================
@@ -188,25 +191,25 @@ module Playfield(
             cc = counter_c + { { 7{Tetromino_dout[i*8+7]} }, Tetromino_dout[(i*8+7)-:4] };
             rr = counter_r + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
 
-            if(rr == 19 || ((cc <= 11'd19) && (rr < 19) && state[cc*20 + (rr + 1)]))//Âäµ×¼ì²â
+            if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && state[cc*20 + (rr + 1)]))//Âäµ×¼ì²â
             land = 1'b1;
 
-            if(cc == 0 || ((cc > 0) && (cc <= 11'd19) && (rr < 11'd20) && state[(cc - 1)*20 + rr]))//×ó±ß½çÅö×²¼ì²â
+            if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && state[(cc - 1)*20 + rr]))//×ó±ß½çÅö×²¼ì²â
             boundary_collision_left = 1'b1;
 
-            if(cc >= 19 || ((cc < 11'd19) && (rr < 11'd20) && state[(cc + 1)*20 + rr]))//ÓÒ±ß½çÅö×²¼ì²â
+            if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && state[(cc + 1)*20 + rr]))//ÓÒ±ß½çÅö×²¼ì²â
             boundary_collision_right = 1'b1;
 
 
-            if((hcounter >= 321) && (hcounter < 961) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr) && !rr[5]) //ÕýÔÚÔË¶¯·½¿é
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr) && !rr[5]) //ÕýÔÚÔË¶¯·½¿é
             Piece = 1'b1;
 
-            if((!rr[5]) && (cc <= 11'd19) && (rr <= 11'd19) && state[cc*20 + rr])//ºÍÒÑËø·½¿éÖØµþ=¶¥µ½
+            if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && state[cc*20 + rr])//ºÍÒÑËø·½¿éÖØµþ=¶¥µ½
             touch_top = 1'b1;
 
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
 
-            if((hcounter >= 321) && (hcounter < 961) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (counter_ghost_r_t - counter_r) > 4)
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (counter_ghost_r_t - counter_r) > 4)
             ghost = 1'b1;
 
         end
@@ -218,17 +221,17 @@ module Playfield(
 //============================================================
     always@(*)begin
         C_num = 5'd20;
-        for(o = 0; o < 20; o = o + 1)
+        for(o = 0; o < 24; o = o + 1)
         for(p = 0; p < 20; p = p + 1)
-        if(hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
-        C_num = o;
+        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
+        C_num = o[4:0];
     end
 
     always@(*)begin
         R_num = 5'd20;
         for(p = 0; p < 20; p = p + 1)
-        for(o = 0; o < 20; o = o + 1)
-        if(hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
+        for(o = 0; o < 24; o = o + 1)
+        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
         R_num = p;
     end
 
@@ -446,9 +449,9 @@ module Playfield(
         for(k = 0; k < 4; k = k + 1)begin
             cc_r = counter_c + ddc_ext + { { 7{Tetromino_dout1[k*8+7]} }, Tetromino_dout1[(k*8+7)-:4] };
             rr_r = counter_r + ddr_ext + { { 7{Tetromino_dout1[k*8+3]} }, Tetromino_dout1[(k*8+3)-:4] };
-            if(cc_r > 11'd19)
+            if(cc_r > (COL - 1'b1))
             rot_block = 1'b1;
-            else if(rr_r[5] || (rr_r > 11'd19))
+            else if(rr_r > 11'd19)
             rot_block = 1'b1;
             else if(state[cc_r*20 + rr_r])
             rot_block = 1'b1;
@@ -563,30 +566,30 @@ module Playfield(
 //============================================================
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
-        state <= 400'd0;
+        state <= 480'd0;
         else if(Idle)
-        state <= 400'd0;
+        state <= 480'd0;
         else if(Finalize)begin
             if(switch_r_flag)begin
-                state <= 400'd0;
+                state <= 480'd0;
             end
             else begin
                 state <= state;
             end
         end
         else if(lock_we)begin
-            if((cc_t[lock_idx] <= 19) && (rr_t[lock_idx] <= 19))
+            if((cc_t[lock_idx] <= (COL - 1'b1)) && (rr_t[lock_idx] <= 19))
             state[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= 1'b1;
         end
         else if(clear_time)begin
             if(clear_t)begin
-                for(c = 0; c < 20; c = c + 1)
+                for(c = 0; c < 24; c = c + 1)
                         for(m = 0; m < 20; m = m + 1)
                             if(line_t[m])
                                 state[c*20 + m] <= state[c*20 + m];
             end
             else if(!clear_pulse)begin
-                for(c = 0; c < 20; c = c + 1)begin
+                for(c = 0; c < 24; c = c + 1)begin
                     state[c*20 + 0] <= 1'b0;
                     for(m = 1; m < 20; m = m + 1)begin
                         if(m <= clear_row)begin
@@ -603,11 +606,11 @@ module Playfield(
         line = 20'd0;
         for(m = 0; m < 20; m = m + 1)begin
             row_cnt[m] = 5'd0;
-            for(c = 0; c < 20; c = c + 1)begin
+            for(c = 0; c < 24; c = c + 1)begin
                 if(state[c*20 + m])
                 row_cnt[m] = row_cnt[m] + 5'd1;
             end
-            if(row_cnt[m] == 5'd20)begin
+            if(row_cnt[m] == COL)begin
                 line[m] = 1'b1;
                 clear = 1'b1;
             end

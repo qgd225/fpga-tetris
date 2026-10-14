@@ -127,6 +127,7 @@ wire hold_p     = hold_p_flag   | kb_hold_p;
     wire over;
     wire choose;
     wire [3:0]choose_cnt;
+    wire duo = (choose_cnt == 4'd1);
     
     Game_state_machine Game_state_machine_inst(
     .Clk_74M(Clk_74M),
@@ -168,6 +169,7 @@ wire hold_p     = hold_p_flag   | kb_hold_p;
     .Idle(Idle),
     .choose(choose),
     .choose_cnt(choose_cnt),
+    .duo(duo),
     .Playing(Playing),
     .Stop(Stop),
     .Finalize(Finalize),

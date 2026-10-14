@@ -16,6 +16,7 @@ module frame(
     input Finalize,
     input choose,
     input [3:0]choose_cnt,
+    input duo,
     
     output reg [23:0]rgb,
     output over,
@@ -30,7 +31,7 @@ module frame(
 //    ÓÎÏ·Çø
     wire [4:0]C_num;
     wire [4:0]R_num;
-    wire [399:0]state;
+    wire [479:0]state;
     wire Piece;
     wire ghost;
     wire clear_t;
@@ -164,6 +165,7 @@ module frame(
     .Reset_n(Reset_n),
     .hcounter(hcounter),
     .vcounter(vcounter),
+    .duo(duo),
     
     .margin(margin)
     );
