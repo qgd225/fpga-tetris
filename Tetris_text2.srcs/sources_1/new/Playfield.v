@@ -15,6 +15,7 @@ module Playfield(
     input Finalize,
     input hold_p_flag,
     input [19:0]score,
+    input [13:0]time_sec,
 
     output reg [399:0]state,
     output reg Piece,
@@ -52,6 +53,22 @@ module Playfield(
     parameter MCNT = 74_250_000;
     parameter MCNT_LAND = 20_000_000;
     parameter MCNT_Drop = 74_250_000 - 1;//自动下落时间
+
+    parameter [19:0]LV1_TH = 20'd4;
+    parameter [19:0]LV2_TH = 20'd15;
+    parameter [19:0]LV3_TH = 20'd35;
+    parameter [19:0]LV4_TH = 20'd70;
+    parameter [19:0]LV5_TH = 20'd150;
+    parameter [19:0]LV6_TH = 20'd300;
+    parameter [19:0]LV7_TH = 20'd600;
+
+    parameter [13:0]TIME_LV1 = 14'd20;
+    parameter [13:0]TIME_LV2 = 14'd60;
+    parameter [13:0]TIME_LV3 = 14'd120;
+    parameter [13:0]TIME_LV4 = 14'd200;
+    parameter [13:0]TIME_LV5 = 14'd300;
+    parameter [13:0]TIME_LV6 = 14'd440;
+    parameter [13:0]TIME_LV7 = 14'd600;
     parameter CLEAR_STEP = 6_311_250;//85ms
 
 
@@ -307,25 +324,29 @@ module Playfield(
     end
     
     
+    wire [2:0]lv_score = (score >= LV7_TH) ? 3'd7 :
+                         (score >= LV6_TH) ? 3'd6 :
+                         (score >= LV5_TH) ? 3'd5 :
+                         (score >= LV4_TH) ? 3'd4 :
+                         (score >= LV3_TH) ? 3'd3 :
+                         (score >= LV2_TH) ? 3'd2 :
+                         (score >= LV1_TH) ? 3'd1 : 3'd0;
+
+    wire [2:0]lv_time  = (time_sec >= TIME_LV7) ? 3'd7 :
+                         (time_sec >= TIME_LV6) ? 3'd6 :
+                         (time_sec >= TIME_LV5) ? 3'd5 :
+                         (time_sec >= TIME_LV4) ? 3'd4 :
+                         (time_sec >= TIME_LV3) ? 3'd3 :
+                         (time_sec >= TIME_LV2) ? 3'd2 :
+                         (time_sec >= TIME_LV1) ? 3'd1 : 3'd0;
+
+    wire [2:0]lv_now   = (lv_score > lv_time) ? lv_score : lv_time;
+
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         speed_level <= 0;
-        else if(score >= 1000)
-        speed_level <= 7;
-        else if(score >= 500)
-        speed_level <= 6;
-        else if(score >= 250)
-        speed_level <= 5;
-        else if(score >= 100)
-        speed_level <= 4;
-        else if(score >= 50)
-        speed_level <= 3;
-        else if(score >= 20)
-        speed_level <= 2;
-        else if(score >= 5)
-        speed_level <= 1;
         else
-        speed_level <= 0;
+        speed_level <= lv_now;
     end
     
     always@(posedge Clk_74M or negedge Reset_n)begin

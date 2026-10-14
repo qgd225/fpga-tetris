@@ -16,6 +16,8 @@ module scoring(
     output lit
     );
     
+    parameter SCORE_UNIT = 2;
+
     integer i;
     
     reg [43:0]shift_counter;
@@ -40,10 +42,10 @@ module scoring(
     else if(Playing)begin
         if(clear_t_t)
         case(c_clear)
-        1:counter <= counter + ( (speed_level + 1)*1)*1;
-        2:counter <= counter + ( (speed_level + 1)*1)*2;
-        3:counter <= counter + ( (speed_level + 1)*1)*3;
-        4:counter <= counter + ( (speed_level + 1)*1)*4;
+        1:counter <= counter + ( (speed_level + 1)*SCORE_UNIT)*1;
+        2:counter <= counter + ( (speed_level + 1)*SCORE_UNIT)*2;
+        3:counter <= counter + ( (speed_level + 1)*SCORE_UNIT)*3;
+        4:counter <= counter + ( (speed_level + 1)*SCORE_UNIT)*4;
         default:counter <= counter;
         endcase
         end

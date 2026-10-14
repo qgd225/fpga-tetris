@@ -123,6 +123,7 @@ module frame(
     .Stop(Stop),
     .Finalize(Finalize),
     .score(score),
+    .time_sec(time_sec),
     
     .state(state),
     .Piece(Piece),
