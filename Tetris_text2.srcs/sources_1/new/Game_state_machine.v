@@ -18,7 +18,7 @@ module Game_state_machine(
     
     
     parameter MCNT = 74_250_000;
-    parameter [3:0]CHOOSE_MAX = 4'd2;
+    parameter [3:0]CHOOSE_MAX = 4'd1;
     
 //    按键信号处理
     reg [26:0]counter;

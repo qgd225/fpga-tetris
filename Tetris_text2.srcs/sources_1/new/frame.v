@@ -14,6 +14,8 @@ module frame(
     input Playing,
     input Stop,
     input Finalize,
+    input choose,
+    input [3:0]choose_cnt,
     
     output reg [23:0]rgb,
     output over,
@@ -268,6 +270,23 @@ module frame(
     .cn(cn)
     );
     
+    wire chs_margin;
+    wire chs_inner;
+    wire chs_text;
+    
+    choose_menu choose_menu_inst(
+    .Clk_74M(Clk_74M),
+    .Reset_n(Reset_n),
+    .hcounter(hcounter),
+    .vcounter(vcounter),
+    .choose(choose),
+    .choose_cnt(choose_cnt),
+    
+    .margin(chs_margin),
+    .inner(chs_inner),
+    .text(chs_text)
+    );
+    
 
     reg over_lit_r;
     reg tick_r;
@@ -293,6 +312,9 @@ module frame(
     reg [2:0]sc_r;
     reg clear_t_r;
     reg flash_r;
+    reg chs_margin_r;
+    reg chs_inner_r;
+    reg chs_text_r;
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -320,6 +342,9 @@ module frame(
     sc_r <= 3'd0;
     clear_t_r <= 1'b0;
     flash_r <= 1'b0;
+    chs_margin_r <= 1'b0;
+    chs_inner_r <= 1'b0;
+    chs_text_r <= 1'b0;
     end
     else begin
     over_lit_r <= over_lit;
@@ -346,6 +371,9 @@ module frame(
     sc_r <= state_color[(C_num*20) + R_num];
     clear_t_r <= clear_t;
     flash_r <= (clear_t) && (line_t[R_num]) && (!clear_flash);
+    chs_margin_r <= chs_margin;
+    chs_inner_r <= chs_inner;
+    chs_text_r <= chs_text;
     end
     end
     parameter CYAN = 24'h00CCFF,//ÇàÉ«I
@@ -368,6 +396,16 @@ module frame(
     always@(*)begin
     if(!Reset_n)
     rgb = BLACK;
+    else if(choose)begin
+        if(chs_margin_r)
+        rgb = WHITE;
+        else if(chs_text_r)
+        rgb = WHITE;
+        else if(chs_inner_r)
+        rgb = 24'h101010;
+        else
+        rgb = BLACK;
+        end
     else if(over_lit_r)
         case(cn_r)
         0:rgb = 24'h101010;
