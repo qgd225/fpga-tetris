@@ -8,7 +8,8 @@ module choose_menu(
     
     output margin,
     output inner,
-    output text
+    output text,
+    output dim
     );
     
     parameter [10:0]BX  = 11'd420,
@@ -51,9 +52,6 @@ module choose_menu(
     wire sel1 = (choose_cnt == 4'd0);
     wire sel2 = (choose_cnt == 4'd1);
     
-    wire vis1 = (!sel1) || blink;
-    wire vis2 = (!sel2) || blink;
-    
     wire y1 = (vcounter >= BY1) && (vcounter < (BY1 + BH));
     wire y2 = (vcounter >= BY2) && (vcounter < (BY2 + BH));
     
@@ -65,11 +63,12 @@ module choose_menu(
     wire ed2 = (hcounter < (BX + BT)) || (hcounter >= (BX + BW - BT)) ||
                (vcounter < (BY2 + BT)) || (vcounter >= (BY2 + BH - BT));
     
-    wire show1 = choose && in1 && vis1;
-    wire show2 = choose && in2 && vis2;
+    wire show1 = choose && in1;
+    wire show2 = choose && in2;
     
     assign margin = (show1 && ed1) || (show2 && ed2);
     assign inner  = (show1 && (!ed1)) || (show2 && (!ed2));
+    assign dim    = choose && (!blink) && ((in1 && sel1) || (in2 && sel2));
     
     integer i;
     
@@ -95,7 +94,7 @@ module choose_menu(
                     X = TX1 + i*48;
                     Y = TY1;
                 end
-                if( (hn >= (TX1 + i*48)) && (hn < (TX1 + i*48 + 40)) &&
+                if( (hn >= (TX1 + i*48 - 1)) && (hn < (TX1 + i*48 + 40)) &&
                     (vcounter >= TY1) && (vcounter < (TY1 + 64)) )begin
                     ena_n = 1'b1;
                     case(i)
@@ -116,7 +115,7 @@ module choose_menu(
                     X = TX2 + i*48;
                     Y = TY2;
                 end
-                if( (hn >= (TX2 + i*48)) && (hn < (TX2 + i*48 + 40)) &&
+                if( (hn >= (TX2 + i*48 - 1)) && (hn < (TX2 + i*48 + 40)) &&
                     (vcounter >= TY2) && (vcounter < (TY2 + 64)) )begin
                     ena_n = 1'b1;
                     case(i)
@@ -138,9 +137,8 @@ module choose_menu(
     wire [19:0]douta;
     wire [5:0]vt = (vcounter - Y) >> 1;
     wire [10:0]ht = (hcounter - X) >> 1;
-    wire vis = y1 ? vis1 : (y2 ? vis2 : 1'b1);
     
-    assign text = ena ? (douta[19 - ht] && vis) : 1'b0;
+    assign text = ena ? douta[19 - ht] : 1'b0;
     
     letter letter_inst0(
     .clka(Clk_74M),

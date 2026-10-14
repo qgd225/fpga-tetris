@@ -273,6 +273,7 @@ module frame(
     wire chs_margin;
     wire chs_inner;
     wire chs_text;
+    wire chs_dim;
     
     choose_menu choose_menu_inst(
     .Clk_74M(Clk_74M),
@@ -284,7 +285,8 @@ module frame(
     
     .margin(chs_margin),
     .inner(chs_inner),
-    .text(chs_text)
+    .text(chs_text),
+    .dim(chs_dim)
     );
     
 
@@ -315,6 +317,7 @@ module frame(
     reg chs_margin_r;
     reg chs_inner_r;
     reg chs_text_r;
+    reg chs_dim_r;
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -345,6 +348,7 @@ module frame(
     chs_margin_r <= 1'b0;
     chs_inner_r <= 1'b0;
     chs_text_r <= 1'b0;
+    chs_dim_r <= 1'b0;
     end
     else begin
     over_lit_r <= over_lit;
@@ -374,6 +378,7 @@ module frame(
     chs_margin_r <= chs_margin;
     chs_inner_r <= chs_inner;
     chs_text_r <= chs_text;
+    chs_dim_r <= chs_dim;
     end
     end
     parameter CYAN = 24'h00CCFF,//ÇàÉ«I
@@ -398,9 +403,9 @@ module frame(
     rgb = BLACK;
     else if(choose)begin
         if(chs_margin_r)
-        rgb = WHITE;
+        rgb = chs_dim_r ? 24'h606060 : WHITE;
         else if(chs_text_r)
-        rgb = WHITE;
+        rgb = chs_dim_r ? 24'h606060 : WHITE;
         else if(chs_inner_r)
         rgb = 24'h101010;
         else
