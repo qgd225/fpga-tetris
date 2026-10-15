@@ -65,7 +65,6 @@ module Playfield(
     output wire [2:0]type_t2_out
     );
 
-
 //============================================================
 //    参数
 //============================================================
@@ -104,7 +103,6 @@ module Playfield(
     //    出生列: 双人用 24 列的三等分点
     wire [4:0]SPAWN_C1 = duo ? 5'd8  : 5'd9;
     wire [4:0]SPAWN_C2 = duo ? 5'd16 : 5'd9;
-
 
 //============================================================
 //    信号声明
@@ -267,7 +265,6 @@ module Playfield(
     wire [10:0]ddc_ext2;
     wire [10:0]ddr_ext2;
 
-
 //    循环变量
     integer i;
     integer y;
@@ -313,7 +310,6 @@ module Playfield(
     integer p2;
     integer k2;
 
-
 //============================================================
 //    提取方块信息
 //============================================================
@@ -340,7 +336,6 @@ module Playfield(
         for(i = 0; i < 4; i = i + 1)begin
             cc = counter_c + { { 7{Tetromino_dout[i*8+7]} }, Tetromino_dout[(i*8+7)-:4] };
             rr = counter_r + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
-
             //    与对方运动方块互撞: 左右阻挡 / 下行顶住(不算落底) / 重合
             if(duo)begin
                 if(or2_0 == rr)begin
@@ -372,31 +367,21 @@ module Playfield(
                 if((oc2_3 == cc) && (or2_3 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
                 other_down_hold = 1'b1;
             end
-
             if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && row_w[rr + 6'd1][cc]))//落底检测
             land = 1'b1;
-
             if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc - 6'd1]))//左边界碰撞检测
             boundary_collision_left = 1'b1;
-
             if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc + 6'd1]))//右边界碰撞检测
             boundary_collision_right = 1'b1;
-
-
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr) && !rr[5]) //正在运动方块
             Piece = 1'b1;
-
             if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && row_w[rr][cc])//和已锁方块重叠=顶到
             touch_top = 1'b1;
-
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
-
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && ghost_done && (!clear_time) && (counter_ghost_r_t > (counter_r + 5'd4)))
             ghost = 1'b1;
-
         end
     end
-
 
 //============================================================
 //    划区
@@ -417,7 +402,6 @@ module Playfield(
         if(vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
         R_num = p[4:0];
     end
-
 
 //============================================================
 //    随机方块类型选择
@@ -463,7 +447,6 @@ module Playfield(
         type_d <= type;
     end
 
-
 //============================================================
 //    按键信号处理
 //============================================================
@@ -483,7 +466,6 @@ module Playfield(
         else if(drop_r_flag)
         drop_r_t <= 1'b1;
     end
-
 
 //============================================================
 //    自动下落与参考点移动
@@ -508,7 +490,6 @@ module Playfield(
         else
         counter_drop <= 1'd0;
     end
-    
     
     wire [2:0]lv_score = (score >= LV7_TH) ? 3'd7 :
                          (score >= LV6_TH) ? 3'd6 :
@@ -619,7 +600,6 @@ module Playfield(
         counter_c <= SPAWN_C1;
     end
 
-
 //============================================================
 //    方块旋转序号
 //============================================================
@@ -675,7 +655,6 @@ module Playfield(
         else
         rot <= 2'd0;
     end
-
 
 //============================================================
 //    落地计时与锁定
@@ -753,7 +732,6 @@ module Playfield(
 
     assign cc_d = {cc_t[0],cc_t[1], cc_t[2],cc_t[3]};
     assign rr_d = {rr_t[0],rr_t[1], rr_t[2],rr_t[3]};
-
 
 //============================================================
 //    场地状态与消行
@@ -916,7 +894,6 @@ module Playfield(
 
     assign clear_pulse = (clear_time) && (!clear_d);
 
-    
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     c_clear <= 5'd0;
@@ -1005,8 +982,6 @@ module Playfield(
         end
     end
 
-
-
 //============================================================
 //    Hold 功能
 //============================================================
@@ -1045,7 +1020,6 @@ module Playfield(
         hold_type <= type2;
     end
 
-
 //============================================================
 //    游戏结束判断
 //============================================================
@@ -1063,7 +1037,6 @@ module Playfield(
         else
         over <= 1'b0;
     end
-
 
 //    P2 形状 ROM
     Tetromino Tetromino_inst2(
@@ -1175,46 +1148,26 @@ module Playfield(
         end
     end
 
-
 //===================== P2 逻辑(自动生成) =====================
 //==== P2 block: Tetromino_addr = {type[2:0], rot[1:0]}; ====
-
     always@(*)begin
-
         Tetromino_addr2 = {type2[2:0], rot2[1:0]};
-
         Piece2 = 1'b0;
-
         land2 = 1'b0;
-
         boundary_collision_left2 = 1'b0;
-
         boundary_collision_right2 = 1'b0;
-
         ghost2 = 1'b0;
-
         touch_top2 = 1'b0;
-
         other_down_hold2 = 1'b0;
-
         if(Idle || Finalize || !duo)begin//单人模式下 P2 不显示也不下落
-
              Piece2 = 1'b0;
-
              ghost2 = 1'b0;
-
              land2 = 1'b1;
-
         end
-
         else
-
         for(i2 = 0; i2 < 4; i2 = i2 + 1)begin
-
             cc2 = counter_c2 + { { 7{Tetromino_dout2[i2*8+7]} }, Tetromino_dout2[(i2*8+7)-:4] };
-
             rr2 = counter_r2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
-
             //    与对方运动方块互撞
             if(duo)begin
                 if(or1_0 == rr2)begin
@@ -1246,586 +1199,285 @@ module Playfield(
                 if((oc1_3 == cc2) && (or1_3 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
                 other_down_hold2 = 1'b1;
             end
-
-
-
             if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && row_w[rr2 + 6'd1][cc2]))//落底检测
-
             land2 = 1'b1;
-
-
-
             if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 - 6'd1]))//左边界碰撞检测
-
             boundary_collision_left2 = 1'b1;
-
-
-
             if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 + 6'd1]))//右边界碰撞检测
-
             boundary_collision_right2 = 1'b1;
-
-
-
-
-
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr2) && !rr2[5]) //正在运动方块
-
             Piece2 = 1'b1;
-
-
-
             if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && row_w[rr2][cc2])//和已锁方块重叠=顶到
-
             touch_top2 = 1'b1;
-
-
-
             rr_g2 = counter_ghost_r_t2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
-
-
-
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && ghost_done2 && (!clear_time) && (counter_ghost_r_t2 > (counter_r2 + 5'd4)))
-
             ghost2 = 1'b1;
-
-
-
         end
-
     end
-
-
-
-
 
 //==== P2 block: type <= 3'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         type2 <= 3'd0;
-
         else if(Idle)
-
         type2 <= p2_late ? rnd_type_t1 : rnd_type_t;
-
         else if((land_pulse2 || hold_up2) && Playing)
-
         type2 <= type_t2;
-
     end
-
-
 
 //==== P2 block: type_t <= 3'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         type_t2 <= 3'd0;
-
         else if(Idle)
-
         type_t2 <= p2_late ? rnd_type_n1 : rnd_type_n;
-
         else if(hold_down2)
-
         type_t2 <= hold_type;
-
         else if(land_pulse2 && Playing)
-
         type_t2 <= ((land_pulse && land_pulse2) ? rnd_type_n1 : rnd_type_n);
-
     end
-
-
 
 //==== P2 block: type_d <= 3'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         type_d2 <= 3'd0;
-
         else if(land_pulse2 && Playing)
-
         type_d2 <= type2;
-
     end
-
-
 
 //==== P2 block: counter <= 30'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)
-
     if(!Reset_n)
-
     counter2 <= 30'd0;
-
     else if(!drop_en2)
-
     counter2 <= 30'd0;
-
     else if(counter2 < MCNT)
-
     counter2 <= counter2 + 30'd1;
 
-
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         drop_r_t2 <= 1'b1;
-
         else if(drop_hold2)
-
         drop_r_t2 <= 1'b0;
-
         else if(drop_r_flag2)
-
         drop_r_t2 <= 1'b1;
-
     end
-
-
 
 //==== P2 block: counter_drop <= 1'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         counter_drop2 <= 1'd0;
-
         else if(Finalize)begin
-
             if(switch_r_flag)
-
             counter_drop2 <= 10'd0;
-
             else
-
             counter_drop2 <= counter_drop2;
-
         end
-
         else if(Stop)
-
         counter_drop2 <= counter_drop2;
-
         else if(Playing)begin
-
             if(counter_drop2 == Drop)
-
             counter_drop2 <= 1'd0;
-
             else
-
             counter_drop2 <= counter_drop2 + 1'd1;
-
         end
-
         else
-
         counter_drop2 <= 1'd0;
-
     end
-
-
 
 //==== P2 block: counter_r <= 5'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         counter_r2 <= 5'd0;
-
         else if(Finalize)begin
-
             if(switch_r_flag)
-
             counter_r2 <= 5'd0;
-
             else
-
             counter_r2 <= counter_r2;
-
         end
-
         else if(Stop)
-
         counter_r2 <= counter_r2;
-
         else if(Playing)begin
-
             if(land_we2)
-
             counter_r2 <= counter_r2;
-
             else if(land_pulse2 || hold_up2)//归位
-
             counter_r2 <= 5'd0;
-
             else if(drop_r2 && !land2 && !lock_we2 && !other_down_hold2)//软降
-
             counter_r2 <= counter_r2 + 1'd1;
-
             else if(drop_hold2 && !lock_we2)//硬降
-
             counter_r2 <= counter_ghost_r_t2;
-
             else if(en_rotate2)//旋转
-
             counter_r2 <= counter_r2 + ddr_ext2;
-
             else if(counter_drop2 == Drop && !land2 && !lock_we2 && !other_down_hold2)//自动下落
-
             counter_r2 <= counter_r2 + 1'd1;
-
         end
-
         else
-
         counter_r2 <= 5'd0;
-
     end
-
-
 
 //==== P2 block: counter_c <= 5'd9; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         counter_c2 <= SPAWN_C2;
-
         else if(Finalize)begin
-
             if(switch_r_flag)
-
             counter_c2 <= SPAWN_C2;
-
             else
-
             counter_c2 <= counter_c2;
-
         end
-
         else if(Stop)
-
         counter_c2 <= counter_c2;
-
         else if(Playing)begin
-
             if(land_we2)
-
             counter_c2 <= counter_c2;
-
             else if(land_pulse2 || hold_up2)//归位
-
             counter_c2 <= SPAWN_C2;
-
             else if(en_rotate2)//旋转
-
             counter_c2 <= counter_c2 + ddc_ext2;
-
             else if(!boundary_collision_left2 && left_p_flag2 && !lock_we2)//左移
-
             counter_c2 <= counter_c2 - 1;
-
             else if(!boundary_collision_right2 && right_p_flag2 && !lock_we2)//右移
-
             counter_c2 <= counter_c2 + 1;
-
         end
-
         else
-
         counter_c2 <= SPAWN_C2;
-
     end
-
-
 
 //==== P2 block: Tetromino_addr1 = {type[2:0], (rot[1:0] + 1)}; ====
-
     always@(*)begin
-
         Tetromino_addr3 = {type2[2:0], (rot2[1:0] + 1)};
-
         rot_block2 = 1'b0;
-
         for(k2 = 0; k2 < 4; k2 = k2 + 1)begin
-
             cc_r2 = counter_c2 + ddc_ext2 + { { 7{Tetromino_dout3[k2*8+7]} }, Tetromino_dout3[(k2*8+7)-:4] };
-
             rr_r2 = counter_r2 + ddr_ext2 + { { 7{Tetromino_dout3[k2*8+3]} }, Tetromino_dout3[(k2*8+3)-:4] };
-
             if((cc_r2 > (COL - 1'b1)) || cc_r2[5])
-
             rot_block2 = 1'b1;
-
             else if((rr_r2 > 11'd19) && !rr_r2[5])
-
             rot_block2 = 1'b1;
-
             else if((cc_r2 <= (COL - 1'b1)) && (rr_r2 <= 11'd19) && row_w[rr_r2][cc_r2])
-
             rot_block2 = 1'b1;
-
         end
-
         en_rotate2 = (rotate_p_flag2) && (!rot_block2) && (!lock_we2);
-
     end
-
-
 
 //==== P2 block: rot <= 2'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         rot2 <= 2'd0;
-
         else if(Finalize)begin
-
             if(switch_r_flag)
-
             rot2 <= 2'd0;
-
             else
-
             rot2 <= rot2;
-
         end
-
         else if(Stop)
-
         rot2 <= rot2;
-
         else if(Playing)begin
-
             if(land_we2)
-
             rot2 <= rot2;
-
             else if(en_rotate2)
-
             rot2 <= rot2 + 2'd1;
-
             else if(land_pulse2 || hold_up2)
-
             rot2 <= 2'd0;
-
         end
-
         else
-
         rot2 <= 2'd0;
-
     end
-
-
 
 //==== P2 block: counter_land <= 1'b0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         counter_land2 <= 1'b0;
-
         else if(Playing)begin
-
             if(land2 && !lock_we2)
-
             counter_land2 <= counter_land2 + 30'd1;
-
             else
-
             counter_land2 <= 1'b0;
-
         end
-
         else
-
         counter_land2 <= 1'b0;
-
     end
-
-
 
 //==== P2 block: lock_t <= 1'b0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         lock_t2 <= 1'b0;
-
         else if(land_pulse2)
-
         lock_t2 <= 1'b1;
-
         else
-
         lock_t2 <= 1'b0;
-
     end
-
-
 
 //==== P2 block: lock_cnt <= 2'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         lock_cnt2 <= 2'd0;
-
         else if(lock_t2)
-
         lock_cnt2 <= 2'd1;
-
         else if(lock_cnt2 == 2'd3)
-
         lock_cnt2 <= 2'd0;
-
         else if(lock_cnt2 != 2'd0)
-
         lock_cnt2 <= lock_cnt2 + 2'd1;
-
     end
-
-
 
 //==== P2 block: lock_counter <= 2'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         lock_counter2 <= 2'd0;
-
         else if(land_pulse_t2)
-
         lock_counter2 <= 2'd1;
-
         else if(lock_counter2 == 5940000)
-
         lock_counter2 <= 2'd0;
-
         else if(lock_counter2 != 2'd0)
-
         lock_counter2 <= lock_counter2 + 2'd1;
-
     end
-
-
 
 //==== P2 block: cc_t[0] <= 11'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)begin
-
             cc_t2[0] <= 11'd0; cc_t2[1] <= 11'd0; cc_t2[2] <= 11'd0; cc_t2[3] <= 11'd0;
-
         end
-
         else if(land_pulse2)
-
         for(y = 0; y < 4; y = y + 1)
-
         cc_t2[y] <= counter_c2 + { {7{Tetromino_dout2[y*8+7]}}, Tetromino_dout2[y*8+7 -:4] };
-
     end
-
-
 
 //==== P2 block: rr_t[0] <= 11'd0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)begin
-
             rr_t2[0] <= 11'd0; rr_t2[1] <= 11'd0; rr_t2[2] <= 11'd0; rr_t2[3] <= 11'd0;
-
         end
-
         else if(land_pulse2)
-
         for(y = 0; y < 4; y = y + 1)
-
         rr_t2[y] <= counter_r2 + { {7{Tetromino_dout2[y*8+3]}}, Tetromino_dout2[y*8+3 -:4] };
-
     end
-
-
 
 //==== P2 block: en_hold <= 0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         en_hold2 <= 0;
-
         else if(Idle)
-
         en_hold2 <= 1'b0;
-
         else if(Stop)
-
         en_hold2 <= en_hold2;
-
         else if(Finalize)begin
-
             if(switch_r_flag)
-
             en_hold2 <=1'b0;
-
             else
-
             en_hold2 <= en_hold2;
-
         end
-
         else if(!en_hold2 && hold_p_flag2)
-
         en_hold2 <= 1;
-
         else if(en_hold2 && hold_p_flag2)
-
         en_hold2 <= 0;
-
     end
-
-
 
 //==== P2 block: en_hold_t <= 0; ====
-
     always@(posedge Clk_74M or negedge Reset_n)begin
-
         if(!Reset_n)
-
         en_hold_t2 <= 0;
-
         else
-
         en_hold_t2 <= en_hold2;
-
     end
-
 
 endmodule
