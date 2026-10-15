@@ -16,7 +16,8 @@ FPGA 发来的结果包（每局结束进结束画面时发，之后每 500ms �
           bit4=小键盘0(保持)  bit5=小键盘5(开始/暂停)  bit6=小键盘9(复位)
   按下/松开立刻发一包，另外每 20ms 无条件重发一包（丢包 20ms 自愈）
 
-注意：FPGA 不回 ARP，所以要先双击一次 tools\一次性-设置静态ARP.bat。
+注意：FPGA 不回 ARP，所以第一次用（或重启后）请双击一次 tools\双击启动.bat，
+      它会自动把静态 ARP 绑到正确的网卡，然后启动本程序。
 """
 import os, socket, sys, threading, time
 
@@ -137,8 +138,48 @@ except Exception:
     pass
 
 
+def local_ip_in_subnet(prefix="192.168.0."):
+    """本机是否有一块网卡是 192.168.0.x；有就返回这个地址。"""
+    ips = set()
+    try:
+        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            ips.add(info[4][0])
+    except Exception:
+        pass
+    try:
+        for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
+            ips.add(ip)
+    except Exception:
+        pass
+    for ip in sorted(ips):
+        if ip.startswith(prefix):
+            return ip
+    return None
+
+
 def tx_loop():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # 把发送源地址钉在场地网卡上：不钉的话，去 192.168.0.2 的包可能被 WiFi/VPN 的默认路由抢走
+    auto_src = None
+    try:
+        probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        probe.connect((FPGA_IP, FPGA_PORT))
+        auto_src = probe.getsockname()[0]
+        probe.close()
+    except Exception:
+        auto_src = None
+    local = local_ip_in_subnet()
+    if local:
+        try:
+            s.bind((local, 0))
+            print("[按键] 源地址固定为 %s -> %s:%d" % (local, FPGA_IP, FPGA_PORT))
+            if auto_src and auto_src != local:
+                print("[提示] 系统原本会从 %s 发出（不是场地网段），已改为走 %s" % (auto_src, local))
+        except Exception as e:
+            print("[警告] 绑定本机地址 %s 失败(%s)，改用系统默认路由" % (local, e))
+    else:
+        print("[按键] 没找到本机 192.168.0.x 地址（源地址 %s）；按键若无效，请双击 双击启动.bat"
+              % (auto_src or "未知"))
     nxt = time.time()
     while True:
         now = time.time()
@@ -287,7 +328,7 @@ def main():
     res_csv_load()
     print("成绩文件: %s" % SCORE_CSV)
     print("画面目标: 监听 %d 端口 <- FPGA" % LISTEN_PORT)
-    print("按键目标: 发给 %s:%d（要先跑一次 一次性-设置静态ARP.bat）" % (FPGA_IP, FPGA_PORT))
+    print("按键目标: 发给 %s:%d（静态 ARP 由 双击启动.bat 自动设置）" % (FPGA_IP, FPGA_PORT))
     threading.Thread(target=rx_loop, daemon=True).start()
     start_listener()
     threading.Thread(target=tx_loop, daemon=True).start()
