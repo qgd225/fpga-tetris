@@ -17,6 +17,12 @@ module frame(
     input choose,
     input [3:0]choose_cnt,
     input duo,
+    input left_p_flag2,
+    input right_p_flag2,
+    input drop_r_flag2,
+    input drop_en2,
+    input rotate_p_flag2,
+    input hold_p_flag2,
     
     output reg [23:0]rgb,
     output over,
@@ -54,6 +60,21 @@ module frame(
     wire [19:0]line_t;
     wire clear_flash;
     
+    //    P2(双人)显示用
+    wire Piece2;
+    wire ghost2;
+    wire [2:0]type2;
+    wire [2:0]type_d2;
+    wire [2:0]type_t2;
+    wire [19:0]cc_d2;
+    wire [19:0]rr_d2;
+    wire lock_we2;
+    wire [1:0]lock_idx2;
+    wire land_we2;
+    wire next2;
+    wire [4:0]cc_t2 [0:3];
+    wire [4:0]rr_t2 [0:3];
+
     reg [15:0]lines_total;
 
     always@(posedge Clk_74M or negedge Reset_n)begin
@@ -89,20 +110,31 @@ module frame(
     assign rr_t[1] = rr_d[14:10];
     assign rr_t[2] = rr_d[9:5];
     assign rr_t[3] = rr_d[4:0];
+
+    assign cc_t2[0] = cc_d2[19:15];
+    assign cc_t2[1] = cc_d2[14:10];
+    assign cc_t2[2] = cc_d2[9:5];
+    assign cc_t2[3] = cc_d2[4:0];
+    assign rr_t2[0] = rr_d2[19:15];
+    assign rr_t2[1] = rr_d2[14:10];
+    assign rr_t2[2] = rr_d2[9:5];
+    assign rr_t2[3] = rr_d2[4:0];
     
-    reg [2:0]state_color[0:399];
+    reg [2:0]state_color[0:479];
     
     integer c;
     integer m;
     integer y;
     
     always @(posedge Clk_74M) begin
-    if(lock_we)begin
-        if((cc_t[lock_idx] <= 19) && (rr_t[lock_idx] <= 19))
+    if(lock_we || (duo && lock_we2))begin
+        if(lock_we && (cc_t[lock_idx] <= (duo ? 5'd23 : 5'd19)) && (rr_t[lock_idx] <= 5'd19))
         state_color[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= type_d;
+        if(duo && lock_we2 && (cc_t2[lock_idx2] <= 5'd23) && (rr_t2[lock_idx2] <= 5'd19))
+        state_color[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= type_d2;
     end
     else if(clear_time && !clear_t && !clear_pulse)begin 
-        for(c = 0; c < 20; c = c + 1)
+        for(c = 0; c < 24; c = c + 1)
             for(m = 1; m < 20; m = m + 1)
                 if(m <= clear_row)
                 state_color[c*20 + m] <= state_color[c*20 + m - 1];
@@ -127,6 +159,13 @@ module frame(
     .Finalize(Finalize),
     .score(score),
     .time_sec(time_sec),
+    .duo(duo),
+    .left_p_flag2(left_p_flag2),
+    .right_p_flag2(right_p_flag2),
+    .drop_r_flag2(drop_r_flag2),
+    .drop_en2(drop_en2),
+    .rotate_p_flag2(rotate_p_flag2),
+    .hold_p_flag2(hold_p_flag2),
     
     .state(state),
     .Piece(Piece),
@@ -154,7 +193,17 @@ module frame(
     .speed_level(speed_level),
     .land_we(land_we),
     .line_t(line_t),
-    .clear_flash(clear_flash)
+    .clear_flash(clear_flash),
+    .Piece2(Piece2),
+    .ghost2(ghost2),
+    .type2_out(type2),
+    .type_d2_out(type_d2),
+    .type_t2_out(type_t2),
+    .cc_d2(cc_d2),
+    .rr_d2(rr_d2),
+    .lock_we2(lock_we2),
+    .lock_idx2(lock_idx2),
+    .land_we2(land_we2)
     );
     
     
@@ -216,9 +265,12 @@ module frame(
     .hcounter(hcounter),
     .vcounter(vcounter),
     .Idle(Idle),
+    .duo(duo),
     .type_t(type_t),
+    .type_t2(type_t2),
     
     .next(next),
+    .next2(next2),
     .next_margin(next_margin)
     );
     
@@ -231,6 +283,7 @@ module frame(
     .hcounter(hcounter),
     .vcounter(vcounter),
     .Idle(Idle),
+    .duo(duo),
     .en_hold(en_hold),
     .hold_type(hold_type),
     
@@ -320,6 +373,12 @@ module frame(
     reg chs_inner_r;
     reg chs_text_r;
     reg chs_dim_r;
+    reg Piece2_r;
+    reg ghost2_r;
+    reg [2:0]type2_r;
+    reg [2:0]type_t2_r;
+    reg land_we2_r;
+    reg next2_r;
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -351,6 +410,12 @@ module frame(
     chs_inner_r <= 1'b0;
     chs_text_r <= 1'b0;
     chs_dim_r <= 1'b0;
+    Piece2_r <= 1'b0;
+    ghost2_r <= 1'b0;
+    type2_r <= 3'd0;
+    type_t2_r <= 3'd0;
+    land_we2_r <= 1'b0;
+    next2_r <= 1'b0;
     end
     else begin
     over_lit_r <= over_lit;
@@ -381,6 +446,12 @@ module frame(
     chs_inner_r <= chs_inner;
     chs_text_r <= chs_text;
     chs_dim_r <= chs_dim;
+    Piece2_r <= Piece2;
+    ghost2_r <= ghost2;
+    type2_r <= type2;
+    type_t2_r <= type_t2;
+    land_we2_r <= land_we2;
+    next2_r <= next2;
     end
     end
     parameter CYAN = 24'h00CCFF,//青色I
@@ -470,6 +541,18 @@ module frame(
         default:rgb = 0;
         endcase
         end
+    else if(next2_r)begin
+        case(type_t2_r)
+        0:rgb = CYAN;
+        1:rgb = PURPPLE;
+        2:rgb = YELLOW;
+        3:rgb = RED;
+        4:rgb = GREEN;
+        5:rgb = ORANGE;
+        6:rgb = PINK;
+        default:rgb = 0;
+        endcase
+        end
     else if(next_margin_r)
     rgb = WHITE;
     else if(score_lit_r)
@@ -532,6 +615,33 @@ module frame(
         default:rgb = 0;
         endcase
     end
+    else if(Piece2_r)begin
+        if(land_we2_r)
+        rgb = 24'hEEEEEE;
+        else
+        case(type2_r)
+        0:rgb = CYAN;
+        1:rgb = PURPPLE;
+        2:rgb = YELLOW;
+        3:rgb = RED;
+        4:rgb = GREEN;
+        5:rgb = ORANGE;
+        6:rgb = PINK;
+        default:rgb = 0;
+        endcase
+        end
+    else if(ghost2_r)begin
+        case(type2_r)
+        0:rgb = LIGHT_CYAN;
+        1:rgb = LIGHT_PURPPLE;
+        2:rgb = LIGHT_YELLOW;
+        3:rgb = LIGHT_RED;
+        4:rgb = LIGHT_GREEN;
+        5:rgb = LIGHT_ORANGE;
+        6:rgb = LIGHT_PINK;
+        default:rgb = 0;
+        endcase
+        end
     else
     rgb = BLACK;
     end

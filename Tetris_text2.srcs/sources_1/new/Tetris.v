@@ -110,14 +110,14 @@ module Tetris(
     .hold_p_flag(hold_p_flag)
     );
 
-wire left_p     = left_p_flag   | kb_left_p;
-wire right_p    = right_p_flag  | kb_right_p;
-wire drop_r_f   = drop_r_flag   | kb_drop_r;
-wire drop_e     = drop_en       | kb_drop_en;
-wire rotate_p   = rotate_p_flag | kb_rotate_p;
+wire left_p     = left_p_flag;
+wire right_p    = right_p_flag;
+wire drop_r_f   = drop_r_flag;
+wire drop_e     = drop_en;
+wire rotate_p   = rotate_p_flag;
 wire switch_r_f = switch_r_flag | kb_switch_r;
 wire switch_e   = switch_en     | kb_switch_en;
-wire hold_p     = hold_p_flag   | kb_hold_p;
+wire hold_p     = hold_p_flag;
     
 //    ÓÎÏ·×´Ì¬»ú
     wire Idle;  
@@ -170,6 +170,12 @@ wire hold_p     = hold_p_flag   | kb_hold_p;
     .choose(choose),
     .choose_cnt(choose_cnt),
     .duo(duo),
+    .left_p_flag2(kb_left_p),
+    .right_p_flag2(kb_right_p),
+    .drop_r_flag2(kb_drop_r),
+    .drop_en2(kb_drop_en),
+    .rotate_p_flag2(kb_rotate_p),
+    .hold_p_flag2(kb_hold_p),
     .Playing(Playing),
     .Stop(Stop),
     .Finalize(Finalize),

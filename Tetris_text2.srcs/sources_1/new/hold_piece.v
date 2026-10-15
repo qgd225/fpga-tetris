@@ -4,6 +4,7 @@ module hold_piece(
     input [10:0]hcounter,
     input [10:0]vcounter,
     input Idle,
+    input duo,
     input [2:0]hold_type,
     input en_hold,
     
@@ -11,6 +12,14 @@ module hold_piece(
     output reg hold_margin
     );
     
+    //    单人: 盒子 x1040-1200, y264-424; 双人: 右移下移到 x1104-1264, y360-520
+    wire [10:0]XB = duo ? 11'd1104 : 11'd1040;
+    wire [10:0]XE = duo ? 11'd1264 : 11'd1200;
+    wire [10:0]YB = duo ? 11'd360  : 11'd264;
+    wire [10:0]YE = duo ? 11'd520  : 11'd424;
+    wire [10:0]XI = duo ? 11'd1121 : 11'd1057;
+    wire [10:0]Y1 = duo ? 11'd377  : 11'd281;
+
     integer i;
     
     reg [1:0]C_num;
@@ -19,10 +28,10 @@ module hold_piece(
     reg [3:0]rr;
     
     always@(*)begin
-    if(     (hcounter >= 1040 && hcounter < 1043 &&  vcounter >= 264 && vcounter < 424) ||
-            (hcounter >= 1197 && hcounter < 1200 &&  vcounter >= 264 && vcounter < 424) ||
-            (hcounter >= 1040 && hcounter < 1200 &&  vcounter >= 264 && vcounter < 267) ||
-            (hcounter >= 1040 && hcounter < 1200 &&  vcounter >= 421 && vcounter < 424))
+    if(     (hcounter >= XB && hcounter < (XB + 11'd3) && vcounter >= YB && vcounter < YE) ||
+            (hcounter >= (XE - 11'd3) && hcounter < XE && vcounter >= YB && vcounter < YE) ||
+            (hcounter >= XB && hcounter < XE && vcounter >= YB && vcounter < (YB + 11'd3)) ||
+            (hcounter >= XB && hcounter < XE && vcounter >= (YE - 11'd3) && vcounter < YE))
     hold_margin = 1'b1;
     else
     hold_margin = 1'b0;
@@ -31,19 +40,21 @@ module hold_piece(
     integer o;
     integer p;
     
-    always@(*)begin
+    always@(*)begin : blk1
+        integer o, p;
     C_num = 11'd0;
     for(o = 0; o < 4; o = o + 1)
     for(p = 0; p < 4; p = p + 1)
-    if(hcounter >= (1057 + 32*o) && hcounter < (1087 + 32*o) && vcounter >= (281 + 32*p) && vcounter < (311 + 32*p))
+    if(hcounter >= (XI + 32*o) && hcounter < (XI + 30 + 32*o) && vcounter >= (Y1 + 32*p) && vcounter < (Y1 + 30 + 32*p))
     C_num = o;
     end
     
-    always@(*)begin
+    always@(*)begin : blk2
+        integer o, p;
     R_num = 11'd0;
     for(p = 0; p < 4; p = p + 1)
     for(o = 0; o < 4; o = o + 1)
-    if(hcounter >= (1057 + 32*o) && hcounter < (1087 + 32*o) && vcounter >= (281 + 32*p) && vcounter < (311 + 32*p))
+    if(hcounter >= (XI + 32*o) && hcounter < (XI + 30 + 32*o) && vcounter >= (Y1 + 32*p) && vcounter < (Y1 + 30 + 32*p))
     R_num = p;
     end
     

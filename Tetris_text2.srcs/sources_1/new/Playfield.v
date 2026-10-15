@@ -53,12 +53,16 @@ module Playfield(
     output reg clear_flash,
     output reg Piece2,
     output reg ghost2,
-    output reg [4:0]C_num2,
-    output reg [4:0]R_num2,
+    output wire [4:0]C_num2,
+    output wire [4:0]R_num2,
     output wire [2:0]type2_out,
     output wire [19:0]cc_d2,
     output wire [19:0]rr_d2,
-    output wire [2:0]type_d2_out
+    output wire [2:0]type_d2_out,
+    output wire lock_we2,
+    output wire [1:0]lock_idx2,
+    output wire land_we2,
+    output wire [2:0]type_t2_out
     );
 
 
@@ -88,6 +92,19 @@ module Playfield(
 
     wire [4:0]COL = duo ? 5'd24 : 5'd20;
 
+    //    双人模式时间阈值(放宽)
+    parameter [13:0]TIME_LV1_D = 14'd40;
+    parameter [13:0]TIME_LV2_D = 14'd120;
+    parameter [13:0]TIME_LV3_D = 14'd240;
+    parameter [13:0]TIME_LV4_D = 14'd400;
+    parameter [13:0]TIME_LV5_D = 14'd600;
+    parameter [13:0]TIME_LV6_D = 14'd880;
+    parameter [13:0]TIME_LV7_D = 14'd1200;
+
+    //    出生列: 双人用 24 列的三等分点
+    wire [4:0]SPAWN_C1 = duo ? 5'd8  : 5'd9;
+    wire [4:0]SPAWN_C2 = duo ? 5'd16 : 5'd9;
+
 
 //============================================================
 //    信号声明
@@ -109,7 +126,7 @@ module Playfield(
     reg  [4:0]Tetromino_addr;
     reg [4:0]Tetromino_addr1;
     wire [31:0]Tetromino_dout1;
-    wire [4:0]counter_ghost_r_t;
+    reg  [4:0]counter_ghost_r_t;
 
 //    落地与锁定
     wire land_pulse;
@@ -184,10 +201,9 @@ module Playfield(
     reg  [4:0]Tetromino_addr2;
     reg [4:0]Tetromino_addr3;
     wire [31:0]Tetromino_dout3;
-    wire [4:0]counter_ghost_r_t2;
+    reg  [4:0]counter_ghost_r_t2;
     wire land_pulse2;
     wire land_pulse_t2;
-    wire land_we2;
     reg [1:0]lock_cnt2;
     reg [4:0]cc_t2 [0:3];
     reg [4:0]rr_t2 [0:3];
@@ -207,9 +223,46 @@ module Playfield(
     wire hold_up2 = !en_hold_t2 && en_hold2;
     wire hold_down2 = en_hold_t2 && !en_hold2;
     reg lock_t2;
-    wire lock_we2;
-    wire [1:0]lock_idx2;
     wire [9:0]douta_dummy2;
+
+//    Duo: 互撞/顶住 + 通用幽灵扫描(本轮新增)
+    reg  other_down_hold;
+    reg  other_down_hold2;
+    reg  [5:0]cc_o1, rr_o1;
+    reg  [5:0]cc_o2, rr_o2;
+    reg  [5:0]gc1, gr1, oc1, or1;
+    reg  [5:0]gc2, gr2, oc2, or2;
+    reg  ghost_blocked1, ghost_blk_state1, ghost_blk_other1;
+    reg  ghost_blocked2, ghost_blk_state2, ghost_blk_other2;
+    reg  [4:0]ghost_scan_r, ghost_scan_r2;
+    reg  ghost_done, ghost_done2;
+    reg  ghost_blk_oth, ghost_blk_oth2;
+    reg  [4:0]counter_r_d1, counter_r2_d1;
+    reg  [15:0]sig_p1_d, sig_p2_d;
+    integer j1;
+    integer j2;
+    integer jg1;
+    integer jg1b;
+    integer jg2;
+    integer jg2b;
+    wire [15:0]sig_p1 = {duo, counter_c[4:0], counter_r[4:0], type[2:0], rot[1:0]};
+    wire [15:0]sig_p2 = {duo, counter_c2[4:0], counter_r2[4:0], type2[2:0], rot2[1:0]};
+    wire other_moved1 = (sig_p2 != sig_p2_d);
+    wire other_moved2 = (sig_p1 != sig_p1_d);
+    wire new_piece1 = (counter_r == 5'd0) && (counter_r_d1 != 5'd0);
+    wire new_piece2 = (counter_r2 == 5'd0) && (counter_r2_d1 != 5'd0);
+    wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || (Finalize && switch_r_flag) || clear_down || (duo && other_moved1);
+    wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || (Finalize && switch_r_flag) || clear_down || (duo && other_moved2);
+
+//    P2 独立信号(修复: 原克隆漏改, 误用 P1 信号)
+    wire drop_hold2;
+    wire drop_r2;
+    wire [7:0]weiyibiao_dout2;
+    wire [4:0]weiyibiao_addr2;
+    wire [3:0]ddc2;
+    wire [3:0]ddr2;
+    wire [10:0]ddc_ext2;
+    wire [10:0]ddr_ext2;
 
 
 //    循环变量
@@ -220,6 +273,10 @@ module Playfield(
     integer o;
     integer p;
     integer k;
+    integer i2;
+    integer o2;
+    integer p2;
+    integer k2;
 
 
 //============================================================
@@ -239,6 +296,7 @@ module Playfield(
         boundary_collision_right = 1'b0;
         ghost = 1'b0;
         touch_top = 1'b0;
+        other_down_hold = 1'b0;
         if(Idle || Finalize)begin
              Piece = 1'b0;
              ghost = 1'b0;
@@ -247,6 +305,22 @@ module Playfield(
         for(i = 0; i < 4; i = i + 1)begin
             cc = counter_c + { { 7{Tetromino_dout[i*8+7]} }, Tetromino_dout[(i*8+7)-:4] };
             rr = counter_r + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
+
+            //    与对方运动方块互撞: 左右阻挡 / 下行顶住(不算落底) / 重合
+            if(duo)begin
+                for(j1 = 0; j1 < 4; j1 = j1 + 1)begin
+                    cc_o1 = counter_c2 + { { 7{Tetromino_dout2[j1*8+7]} }, Tetromino_dout2[(j1*8+7)-:4] };
+                    rr_o1 = counter_r2 + { { 7{Tetromino_dout2[j1*8+3]} }, Tetromino_dout2[(j1*8+3)-:4] };
+                    if((rr_o1 == rr) && (cc > 0) && (cc_o1 == (cc - 1'd1)))
+                    boundary_collision_left = 1'b1;
+                    if((rr_o1 == rr) && (cc_o1 == (cc + 1'd1)))
+                    boundary_collision_right = 1'b1;
+                    if((cc_o1 == cc) && (rr_o1 == (rr + 1'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && state[cc*20 + (rr + 1'd1)]))
+                    other_down_hold = 1'b1;
+                    if((cc_o1 == cc) && (rr_o1 == rr))
+                    touch_top = 1'b1;
+                end
+            end
 
             if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && state[cc*20 + (rr + 1)]))//落底检测
             land = 1'b1;
@@ -266,7 +340,7 @@ module Playfield(
 
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
 
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (counter_ghost_r_t - counter_r) > 4)
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && (counter_ghost_r_t - counter_r) > 4)
             ghost = 1'b1;
 
         end
@@ -276,20 +350,16 @@ module Playfield(
 //============================================================
 //    划区
 //============================================================
-    always@(*)begin
+    always@(*)begin : blk1
+        integer o, p;
         C_num = 5'd20;
-        for(o = 0; o < 24; o = o + 1)
-        for(p = 0; p < 20; p = p + 1)
-        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
-        C_num = o[4:0];
-    end
-
-    always@(*)begin
         R_num = 5'd20;
-        for(p = 0; p < 20; p = p + 1)
         for(o = 0; o < 24; o = o + 1)
-        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
-        R_num = p;
+        for(p = 0; p < 20; p = p + 1)
+        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))begin
+        C_num = o[4:0];
+        R_num = p[4:0];
+        end
     end
 
 
@@ -392,13 +462,24 @@ module Playfield(
                          (score >= LV2_TH) ? 3'd2 :
                          (score >= LV1_TH) ? 3'd1 : 3'd0;
 
-    wire [2:0]lv_time  = (time_sec >= TIME_LV7) ? 3'd7 :
+    wire [2:0]lv_time_s = (time_sec >= TIME_LV7) ? 3'd7 :
                          (time_sec >= TIME_LV6) ? 3'd6 :
                          (time_sec >= TIME_LV5) ? 3'd5 :
                          (time_sec >= TIME_LV4) ? 3'd4 :
                          (time_sec >= TIME_LV3) ? 3'd3 :
                          (time_sec >= TIME_LV2) ? 3'd2 :
                          (time_sec >= TIME_LV1) ? 3'd1 : 3'd0;
+
+    wire [2:0]lv_time_d = (time_sec >= TIME_LV7_D) ? 3'd7 :
+                         (time_sec >= TIME_LV6_D) ? 3'd6 :
+                         (time_sec >= TIME_LV5_D) ? 3'd5 :
+                         (time_sec >= TIME_LV4_D) ? 3'd4 :
+                         (time_sec >= TIME_LV3_D) ? 3'd3 :
+                         (time_sec >= TIME_LV2_D) ? 3'd2 :
+                         (time_sec >= TIME_LV1_D) ? 3'd1 : 3'd0;
+
+    //    双人: 时间阈值放宽; 规则仍为 分数等级/时间等级 取较大值
+    wire [2:0]lv_time  = duo ? lv_time_d : lv_time_s;
 
     wire [2:0]lv_now   = (lv_score > lv_time) ? lv_score : lv_time;
 
@@ -442,13 +523,13 @@ module Playfield(
             counter_r <= counter_r;
             else if(land_pulse || hold_up)//归位
             counter_r <= 5'd0;
-            else if(drop_r && !land && !lock_we)//软降
+            else if(drop_r && !land && !lock_we && !other_down_hold)//软降
             counter_r <= counter_r + 1'd1;
             else if(drop_hold && !lock_we)//硬降
             counter_r <= counter_ghost_r_t;
             else if(en_rotate)//旋转
             counter_r <= counter_r + ddr_ext;
-            else if(counter_drop == Drop && !land && !lock_we)//自动下落
+            else if(counter_drop == Drop && !land && !lock_we && !other_down_hold)//自动下落
             counter_r <= counter_r + 1'd1;
         end
         else
@@ -457,10 +538,10 @@ module Playfield(
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
-        counter_c <= 5'd9;
+        counter_c <= SPAWN_C1;
         else if(Finalize)begin
             if(switch_r_flag)
-            counter_c <= 5'd9;
+            counter_c <= SPAWN_C1;
             else
             counter_c <= counter_c;
         end
@@ -470,7 +551,7 @@ module Playfield(
             if(land_we)
             counter_c <= counter_c;
             else if(land_pulse || hold_up)//归位
-            counter_c <= 5'd9;
+            counter_c <= SPAWN_C1;
             else if(en_rotate)//旋转
             counter_c <= counter_c + ddc_ext;
             else if(!boundary_collision_left && left_p_flag && !lock_we)//左移
@@ -479,7 +560,7 @@ module Playfield(
             counter_c <= counter_c + 1;
         end
         else
-        counter_c <= 5'd9;
+        counter_c <= SPAWN_C1;
     end
 
 
@@ -506,11 +587,11 @@ module Playfield(
         for(k = 0; k < 4; k = k + 1)begin
             cc_r = counter_c + ddc_ext + { { 7{Tetromino_dout1[k*8+7]} }, Tetromino_dout1[(k*8+7)-:4] };
             rr_r = counter_r + ddr_ext + { { 7{Tetromino_dout1[k*8+3]} }, Tetromino_dout1[(k*8+3)-:4] };
-            if(cc_r > (COL - 1'b1))
+            if((cc_r > (COL - 1'b1)) || cc_r[5])
             rot_block = 1'b1;
-            else if(rr_r > 11'd19)
+            else if((rr_r > 11'd19) && !rr_r[5])
             rot_block = 1'b1;
-            else if(state[cc_r*20 + rr_r])
+            else if((cc_r <= (COL - 1'b1)) && (rr_r <= 11'd19) && state[cc_r*20 + rr_r])
             rot_block = 1'b1;
         end
         en_rotate = (rotate_p_flag) && (!rot_block) && (!lock_we);
@@ -660,7 +741,8 @@ module Playfield(
         end
     end
 
-    always@(*)begin
+    always@(*)begin : blk4
+        integer m;
         clear = 1'b0;
         line = 20'd0;
         for(m = 0; m < 20; m = m + 1)begin
@@ -758,14 +840,16 @@ module Playfield(
     line_t <= 20'd0;
     end
 
-    always@(*)begin
+    always@(*)begin : blk5
+        integer m;
     line_d = 20'd0;
     for(m = 0; m < 20; m = m + 1)
     if(line[m] && !line_t[m])
     line_d = (20'd1 << m);
     end
 
-    always@(*)begin
+    always@(*)begin : blk6
+        integer m;
         clear_row = 5'd0;
         for(m = 0; m < 20; m = m + 1)
         if(line[m])
@@ -792,25 +876,76 @@ module Playfield(
 //============================================================
 //    Ghost 方块
 //============================================================
-    Ghost_piece Ghost_piece_inst(
-        .Clk_74M(Clk_74M),
-        .Reset_n(Reset_n),
-        .state(state),
-        .counter_ghost_r_t(counter_ghost_r_t),
-        .counter_r(counter_r),
-        .counter_c(counter_c),
-        .type(type),
-        .rot(rot),
-        .C_num(C_num),
-        .R_num(R_num),
-        .rotate_p(en_rotate),
-        .left_p(left_p_flag),
-        .right_p(right_p_flag),
-        .land_pulse(land_pulse),
-        .switch_r_flag(switch_r_flag),
-        .clear_down(clear_down),
-        .Finalize(Finalize)
-    );
+//============================================================
+//    P1 幽灵落点: 通用逐行扫描(地板/已落格/对方运动方块)
+//============================================================
+    always@(*)begin
+        ghost_blocked1 = 1'b0;
+        ghost_blk_state1 = 1'b0;
+        ghost_blk_other1 = 1'b0;
+        for(jg1 = 0; jg1 < 4; jg1 = jg1 + 1)begin
+            gc1 = counter_c + { { 7{Tetromino_dout[jg1*8+7]} }, Tetromino_dout[(jg1*8+7)-:4] };
+            gr1 = ghost_scan_r + { { 7{Tetromino_dout[jg1*8+3]} }, Tetromino_dout[(jg1*8+3)-:4] };
+            if((!gr1[5]) && (gr1 > 6'd19))
+            ghost_blocked1 = 1'b1;
+            else if((!gr1[5]) && (gc1 <= (COL - 1'b1)) && state[gc1*20 + gr1])begin
+                ghost_blocked1 = 1'b1;
+                ghost_blk_state1 = 1'b1;
+            end
+            else if(duo)begin
+                for(jg1b = 0; jg1b < 4; jg1b = jg1b + 1)begin
+                    oc1 = counter_c2 + { { 7{Tetromino_dout2[jg1b*8+7]} }, Tetromino_dout2[(jg1b*8+7)-:4] };
+                    or1 = counter_r2 + { { 7{Tetromino_dout2[jg1b*8+3]} }, Tetromino_dout2[(jg1b*8+3)-:4] };
+                    if((gc1 == oc1) && (gr1 == or1))begin
+                        ghost_blocked1 = 1'b1;
+                        ghost_blk_other1 = 1'b1;
+                    end
+                end
+            end
+        end
+    end
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin
+            ghost_scan_r <= 5'd0;
+            ghost_done <= 1'b0;
+            ghost_blk_oth <= 1'b0;
+            counter_ghost_r_t <= 5'd0;
+        end
+        else if(ghost_restart1)begin
+            ghost_scan_r <= counter_r;
+            ghost_done <= 1'b0;
+            ghost_blk_oth <= 1'b0;
+        end
+        else if(!ghost_done)begin
+            if(ghost_blocked1)begin
+                ghost_done <= 1'b1;
+                ghost_blk_oth <= ghost_blk_other1;
+                counter_ghost_r_t <= ghost_scan_r - 5'd1;
+            end
+            else if(ghost_scan_r < 5'd20)
+            ghost_scan_r <= ghost_scan_r + 5'd1;
+            else
+            ghost_done <= 1'b1;
+        end
+    end
+
+//    延迟寄存(供重启条件使用)
+    always@(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin
+            sig_p1_d <= 16'd0;
+            sig_p2_d <= 16'd0;
+            counter_r_d1 <= 5'd0;
+            counter_r2_d1 <= 5'd0;
+        end
+        else begin
+            sig_p1_d <= sig_p1;
+            sig_p2_d <= sig_p2;
+            counter_r_d1 <= counter_r;
+            counter_r2_d1 <= counter_r2;
+        end
+    end
+
 
 
 //============================================================
@@ -847,6 +982,8 @@ module Playfield(
         hold_type <= 0;
         else if(hold_up)
         hold_type <= type;
+        else if(hold_up2)
+        hold_type <= type2;
     end
 
 
@@ -884,6 +1021,11 @@ module Playfield(
 
     assign type2_out = type2;
     assign type_d2_out = type_d2;
+    assign type_t2_out = type_t2;
+
+    //    C_num2/R_num2 与 C_num/R_num 完全同源(同一次搜索), 直接复用省逻辑
+    assign C_num2 = C_num;
+    assign R_num2 = R_num;
 
     assign land_we2  = (lock_counter2 != 0) && (lock_counter2 != 5940000) && (lock_counter2[21]);
     assign land_pulse2 = (lock_counter2 == 5940000) ? 1 : 0;
@@ -892,25 +1034,77 @@ module Playfield(
     assign cc_d2 = {cc_t2[0], cc_t2[1], cc_t2[2], cc_t2[3]};
     assign rr_d2 = {rr_t2[0], rr_t2[1], rr_t2[2], rr_t2[3]};
 
-    Ghost_piece Ghost_piece_inst2(
-        .Clk_74M(Clk_74M),
-        .Reset_n(Reset_n),
-        .state(state),
-        .counter_ghost_r_t(counter_ghost_r_t2),
-        .counter_r(counter_r2),
-        .counter_c(counter_c2),
-        .type(type2),
-        .rot(rot2),
-        .C_num(C_num2),
-        .R_num(R_num2),
-        .rotate_p(en_rotate2),
-        .left_p(left_p_flag2),
-        .right_p(right_p_flag2),
-        .land_pulse(land_pulse2),
-        .switch_r_flag(switch_r_flag),
-        .clear_down(clear_down),
-        .Finalize(Finalize)
+//    P2 独立的降键/落地/旋转偏移(修复克隆漏改)
+    assign drop_hold2 = (counter2 == MCNT) && (drop_r_t2);
+    assign drop_r2    = (drop_r_t2) && (drop_r_flag2);
+    assign land_pulse_t2 = (land2) && (counter_land2 == MCNT_LAND);
+
+    weiyibiao weiyibiao_inst2(
+        .clka(Clk_74M),
+        .addra(weiyibiao_addr2),
+        .douta(weiyibiao_dout2)
     );
+
+    assign weiyibiao_addr2 = {type2[2:0],rot2[1:0]};
+    assign ddc2     = weiyibiao_dout2[7:4];
+    assign ddr2     = weiyibiao_dout2[3:0];
+    assign ddc_ext2 = {{7{ddc2[3]}}, ddc2};
+    assign ddr_ext2 = {{7{ddr2[3]}}, ddr2};
+
+//============================================================
+//    P2 幽灵落点: 通用逐行扫描
+//============================================================
+    always@(*)begin
+        ghost_blocked2 = 1'b0;
+        ghost_blk_state2 = 1'b0;
+        ghost_blk_other2 = 1'b0;
+        for(jg2 = 0; jg2 < 4; jg2 = jg2 + 1)begin
+            gc2 = counter_c2 + { { 7{Tetromino_dout2[jg2*8+7]} }, Tetromino_dout2[(jg2*8+7)-:4] };
+            gr2 = ghost_scan_r2 + { { 7{Tetromino_dout2[jg2*8+3]} }, Tetromino_dout2[(jg2*8+3)-:4] };
+            if((!gr2[5]) && (gr2 > 6'd19))
+            ghost_blocked2 = 1'b1;
+            else if((!gr2[5]) && (gc2 <= (COL - 1'b1)) && state[gc2*20 + gr2])begin
+                ghost_blocked2 = 1'b1;
+                ghost_blk_state2 = 1'b1;
+            end
+            else if(duo)begin
+                for(jg2b = 0; jg2b < 4; jg2b = jg2b + 1)begin
+                    oc2 = counter_c + { { 7{Tetromino_dout[jg2b*8+7]} }, Tetromino_dout[(jg2b*8+7)-:4] };
+                    or2 = counter_r + { { 7{Tetromino_dout[jg2b*8+3]} }, Tetromino_dout[(jg2b*8+3)-:4] };
+                    if((gc2 == oc2) && (gr2 == or2))begin
+                        ghost_blocked2 = 1'b1;
+                        ghost_blk_other2 = 1'b1;
+                    end
+                end
+            end
+        end
+    end
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin
+            ghost_scan_r2 <= 5'd0;
+            ghost_done2 <= 1'b0;
+            ghost_blk_oth2 <= 1'b0;
+            counter_ghost_r_t2 <= 5'd0;
+        end
+        else if(ghost_restart2)begin
+            ghost_scan_r2 <= counter_r2;
+            ghost_done2 <= 1'b0;
+            ghost_blk_oth2 <= 1'b0;
+        end
+        else if(!ghost_done2)begin
+            if(ghost_blocked2)begin
+                ghost_done2 <= 1'b1;
+                ghost_blk_oth2 <= ghost_blk_other2;
+                counter_ghost_r_t2 <= ghost_scan_r2 - 5'd1;
+            end
+            else if(ghost_scan_r2 < 5'd20)
+            ghost_scan_r2 <= ghost_scan_r2 + 5'd1;
+            else
+            ghost_done2 <= 1'b1;
+        end
+    end
+
 
 //===================== P2 逻辑(自动生成) =====================
 //==== P2 block: Tetromino_addr = {type[2:0], rot[1:0]}; ====
@@ -931,21 +1125,41 @@ module Playfield(
 
         touch_top2 = 1'b0;
 
-        if(Idle || Finalize)begin
+        other_down_hold2 = 1'b0;
+
+        if(Idle || Finalize || !duo)begin//单人模式下 P2 不显示也不下落
 
              Piece2 = 1'b0;
 
              ghost2 = 1'b0;
 
+             land2 = 1'b1;
+
         end
 
         else
 
-        for(i = 0; i < 4; i = i + 1)begin
+        for(i2 = 0; i2 < 4; i2 = i2 + 1)begin
 
-            cc2 = counter_c2 + { { 7{Tetromino_dout2[i*8+7]} }, Tetromino_dout2[(i*8+7)-:4] };
+            cc2 = counter_c2 + { { 7{Tetromino_dout2[i2*8+7]} }, Tetromino_dout2[(i2*8+7)-:4] };
 
-            rr2 = counter_r2 + { { 7{Tetromino_dout2[i*8+3]} }, Tetromino_dout2[(i*8+3)-:4] };
+            rr2 = counter_r2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
+
+            //    与对方运动方块互撞
+            if(duo)begin
+                for(j2 = 0; j2 < 4; j2 = j2 + 1)begin
+                    cc_o2 = counter_c + { { 7{Tetromino_dout[j2*8+7]} }, Tetromino_dout[(j2*8+7)-:4] };
+                    rr_o2 = counter_r + { { 7{Tetromino_dout[j2*8+3]} }, Tetromino_dout[(j2*8+3)-:4] };
+                    if((rr_o2 == rr2) && (cc2 > 0) && (cc_o2 == (cc2 - 1'd1)))
+                    boundary_collision_left2 = 1'b1;
+                    if((rr_o2 == rr2) && (cc_o2 == (cc2 + 1'd1)))
+                    boundary_collision_right2 = 1'b1;
+                    if((cc_o2 == cc2) && (rr_o2 == (rr2 + 1'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && state[cc2*20 + (rr2 + 1'd1)]))
+                    other_down_hold2 = 1'b1;
+                    if((cc_o2 == cc2) && (rr_o2 == rr2))
+                    touch_top2 = 1'b1;
+                end
+            end
 
 
 
@@ -969,7 +1183,7 @@ module Playfield(
 
 
 
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num2 == cc2) && (R_num2 == rr2) && !rr2[5]) //正在运动方块
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr2) && !rr2[5]) //正在运动方块
 
             Piece2 = 1'b1;
 
@@ -981,11 +1195,11 @@ module Playfield(
 
 
 
-            rr_g2 = counter_ghost_r_t2 + { { 7{Tetromino_dout2[i*8+3]} }, Tetromino_dout2[(i*8+3)-:4] };
+            rr_g2 = counter_ghost_r_t2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
 
 
 
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num2 == cc2) && (R_num2 == rr_g2) && !rr_g2[5] && (counter_ghost_r_t2 - counter_r2) > 4)
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && (counter_ghost_r_t2 - counter_r2) > 4)
 
             ghost2 = 1'b1;
 
@@ -996,40 +1210,6 @@ module Playfield(
     end
 
 
-
-//==== P2 block: C_num = 5'd20; ====
-
-    always@(*)begin
-
-        C_num2 = 5'd20;
-
-        for(o = 0; o < 24; o = o + 1)
-
-        for(p = 0; p < 20; p = p + 1)
-
-        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
-
-        C_num2 = o[4:0];
-
-    end
-
-
-
-//==== P2 block: R_num = 5'd20; ====
-
-    always@(*)begin
-
-        R_num2 = 5'd20;
-
-        for(p = 0; p < 20; p = p + 1)
-
-        for(o = 0; o < 24; o = o + 1)
-
-        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
-
-        R_num2 = p;
-
-    end
 
 
 
@@ -1117,7 +1297,7 @@ module Playfield(
 
         drop_r_t2 <= 1'b1;
 
-        else if(drop_hold)
+        else if(drop_hold2)
 
         drop_r_t2 <= 1'b0;
 
@@ -1207,19 +1387,19 @@ module Playfield(
 
             counter_r2 <= 5'd0;
 
-            else if(drop_r && !land2 && !lock_we2)//软降
+            else if(drop_r2 && !land2 && !lock_we2 && !other_down_hold2)//软降
 
             counter_r2 <= counter_r2 + 1'd1;
 
-            else if(drop_hold && !lock_we2)//硬降
+            else if(drop_hold2 && !lock_we2)//硬降
 
             counter_r2 <= counter_ghost_r_t2;
 
             else if(en_rotate2)//旋转
 
-            counter_r2 <= counter_r2 + ddr_ext;
+            counter_r2 <= counter_r2 + ddr_ext2;
 
-            else if(counter_drop2 == Drop && !land2 && !lock_we2)//自动下落
+            else if(counter_drop2 == Drop && !land2 && !lock_we2 && !other_down_hold2)//自动下落
 
             counter_r2 <= counter_r2 + 1'd1;
 
@@ -1239,13 +1419,13 @@ module Playfield(
 
         if(!Reset_n)
 
-        counter_c2 <= 5'd9;
+        counter_c2 <= SPAWN_C2;
 
         else if(Finalize)begin
 
             if(switch_r_flag)
 
-            counter_c2 <= 5'd9;
+            counter_c2 <= SPAWN_C2;
 
             else
 
@@ -1265,11 +1445,11 @@ module Playfield(
 
             else if(land_pulse2 || hold_up2)//归位
 
-            counter_c2 <= 5'd9;
+            counter_c2 <= SPAWN_C2;
 
             else if(en_rotate2)//旋转
 
-            counter_c2 <= counter_c2 + ddc_ext;
+            counter_c2 <= counter_c2 + ddc_ext2;
 
             else if(!boundary_collision_left2 && left_p_flag2 && !lock_we2)//左移
 
@@ -1283,7 +1463,7 @@ module Playfield(
 
         else
 
-        counter_c2 <= 5'd9;
+        counter_c2 <= SPAWN_C2;
 
     end
 
@@ -1297,21 +1477,21 @@ module Playfield(
 
         rot_block2 = 1'b0;
 
-        for(k = 0; k < 4; k = k + 1)begin
+        for(k2 = 0; k2 < 4; k2 = k2 + 1)begin
 
-            cc_r2 = counter_c2 + ddc_ext + { { 7{Tetromino_dout3[k*8+7]} }, Tetromino_dout3[(k*8+7)-:4] };
+            cc_r2 = counter_c2 + ddc_ext2 + { { 7{Tetromino_dout3[k2*8+7]} }, Tetromino_dout3[(k2*8+7)-:4] };
 
-            rr_r2 = counter_r2 + ddr_ext + { { 7{Tetromino_dout3[k*8+3]} }, Tetromino_dout3[(k*8+3)-:4] };
+            rr_r2 = counter_r2 + ddr_ext2 + { { 7{Tetromino_dout3[k2*8+3]} }, Tetromino_dout3[(k2*8+3)-:4] };
 
-            if(cc_r2 > (COL - 1'b1))
-
-            rot_block2 = 1'b1;
-
-            else if(rr_r2 > 11'd19)
+            if((cc_r2 > (COL - 1'b1)) || cc_r2[5])
 
             rot_block2 = 1'b1;
 
-            else if(state[cc_r2*20 + rr_r2])
+            else if((rr_r2 > 11'd19) && !rr_r2[5])
+
+            rot_block2 = 1'b1;
+
+            else if((cc_r2 <= (COL - 1'b1)) && (rr_r2 <= 11'd19) && state[cc_r2*20 + rr_r2])
 
             rot_block2 = 1'b1;
 
@@ -1451,7 +1631,7 @@ module Playfield(
 
         lock_counter2 <= 2'd0;
 
-        else if(land_pulse_t)
+        else if(land_pulse_t2)
 
         lock_counter2 <= 2'd1;
 
