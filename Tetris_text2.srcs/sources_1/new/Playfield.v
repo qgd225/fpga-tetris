@@ -62,9 +62,7 @@ module Playfield(
     output wire lock_we2,
     output wire [1:0]lock_idx2,
     output wire land_we2,
-    output wire [2:0]type_t2_out,
-    output reg mv_we,
-    output reg [4:0]mv_row
+    output wire [2:0]type_t2_out
     );
 
 //============================================================
@@ -135,11 +133,6 @@ module Playfield(
     reg [4:0]rr_t [0:3];
     reg [24:0]counter_land;
     reg [24:0]lock_counter;
-//    场地写口(打拍后): 一拍写一行, 镜像与 8 份副本同写
-    reg        wr_we;
-    reg [4:0]  wr_a;
-    reg [23:0] wr_d;
-    reg        mv_req;
 
 //    消行
     reg [19:0]line;
@@ -258,7 +251,7 @@ module Playfield(
     wire other_moved2 = (sig_p1 != sig_p1_d);
     wire new_piece1 = (counter_r == 5'd0) && (counter_r_d1 != 5'd0);
     wire new_piece2 = (counter_r2 == 5'd0) && (counter_r2_d1 != 5'd0);
-    wire field_chg = wr_we || lock_we || lock_we2 || clear_pulse || clear_t_t;
+    wire field_chg = lock_we || lock_we2 || clear_pulse || clear_t_t || (clear_time && (!clear_t) && (!clear_pulse));
     wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || hold_up || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved1);
     wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || hold_up2 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved2);
 
@@ -284,28 +277,6 @@ module Playfield(
 
     //    行字: row_w[m] = 第 m 行 24 列(纯连线, 只作写路径的源与整行判满)
     wire [23:0]row_w [0:19];
-    //    行字副本: 8 份独立 24x20 单口 RAM(分布式 RAM, 单读口一拍读一行; 8 份内容永远相同)
-    //    0:P1渲染下行 1:P1渲染本行 2:P2渲染下行 3:P2渲染本行
-    //    4:P1幽灵 5:P2幽灵 6:P1旋转 7:P2旋转
-    reg [23:0]sram0 [0:19];
-    reg [23:0]sram1 [0:19];
-    reg [23:0]sram2 [0:19];
-    reg [23:0]sram3 [0:19];
-    reg [23:0]sram4 [0:19];
-    reg [23:0]sram5 [0:19];
-    reg [23:0]sram6 [0:19];
-    reg [23:0]sram7 [0:19];
-    //    副本读口(组合读; 地址一律取 5 位, 越界场合由各判定点自己的守卫条件挡掉)
-    wire [4:0] addr_p1n = rr[4:0] + 5'd1;
-    wire [4:0] addr_p2n = rr2[4:0] + 5'd1;
-    wire [23:0]rw_p1n = sram0[addr_p1n];
-    wire [23:0]rw_p1c = sram1[rr[4:0]];
-    wire [23:0]rw_p2n = sram2[addr_p2n];
-    wire [23:0]rw_p2c = sram3[rr2[4:0]];
-    wire [23:0]rw_g1 = sram4[gr1[4:0]];
-    wire [23:0]rw_g2 = sram5[gr2[4:0]];
-    wire [23:0]rw_r1 = sram6[rr_r[4:0]];
-    wire [23:0]rw_r2 = sram7[rr_r2[4:0]];
     //    整行判满用的列掩码(单机只看 0..19 列)
     wire [23:0]full_mask = duo ? 24'hFFFFFF : 24'h000FFFFF;
 
@@ -373,39 +344,39 @@ module Playfield(
                     if(oc2_0 == (cc + 6'd1)) boundary_collision_right = 1'b1;
                     if(oc2_0 == cc) touch_top = 1'b1;
                 end
-                if((oc2_0 == cc) && (or2_0 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && rw_p1n[cc]))
+                if((oc2_0 == cc) && (or2_0 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
                 other_down_hold = 1'b1;
                 if(or2_1 == rr)begin
                     if((cc > 0) && (oc2_1 == (cc - 6'd1))) boundary_collision_left = 1'b1;
                     if(oc2_1 == (cc + 6'd1)) boundary_collision_right = 1'b1;
                     if(oc2_1 == cc) touch_top = 1'b1;
                 end
-                if((oc2_1 == cc) && (or2_1 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && rw_p1n[cc]))
+                if((oc2_1 == cc) && (or2_1 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
                 other_down_hold = 1'b1;
                 if(or2_2 == rr)begin
                     if((cc > 0) && (oc2_2 == (cc - 6'd1))) boundary_collision_left = 1'b1;
                     if(oc2_2 == (cc + 6'd1)) boundary_collision_right = 1'b1;
                     if(oc2_2 == cc) touch_top = 1'b1;
                 end
-                if((oc2_2 == cc) && (or2_2 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && rw_p1n[cc]))
+                if((oc2_2 == cc) && (or2_2 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
                 other_down_hold = 1'b1;
                 if(or2_3 == rr)begin
                     if((cc > 0) && (oc2_3 == (cc - 6'd1))) boundary_collision_left = 1'b1;
                     if(oc2_3 == (cc + 6'd1)) boundary_collision_right = 1'b1;
                     if(oc2_3 == cc) touch_top = 1'b1;
                 end
-                if((oc2_3 == cc) && (or2_3 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && rw_p1n[cc]))
+                if((oc2_3 == cc) && (or2_3 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
                 other_down_hold = 1'b1;
             end
-            if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && rw_p1n[cc]))//落底检测
+            if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && row_w[rr + 6'd1][cc]))//落底检测
             land = 1'b1;
-            if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && rw_p1c[cc - 6'd1]))//左边界碰撞检测
+            if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc - 6'd1]))//左边界碰撞检测
             boundary_collision_left = 1'b1;
-            if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && rw_p1c[cc + 6'd1]))//右边界碰撞检测
+            if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc + 6'd1]))//右边界碰撞检测
             boundary_collision_right = 1'b1;
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr) && !rr[5]) //正在运动方块
             Piece = 1'b1;
-            if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && rw_p1c[cc])//和已锁方块重叠=顶到
+            if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && row_w[rr][cc])//和已锁方块重叠=顶到
             touch_top = 1'b1;
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && ghost_done && (!clear_time) && (counter_ghost_r_t > (counter_r + 5'd4)))
@@ -667,7 +638,7 @@ module Playfield(
             rot_block = 1'b1;
             else if((rr_r > 11'd19) && !rr_r[5])
             rot_block = 1'b1;
-            else if((cc_r <= (COL - 1'b1)) && (rr_r <= 11'd19) && rw_r1[cc_r])
+            else if((cc_r <= (COL - 1'b1)) && (rr_r <= 11'd19) && row_w[rr_r][cc_r])
             rot_block = 1'b1;
         end
         en_rotate = (rotate_p_flag) && (!rot_block) && (!lock_we);
@@ -781,147 +752,43 @@ module Playfield(
 //============================================================
 //    场地状态与消行
 //============================================================
-//    写口: 复位清/Idle清/换局清/落锁/消行搬移共用, 一拍拍一行(镜像与 8 份副本同写)
-    reg        row_we;
-    reg [4:0]  row_a;
-    reg [23:0] row_d;
-    reg [4:0]  wm;
-    reg        boot_clr;
-    reg        mv_act;
-    reg [4:0]  mv_max;
-    reg        lk_sel;
-    wire       clr_ramp = boot_clr || Idle || (Finalize && switch_r_flag);
-    wire       lk1_ok = lock_we && (cc_t[lock_idx] <= (COL - 1'b1)) && (rr_t[lock_idx] <= 19);
-    wire       lk2_ok = duo && lock_we2 && (cc_t2[lock_idx2] <= (COL - 1'b1)) && (rr_t2[lock_idx2] <= 19);
-    wire       lk_any = lk1_ok || lk2_ok;
-    wire       lk_take2 = lk2_ok && ((!lk1_ok) || lk_sel);
-    wire       mv_en = (!clear_t) && (!clear_pulse) && (!Finalize);
-    wire [4:0] mv_ptr = 5'd19 - wm;
-    wire [4:0] mv_lim = (wm == 5'd0) ? clear_row : mv_max;
-    wire       mv_start = (wm == 5'd0) && clear_time && mv_en && (!clr_ramp);
-    wire       mv_go = (mv_act || mv_start) && mv_en;
-
-//    写口仲裁: 一次只写一行, 优先级 清零 > 落锁 > 消行搬移
-    always@(*)begin
-        row_we = 1'b0;
-        row_a = 5'd0;
-        row_d = 24'd0;
-        mv_req = 1'b0;
-        if(clr_ramp)begin
-            row_we = 1'b1;
-            row_a = wm;
-            row_d = 24'd0;
-        end
-        else if(lk_any)begin
-            row_we = 1'b1;
-            if(lk_take2)begin
-                row_a = rr_t2[lock_idx2];
-                row_d = row_w[rr_t2[lock_idx2]] | (24'd1 << cc_t2[lock_idx2]);
-            end
-            else begin
-                row_a = rr_t[lock_idx];
-                row_d = row_w[rr_t[lock_idx]] | (24'd1 << cc_t[lock_idx]);
-            end
-        end
-        else if(mv_go)begin
-            row_we = 1'b1;
-            row_a = mv_ptr;
-            row_d = (mv_ptr == 5'd0) ? 24'd0 : ((mv_ptr <= mv_lim) ? row_w[mv_ptr - 5'd1] : row_w[mv_ptr]);
-            mv_req = (mv_ptr != 5'd0) && (mv_ptr <= mv_lim);
-        end
-    end
-
-//    行计数: 清零一趟 20 拍; 搬移一趟 20 拍(行号降序, 开了头就跑完这一趟), 被落锁/闪白占口时本拍暂停不丢行
-    always@(posedge Clk_74M or negedge Reset_n)begin
-        if(!Reset_n)begin
-            wm <= 5'd0;
-            boot_clr <= 1'b1;
-            mv_act <= 1'b0;
-            mv_max <= 5'd0;
-        end
-        else if(clr_ramp)begin
-            wm <= (wm == 5'd19) ? 5'd0 : (wm + 5'd1);
-            if(wm == 5'd19)
-            boot_clr <= 1'b0;
-            mv_act <= 1'b0;
-        end
-        else if(mv_act)begin
-            if(mv_en && (!lk_any))begin
-                if(wm == 5'd0)
-                mv_max <= clear_row;
-                wm <= (wm == 5'd19) ? 5'd0 : (wm + 5'd1);
-                mv_act <= (wm != 5'd19);
-            end
-        end
-        else if(mv_start)begin
-            mv_max <= clear_row;
-            wm <= 5'd1;
-            mv_act <= 1'b1;
-        end
-        else
-        wm <= 5'd0;
-    end
-
-//    同拍两人落锁: 本拍写 P1 的行, 下拍写 P2 的行(两边 lock_we 都持续 4 拍, 不会丢)
-    always@(posedge Clk_74M or negedge Reset_n)begin
-        if(!Reset_n)
-        lk_sel <= 1'b0;
-        else if(lk1_ok && lk2_ok)
-        lk_sel <= !lk_sel;
-    end
-
-//    写口打一拍: 组合端先把"这一拍要写哪一行"选出来, 下一拍再落到镜像与 8 份副本(单口 RAM 规矩写法)
-    always@(posedge Clk_74M or negedge Reset_n)begin
-        if(!Reset_n)begin
-            wr_we <= 1'b0;
-            wr_a <= 5'd0;
-            wr_d <= 24'd0;
-            mv_we <= 1'b0;
-            mv_row <= 5'd0;
-        end
-        else begin
-            wr_we <= row_we;
-            wr_a <= row_a;
-            wr_d <= row_d;
-            mv_we <= mv_req;
-            mv_row <= mv_ptr;
-        end
-    end
-
-//    8 份副本: 同一拍写同一行, 内容永远一致
-    always@(posedge Clk_74M)begin
-        if(wr_we)begin
-            sram0[wr_a] <= wr_d;
-            sram1[wr_a] <= wr_d;
-            sram2[wr_a] <= wr_d;
-            sram3[wr_a] <= wr_d;
-            sram4[wr_a] <= wr_d;
-            sram5[wr_a] <= wr_d;
-            sram6[wr_a] <= wr_d;
-            sram7[wr_a] <= wr_d;
-        end
-    end
-
-//    镜像(对外 480 位): 与 8 份副本同拍写同一行, 内容始终一致
+//    场地状态: 直接存 480 位(state), 写口一次写一行(清零/落锁/消行搬移都在这里)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         state <= 480'd0;
-        else if(wr_we)
-        for(c = 0; c < 24; c = c + 1)
-        state[c*20 + wr_a] <= wr_d[c];
-    end
-
-//    副本无异步复位: initial 置 0(上板由配置初值保证, 仿真靠这里保证初值非 X)
-    initial begin
-        for(m = 0; m < 20; m = m + 1)begin
-            sram0[m] = 24'd0;
-            sram1[m] = 24'd0;
-            sram2[m] = 24'd0;
-            sram3[m] = 24'd0;
-            sram4[m] = 24'd0;
-            sram5[m] = 24'd0;
-            sram6[m] = 24'd0;
-            sram7[m] = 24'd0;
+        else if(Idle)
+        state <= 480'd0;
+        else if(Finalize)begin
+            if(switch_r_flag)begin
+                state <= 480'd0;
+            end
+            else begin
+                state <= state;
+            end
+        end
+        else if(lock_we || (duo && lock_we2))begin
+            if(lock_we && (cc_t[lock_idx] <= (COL - 1'b1)) && (rr_t[lock_idx] <= 19))
+            state[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= 1'b1;
+            if(duo && lock_we2 && (cc_t2[lock_idx2] <= (COL - 1'b1)) && (rr_t2[lock_idx2] <= 19))
+            state[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= 1'b1;
+        end
+        else if(clear_time)begin
+            if(clear_t)begin
+                for(c = 0; c < 24; c = c + 1)
+                        for(m = 0; m < 20; m = m + 1)
+                            if(line_t[m])
+                                state[c*20 + m] <= state[c*20 + m];
+            end
+            else if(!clear_pulse)begin
+                for(c = 0; c < 24; c = c + 1)begin
+                    state[c*20 + 0] <= 1'b0;
+                    for(m = 1; m < 20; m = m + 1)begin
+                        if(m <= clear_row)begin
+                            state[c*20 + m] <= state[c*20 + m - 1];
+                        end
+                    end
+                end
+            end
         end
     end
 
@@ -1079,7 +946,7 @@ module Playfield(
             gr1 = ghost_scan_r + { { 7{Tetromino_dout[jg1*8+3]} }, Tetromino_dout[(jg1*8+3)-:4] };
             if((!gr1[5]) && (gr1 > 6'd19))
             ghost_blocked1 = 1'b1;
-            else if((!gr1[5]) && (gc1 <= (COL - 1'b1)) && rw_g1[gc1])begin
+            else if((!gr1[5]) && (gc1 <= (COL - 1'b1)) && row_w[gr1][gc1])begin
                 ghost_blocked1 = 1'b1;
                 ghost_blk_state1 = 1'b1;
             end
@@ -1123,13 +990,10 @@ module Playfield(
                 ghost_blk_oth <= ghost_blk_other1;
                 counter_ghost_r_t <= (ghost_scan_r > counter_r) ? (ghost_scan_r - 5'd1) : counter_r;
             end
-            else if(ghost_scan_r < 5'd20)
+            else if(ghost_scan_r < 5'd21)//上限 21: 形状行偏移都 >= -1, 到 21 必被地板挡住, 落点自然是 20
             ghost_scan_r <= ghost_scan_r + 5'd1;
-            else begin
-                ghost_done <= 1'b1;
-                ghost_blk_oth <= 1'b0;
-                counter_ghost_r_t <= ghost_scan_r;
-            end
+            else
+            ghost_done <= 1'b1;
         end
     end
 
@@ -1267,7 +1131,7 @@ module Playfield(
             gr2 = ghost_scan_r2 + { { 7{Tetromino_dout2[jg2*8+3]} }, Tetromino_dout2[(jg2*8+3)-:4] };
             if((!gr2[5]) && (gr2 > 6'd19))
             ghost_blocked2 = 1'b1;
-            else if((!gr2[5]) && (gc2 <= (COL - 1'b1)) && rw_g2[gc2])begin
+            else if((!gr2[5]) && (gc2 <= (COL - 1'b1)) && row_w[gr2][gc2])begin
                 ghost_blocked2 = 1'b1;
                 ghost_blk_state2 = 1'b1;
             end
@@ -1311,13 +1175,10 @@ module Playfield(
                 ghost_blk_oth2 <= ghost_blk_other2;
                 counter_ghost_r_t2 <= (ghost_scan_r2 > counter_r2) ? (ghost_scan_r2 - 5'd1) : counter_r2;
             end
-            else if(ghost_scan_r2 < 5'd20)
+            else if(ghost_scan_r2 < 5'd21)//同上: 上限 21, 落点自然到 20
             ghost_scan_r2 <= ghost_scan_r2 + 5'd1;
-            else begin
-                ghost_done2 <= 1'b1;
-                ghost_blk_oth2 <= 1'b0;
-                counter_ghost_r_t2 <= ghost_scan_r2;
-            end
+            else
+            ghost_done2 <= 1'b1;
         end
     end
 
@@ -1350,39 +1211,39 @@ module Playfield(
                     if(oc1_0 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
                     if(oc1_0 == cc2) touch_top2 = 1'b1;
                 end
-                if((oc1_0 == cc2) && (or1_0 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && rw_p2n[cc2]))
+                if((oc1_0 == cc2) && (or1_0 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
                 other_down_hold2 = 1'b1;
                 if(or1_1 == rr2)begin
                     if((cc2 > 0) && (oc1_1 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
                     if(oc1_1 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
                     if(oc1_1 == cc2) touch_top2 = 1'b1;
                 end
-                if((oc1_1 == cc2) && (or1_1 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && rw_p2n[cc2]))
+                if((oc1_1 == cc2) && (or1_1 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
                 other_down_hold2 = 1'b1;
                 if(or1_2 == rr2)begin
                     if((cc2 > 0) && (oc1_2 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
                     if(oc1_2 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
                     if(oc1_2 == cc2) touch_top2 = 1'b1;
                 end
-                if((oc1_2 == cc2) && (or1_2 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && rw_p2n[cc2]))
+                if((oc1_2 == cc2) && (or1_2 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
                 other_down_hold2 = 1'b1;
                 if(or1_3 == rr2)begin
                     if((cc2 > 0) && (oc1_3 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
                     if(oc1_3 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
                     if(oc1_3 == cc2) touch_top2 = 1'b1;
                 end
-                if((oc1_3 == cc2) && (or1_3 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && rw_p2n[cc2]))
+                if((oc1_3 == cc2) && (or1_3 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
                 other_down_hold2 = 1'b1;
             end
-            if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && rw_p2n[cc2]))//落底检测
+            if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && row_w[rr2 + 6'd1][cc2]))//落底检测
             land2 = 1'b1;
-            if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && rw_p2c[cc2 - 6'd1]))//左边界碰撞检测
+            if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 - 6'd1]))//左边界碰撞检测
             boundary_collision_left2 = 1'b1;
-            if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && rw_p2c[cc2 + 6'd1]))//右边界碰撞检测
+            if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 + 6'd1]))//右边界碰撞检测
             boundary_collision_right2 = 1'b1;
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr2) && !rr2[5]) //正在运动方块
             Piece2 = 1'b1;
-            if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && rw_p2c[cc2])//和已锁方块重叠=顶到
+            if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && row_w[rr2][cc2])//和已锁方块重叠=顶到
             touch_top2 = 1'b1;
             rr_g2 = counter_ghost_r_t2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && ghost_done2 && (!clear_time) && (counter_ghost_r_t2 > (counter_r2 + 5'd4)))
@@ -1530,7 +1391,7 @@ module Playfield(
             rot_block2 = 1'b1;
             else if((rr_r2 > 11'd19) && !rr_r2[5])
             rot_block2 = 1'b1;
-            else if((cc_r2 <= (COL - 1'b1)) && (rr_r2 <= 11'd19) && rw_r2[cc_r2])
+            else if((cc_r2 <= (COL - 1'b1)) && (rr_r2 <= 11'd19) && row_w[rr_r2][cc_r2])
             rot_block2 = 1'b1;
         end
         en_rotate2 = (rotate_p_flag2) && (!rot_block2) && (!lock_we2);

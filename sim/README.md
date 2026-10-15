@@ -145,3 +145,20 @@ end
 这一版的面积（`Flow_AreaOptimized_high`）：**LUT 11921 (57.31%)**、LUT as Logic 11788、
 LUT as Memory 133（128 分布式 RAM + 5 SRL）、FF 4739、F7 1668、F8 269、BRAM 14、DSP 3、IOB 34；
 模块 `Playfield` 6827。
+
+
+## 回退记录：场地存储退回 LUTRAM 之前的版本
+
+上板实测：23:05 生成的 bit 用的就是"加固版 LUTRAM"综合结果，**仍然不正常** →
+不再用 LUTRAM 存场地副本，退回 `state` 单份 480 位 FF + `row_w` 直读（这套之前上板验证过是好的）。
+
+保留的东西（不回退）：
+- 幽灵两处修复：重扫触发（含消行搬移那一拍、Hold 换块）+ **扫描上限 20 → 21**
+  （形状 ROM 的行偏移都 ≥ -1，扫到 21 必被地板挡住，落点自然就是 20；比"到上限再补一条分支"省约 450 LUT，
+  但行为等价，`sim/duo` 第 20 组仍在守着这条）。
+- 全部中文块注释（每个 `always` 上方都写明块作用）。
+- `sim/duo` 第 20/21 组断言（幽灵落点不受行上限影响 / 幽灵不能压在对方运动方块上）。
+
+最终面积（`Flow_AreaOptimized_high`）：**LUT 16007 (76.96%)**、LUT as Logic 16002、
+LUT as Memory 5（只剩 SRL，**无分布式 RAM**）、FF 4681、F7 1933、F8 586、BRAM 14、DSP 5、IOB 34；
+模块 `Playfield` 10879、`frame` 13222。三套仿真全绿（duo 80 / frame_duo 22 / level 26），综合 0 error。

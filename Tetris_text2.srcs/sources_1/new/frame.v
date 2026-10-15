@@ -48,8 +48,6 @@ module frame(
     wire clear_t_t;
     wire [4:0]c_clear;
     wire [4:0]clear_row;
-    wire mv_we;
-    wire [4:0]mv_row;
     wire [19:0]cc_d;
     wire [19:0]rr_d;
     wire lock_t;
@@ -135,10 +133,12 @@ module frame(
         if(duo && lock_we2 && (cc_t2[lock_idx2] <= 5'd23) && (rr_t2[lock_idx2] <= 5'd19))
         state_color[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= type_d2;
     end
-    else if(mv_we)begin
+    else if(clear_time && !clear_t && !clear_pulse)begin 
         for(c = 0; c < 24; c = c + 1)
-            state_color[c*20 + mv_row] <= state_color[c*20 + mv_row - 1];
-    end
+            for(m = 1; m < 20; m = m + 1)
+                if(m <= clear_row)
+                state_color[c*20 + m] <= state_color[c*20 + m - 1];
+        end
     end
     
     Playfield Playfield_inst(
@@ -203,9 +203,7 @@ module frame(
     .rr_d2(rr_d2),
     .lock_we2(lock_we2),
     .lock_idx2(lock_idx2),
-    .land_we2(land_we2),
-    .mv_we(mv_we),
-    .mv_row(mv_row)
+    .land_we2(land_we2)
     );
     
     

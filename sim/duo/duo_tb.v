@@ -22,7 +22,7 @@ reg [31:0] shape_val = 32'h0;   // 合成形状(默认退化单格)
 wire [479:0] state;
 wire Piece, ghost, Piece2, ghost2, over, clear, clear_time, clear_pulse, clear_t_t, clear_t;
 wire [4:0] C_num, R_num, C_num2, R_num2, c_clear, clear_row;
-wire [2:0] type, type_t, type_d, type2_out, type_t2_out, type_d2_out, speed_level;
+wire [2:0] type, type_t, type_d, type2_out, type_t2_out, speed_level;
 wire [1:0] lock_idx, lock_idx2;
 wire lock_t, lock_we, land_we, en_hold, lock_we2, land_we2;
 wire [19:0] cc_d, rr_d, cc_d2, rr_d2, line_t;
@@ -50,26 +50,6 @@ Playfield dut(
 );
 
 integer bad;
-integer ram_bad = 0;
-reg ram_chk_on = 1'b1;   // 第19组故意只写副本这一段会关掉
-integer mq, mcc;
-reg [23:0] mw;
-// 全程核查: 镜像与 8 份副本内容必须逐位一致
-// 复位期间镜像走异步复位、副本靠 20 拍清零, 那段时间不比; 其余时刻必须一致
-always @(posedge Clk_74M) begin
-  #1;
-  if(ram_chk_on && (Rst === 1'b1) && (dut.boot_clr === 1'b0) && (ram_eq_state(1'b0) !== 1))begin
-    if(ram_bad == 0)begin
-      $display("  [dbg] 首次镜像!=副本 @%0t row_we=%0d row_a=%0d wm=%0d mv_act=%0d", $time, dut.row_we, dut.row_a, dut.wm, dut.mv_act);
-      for(mq = 0; mq < 20; mq = mq + 1)begin
-        mw = 24'd0;
-        for(mcc = 0; mcc < 24; mcc = mcc + 1) mw[mcc] = dut.state[mcc*20 + mq];
-        if(mw !== dut.sram0[mq]) $display("  [dbg] row %0d mirror=%h r0=%h r1=%h r2=%h r3=%h r4=%h r5=%h r6=%h r7=%h", mq, mw, dut.sram0[mq], dut.sram1[mq], dut.sram2[mq], dut.sram3[mq], dut.sram4[mq], dut.sram5[mq], dut.sram6[mq], dut.sram7[mq]);
-      end
-    end
-    ram_bad = ram_bad + 1;
-  end
-end
 task chk;
 input [8*32-1:0] name; input integer got; input integer exp;
 begin
@@ -148,124 +128,7 @@ begin
 end
 endtask
 
-// 摆场地: 镜像与 8 份副本同时写(判定读副本, 渲染读镜像)
-task set_cell;
-input [4:0] cc; input [4:0] rr;
-begin
-  dut.state[cc*20 + rr] = 1'b1;
-  dut.sram0[rr][cc] = 1'b1;
-  dut.sram1[rr][cc] = 1'b1;
-  dut.sram2[rr][cc] = 1'b1;
-  dut.sram3[rr][cc] = 1'b1;
-  dut.sram4[rr][cc] = 1'b1;
-  dut.sram5[rr][cc] = 1'b1;
-  dut.sram6[rr][cc] = 1'b1;
-  dut.sram7[rr][cc] = 1'b1;
-end
-endtask
-
-// 只写 8 份副本(不写镜像): 验证判定/幽灵确实读副本
-task set_cell_ram;
-input [4:0] cc; input [4:0] rr;
-begin
-  dut.sram0[rr][cc] = 1'b1;
-  dut.sram1[rr][cc] = 1'b1;
-  dut.sram2[rr][cc] = 1'b1;
-  dut.sram3[rr][cc] = 1'b1;
-  dut.sram4[rr][cc] = 1'b1;
-  dut.sram5[rr][cc] = 1'b1;
-  dut.sram6[rr][cc] = 1'b1;
-  dut.sram7[rr][cc] = 1'b1;
-end
-endtask
-
-// 清场: 镜像与 8 份副本一起清(副本没有异步复位, 只能这样清)
-task clr_state;
-integer q;
-begin
-  force dut.row_we = 1'b0;
-  @(posedge Clk_74M);
-  dut.state = 480'd0;
-  for(q = 0; q < 20; q = q + 1)begin
-    dut.sram0[q] = 24'd0;
-    dut.sram1[q] = 24'd0;
-    dut.sram2[q] = 24'd0;
-    dut.sram3[q] = 24'd0;
-    dut.sram4[q] = 24'd0;
-    dut.sram5[q] = 24'd0;
-    dut.sram6[q] = 24'd0;
-    dut.sram7[q] = 24'd0;
-  end
-  @(posedge Clk_74M);
-  release dut.row_we;
-  @(posedge Clk_74M);
-end
-endtask
-
-// 镜像与 8 份副本内容是否逐位一致
-function integer ram_eq_state;
-input d;
-integer q, cc;
-reg [23:0] w;
-begin
-  ram_eq_state = 1;
-  for(q = 0; q < 20; q = q + 1)begin
-    w = 24'd0;
-    for(cc = 0; cc < 24; cc = cc + 1)
-    w[cc] = dut.state[cc*20 + q];
-    if(w !== dut.sram0[q]) ram_eq_state = 0;
-    if(w !== dut.sram1[q]) ram_eq_state = 0;
-    if(w !== dut.sram2[q]) ram_eq_state = 0;
-    if(w !== dut.sram3[q]) ram_eq_state = 0;
-    if(w !== dut.sram4[q]) ram_eq_state = 0;
-    if(w !== dut.sram5[q]) ram_eq_state = 0;
-    if(w !== dut.sram6[q]) ram_eq_state = 0;
-    if(w !== dut.sram7[q]) ram_eq_state = 0;
-  end
-end
-endfunction
-
-// 某行已落格数(读镜像)
-function integer row_cnt;
-input integer rr;
-integer cc;
-begin
-  row_cnt = 0;
-  for(cc = 0; cc < 24; cc = cc + 1)
-  if(dut.state[cc*20 + rr] === 1'b1) row_cnt = row_cnt + 1;
-end
-endfunction
-
-// 场地上已落格总数(读镜像)
-function integer field_cnt;
-input d;
-integer cc, rr;
-begin
-  field_cnt = 0;
-  for(rr = 0; rr < 20; rr = rr + 1)
-  for(cc = 0; cc < 24; cc = cc + 1)
-  if(dut.state[cc*20 + rr] === 1'b1) field_cnt = field_cnt + 1;
-end
-endfunction
-
-// 8 份副本里含 X 的字数
-function integer ram_x_cnt;
-input d;
-integer q;
-begin
-  ram_x_cnt = 0;
-  for(q = 0; q < 20; q = q + 1)begin
-    if((^dut.sram0[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.sram1[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.sram2[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.sram3[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.sram4[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.sram5[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.sram6[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.sram7[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-  end
-end
-endfunction
+task clr_state; begin force dut.state = 480'd0; @(posedge Clk_74M); release dut.state; @(posedge Clk_74M); end endtask
 
 initial begin
   bad = 0;
@@ -509,17 +372,17 @@ initial begin
 
   $display("=== 15) 消行: 整行 24 格才消 ===");
   clr_state;
-  for(integer c1 = 0; c1 < 12; c1 = c1 + 1) set_cell(c1[4:0], 5'd5);
+  for(integer c1 = 0; c1 < 12; c1 = c1 + 1) dut.state[c1*20 + 5] = 1'b1;
   repeat(2) @(posedge Clk_74M);
   chk("只填 12 格不消行", clear, 0);
   clr_state;
-  for(integer c2 = 0; c2 < 24; c2 = c2 + 1) set_cell(c2[4:0], 5'd5);
+  for(integer c2 = 0; c2 < 24; c2 = c2 + 1) dut.state[c2*20 + 5] = 1'b1;
   repeat(2) @(posedge Clk_74M);
   chk("填满 24 格消行", clear, 1);
   clr_state;
   for(integer c3 = 0; c3 < 24; c3 = c3 + 1)begin
-    set_cell(c3[4:0], 5'd5);
-    set_cell(c3[4:0], 5'd7);
+    dut.state[c3*20 + 5] = 1'b1;
+    dut.state[c3*20 + 7] = 1'b1;
   end
   repeat(3) @(posedge Clk_74M);
   chk("两行同时满 clear=1", clear, 1);
@@ -572,79 +435,11 @@ initial begin
     release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   end
 
-  $display("=== 17) 场地副本: 消行搬移 20 拍搬完, 内容逐位一致 ===");
-  begin : mv_chk
-    integer c4;
-    force dut.counter_land = 25'd0; force dut.counter_land2 = 25'd0;
-    force dut.lock_counter = 25'd0; force dut.lock_counter2 = 25'd0;
-    force dut.lock_t = 1'b0; force dut.lock_t2 = 1'b0;
-    force dut.lock_cnt = 2'd0; force dut.lock_cnt2 = 2'd0;
-    clr_state;
-    duo = 1'b0; repeat(4) @(posedge Clk_74M);
-    set_cell(5'd5, 5'd4);                                    // 第4行第5列
-    set_cell(5'd0, 5'd5); set_cell(5'd1, 5'd5); set_cell(5'd2, 5'd5);
-    set_cell(5'd9, 5'd7);                                    // 满行之上, 不该动
-    for(c4 = 0; c4 < 20; c4 = c4 + 1) set_cell(c4[4:0], 5'd6);
-    repeat(2) @(posedge Clk_74M);
-    chk("20 列填满后 clear=1", clear, 1);
-    chk("摆场后镜像=8 份副本", ram_eq_state(1'b0), 1);
-    force dut.clear_t = 1'b0;                                // 跳过闪白, 直接看搬移
-    repeat(60) @(posedge Clk_74M);
-    release dut.clear_t;
-    chk("搬移后镜像=8 份副本", ram_eq_state(1'b0), 1);
-    chk("搬移后 clear=0", clear, 0);
-    chk("搬移后格子总数=5", field_cnt(1'b0), 5);
-    chk("搬移后 第5行格数=1", row_cnt(5), 1);
-    chk("搬移后 第6行格数=3", row_cnt(6), 3);
-    chk("搬移后 第7行格数=1", row_cnt(7), 1);
-    chk("搬移后 (5,5) 搬下来了", dut.state[5*20 + 5], 1);
-    chk("搬移后 (5,4) 已空", dut.state[5*20 + 4], 0);
-    chk("搬移后 (0,6)=1", dut.state[0*20 + 6], 1);
-    chk("搬移后 (1,6)=1", dut.state[1*20 + 6], 1);
-    chk("搬移后 (2,6)=1", dut.state[2*20 + 6], 1);
-    chk("搬移后 (3,6)=0", dut.state[3*20 + 6], 0);
-    chk("搬移后 (9,7) 没动", dut.state[9*20 + 7], 1);
-    release dut.counter_land; release dut.counter_land2;
-    release dut.lock_counter; release dut.lock_counter2;
-    release dut.lock_t; release dut.lock_t2;
-    release dut.lock_cnt; release dut.lock_cnt2;
-    clr_state;
-  end
-
-  $display("=== 18) 复位/清场后场地全 0(镜像与 8 份副本), 初值无 X ===");
-  clr_state;
-  Rst = 0; #200; Rst = 1; repeat(30) @(posedge Clk_74M);
-  chk("复位后镜像全 0", (dut.state === 480'd0), 1);
-  chk("复位后镜像=8 份副本", ram_eq_state(1'b0), 1);
-  chk("复位后副本无 X", ram_x_cnt(1'b0), 0);
-  chk("复位后格子总数=0", field_cnt(1'b0), 0);
-
-  $display("=== 19) 判定读副本: 只写副本也算数 ===");
-  begin : ram_read_chk
-    clr_state;
-    duo = 1'b0; repeat(4) @(posedge Clk_74M);
-    force dut.counter_c = 5'd5; force dut.counter_r = 5'd18;
-    force dut.counter_c2 = 5'd0; force dut.counter_r2 = 5'd0;
-    repeat(4) @(posedge Clk_74M);
-    chk("空场时 land=0", dut.land, 0);
-    ram_chk_on = 1'b0;                                       // 这一段本来就故意只写副本
-    set_cell_ram(5'd5, 5'd19);                               // 只写副本
-    repeat(4) @(posedge Clk_74M);
-    chk("只写副本也能判定落底", dut.land, 1);
-    chk("只写副本时未顶到", dut.touch_top, 0);
-    clr_state;
-    ram_chk_on = 1'b1;
-    set_cell(5'd5, 5'd19);                                   // 镜像+副本
-    repeat(4) @(posedge Clk_74M);
-    chk("镜像+副本判定一致", dut.land, 1);
-    release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
-    clr_state;
-  end
-
   $display("=== 20) 幽灵落点: 扫到行上限也要更新(不能停旧值) ===");
   begin : ghost_row_chk
     clr_state;
     duo = 1'b0; repeat(4) @(posedge Clk_74M);
+    force dut.clear_t = 1'b0;                  // 前面测试留下的闪白会挡住幽灵显示
     force dut.counter_land = 25'd0; force dut.lock_counter = 25'd0;
     force dut.lock_t = 1'b0; force dut.lock_cnt = 2'd0;
     force dut.drop_r_t = 1'b1;
@@ -664,7 +459,7 @@ initial begin
     chk("硬降停在落点(20)", dut.counter_r, 20);
     chk("停在落点时已满足落底", dut.land, 1);
     release dut.counter_land; release dut.lock_counter;
-    release dut.lock_t; release dut.lock_cnt; release dut.drop_r_t;
+    release dut.lock_t; release dut.lock_cnt; release dut.drop_r_t; release dut.clear_t;
     shape_val = 32'h0;
     clr_state;
   end
@@ -686,8 +481,6 @@ initial begin
     shape_val = 32'h0;
     clr_state;
   end
-
-  chk("全程 镜像=8 份副本", (ram_bad == 0), 1);
 
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
