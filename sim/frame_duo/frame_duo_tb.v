@@ -68,6 +68,16 @@ integer q;
 begin
   force dut.Playfield_inst.state = 480'd0; @(posedge Clk);
   release dut.Playfield_inst.state; @(posedge Clk);
+  for(q = 0; q < 20; q = q + 1)begin
+    dut.Playfield_inst.state_ram[0][q] = 24'd0;
+    dut.Playfield_inst.state_ram[1][q] = 24'd0;
+    dut.Playfield_inst.state_ram[2][q] = 24'd0;
+    dut.Playfield_inst.state_ram[3][q] = 24'd0;
+    dut.Playfield_inst.state_ram[4][q] = 24'd0;
+    dut.Playfield_inst.state_ram[5][q] = 24'd0;
+    dut.Playfield_inst.state_ram[6][q] = 24'd0;
+    dut.Playfield_inst.state_ram[7][q] = 24'd0;
+  end
   for(q = 0; q < 480; q = q + 1) dut.state_color[q] = 3'd0;
 end
 endtask
