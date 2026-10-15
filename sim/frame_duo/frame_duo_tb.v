@@ -161,6 +161,21 @@ initial begin
   chk("duo=0 P1 方块=黄色(与原来一致)", rgb, `YELLOW);
   release dut.Playfield_inst.counter_c; release dut.Playfield_inst.counter_r; release dut.Playfield_inst.type;
 
+  $display("=== 8) 2px 死区不误取相邻格(哨兵修复) ===");
+  duo = 1'b1; repeat(4) @(posedge Clk);
+  dut.state_color[20*20 + 3] = 3'd3;              // 占住"旧哨兵会误读"的那格(第20列第3行)
+  dut.Playfield_inst.state[20*20 + 3] = 1'b1;
+  look(11'd351, 11'd200);                        // 列窗口之间的 2px 间隙
+  chk("死区像素=黑", rgb, `BLACK);
+  dut.state_color[20*20 + 3] = 3'd0;
+  dut.Playfield_inst.state[20*20 + 3] = 1'b0;
+  look(11'd318, 11'd40);                         // 场地上方: 左边框不应出现
+  chk("左边框不再出头(上方=黑)", rgb, `BLACK);
+  look(11'd318, 11'd200);                        // 场地旁边: 左边框仍在
+  chk("左边框仍在(旁边=白)", rgb, `WHITE);
+  look(11'd321, 11'd81);                         // 第0列第0行(有效, 空)
+  chk("有效空格=黑", rgb, `BLACK);
+
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;

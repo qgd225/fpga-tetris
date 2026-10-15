@@ -14,7 +14,7 @@ module Playfield_margin(
     wire [10:0]XR = duo ? XR24 : XR20;
     
     always@(*)begin
-    if(     (hcounter >= 317 && hcounter < 320) ||
+    if(     (hcounter >= 317 && hcounter < 320 && vcounter >= 80) ||
             (hcounter >= 317 && hcounter < (XR + 3) && vcounter < 80 && vcounter >= 77) ||
             (hcounter >= XR && hcounter < (XR + 3) && vcounter >= 80))
     margin = 1'b1;

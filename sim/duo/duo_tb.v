@@ -353,6 +353,60 @@ initial begin
   repeat(2) @(posedge Clk_74M);
   chk("填满 24 格消行", clear, 1);
   clr_state;
+  for(integer c3 = 0; c3 < 24; c3 = c3 + 1)begin
+    dut.state[c3*20 + 5] = 1'b1;
+    dut.state[c3*20 + 7] = 1'b1;
+  end
+  repeat(3) @(posedge Clk_74M);
+  chk("两行同时满 clear=1", clear, 1);
+  chk("d_clear=2", dut.d_clear, 2);
+  clr_state;
+
+  $display("=== 16) 随机取样: 时间采样 / 同拍分配 / Idle 搅动 ===");
+  begin : rnd_chk
+    reg [2:0] t_a;
+    reg [31:0] exp_ns;
+    integer q, qn, d1, d2, d3;
+    reg [2:0] t1, t2;
+    force dut.counter_c = 5'd1; force dut.counter_r = 5'd19;
+    force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd19;
+    Idle = 1'b0; Playing = 1'b1; repeat(4) @(posedge Clk_74M);
+    t_a = dut.rnd_type_t;
+    d3 = 0;
+    for(qn = 0; qn < 6; qn = qn + 1)begin
+      repeat(5) @(posedge Clk_74M);
+      if(dut.rnd_type_t !== t_a) d3 = d3 + 1;
+      t_a = dut.rnd_type_t;
+    end
+    chk("Playing 无取块时取样值随时间变化", (d3 > 0), 1);
+    d2 = 0;
+    for(q = 0; q < 8; q = q + 1)begin
+      exp_ns = {dut.rnd[30:0], dut.rnd[31]^dut.rnd[21]^dut.rnd[1]^dut.rnd[0]};
+      @(posedge Clk_74M);
+      if(dut.rnd !== exp_ns) d2 = d2 + 1;
+    end
+    chk("Playing 时不加搅动", d2, 0);
+    Idle = 1'b1; Playing = 1'b0; repeat(4) @(posedge Clk_74M);
+    d1 = 0;
+    for(q = 0; q < 8; q = q + 1)begin
+      exp_ns = {dut.rnd[30:0], dut.rnd[31]^dut.rnd[21]^dut.rnd[1]^dut.rnd[0]};
+      @(posedge Clk_74M);
+      if(dut.rnd !== exp_ns) d1 = d1 + 1;
+    end
+    chk("Idle 搅动生效", (d1 > 0), 1);
+    Idle = 1'b0; Playing = 1'b1; repeat(2) @(posedge Clk_74M);
+    force dut.rnd = 32'h000000F0; force dut.rnd_cnt = 16'h0000;
+    repeat(2) @(posedge Clk_74M);
+    force dut.land_pulse = 1'b1; force dut.land_pulse2 = 1'b1;
+    @(posedge Clk_74M);
+    release dut.land_pulse; release dut.land_pulse2;
+    repeat(2) @(posedge Clk_74M);
+    t1 = dut.type_t; t2 = dut.type_t2;
+    $display("  [info] 同拍取块(定态): P1 next=%0d, P2 next=%0d", t1, t2);
+    chk("同拍两人拿到不同块", (t1 !== t2), 1);
+    release dut.rnd; release dut.rnd_cnt;
+    release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
+  end
 
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);

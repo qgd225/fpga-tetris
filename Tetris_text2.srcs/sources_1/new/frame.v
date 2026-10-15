@@ -438,8 +438,15 @@ module frame(
     type_r <= type;
     type_t_r <= type_t;
     hold_type_r <= hold_type;
+    //    场地取色: 编号必须在场地内(哨兵 24 或 20 表示不在任何格)
+    if((C_num <= 5'd23) && (R_num <= 5'd19))begin
     cell_r <= state[(C_num*20) + R_num];
     sc_r <= state_color[(C_num*20) + R_num];
+    end
+    else begin
+    cell_r <= 1'b0;
+    sc_r <= 3'd0;
+    end
     clear_t_r <= clear_t;
     flash_r <= (clear_t) && (line_t[R_num]) && (!clear_flash);
     chs_margin_r <= chs_margin;

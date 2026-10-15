@@ -137,7 +137,6 @@ module Playfield(
     reg [24:0]lock_counter;
 
 //    消行
-    reg [4:0]row_cnt[0:19];
     reg [19:0]line;
     reg clear_d;
     wire [4:0]d_clear = line[0] + line[1] + line[2] + line[3] + line[4] + line[5] + line[6] + line[7] + line[8] +
@@ -171,15 +170,24 @@ module Playfield(
     reg rot_block;
 
 //    随机出块
-    reg [15:0]rnd;
+    reg [31:0]rnd;
     reg [15:0]rnd_cnt;
-    wire rnd_fb = rnd[15] ^ rnd[13] ^ rnd[12] ^ rnd[10];
+    wire rnd_fb  = rnd[31] ^ rnd[21] ^ rnd[1] ^ rnd[0];
+    wire rnd_stir = Idle ? (rnd_cnt[13] ^ rnd_cnt[7] ^ rnd_cnt[3]) : 1'b0;
+    wire rnd_fb_eff = rnd_fb ^ rnd_stir;
+    wire [31:0]rnd_n1 = {rnd[30:0], rnd_fb_eff};
     wire [3:0]rnd4t = rnd[3:0] ^ rnd_cnt[3:0];
     wire [3:0]rnd4n = rnd[7:4] ^ rnd_cnt[7:4];
     wire [3:0]r7t = (rnd4t >= 4'd7) ? (rnd4t - 4'd7) : rnd4t;
     wire [3:0]r7n = (rnd4n >= 4'd7) ? (rnd4n - 4'd7) : rnd4n;
     wire [2:0]rnd_type_t = (r7t >= 4'd7) ? (r7t - 4'd7) : r7t[2:0];
     wire [2:0]rnd_type_n = (r7n >= 4'd7) ? (r7n - 4'd7) : r7n[2:0];
+    wire [3:0]rnd4t1 = rnd_n1[3:0] ^ rnd_cnt[3:0];
+    wire [3:0]rnd4n1 = rnd_n1[7:4] ^ rnd_cnt[7:4];
+    wire [3:0]r7t1 = (rnd4t1 >= 4'd7) ? (rnd4t1 - 4'd7) : rnd4t1;
+    wire [3:0]r7n1 = (rnd4n1 >= 4'd7) ? (rnd4n1 - 4'd7) : rnd4n1;
+    wire [2:0]rnd_type_t1 = (r7t1 >= 4'd7) ? (r7t1 - 4'd7) : r7t1[2:0];
+    wire [2:0]rnd_type_n1 = (r7n1 >= 4'd7) ? (r7n1 - 4'd7) : r7n1[2:0];
 
 //    Hold
     reg en_hold_t;
@@ -228,10 +236,8 @@ module Playfield(
 //    Duo: 互撞/顶住 + 通用幽灵扫描(本轮新增)
     reg  other_down_hold;
     reg  other_down_hold2;
-    reg  [5:0]cc_o1, rr_o1;
-    reg  [5:0]cc_o2, rr_o2;
-    reg  [5:0]gc1, gr1, oc1, or1;
-    reg  [5:0]gc2, gr2, oc2, or2;
+    reg  [5:0]gc1, gr1;
+    reg  [5:0]gc2, gr2;
     reg  ghost_blocked1, ghost_blk_state1, ghost_blk_other1;
     reg  ghost_blocked2, ghost_blk_state2, ghost_blk_other2;
     reg  [4:0]ghost_scan_r, ghost_scan_r2;
@@ -239,12 +245,8 @@ module Playfield(
     reg  ghost_blk_oth, ghost_blk_oth2;
     reg  [4:0]counter_r_d1, counter_r2_d1;
     reg  [15:0]sig_p1_d, sig_p2_d;
-    integer j1;
-    integer j2;
     integer jg1;
-    integer jg1b;
     integer jg2;
-    integer jg2b;
     wire [15:0]sig_p1 = {duo, counter_c[4:0], counter_r[4:0], type[2:0], rot[1:0]};
     wire [15:0]sig_p2 = {duo, counter_c2[4:0], counter_r2[4:0], type2[2:0], rot2[1:0]};
     wire other_moved1 = (sig_p2 != sig_p2_d);
@@ -274,6 +276,38 @@ module Playfield(
     integer p;
     integer k;
     integer i2;
+
+    //    行字: row_w[m] = 第 m 行 24 列(纯连线, 供所有场地查表共用)
+    wire [23:0]row_w [0:19];
+    //    整行判满用的列掩码(单机只看 0..19 列)
+    wire [23:0]full_mask = duo ? 24'hFFFFFF : 24'h000FFFFF;
+
+    //    对方方块 4 格绝对坐标(公共连线)
+    wire [5:0] oc2_0 = counter_c2 + { { 7{Tetromino_dout2[7]} }, Tetromino_dout2[7-:4] };
+    wire [5:0] or2_0 = counter_r2 + { { 7{Tetromino_dout2[3]} }, Tetromino_dout2[3-:4] };
+    wire [5:0] oc2_1 = counter_c2 + { { 7{Tetromino_dout2[15]} }, Tetromino_dout2[15-:4] };
+    wire [5:0] or2_1 = counter_r2 + { { 7{Tetromino_dout2[11]} }, Tetromino_dout2[11-:4] };
+    wire [5:0] oc2_2 = counter_c2 + { { 7{Tetromino_dout2[23]} }, Tetromino_dout2[23-:4] };
+    wire [5:0] or2_2 = counter_r2 + { { 7{Tetromino_dout2[19]} }, Tetromino_dout2[19-:4] };
+    wire [5:0] oc2_3 = counter_c2 + { { 7{Tetromino_dout2[31]} }, Tetromino_dout2[31-:4] };
+    wire [5:0] or2_3 = counter_r2 + { { 7{Tetromino_dout2[27]} }, Tetromino_dout2[27-:4] };
+    wire [5:0] oc1_0 = counter_c + { { 7{Tetromino_dout[7]} }, Tetromino_dout[7-:4] };
+    wire [5:0] or1_0 = counter_r + { { 7{Tetromino_dout[3]} }, Tetromino_dout[3-:4] };
+    wire [5:0] oc1_1 = counter_c + { { 7{Tetromino_dout[15]} }, Tetromino_dout[15-:4] };
+    wire [5:0] or1_1 = counter_r + { { 7{Tetromino_dout[11]} }, Tetromino_dout[11-:4] };
+    wire [5:0] oc1_2 = counter_c + { { 7{Tetromino_dout[23]} }, Tetromino_dout[23-:4] };
+    wire [5:0] or1_2 = counter_r + { { 7{Tetromino_dout[19]} }, Tetromino_dout[19-:4] };
+    wire [5:0] oc1_3 = counter_c + { { 7{Tetromino_dout[31]} }, Tetromino_dout[31-:4] };
+    wire [5:0] or1_3 = counter_r + { { 7{Tetromino_dout[27]} }, Tetromino_dout[27-:4] };
+    genvar gw;
+    generate for(gw = 0; gw < 20; gw = gw + 1)begin : gen_roww
+        assign row_w[gw] = { state[23*20+gw], state[22*20+gw], state[21*20+gw], state[20*20+gw],
+                             state[19*20+gw], state[18*20+gw], state[17*20+gw], state[16*20+gw],
+                             state[15*20+gw], state[14*20+gw], state[13*20+gw], state[12*20+gw],
+                             state[11*20+gw], state[10*20+gw], state[9*20+gw],  state[8*20+gw],
+                             state[7*20+gw],  state[6*20+gw],  state[5*20+gw],  state[4*20+gw],
+                             state[3*20+gw],  state[2*20+gw],  state[1*20+gw],  state[0*20+gw] };
+    end endgenerate
     integer o2;
     integer p2;
     integer k2;
@@ -308,34 +342,50 @@ module Playfield(
 
             //    与对方运动方块互撞: 左右阻挡 / 下行顶住(不算落底) / 重合
             if(duo)begin
-                for(j1 = 0; j1 < 4; j1 = j1 + 1)begin
-                    cc_o1 = counter_c2 + { { 7{Tetromino_dout2[j1*8+7]} }, Tetromino_dout2[(j1*8+7)-:4] };
-                    rr_o1 = counter_r2 + { { 7{Tetromino_dout2[j1*8+3]} }, Tetromino_dout2[(j1*8+3)-:4] };
-                    if((rr_o1 == rr) && (cc > 0) && (cc_o1 == (cc - 1'd1)))
-                    boundary_collision_left = 1'b1;
-                    if((rr_o1 == rr) && (cc_o1 == (cc + 1'd1)))
-                    boundary_collision_right = 1'b1;
-                    if((cc_o1 == cc) && (rr_o1 == (rr + 1'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && state[cc*20 + (rr + 1'd1)]))
-                    other_down_hold = 1'b1;
-                    if((cc_o1 == cc) && (rr_o1 == rr))
-                    touch_top = 1'b1;
+                if(or2_0 == rr)begin
+                    if((cc > 0) && (oc2_0 == (cc - 6'd1))) boundary_collision_left = 1'b1;
+                    if(oc2_0 == (cc + 6'd1)) boundary_collision_right = 1'b1;
+                    if(oc2_0 == cc) touch_top = 1'b1;
                 end
+                if((oc2_0 == cc) && (or2_0 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
+                other_down_hold = 1'b1;
+                if(or2_1 == rr)begin
+                    if((cc > 0) && (oc2_1 == (cc - 6'd1))) boundary_collision_left = 1'b1;
+                    if(oc2_1 == (cc + 6'd1)) boundary_collision_right = 1'b1;
+                    if(oc2_1 == cc) touch_top = 1'b1;
+                end
+                if((oc2_1 == cc) && (or2_1 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
+                other_down_hold = 1'b1;
+                if(or2_2 == rr)begin
+                    if((cc > 0) && (oc2_2 == (cc - 6'd1))) boundary_collision_left = 1'b1;
+                    if(oc2_2 == (cc + 6'd1)) boundary_collision_right = 1'b1;
+                    if(oc2_2 == cc) touch_top = 1'b1;
+                end
+                if((oc2_2 == cc) && (or2_2 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
+                other_down_hold = 1'b1;
+                if(or2_3 == rr)begin
+                    if((cc > 0) && (oc2_3 == (cc - 6'd1))) boundary_collision_left = 1'b1;
+                    if(oc2_3 == (cc + 6'd1)) boundary_collision_right = 1'b1;
+                    if(oc2_3 == cc) touch_top = 1'b1;
+                end
+                if((oc2_3 == cc) && (or2_3 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
+                other_down_hold = 1'b1;
             end
 
-            if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && state[cc*20 + (rr + 1)]))//落底检测
+            if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && row_w[rr + 6'd1][cc]))//落底检测
             land = 1'b1;
 
-            if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && state[(cc - 1)*20 + rr]))//左边界碰撞检测
+            if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc - 6'd1]))//左边界碰撞检测
             boundary_collision_left = 1'b1;
 
-            if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && state[(cc + 1)*20 + rr]))//右边界碰撞检测
+            if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc + 6'd1]))//右边界碰撞检测
             boundary_collision_right = 1'b1;
 
 
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr) && !rr[5]) //正在运动方块
             Piece = 1'b1;
 
-            if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && state[cc*20 + rr])//和已锁方块重叠=顶到
+            if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && row_w[rr][cc])//和已锁方块重叠=顶到
             touch_top = 1'b1;
 
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
@@ -350,16 +400,21 @@ module Playfield(
 //============================================================
 //    划区
 //============================================================
+    //    横纵拆开: 列只看 hcounter, 行只看 vcounter; 无命中给哨兵 24
     always@(*)begin : blk1
-        integer o, p;
-        C_num = 5'd20;
-        R_num = 5'd20;
+        integer o;
+        C_num = 5'd24;
         for(o = 0; o < 24; o = o + 1)
-        for(p = 0; p < 20; p = p + 1)
-        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o) && vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))begin
+        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o))
         C_num = o[4:0];
+    end
+
+    always@(*)begin : blk2
+        integer p;
+        R_num = 5'd24;
+        for(p = 0; p < 20; p = p + 1)
+        if(vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
         R_num = p[4:0];
-        end
     end
 
 
@@ -368,9 +423,9 @@ module Playfield(
 //============================================================
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
-        rnd <= 16'hACE1;
+        rnd <= 32'hACE1_2C7B;
         else
-        rnd <= {rnd[14:0], rnd_fb};
+        rnd <= {rnd[30:0], rnd_fb_eff};
     end
 
     always@(posedge Clk_74M or negedge Reset_n)begin
@@ -591,7 +646,7 @@ module Playfield(
             rot_block = 1'b1;
             else if((rr_r > 11'd19) && !rr_r[5])
             rot_block = 1'b1;
-            else if((cc_r <= (COL - 1'b1)) && (rr_r <= 11'd19) && state[cc_r*20 + rr_r])
+            else if((cc_r <= (COL - 1'b1)) && (rr_r <= 11'd19) && row_w[rr_r][cc_r])
             rot_block = 1'b1;
         end
         en_rotate = (rotate_p_flag) && (!rot_block) && (!lock_we);
@@ -746,12 +801,7 @@ module Playfield(
         clear = 1'b0;
         line = 20'd0;
         for(m = 0; m < 20; m = m + 1)begin
-            row_cnt[m] = 5'd0;
-            for(c = 0; c < 24; c = c + 1)begin
-                if(state[c*20 + m])
-                row_cnt[m] = row_cnt[m] + 5'd1;
-            end
-            if(row_cnt[m] == COL)begin
+            if(&(row_w[m] | ~full_mask))begin
                 line[m] = 1'b1;
                 clear = 1'b1;
             end
@@ -888,18 +938,26 @@ module Playfield(
             gr1 = ghost_scan_r + { { 7{Tetromino_dout[jg1*8+3]} }, Tetromino_dout[(jg1*8+3)-:4] };
             if((!gr1[5]) && (gr1 > 6'd19))
             ghost_blocked1 = 1'b1;
-            else if((!gr1[5]) && (gc1 <= (COL - 1'b1)) && state[gc1*20 + gr1])begin
+            else if((!gr1[5]) && (gc1 <= (COL - 1'b1)) && row_w[gr1][gc1])begin
                 ghost_blocked1 = 1'b1;
                 ghost_blk_state1 = 1'b1;
             end
             else if(duo)begin
-                for(jg1b = 0; jg1b < 4; jg1b = jg1b + 1)begin
-                    oc1 = counter_c2 + { { 7{Tetromino_dout2[jg1b*8+7]} }, Tetromino_dout2[(jg1b*8+7)-:4] };
-                    or1 = counter_r2 + { { 7{Tetromino_dout2[jg1b*8+3]} }, Tetromino_dout2[(jg1b*8+3)-:4] };
-                    if((gc1 == oc1) && (gr1 == or1))begin
-                        ghost_blocked1 = 1'b1;
-                        ghost_blk_other1 = 1'b1;
-                    end
+                                if((gr1 == or2_0) && (gc1 == oc2_0))begin
+                    ghost_blocked1 = 1'b1;
+                    ghost_blk_other1 = 1'b1;
+                end
+                if((gr1 == or2_1) && (gc1 == oc2_1))begin
+                    ghost_blocked1 = 1'b1;
+                    ghost_blk_other1 = 1'b1;
+                end
+                if((gr1 == or2_2) && (gc1 == oc2_2))begin
+                    ghost_blocked1 = 1'b1;
+                    ghost_blk_other1 = 1'b1;
+                end
+                if((gr1 == or2_3) && (gc1 == oc2_3))begin
+                    ghost_blocked1 = 1'b1;
+                    ghost_blk_other1 = 1'b1;
                 end
             end
         end
@@ -1038,6 +1096,9 @@ module Playfield(
     assign drop_hold2 = (counter2 == MCNT) && (drop_r_t2);
     assign drop_r2    = (drop_r_t2) && (drop_r_flag2);
     assign land_pulse_t2 = (land2) && (counter_land2 == MCNT_LAND);
+    //    同拍两人取样: P2 取下一个值(开局 Idle 同时装载也算同拍)
+    wire p2_late;
+    assign p2_late = Idle || (land_pulse && land_pulse2);
 
     weiyibiao weiyibiao_inst2(
         .clka(Clk_74M),
@@ -1063,18 +1124,26 @@ module Playfield(
             gr2 = ghost_scan_r2 + { { 7{Tetromino_dout2[jg2*8+3]} }, Tetromino_dout2[(jg2*8+3)-:4] };
             if((!gr2[5]) && (gr2 > 6'd19))
             ghost_blocked2 = 1'b1;
-            else if((!gr2[5]) && (gc2 <= (COL - 1'b1)) && state[gc2*20 + gr2])begin
+            else if((!gr2[5]) && (gc2 <= (COL - 1'b1)) && row_w[gr2][gc2])begin
                 ghost_blocked2 = 1'b1;
                 ghost_blk_state2 = 1'b1;
             end
             else if(duo)begin
-                for(jg2b = 0; jg2b < 4; jg2b = jg2b + 1)begin
-                    oc2 = counter_c + { { 7{Tetromino_dout[jg2b*8+7]} }, Tetromino_dout[(jg2b*8+7)-:4] };
-                    or2 = counter_r + { { 7{Tetromino_dout[jg2b*8+3]} }, Tetromino_dout[(jg2b*8+3)-:4] };
-                    if((gc2 == oc2) && (gr2 == or2))begin
-                        ghost_blocked2 = 1'b1;
-                        ghost_blk_other2 = 1'b1;
-                    end
+                                if((gr2 == or1_0) && (gc2 == oc1_0))begin
+                    ghost_blocked2 = 1'b1;
+                    ghost_blk_other2 = 1'b1;
+                end
+                if((gr2 == or1_1) && (gc2 == oc1_1))begin
+                    ghost_blocked2 = 1'b1;
+                    ghost_blk_other2 = 1'b1;
+                end
+                if((gr2 == or1_2) && (gc2 == oc1_2))begin
+                    ghost_blocked2 = 1'b1;
+                    ghost_blk_other2 = 1'b1;
+                end
+                if((gr2 == or1_3) && (gc2 == oc1_3))begin
+                    ghost_blocked2 = 1'b1;
+                    ghost_blk_other2 = 1'b1;
                 end
             end
         end
@@ -1147,35 +1216,51 @@ module Playfield(
 
             //    与对方运动方块互撞
             if(duo)begin
-                for(j2 = 0; j2 < 4; j2 = j2 + 1)begin
-                    cc_o2 = counter_c + { { 7{Tetromino_dout[j2*8+7]} }, Tetromino_dout[(j2*8+7)-:4] };
-                    rr_o2 = counter_r + { { 7{Tetromino_dout[j2*8+3]} }, Tetromino_dout[(j2*8+3)-:4] };
-                    if((rr_o2 == rr2) && (cc2 > 0) && (cc_o2 == (cc2 - 1'd1)))
-                    boundary_collision_left2 = 1'b1;
-                    if((rr_o2 == rr2) && (cc_o2 == (cc2 + 1'd1)))
-                    boundary_collision_right2 = 1'b1;
-                    if((cc_o2 == cc2) && (rr_o2 == (rr2 + 1'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && state[cc2*20 + (rr2 + 1'd1)]))
-                    other_down_hold2 = 1'b1;
-                    if((cc_o2 == cc2) && (rr_o2 == rr2))
-                    touch_top2 = 1'b1;
+                if(or1_0 == rr2)begin
+                    if((cc2 > 0) && (oc1_0 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
+                    if(oc1_0 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
+                    if(oc1_0 == cc2) touch_top2 = 1'b1;
                 end
+                if((oc1_0 == cc2) && (or1_0 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
+                other_down_hold2 = 1'b1;
+                if(or1_1 == rr2)begin
+                    if((cc2 > 0) && (oc1_1 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
+                    if(oc1_1 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
+                    if(oc1_1 == cc2) touch_top2 = 1'b1;
+                end
+                if((oc1_1 == cc2) && (or1_1 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
+                other_down_hold2 = 1'b1;
+                if(or1_2 == rr2)begin
+                    if((cc2 > 0) && (oc1_2 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
+                    if(oc1_2 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
+                    if(oc1_2 == cc2) touch_top2 = 1'b1;
+                end
+                if((oc1_2 == cc2) && (or1_2 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
+                other_down_hold2 = 1'b1;
+                if(or1_3 == rr2)begin
+                    if((cc2 > 0) && (oc1_3 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
+                    if(oc1_3 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
+                    if(oc1_3 == cc2) touch_top2 = 1'b1;
+                end
+                if((oc1_3 == cc2) && (or1_3 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
+                other_down_hold2 = 1'b1;
             end
 
 
 
-            if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && state[cc2*20 + (rr2 + 1)]))//落底检测
+            if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && row_w[rr2 + 6'd1][cc2]))//落底检测
 
             land2 = 1'b1;
 
 
 
-            if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && state[(cc2 - 1)*20 + rr2]))//左边界碰撞检测
+            if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 - 6'd1]))//左边界碰撞检测
 
             boundary_collision_left2 = 1'b1;
 
 
 
-            if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && state[(cc2 + 1)*20 + rr2]))//右边界碰撞检测
+            if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 + 6'd1]))//右边界碰撞检测
 
             boundary_collision_right2 = 1'b1;
 
@@ -1189,7 +1274,7 @@ module Playfield(
 
 
 
-            if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && state[cc2*20 + rr2])//和已锁方块重叠=顶到
+            if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && row_w[rr2][cc2])//和已锁方块重叠=顶到
 
             touch_top2 = 1'b1;
 
@@ -1223,7 +1308,7 @@ module Playfield(
 
         else if(Idle)
 
-        type2 <= rnd_type_t;
+        type2 <= p2_late ? rnd_type_t1 : rnd_type_t;
 
         else if((land_pulse2 || hold_up2) && Playing)
 
@@ -1243,7 +1328,7 @@ module Playfield(
 
         else if(Idle)
 
-        type_t2 <= rnd_type_n;
+        type_t2 <= p2_late ? rnd_type_n1 : rnd_type_n;
 
         else if(hold_down2)
 
@@ -1251,7 +1336,7 @@ module Playfield(
 
         else if(land_pulse2 && Playing)
 
-        type_t2 <= rnd_type_n;
+        type_t2 <= ((land_pulse && land_pulse2) ? rnd_type_n1 : rnd_type_n);
 
     end
 
@@ -1491,7 +1576,7 @@ module Playfield(
 
             rot_block2 = 1'b1;
 
-            else if((cc_r2 <= (COL - 1'b1)) && (rr_r2 <= 11'd19) && state[cc_r2*20 + rr_r2])
+            else if((cc_r2 <= (COL - 1'b1)) && (rr_r2 <= 11'd19) && row_w[rr_r2][cc_r2])
 
             rot_block2 = 1'b1;
 
