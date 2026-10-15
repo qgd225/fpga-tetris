@@ -254,8 +254,8 @@ module Playfield(
     wire new_piece1 = (counter_r == 5'd0) && (counter_r_d1 != 5'd0);
     wire new_piece2 = (counter_r2 == 5'd0) && (counter_r2_d1 != 5'd0);
     wire field_chg = lock_we || lock_we2 || clear_pulse || clear_t_t;
-    wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved1);
-    wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved2);
+    wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || hold_up || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved1);
+    wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || hold_up2 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved2);
 
 //    P2 独立信号(修复: 原克隆漏改, 误用 P1 信号)
     wire drop_hold2;
@@ -334,6 +334,7 @@ module Playfield(
         .douta(Tetromino_dout)
     );
 
+//    P1 运动方块显示与判定: 形状查表 / 落底 / 左右边界 / 顶到 / 幽灵 / 与对方运动方块互撞
     always@(*)begin
         Tetromino_addr = {type[2:0], rot[1:0]};
         Piece = 1'b0;
@@ -410,6 +411,7 @@ module Playfield(
         C_num = o[4:0];
     end
 
+//    行编号: 只看 vcounter, 无命中给哨兵 24
     always@(*)begin : blk2
         integer p;
         R_num = 5'd24;
@@ -428,6 +430,7 @@ module Playfield(
         rnd <= {rnd[30:0], rnd_fb_eff};
     end
 
+//    自由计数: 给随机取样与 Idle 搅动用
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         rnd_cnt <= 16'd0;
@@ -435,6 +438,7 @@ module Playfield(
         rnd_cnt <= rnd_cnt + 16'd1;
     end
 
+//    P1 当前方块类型: 到下一块或 Hold 时替换
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type <= 3'd0;
@@ -444,6 +448,7 @@ module Playfield(
         type <= type_t;
     end
 
+//    P1 下一块类型: 显示在画面 Next 框上半
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_t <= 3'd0;
@@ -455,6 +460,7 @@ module Playfield(
         type_t <= rnd_type_n;
     end
 
+//    P1 落锁时的类型: 交给 frame 定格子颜色
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_d <= 3'd0;
@@ -464,7 +470,7 @@ module Playfield(
 
 //============================================================
 //    按键信号处理
-//============================================================
+//    P1 软降计时: 满 MCNT 才认一次软降
     always@(posedge Clk_74M or negedge Reset_n)
     if(!Reset_n)
     counter <= 30'd0;
@@ -473,6 +479,7 @@ module Playfield(
     else if(counter < MCNT)
     counter <= counter + 30'd1;
 
+//    P1 硬降标志: 按一次只吃一次, 松键后复位
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         drop_r_t <= 1'b1;
@@ -484,7 +491,7 @@ module Playfield(
 
 //============================================================
 //    自动下落与参考点移动
-//============================================================
+//    P1 自动下落计时: 满 Drop 自动降一格
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_drop <= 1'd0;
@@ -535,6 +542,7 @@ module Playfield(
 
     wire [2:0]lv_now   = (lv_score > lv_time) ? lv_score : lv_time;
 
+//    速度等级: 分数等级与时间等级取较大值
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         speed_level <= 0;
@@ -542,6 +550,7 @@ module Playfield(
         speed_level <= lv_now;
     end
     
+//    自动下落间隔: 按速度等级查表
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         Drop <= MCNT_Drop;
@@ -588,6 +597,7 @@ module Playfield(
         counter_r <= 5'd0;
     end
 
+//    P1 参考点列: 左右移动/旋转/归位(双人出生列 8)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_c <= SPAWN_C1;
@@ -632,6 +642,7 @@ module Playfield(
 
     assign weiyibiao_addr = {type[2:0],rot[1:0]};
 
+//    P1 旋转预判: 转过去会不会出界或撞到已落格
     always@(*)begin
         Tetromino_addr1 = {type[2:0], (rot[1:0] + 1)};
         rot_block = 1'b0;
@@ -648,6 +659,7 @@ module Playfield(
         en_rotate = (rotate_p_flag) && (!rot_block) && (!lock_we);
     end
 
+//    P1 当前旋转序号
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         rot <= 2'd0;
@@ -673,7 +685,7 @@ module Playfield(
 
 //============================================================
 //    落地计时与锁定
-//============================================================
+//    P1 落底停留计时: 满 MCNT_LAND 就开始锁存
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_land <= 1'b0;
@@ -689,6 +701,7 @@ module Playfield(
 
     wire land_pulse_t = (land) && (counter_land == MCNT_LAND);
 
+//    P1 锁存启动
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_t <= 1'b0;
@@ -698,6 +711,7 @@ module Playfield(
         lock_t <= 1'b0;
     end
 
+//    P1 锁存计数: 4 个格子一拍写一个
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_cnt <= 2'd0;
@@ -727,6 +741,7 @@ module Playfield(
     assign lock_we  = (lock_t) || (lock_cnt != 2'd0);
     assign lock_idx = (lock_t) ? 2'd0 : lock_cnt;
 
+//    P1 落锁时 4 个格子的列
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             cc_t[0] <= 11'd0; cc_t[1] <= 11'd0; cc_t[2] <= 11'd0; cc_t[3] <= 11'd0;
@@ -736,6 +751,7 @@ module Playfield(
         cc_t[y] <= counter_c + { {7{Tetromino_dout[y*8+7]}}, Tetromino_dout[y*8+7 -:4] };
     end
 
+//    P1 落锁时 4 个格子的行
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             rr_t[0] <= 11'd0; rr_t[1] <= 11'd0; rr_t[2] <= 11'd0; rr_t[3] <= 11'd0;
@@ -771,6 +787,7 @@ module Playfield(
     wire       mv_start = (wm == 5'd0) && clear_time && mv_en && (!clr_ramp);
     wire       mv_go = (mv_act || mv_start) && mv_en;
 
+//    写口仲裁: 一次只写一行, 优先级 清零 > 落锁 > 消行搬移
     always@(*)begin
         row_we = 1'b0;
         row_a = 5'd0;
@@ -878,6 +895,7 @@ module Playfield(
         end
     end
 
+//    整行判满: 24 格全满的行要消
     always@(*)begin : blk4
         integer m;
         clear = 1'b0;
@@ -892,6 +910,7 @@ module Playfield(
     
     assign clear_time = clear_t || clear;
     
+//    闪白次数: 消 n 行闪 2n 下
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     cl_stop <= 4'd0;
@@ -901,6 +920,7 @@ module Playfield(
     cl_stop <= (d_clear << 1) - 4'd1;
     end
 
+//    闪白分频计数
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_cnt <= 0;
@@ -914,6 +934,7 @@ module Playfield(
 
     assign clear_step = (clear_t) && (clear_cnt == CLEAR_STEP);
 
+//    闪白标志: 消行动画期间锁住场地
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_t <= 1'b0;
@@ -923,6 +944,7 @@ module Playfield(
     clear_t <= 1'b0;
     end
 
+//    闪白节拍
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_tick <= 3'd0;
@@ -936,6 +958,7 @@ module Playfield(
     end
     end
 
+//    已消行计数(动画用)
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     cl_tick <= 3'd0;
@@ -945,6 +968,7 @@ module Playfield(
     cl_tick <= cl_tick + 3'd1;
     end
 
+//    消行节拍脉冲: 每消一行给一拍
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_t_t <= 1'b0;
@@ -952,6 +976,7 @@ module Playfield(
     clear_t_t <= clear_step && (cl_tick < d_clear);
     end
 
+//    闪白翻转: 亮/暗交替
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_flash <= 1'b1;
@@ -961,6 +986,7 @@ module Playfield(
     clear_flash <= !clear_flash;
     end
 
+//    正在消的行标记
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     line_t <= 20'd0;
@@ -972,6 +998,7 @@ module Playfield(
     line_t <= 20'd0;
     end
 
+//    找出还没开始消的下一行
     always@(*)begin : blk5
         integer m;
     line_d = 20'd0;
@@ -980,6 +1007,7 @@ module Playfield(
     line_d = (20'd1 << m);
     end
 
+//    消行搬移的上界行(最高的满行)
     always@(*)begin : blk6
         integer m;
         clear_row = 5'd0;
@@ -988,6 +1016,7 @@ module Playfield(
         clear_row = m[4:0];
     end
 
+//    消行开始的沿检测(延迟一拍)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         clear_d <= 1'b0;
@@ -997,6 +1026,7 @@ module Playfield(
 
     assign clear_pulse = (clear_time) && (!clear_d);
 
+//    本次消掉的行数(给计分/等级用)
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     c_clear <= 5'd0;
@@ -1044,6 +1074,7 @@ module Playfield(
         end
     end
 
+//    幽灵扫描状态机: 触发重扫 -> 逐行推进 -> 锁存落点
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             ghost_scan_r <= 5'd0;
@@ -1064,8 +1095,11 @@ module Playfield(
             end
             else if(ghost_scan_r < 5'd20)
             ghost_scan_r <= ghost_scan_r + 5'd1;
-            else
-            ghost_done <= 1'b1;
+            else begin
+                ghost_done <= 1'b1;
+                ghost_blk_oth <= 1'b0;
+                counter_ghost_r_t <= ghost_scan_r;
+            end
         end
     end
 
@@ -1087,7 +1121,7 @@ module Playfield(
 
 //============================================================
 //    Hold 功能
-//============================================================
+//    P1 Hold 键按下/松开状态
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold <= 0;
@@ -1107,6 +1141,7 @@ module Playfield(
         en_hold <= 0;
     end
 
+//    P1 Hold 键延迟一拍: 用来取按下/松开边沿
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold_t <= 0;
@@ -1114,6 +1149,7 @@ module Playfield(
         en_hold_t <= en_hold;
     end
 
+//    Hold 槽内容(两人共用一个)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         hold_type <= 0;
@@ -1226,6 +1262,7 @@ module Playfield(
         end
     end
 
+//    P2 幽灵扫描状态机: 触发重扫 -> 逐行推进 -> 锁存落点
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             ghost_scan_r2 <= 5'd0;
@@ -1246,13 +1283,18 @@ module Playfield(
             end
             else if(ghost_scan_r2 < 5'd20)
             ghost_scan_r2 <= ghost_scan_r2 + 5'd1;
-            else
-            ghost_done2 <= 1'b1;
+            else begin
+                ghost_done2 <= 1'b1;
+                ghost_blk_oth2 <= 1'b0;
+                counter_ghost_r_t2 <= ghost_scan_r2;
+            end
         end
     end
 
-//===================== P2 逻辑(自动生成) =====================
-//==== P2 block: Tetromino_addr = {type[2:0], rot[1:0]}; ====
+//============================================================
+//    P2 逻辑(与 P1 一一对应)
+//============================================================
+//    P2 运动方块显示与判定: 形状查表 / 落底 / 左右边界 / 顶到 / 幽灵 / 与对方运动方块互撞
     always@(*)begin
         Tetromino_addr2 = {type2[2:0], rot2[1:0]};
         Piece2 = 1'b0;
@@ -1318,7 +1360,7 @@ module Playfield(
         end
     end
 
-//==== P2 block: type <= 3'd0; ====
+//    P2 当前方块类型: 到下一块或 Hold 时替换
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type2 <= 3'd0;
@@ -1328,7 +1370,7 @@ module Playfield(
         type2 <= type_t2;
     end
 
-//==== P2 block: type_t <= 3'd0; ====
+//    P2 下一块类型: 显示在画面 Next 框下半
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_t2 <= 3'd0;
@@ -1340,7 +1382,7 @@ module Playfield(
         type_t2 <= ((land_pulse && land_pulse2) ? rnd_type_n1 : rnd_type_n);
     end
 
-//==== P2 block: type_d <= 3'd0; ====
+//    P2 落锁时的类型: 交给 frame 定格子颜色
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_d2 <= 3'd0;
@@ -1348,7 +1390,7 @@ module Playfield(
         type_d2 <= type2;
     end
 
-//==== P2 block: counter <= 30'd0; ====
+//    P2 软降计时: 满 MCNT 才认一次软降
     always@(posedge Clk_74M or negedge Reset_n)
     if(!Reset_n)
     counter2 <= 30'd0;
@@ -1357,6 +1399,7 @@ module Playfield(
     else if(counter2 < MCNT)
     counter2 <= counter2 + 30'd1;
 
+//    P2 硬降标志: 按一次只吃一次, 松键后复位
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         drop_r_t2 <= 1'b1;
@@ -1366,7 +1409,7 @@ module Playfield(
         drop_r_t2 <= 1'b1;
     end
 
-//==== P2 block: counter_drop <= 1'd0; ====
+//    P2 自动下落计时: 满 Drop 自动降一格
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_drop2 <= 1'd0;
@@ -1388,7 +1431,7 @@ module Playfield(
         counter_drop2 <= 1'd0;
     end
 
-//==== P2 block: counter_r <= 5'd0; ====
+//    P2 参考点行: 软降/硬降/旋转/归位都改它
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_r2 <= 5'd0;
@@ -1418,7 +1461,7 @@ module Playfield(
         counter_r2 <= 5'd0;
     end
 
-//==== P2 block: counter_c <= 5'd9; ====
+//    P2 参考点列: 左右移动/旋转/归位(双人出生列 16)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_c2 <= SPAWN_C2;
@@ -1446,7 +1489,7 @@ module Playfield(
         counter_c2 <= SPAWN_C2;
     end
 
-//==== P2 block: Tetromino_addr1 = {type[2:0], (rot[1:0] + 1)}; ====
+//    P2 旋转预判: 转过去会不会出界或撞到已落格
     always@(*)begin
         Tetromino_addr3 = {type2[2:0], (rot2[1:0] + 1)};
         rot_block2 = 1'b0;
@@ -1463,7 +1506,7 @@ module Playfield(
         en_rotate2 = (rotate_p_flag2) && (!rot_block2) && (!lock_we2);
     end
 
-//==== P2 block: rot <= 2'd0; ====
+//    P2 当前旋转序号
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         rot2 <= 2'd0;
@@ -1487,7 +1530,7 @@ module Playfield(
         rot2 <= 2'd0;
     end
 
-//==== P2 block: counter_land <= 1'b0; ====
+//    P2 落底停留计时: 满 MCNT_LAND 就开始锁存
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_land2 <= 1'b0;
@@ -1501,7 +1544,7 @@ module Playfield(
         counter_land2 <= 1'b0;
     end
 
-//==== P2 block: lock_t <= 1'b0; ====
+//    P2 锁存启动
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_t2 <= 1'b0;
@@ -1511,7 +1554,7 @@ module Playfield(
         lock_t2 <= 1'b0;
     end
 
-//==== P2 block: lock_cnt <= 2'd0; ====
+//    P2 锁存计数: 4 个格子一拍写一个
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_cnt2 <= 2'd0;
@@ -1523,7 +1566,7 @@ module Playfield(
         lock_cnt2 <= lock_cnt2 + 2'd1;
     end
 
-//==== P2 block: lock_counter <= 2'd0; ====
+//    P2 锁存闪白计时
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_counter2 <= 2'd0;
@@ -1535,7 +1578,7 @@ module Playfield(
         lock_counter2 <= lock_counter2 + 2'd1;
     end
 
-//==== P2 block: cc_t[0] <= 11'd0; ====
+//    P2 落锁时 4 个格子的列
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             cc_t2[0] <= 11'd0; cc_t2[1] <= 11'd0; cc_t2[2] <= 11'd0; cc_t2[3] <= 11'd0;
@@ -1545,7 +1588,7 @@ module Playfield(
         cc_t2[y] <= counter_c2 + { {7{Tetromino_dout2[y*8+7]}}, Tetromino_dout2[y*8+7 -:4] };
     end
 
-//==== P2 block: rr_t[0] <= 11'd0; ====
+//    P2 落锁时 4 个格子的行
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             rr_t2[0] <= 11'd0; rr_t2[1] <= 11'd0; rr_t2[2] <= 11'd0; rr_t2[3] <= 11'd0;
@@ -1555,7 +1598,7 @@ module Playfield(
         rr_t2[y] <= counter_r2 + { {7{Tetromino_dout2[y*8+3]}}, Tetromino_dout2[y*8+3 -:4] };
     end
 
-//==== P2 block: en_hold <= 0; ====
+//    P2 Hold 键按下/松开状态
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold2 <= 0;
@@ -1575,7 +1618,7 @@ module Playfield(
         en_hold2 <= 0;
     end
 
-//==== P2 block: en_hold_t <= 0; ====
+//    P2 Hold 键延迟一拍: 用来取按下/松开边沿
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold_t2 <= 0;

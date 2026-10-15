@@ -641,6 +641,34 @@ initial begin
     clr_state;
   end
 
+  $display("=== 20) 幽灵落点: 扫到行上限也要更新(不能停旧值) ===");
+  begin : ghost_row_chk
+    clr_state;
+    duo = 1'b0; repeat(4) @(posedge Clk_74M);
+    force dut.counter_land = 25'd0; force dut.lock_counter = 25'd0;
+    force dut.lock_t = 1'b0; force dut.lock_cnt = 2'd0;
+    force dut.drop_r_t = 1'b1;
+    force dut.counter_c = 5'd5; force dut.counter_r = 5'd5;
+    shape_val = 32'h30201000;                    // 4 格同行(行偏移全 0): 锚点最多到 19
+    p_rot1; repeat(20) @(posedge Clk_74M);
+    chk("行偏移全 0: 落点=19", dut.counter_ghost_r_t, 19);
+    shape_val = 32'h1F0FFFFE;                    // 行偏移 -1/-2(没有 0): 锚点必须到 20
+    p_rot1; repeat(30) @(posedge Clk_74M);
+    chk("行偏移 -1/-2: 落点=20", dut.counter_ghost_r_t, 20);
+    hc = 11'd481; vc = 11'd689;                  // 第5列 第19行, 空场地: 幽灵应在这里
+    repeat(2) @(posedge Clk_74M);
+    chk("幽灵画在第19行(不悬空)", ghost, 1);
+    hc = 11'd0; vc = 11'd0; repeat(2) @(posedge Clk_74M);
+    release dut.counter_c; release dut.counter_r;
+    hard1;                                       // 硬降要停在落点
+    chk("硬降停在落点(20)", dut.counter_r, 20);
+    chk("停在落点时已满足落底", dut.land, 1);
+    release dut.counter_land; release dut.lock_counter;
+    release dut.lock_t; release dut.lock_cnt; release dut.drop_r_t;
+    shape_val = 32'h0;
+    clr_state;
+  end
+
   chk("全程 镜像=8 份副本", (ram_bad == 0), 1);
 
   if(bad == 0) $display("=== ALL PASS ===");
