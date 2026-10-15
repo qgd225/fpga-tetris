@@ -343,6 +343,33 @@ initial begin
   time_sec = 14'd600; repeat(4) @(posedge Clk_74M); chk("solo 600s", speed_level, 7);
   duo = 1'b1; time_sec = 14'd0; repeat(4) @(posedge Clk_74M);
 
+  $display("=== 17) 幽灵: 场地变化后要重算, 且不能跑到方块上方 ===");
+  begin : ghost_chk
+    clr_state;
+    duo = 1'b1; repeat(4) @(posedge Clk_74M);
+    // (a) 空场地: 幽灵应在地板(19)
+    force dut.counter_c = 5'd8;  force dut.counter_r = 5'd0;
+    force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd0;
+    settle;
+    chk("空场地幽灵=19", dut.counter_ghost_r_t, 19);
+    // (b) 对方方块压在下方(运动方块): 幽灵钳位到"方块上一行", 且标记被对方挡住
+    release dut.counter_c2; force dut.counter_c2 = 5'd8; force dut.counter_r2 = 5'd11;
+    settle;
+    chk("被对方运动方块挡住时幽灵=10", dut.counter_ghost_r_t, 10);
+    chk("此时幽灵隐藏标记=1", dut.ghost_blk_oth, 1);
+    // (c) 对方锁进场地: 场地变化必须触发重算 -> 幽灵仍在10, 但改为"落在已落格上"(要显示)
+    lock2;
+    repeat(6) @(posedge Clk_74M);
+    chk("对方落格后幽灵=10", dut.counter_ghost_r_t, 10);
+    chk("对方落格后幽灵显示(不再是对方方块)", dut.ghost_blk_oth, 0);
+    // (d) 方块本身就在被挡的行(重叠): 幽灵不能跑到方块上方
+    force dut.counter_r = 5'd11;
+    settle;
+    chk("起点被挡时幽灵钳位>=方块行", (dut.counter_ghost_r_t >= dut.counter_r), 1);
+    release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
+    clr_state;
+  end
+
   $display("=== 15) 消行: 整行 24 格才消 ===");
   clr_state;
   for(integer c1 = 0; c1 < 12; c1 = c1 + 1) dut.state[c1*20 + 5] = 1'b1;

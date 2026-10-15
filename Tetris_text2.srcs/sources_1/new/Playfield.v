@@ -253,8 +253,9 @@ module Playfield(
     wire other_moved2 = (sig_p1 != sig_p1_d);
     wire new_piece1 = (counter_r == 5'd0) && (counter_r_d1 != 5'd0);
     wire new_piece2 = (counter_r2 == 5'd0) && (counter_r2_d1 != 5'd0);
-    wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || (Finalize && switch_r_flag) || clear_down || (duo && other_moved1);
-    wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || (Finalize && switch_r_flag) || clear_down || (duo && other_moved2);
+    wire field_chg = lock_we || lock_we2 || clear_pulse || clear_t_t;
+    wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved1);
+    wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved2);
 
 //    P2 独立信号(修复: 原克隆漏改, 误用 P1 信号)
     wire drop_hold2;
@@ -390,7 +391,7 @@ module Playfield(
 
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
 
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && (counter_ghost_r_t - counter_r) > 4)
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && ghost_done && (!clear_time) && (counter_ghost_r_t > (counter_r + 5'd4)))
             ghost = 1'b1;
 
         end
@@ -979,7 +980,7 @@ module Playfield(
             if(ghost_blocked1)begin
                 ghost_done <= 1'b1;
                 ghost_blk_oth <= ghost_blk_other1;
-                counter_ghost_r_t <= ghost_scan_r - 5'd1;
+                counter_ghost_r_t <= (ghost_scan_r > counter_r) ? (ghost_scan_r - 5'd1) : counter_r;
             end
             else if(ghost_scan_r < 5'd20)
             ghost_scan_r <= ghost_scan_r + 5'd1;
@@ -1165,7 +1166,7 @@ module Playfield(
             if(ghost_blocked2)begin
                 ghost_done2 <= 1'b1;
                 ghost_blk_oth2 <= ghost_blk_other2;
-                counter_ghost_r_t2 <= ghost_scan_r2 - 5'd1;
+                counter_ghost_r_t2 <= (ghost_scan_r2 > counter_r2) ? (ghost_scan_r2 - 5'd1) : counter_r2;
             end
             else if(ghost_scan_r2 < 5'd20)
             ghost_scan_r2 <= ghost_scan_r2 + 5'd1;
@@ -1284,7 +1285,7 @@ module Playfield(
 
 
 
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && (counter_ghost_r_t2 - counter_r2) > 4)
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && ghost_done2 && (!clear_time) && (counter_ghost_r_t2 > (counter_r2 + 5'd4)))
 
             ghost2 = 1'b1;
 
