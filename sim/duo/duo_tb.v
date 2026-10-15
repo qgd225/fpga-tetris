@@ -64,7 +64,7 @@ always @(posedge Clk_74M) begin
       for(mq = 0; mq < 20; mq = mq + 1)begin
         mw = 24'd0;
         for(mcc = 0; mcc < 24; mcc = mcc + 1) mw[mcc] = dut.state[mcc*20 + mq];
-        if(mw !== dut.state_ram[0][mq]) $display("  [dbg] row %0d mirror=%h r0=%h r1=%h r2=%h r3=%h r4=%h r5=%h r6=%h r7=%h", mq, mw, dut.state_ram[0][mq], dut.state_ram[1][mq], dut.state_ram[2][mq], dut.state_ram[3][mq], dut.state_ram[4][mq], dut.state_ram[5][mq], dut.state_ram[6][mq], dut.state_ram[7][mq]);
+        if(mw !== dut.sram0[mq]) $display("  [dbg] row %0d mirror=%h r0=%h r1=%h r2=%h r3=%h r4=%h r5=%h r6=%h r7=%h", mq, mw, dut.sram0[mq], dut.sram1[mq], dut.sram2[mq], dut.sram3[mq], dut.sram4[mq], dut.sram5[mq], dut.sram6[mq], dut.sram7[mq]);
       end
     end
     ram_bad = ram_bad + 1;
@@ -153,14 +153,14 @@ task set_cell;
 input [4:0] cc; input [4:0] rr;
 begin
   dut.state[cc*20 + rr] = 1'b1;
-  dut.state_ram[0][rr][cc] = 1'b1;
-  dut.state_ram[1][rr][cc] = 1'b1;
-  dut.state_ram[2][rr][cc] = 1'b1;
-  dut.state_ram[3][rr][cc] = 1'b1;
-  dut.state_ram[4][rr][cc] = 1'b1;
-  dut.state_ram[5][rr][cc] = 1'b1;
-  dut.state_ram[6][rr][cc] = 1'b1;
-  dut.state_ram[7][rr][cc] = 1'b1;
+  dut.sram0[rr][cc] = 1'b1;
+  dut.sram1[rr][cc] = 1'b1;
+  dut.sram2[rr][cc] = 1'b1;
+  dut.sram3[rr][cc] = 1'b1;
+  dut.sram4[rr][cc] = 1'b1;
+  dut.sram5[rr][cc] = 1'b1;
+  dut.sram6[rr][cc] = 1'b1;
+  dut.sram7[rr][cc] = 1'b1;
 end
 endtask
 
@@ -168,14 +168,14 @@ endtask
 task set_cell_ram;
 input [4:0] cc; input [4:0] rr;
 begin
-  dut.state_ram[0][rr][cc] = 1'b1;
-  dut.state_ram[1][rr][cc] = 1'b1;
-  dut.state_ram[2][rr][cc] = 1'b1;
-  dut.state_ram[3][rr][cc] = 1'b1;
-  dut.state_ram[4][rr][cc] = 1'b1;
-  dut.state_ram[5][rr][cc] = 1'b1;
-  dut.state_ram[6][rr][cc] = 1'b1;
-  dut.state_ram[7][rr][cc] = 1'b1;
+  dut.sram0[rr][cc] = 1'b1;
+  dut.sram1[rr][cc] = 1'b1;
+  dut.sram2[rr][cc] = 1'b1;
+  dut.sram3[rr][cc] = 1'b1;
+  dut.sram4[rr][cc] = 1'b1;
+  dut.sram5[rr][cc] = 1'b1;
+  dut.sram6[rr][cc] = 1'b1;
+  dut.sram7[rr][cc] = 1'b1;
 end
 endtask
 
@@ -187,14 +187,14 @@ begin
   @(posedge Clk_74M);
   dut.state = 480'd0;
   for(q = 0; q < 20; q = q + 1)begin
-    dut.state_ram[0][q] = 24'd0;
-    dut.state_ram[1][q] = 24'd0;
-    dut.state_ram[2][q] = 24'd0;
-    dut.state_ram[3][q] = 24'd0;
-    dut.state_ram[4][q] = 24'd0;
-    dut.state_ram[5][q] = 24'd0;
-    dut.state_ram[6][q] = 24'd0;
-    dut.state_ram[7][q] = 24'd0;
+    dut.sram0[q] = 24'd0;
+    dut.sram1[q] = 24'd0;
+    dut.sram2[q] = 24'd0;
+    dut.sram3[q] = 24'd0;
+    dut.sram4[q] = 24'd0;
+    dut.sram5[q] = 24'd0;
+    dut.sram6[q] = 24'd0;
+    dut.sram7[q] = 24'd0;
   end
   @(posedge Clk_74M);
   release dut.row_we;
@@ -213,14 +213,14 @@ begin
     w = 24'd0;
     for(cc = 0; cc < 24; cc = cc + 1)
     w[cc] = dut.state[cc*20 + q];
-    if(w !== dut.state_ram[0][q]) ram_eq_state = 0;
-    if(w !== dut.state_ram[1][q]) ram_eq_state = 0;
-    if(w !== dut.state_ram[2][q]) ram_eq_state = 0;
-    if(w !== dut.state_ram[3][q]) ram_eq_state = 0;
-    if(w !== dut.state_ram[4][q]) ram_eq_state = 0;
-    if(w !== dut.state_ram[5][q]) ram_eq_state = 0;
-    if(w !== dut.state_ram[6][q]) ram_eq_state = 0;
-    if(w !== dut.state_ram[7][q]) ram_eq_state = 0;
+    if(w !== dut.sram0[q]) ram_eq_state = 0;
+    if(w !== dut.sram1[q]) ram_eq_state = 0;
+    if(w !== dut.sram2[q]) ram_eq_state = 0;
+    if(w !== dut.sram3[q]) ram_eq_state = 0;
+    if(w !== dut.sram4[q]) ram_eq_state = 0;
+    if(w !== dut.sram5[q]) ram_eq_state = 0;
+    if(w !== dut.sram6[q]) ram_eq_state = 0;
+    if(w !== dut.sram7[q]) ram_eq_state = 0;
   end
 end
 endfunction
@@ -255,14 +255,14 @@ integer q;
 begin
   ram_x_cnt = 0;
   for(q = 0; q < 20; q = q + 1)begin
-    if((^dut.state_ram[0][q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.state_ram[1][q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.state_ram[2][q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.state_ram[3][q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.state_ram[4][q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.state_ram[5][q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.state_ram[6][q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
-    if((^dut.state_ram[7][q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
+    if((^dut.sram0[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
+    if((^dut.sram1[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
+    if((^dut.sram2[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
+    if((^dut.sram3[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
+    if((^dut.sram4[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
+    if((^dut.sram5[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
+    if((^dut.sram6[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
+    if((^dut.sram7[q]) === 1'bx) ram_x_cnt = ram_x_cnt + 1;
   end
 end
 endfunction
@@ -665,6 +665,24 @@ initial begin
     chk("停在落点时已满足落底", dut.land, 1);
     release dut.counter_land; release dut.lock_counter;
     release dut.lock_t; release dut.lock_cnt; release dut.drop_r_t;
+    shape_val = 32'h0;
+    clr_state;
+  end
+
+  $display("=== 21) 幽灵不能压在对方运动方块上 ===");
+  begin : ghost_oth_chk
+    clr_state;
+    duo = 1'b1; repeat(4) @(posedge Clk_74M);
+    shape_val = 32'h000FFFFE;                    // J rot3: (-1,-2)(-1,-1)(0,-1)(0,0)
+    force dut.counter_c  = 5'd16; force dut.counter_r  = 5'd19;   // P1: (15,17)(15,18)(16,18)(16,19)
+    force dut.counter_c2 = 5'd16; force dut.counter_r2 = 5'd4;    // P2: (15,2)(15,3)(16,3)(16,4)
+    p_rot1; p_rot2; repeat(40) @(posedge Clk_74M);
+    chk("P2 幽灵落在 P1 方块上方(=17)", dut.counter_ghost_r_t2, 17);
+    chk("被对方方块挡住要标记", dut.ghost_blk_oth2, 1);
+    chk("P1 幽灵落在底板(=19)", dut.counter_ghost_r_t, 19);
+    release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
+    hard2;                                       // 硬降要停在对方方块上
+    chk("P2 硬降停在对方方块上(17)", dut.counter_r2, 17);
     shape_val = 32'h0;
     clr_state;
   end

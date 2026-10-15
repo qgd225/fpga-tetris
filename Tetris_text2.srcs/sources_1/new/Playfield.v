@@ -135,6 +135,11 @@ module Playfield(
     reg [4:0]rr_t [0:3];
     reg [24:0]counter_land;
     reg [24:0]lock_counter;
+//    场地写口(打拍后): 一拍写一行, 镜像与 8 份副本同写
+    reg        wr_we;
+    reg [4:0]  wr_a;
+    reg [23:0] wr_d;
+    reg        mv_req;
 
 //    消行
     reg [19:0]line;
@@ -253,7 +258,7 @@ module Playfield(
     wire other_moved2 = (sig_p1 != sig_p1_d);
     wire new_piece1 = (counter_r == 5'd0) && (counter_r_d1 != 5'd0);
     wire new_piece2 = (counter_r2 == 5'd0) && (counter_r2_d1 != 5'd0);
-    wire field_chg = lock_we || lock_we2 || clear_pulse || clear_t_t;
+    wire field_chg = wr_we || lock_we || lock_we2 || clear_pulse || clear_t_t;
     wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || hold_up || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved1);
     wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || hold_up2 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved2);
 
@@ -279,19 +284,28 @@ module Playfield(
 
     //    行字: row_w[m] = 第 m 行 24 列(纯连线, 只作写路径的源与整行判满)
     wire [23:0]row_w [0:19];
-    //    行字副本: 8 份 24x20 分布式 RAM(单读口一拍一行, 每个并发行读点各占一份)
+    //    行字副本: 8 份独立 24x20 单口 RAM(分布式 RAM, 单读口一拍读一行; 8 份内容永远相同)
     //    0:P1渲染下行 1:P1渲染本行 2:P2渲染下行 3:P2渲染本行
     //    4:P1幽灵 5:P2幽灵 6:P1旋转 7:P2旋转
-    reg [23:0]state_ram [0:7][0:19];
-    //    副本读口(组合读, 与原 row_w 查表时序一致)
-    wire [23:0]rw_p1n = state_ram[0][rr + 6'd1];
-    wire [23:0]rw_p1c = state_ram[1][rr];
-    wire [23:0]rw_p2n = state_ram[2][rr2 + 6'd1];
-    wire [23:0]rw_p2c = state_ram[3][rr2];
-    wire [23:0]rw_g1 = state_ram[4][gr1];
-    wire [23:0]rw_g2 = state_ram[5][gr2];
-    wire [23:0]rw_r1 = state_ram[6][rr_r];
-    wire [23:0]rw_r2 = state_ram[7][rr_r2];
+    reg [23:0]sram0 [0:19];
+    reg [23:0]sram1 [0:19];
+    reg [23:0]sram2 [0:19];
+    reg [23:0]sram3 [0:19];
+    reg [23:0]sram4 [0:19];
+    reg [23:0]sram5 [0:19];
+    reg [23:0]sram6 [0:19];
+    reg [23:0]sram7 [0:19];
+    //    副本读口(组合读; 地址一律取 5 位, 越界场合由各判定点自己的守卫条件挡掉)
+    wire [4:0] addr_p1n = rr[4:0] + 5'd1;
+    wire [4:0] addr_p2n = rr2[4:0] + 5'd1;
+    wire [23:0]rw_p1n = sram0[addr_p1n];
+    wire [23:0]rw_p1c = sram1[rr[4:0]];
+    wire [23:0]rw_p2n = sram2[addr_p2n];
+    wire [23:0]rw_p2c = sram3[rr2[4:0]];
+    wire [23:0]rw_g1 = sram4[gr1[4:0]];
+    wire [23:0]rw_g2 = sram5[gr2[4:0]];
+    wire [23:0]rw_r1 = sram6[rr_r[4:0]];
+    wire [23:0]rw_r2 = sram7[rr_r2[4:0]];
     //    整行判满用的列掩码(单机只看 0..19 列)
     wire [23:0]full_mask = duo ? 24'hFFFFFF : 24'h000FFFFF;
 
@@ -792,8 +806,7 @@ module Playfield(
         row_we = 1'b0;
         row_a = 5'd0;
         row_d = 24'd0;
-        mv_we = 1'b0;
-        mv_row = 5'd0;
+        mv_req = 1'b0;
         if(clr_ramp)begin
             row_we = 1'b1;
             row_a = wm;
@@ -814,8 +827,7 @@ module Playfield(
             row_we = 1'b1;
             row_a = mv_ptr;
             row_d = (mv_ptr == 5'd0) ? 24'd0 : ((mv_ptr <= mv_lim) ? row_w[mv_ptr - 5'd1] : row_w[mv_ptr]);
-            mv_we = (mv_ptr != 5'd0) && (mv_ptr <= mv_lim);
-            mv_row = mv_ptr;
+            mv_req = (mv_ptr != 5'd0) && (mv_ptr <= mv_lim);
         end
     end
 
@@ -858,40 +870,58 @@ module Playfield(
         lk_sel <= !lk_sel;
     end
 
-//    8 份副本: 与镜像同拍写同一行
-    always@(posedge Clk_74M)begin
-        if(row_we)begin
-            state_ram[0][row_a] <= row_d;
-            state_ram[1][row_a] <= row_d;
-            state_ram[2][row_a] <= row_d;
-            state_ram[3][row_a] <= row_d;
-            state_ram[4][row_a] <= row_d;
-            state_ram[5][row_a] <= row_d;
-            state_ram[6][row_a] <= row_d;
-            state_ram[7][row_a] <= row_d;
+//    写口打一拍: 组合端先把"这一拍要写哪一行"选出来, 下一拍再落到镜像与 8 份副本(单口 RAM 规矩写法)
+    always@(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin
+            wr_we <= 1'b0;
+            wr_a <= 5'd0;
+            wr_d <= 24'd0;
+            mv_we <= 1'b0;
+            mv_row <= 5'd0;
+        end
+        else begin
+            wr_we <= row_we;
+            wr_a <= row_a;
+            wr_d <= row_d;
+            mv_we <= mv_req;
+            mv_row <= mv_ptr;
         end
     end
 
-//    镜像(对外 480 位): 同拍写同一行, 与副本内容始终一致
+//    8 份副本: 同一拍写同一行, 内容永远一致
+    always@(posedge Clk_74M)begin
+        if(wr_we)begin
+            sram0[wr_a] <= wr_d;
+            sram1[wr_a] <= wr_d;
+            sram2[wr_a] <= wr_d;
+            sram3[wr_a] <= wr_d;
+            sram4[wr_a] <= wr_d;
+            sram5[wr_a] <= wr_d;
+            sram6[wr_a] <= wr_d;
+            sram7[wr_a] <= wr_d;
+        end
+    end
+
+//    镜像(对外 480 位): 与 8 份副本同拍写同一行, 内容始终一致
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         state <= 480'd0;
-        else if(row_we)
+        else if(wr_we)
         for(c = 0; c < 24; c = c + 1)
-        state[c*20 + row_a] <= row_d[c];
+        state[c*20 + wr_a] <= wr_d[c];
     end
 
 //    副本无异步复位: initial 置 0(上板由配置初值保证, 仿真靠这里保证初值非 X)
     initial begin
         for(m = 0; m < 20; m = m + 1)begin
-            state_ram[0][m] = 24'd0;
-            state_ram[1][m] = 24'd0;
-            state_ram[2][m] = 24'd0;
-            state_ram[3][m] = 24'd0;
-            state_ram[4][m] = 24'd0;
-            state_ram[5][m] = 24'd0;
-            state_ram[6][m] = 24'd0;
-            state_ram[7][m] = 24'd0;
+            sram0[m] = 24'd0;
+            sram1[m] = 24'd0;
+            sram2[m] = 24'd0;
+            sram3[m] = 24'd0;
+            sram4[m] = 24'd0;
+            sram5[m] = 24'd0;
+            sram6[m] = 24'd0;
+            sram7[m] = 24'd0;
         end
     end
 
