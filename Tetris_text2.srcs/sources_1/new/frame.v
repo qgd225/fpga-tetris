@@ -612,6 +612,10 @@ module frame(
                WHITE = 24'hFFF_FFF;//白色
     
 
+//    幽灵框: 只在格内 2px 边带画浅色, 内部纯黑(与实心下落方块区分)
+    wire [10:0]glx = (hcounter - 11'd321) & 11'd31;
+    wire [10:0]gly = (vcounter - 11'd81) & 11'd31;
+    wire ghost_edge = (glx < 11'd2) || (glx > 11'd27) || (gly < 11'd2) || (gly > 11'd27);
 
     always@(*)begin
     if(!Reset_n)
@@ -724,6 +728,7 @@ module frame(
         endcase
         end
     else if(ghost_r)begin
+        if(ghost_edge)begin
         case(type_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -734,6 +739,9 @@ module frame(
         6:rgb = LIGHT_PINK;
         default:rgb = 0;
         endcase
+        end
+        else
+        rgb = BLACK;
         end
     else if(cell_r)begin
         if(clear_t_r)begin
@@ -778,6 +786,7 @@ module frame(
         endcase
         end
     else if(ghost2_r)begin
+        if(ghost_edge)begin
         case(type2_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -788,6 +797,9 @@ module frame(
         6:rgb = LIGHT_PINK;
         default:rgb = 0;
         endcase
+        end
+        else
+        rgb = BLACK;
         end
     else
     rgb = BLACK;

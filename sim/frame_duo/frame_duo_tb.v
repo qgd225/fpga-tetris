@@ -204,7 +204,36 @@ initial begin
   look(11'd321, 11'd81);
   chk("有效格(第0行第0列)", rgb, `BLACK);
 
-  $display("=== 9) 等级 8 段竖条 ===");
+  $display("=== 9) 幽灵空心框: 边带浅色 / 内部纯黑 ===");
+  duo = 1'b1; repeat(4) @(posedge Clk);
+  look(11'd351, 11'd85);   chk("格末死区=黑", rgb, `BLACK);
+  force dut.Playfield_inst.Piece = 1'b0;  force dut.Playfield_inst.Piece2 = 1'b0;
+  force dut.Playfield_inst.ghost = 1'b1;  force dut.Playfield_inst.type = 3'd0;
+  force dut.Playfield_inst.ghost2 = 1'b0;
+  repeat(4) @(posedge Clk);
+  look(11'd322, 11'd85);   chk("幽灵左边带=浅青", rgb, 24'h99EEFF);
+  look(11'd349, 11'd108);  chk("幽灵右边带=浅青", rgb, 24'h99EEFF);
+  look(11'd325, 11'd82);   chk("幽灵上边带=浅青", rgb, 24'h99EEFF);
+  look(11'd348, 11'd109);  chk("幽灵下边带=浅青", rgb, 24'h99EEFF);
+  look(11'd325, 11'd85);   chk("幽灵内部=纯黑", rgb, `BLACK);
+  look(11'd348, 11'd108);  chk("幽灵内部靠角=纯黑", rgb, `BLACK);
+  force dut.Playfield_inst.ghost = 1'b0;
+  force dut.Playfield_inst.ghost2 = 1'b1; force dut.Playfield_inst.type2 = 3'd3;
+  repeat(4) @(posedge Clk);
+  look(11'd322, 11'd85);   chk("P2 幽灵左边带=浅红", rgb, 24'hFFB3B9);
+  look(11'd348, 11'd109);  chk("P2 幽灵下边带=浅红", rgb, 24'hFFB3B9);
+  look(11'd325, 11'd85);   chk("P2 幽灵内部=纯黑", rgb, `BLACK);
+  force dut.Playfield_inst.ghost2 = 1'b0;
+  force dut.Playfield_inst.Piece = 1'b1; force dut.Playfield_inst.type = 3'd0;
+  repeat(4) @(posedge Clk);
+  look(11'd325, 11'd85);   chk("下落方块内部=实色", rgb, 24'h00CCFF);
+  look(11'd322, 11'd85);   chk("下落方块边带=实色", rgb, 24'h00CCFF);
+  release dut.Playfield_inst.Piece; release dut.Playfield_inst.Piece2;
+  release dut.Playfield_inst.ghost; release dut.Playfield_inst.ghost2;
+  release dut.Playfield_inst.type;  release dut.Playfield_inst.type2;
+  repeat(4) @(posedge Clk);
+
+  $display("=== 10) 等级 8 段竖条 ===");
   duo = 1'b0; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.speed_level = 3'd3; repeat(4) @(posedge Clk);
   look(11'd293, 11'd440);   chk("lv3 当前段=青", rgb, `CY_MENU);
@@ -219,7 +248,7 @@ initial begin
   look(11'd293, 11'd590);   chk("lv0 第1段(未达)=暗", rgb, `SLOT_BG);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
 
-  $display("=== 10) 菜单屏: 无框选项 + 青色选中标记 ===");
+  $display("=== 11) 菜单屏: 无框选项 + 青色选中标记 ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
   look(11'd426, 11'd290);   chk("选中项竖条=青", rgb, `CY_MENU);
   look(11'd600, 11'd337);   chk("选中项下划线=青", rgb, `CY_MENU);
@@ -235,7 +264,7 @@ initial begin
   look(11'd500, 11'd280);   chk("切换后原项文字=灰", rgb, `GRAY_MID);
   choose = 1'b0; choose_cnt = 4'd0; Playing = 1'b1; repeat(4) @(posedge Clk);
 
-  $display("=== 11) 顶栏: 分数右对齐 + 时间 + LV 数字 + 标签 ===");
+  $display("=== 12) 顶栏: 分数右对齐 + 时间 + LV 数字 + 标签 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("duo=1 分数贴场地右边界", rgb, `WHITE);
   look(11'd95,  11'd90);    chk("duo=1 NEXT 标签=标签灰", rgb, `GRAY_LBL);
