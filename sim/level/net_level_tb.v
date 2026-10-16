@@ -154,6 +154,42 @@ initial begin
   chk("level7 Drop", dut.Playfield_inst.Drop, (64'd74_249_999*64'd21)/64'd100);
   rel_score; rel_time;
 
+  $display("=== 7) 分数 BCD(串行转换)与十进制逐位一致 ===");
+  begin : bcd_chk
+    integer vi, v, e0, e1, e2, e3, e4, e5, badv;
+    badv = 0;
+    for(vi = 0; vi < 7; vi = vi + 1)begin
+      case(vi)
+      0: v = 0;
+      1: v = 9;
+      2: v = 10;
+      3: v = 999;
+      4: v = 1000;
+      5: v = 12345;
+      default: v = 999999;
+      endcase
+      force dut.scoring_inst.counter = v[19:0];
+      repeat(40) @(posedge Clk_74M);
+      e0 = v % 10;
+      e1 = (v / 10) % 10;
+      e2 = (v / 100) % 10;
+      e3 = (v / 1000) % 10;
+      e4 = (v / 10000) % 10;
+      e5 = (v / 100000) % 10;
+      if((dut.scoring_inst.counter0 !== e0[3:0]) || (dut.scoring_inst.counter1 !== e1[3:0]) ||
+         (dut.scoring_inst.counter2 !== e2[3:0]) || (dut.scoring_inst.counter3 !== e3[3:0]) ||
+         (dut.scoring_inst.counter4 !== e4[3:0]) || (dut.scoring_inst.counter5 !== e5[3:0]))begin
+        $display("  FAIL BCD v=%0d got=%0d%0d%0d%0d%0d%0d exp=%0d%0d%0d%0d%0d%0d", v,
+                 dut.scoring_inst.counter5, dut.scoring_inst.counter4, dut.scoring_inst.counter3,
+                 dut.scoring_inst.counter2, dut.scoring_inst.counter1, dut.scoring_inst.counter0,
+                 e5, e4, e3, e2, e1, e0);
+        badv = badv + 1;
+      end
+    end
+    release dut.scoring_inst.counter;
+    chk("分数 BCD 逐位一致(7 个值)", badv, 0);
+  end
+
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;

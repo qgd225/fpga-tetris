@@ -162,3 +162,27 @@ LUT as Memory 133（128 分布式 RAM + 5 SRL）、FF 4739、F7 1668、F8 269、
 最终面积（`Flow_AreaOptimized_high`）：**LUT 16007 (76.96%)**、LUT as Logic 16002、
 LUT as Memory 5（只剩 SRL，**无分布式 RAM**）、FF 4681、F7 1933、F8 586、BRAM 14、DSP 5、IOB 34；
 模块 `Playfield` 10879、`frame` 13222。三套仿真全绿（duo 80 / frame_duo 22 / level 26），综合 0 error。
+
+
+## 时序收敛：两条既有违例路径的修法（A 项）
+
+上板能用那版的 P&R 实测：**WNS = −1.16ns，8 条违例**，全部来自两条**原本就有**的路径：
+
+1. `scoring`：分数→BCD 是"20 次双 dabble 全挤在一拍"（14 级组合链）→ 计分 ROM 地址路径超时；
+2. `Playfield`：`C_num/R_num` 用 24/20 级**优先级搜索**算出来 → 渲染取色
+   （`hcounter_r → cell_r/sc_r`）超时。
+
+修法（都做到等价，并各自带回归断言）：
+
+- **② `C_num/R_num` 改成算术式**：场地是 32px 均匀格子 ⇒ `C_num = (hcounter−321)>>5`，
+  并保留"每格 30px、末尾 2px 给哨兵 24"的原行为。
+  `sim/duo` 第 22 组把**原来的逐格比较**在 tb 里重写当参照，2283 个采样点逐点比对一致。
+- **① `scoring` 的 BCD 改成串行双 dabble**：一拍只做一次"每位比较+加 3，再左移一位"，20 拍
+  出一轮结果（≈0.3µs，显示看不出来）。`sim/level` 第 7 组用 `score/10^k % 10` 当独立参照，
+  7 个值逐位一致。
+- 另：`impl_1` 的实现指令改成**时序驱动**（place = ExtraTimingOpt，phys_opt/route =
+  AggressiveExplore），已写进工程文件。
+
+结果：**WNS = +0.311ns、WHS = +0.111ns、违例 0 条**（`All user specified timing constraints are met`）；
+资源：LUT 16206 (77.9%)、FF 4591、BRAM 12、DSP 5、IOB 34。
+三套仿真全绿：duo 83 / frame_duo 22 / level 27。

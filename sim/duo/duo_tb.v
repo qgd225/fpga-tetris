@@ -17,6 +17,7 @@ reg Idle=0, Playing=1, Stop=0, Finalize=0;
 reg [19:0] score=0;
 reg [13:0] time_sec=0;
 reg duo=1;
+reg duu=1;
 reg [31:0] shape_val = 32'h0;   // 合成形状(默认退化单格)
 
 wire [479:0] state;
@@ -480,6 +481,43 @@ initial begin
     chk("P2 硬降停在对方方块上(17)", dut.counter_r2, 17);
     shape_val = 32'h0;
     clr_state;
+  end
+
+  $display("=== 22) C_num/R_num 编号: 与原来逐格比较逐位等价 ===");
+  begin : num_chk
+    integer hc2, vc2, bad_c, bad_r, c_exp, r_exp, o2, p2, col_now;
+    bad_c = 0; bad_r = 0;
+    duu = 1'b1; col_now = 24;
+    for(hc2 = 300; hc2 <= 1100; hc2 = hc2 + 1)begin
+      hc = hc2[10:0]; vc = 11'd400;
+      #1;
+      c_exp = 24;
+      for(o2 = 0; o2 < 24; o2 = o2 + 1)
+      if((o2 < col_now) && (hc2 >= (321 + 32*o2)) && (hc2 < (351 + 32*o2))) c_exp = o2;
+      if(C_num !== c_exp[4:0]) bad_c = bad_c + 1;
+    end
+    chk("duo=1 列编号逐点一致(801 点)", bad_c, 0);
+    for(vc2 = 60; vc2 <= 740; vc2 = vc2 + 1)begin
+      hc = 11'd577; vc = vc2[10:0];
+      #1;
+      r_exp = 24;
+      for(p2 = 0; p2 < 20; p2 = p2 + 1)
+      if((vc2 >= (81 + 32*p2)) && (vc2 < (111 + 32*p2))) r_exp = p2;
+      if(R_num !== r_exp[4:0]) bad_r = bad_r + 1;
+    end
+    chk("duo=1 行编号逐点一致(681 点)", bad_r, 0);
+    duo = 1'b0; col_now = 20; bad_c = 0; bad_r = 0;
+    for(hc2 = 300; hc2 <= 1100; hc2 = hc2 + 1)begin
+      hc = hc2[10:0]; vc = 11'd400;
+      #1;
+      c_exp = 24;
+      for(o2 = 0; o2 < 24; o2 = o2 + 1)
+      if((o2 < col_now) && (hc2 >= (321 + 32*o2)) && (hc2 < (351 + 32*o2))) c_exp = o2;
+      if(C_num !== c_exp[4:0]) bad_c = bad_c + 1;
+    end
+    chk("duo=0 列编号逐点一致(801 点)", bad_c, 0);
+    duo = 1'b1;
+    hc = 11'd0; vc = 11'd0; #1;
   end
 
   if(bad == 0) $display("=== ALL PASS ===");

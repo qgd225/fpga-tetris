@@ -388,21 +388,19 @@ module Playfield(
 //    划区
 //============================================================
     //    横纵拆开: 列只看 hcounter, 行只看 vcounter; 无命中给哨兵 24
+    //    场地是 32px 均匀格子, 所以直接算术定编号(与原来逐格比较逐位等价, 但链短很多);
+    //    每格 30px: 末尾 2px 不给编号(哨兵 24), 保持原来的行为
     always@(*)begin : blk1
-        integer o;
         C_num = 5'd24;
-        for(o = 0; o < 24; o = o + 1)
-        if((o < COL) && hcounter >= (321 + 32*o) && hcounter < (351 + 32*o))
-        C_num = o[4:0];
+        if((hcounter >= 11'd321) && (hcounter < (321 + 32*COL)) && (((hcounter - 11'd321) & 11'd31) < 11'd30))
+        C_num = (hcounter - 11'd321) >> 5;
     end
 
-//    行编号: 只看 vcounter, 无命中给哨兵 24
+//    行编号: 只看 vcounter, 同样算术定行号
     always@(*)begin : blk2
-        integer p;
         R_num = 5'd24;
-        for(p = 0; p < 20; p = p + 1)
-        if(vcounter >= (81 + 32*p) && vcounter < (111 + 32*p))
-        R_num = p[4:0];
+        if((vcounter >= 11'd81) && (vcounter < 11'd721) && (((vcounter - 11'd81) & 11'd31) < 11'd30))
+        R_num = (vcounter - 11'd81) >> 5;
     end
 
 //============================================================

@@ -20,7 +20,6 @@ module scoring(
 
     integer i;
     
-    reg [43:0]shift_counter;
     reg [3:0]counter0;
     reg [3:0]counter1;
     reg [3:0]counter2;
@@ -53,31 +52,51 @@ module scoring(
     counter <= 20'd0;
     end
     
-    always@(*)begin
-    shift_counter = {24'b0,counter};
-        for(i = 0;i< 20;i = i + 1)begin
-        if(shift_counter[43:40] >= 5)
-        shift_counter[43:40] = shift_counter[43:40] + 3;
-        if(shift_counter[39:36] >= 5)
-        shift_counter[39:36] = shift_counter[39:36] + 3;
-        if(shift_counter[35:32] >= 5)
-        shift_counter[35:32] = shift_counter[35:32] + 3;
-        if(shift_counter[31:28] >= 5)
-        shift_counter[31:28] = shift_counter[31:28] + 3;
-        if(shift_counter[27:24] >= 5)
-        shift_counter[27:24] = shift_counter[27:24] + 3;
-        if(shift_counter[23:20] >= 5)
-        shift_counter[23:20] = shift_counter[23:20] + 3;
-        
-        
-        shift_counter = shift_counter << 1;
+//    分数 -> BCD(串行双 dabble): 一拍只做一次"每位数比较+加3, 再左移一位", 20 拍出一轮结果
+//    组合深度从"原来一拍跑完 20 轮"降到 1 轮, 这是这条路径超时的根因所在
+    reg [43:0]cvt;          // 移位寄存器: 高 24 位放 6 个数字, 低 20 位装分数
+    reg [4:0] bcd_step;
+    reg [43:0]bcd_tmp;
+    reg [43:0]bcd_next;
+
+    always@(*)begin : bcd_fix
+        integer s;
+        bcd_tmp = cvt;
+        for(s = 0; s < 6; s = s + 1)
+        if(bcd_tmp[43 - 4*s -: 4] >= 4'd5)
+        bcd_tmp[43 - 4*s -: 4] = bcd_tmp[43 - 4*s -: 4] + 4'd3;
+        bcd_next = bcd_tmp << 1;
+    end
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin
+            cvt <= 44'd0;
+            bcd_step <= 5'd0;
+            counter0 <= 4'd0;
+            counter1 <= 4'd0;
+            counter2 <= 4'd0;
+            counter3 <= 4'd0;
+            counter4 <= 4'd0;
+            counter5 <= 4'd0;
         end
-    counter5 = shift_counter[43:40];
-    counter4 = shift_counter[39:36];
-    counter3 = shift_counter[35:32];
-    counter2 = shift_counter[31:28];
-    counter1 = shift_counter[27:24];
-    counter0 = shift_counter[23:20];
+        else if(bcd_step == 5'd0)begin
+            cvt <= {24'b0, counter};
+            bcd_step <= 5'd1;
+        end
+        else begin
+            cvt <= bcd_next;
+            if(bcd_step == 5'd20)begin
+                counter5 <= bcd_next[43:40];
+                counter4 <= bcd_next[39:36];
+                counter3 <= bcd_next[35:32];
+                counter2 <= bcd_next[31:28];
+                counter1 <= bcd_next[27:24];
+                counter0 <= bcd_next[23:20];
+                bcd_step <= 5'd0;
+            end
+            else
+            bcd_step <= bcd_step + 5'd1;
+        end
     end
     
     reg [10:0]X;
