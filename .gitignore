@@ -46,3 +46,6 @@ tools/scoreboard.csv
 /sim/*/build/
 *.wdb
 /sim/logs/
+
+# ===== 手动留存的比特流副本 =====
+/Tetris_*.bit

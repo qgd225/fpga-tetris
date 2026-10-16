@@ -7,81 +7,68 @@ module Next_piece(
     input duo,
     input [2:0]type_t,
     input [2:0]type_t2,
-    
+    input [10:0]X1,
+    input [10:0]Y1,
+    input [10:0]X2,
+    input [10:0]Y2,
+
     output reg next,
     output reg next2,
-    output reg next_margin
+    output next_margin,
+    output reg next_slot
     );
-    
-    //    单人: 盒子 x1040-1200, y64-224, 预览内区 x1057 起, y81 起
-    //    双人: 盒子 x1104-1264, y64-344, 中间一条水平虚线, 上=P1 下一块, 下=P2 下一块
-    wire [10:0]XB  = duo ? 11'd1104 : 11'd1040;
-    wire [10:0]XE  = duo ? 11'd1264 : 11'd1200;
-    wire [10:0]YB  = 11'd64;
-    wire [10:0]YE  = duo ? 11'd344  : 11'd224;
-    wire [10:0]XI  = duo ? 11'd1121 : 11'd1057;
-    wire [10:0]YS1 = duo ? 11'd72   : 11'd81;
-    wire [10:0]YS2 = 11'd212;
 
-    wire dash = duo && (vcounter >= 11'd202) && (vcounter < 11'd206) &&
-                (hcounter >= (XB + 11'd3)) && (hcounter < (XE - 11'd3)) &&
-                (hcounter[3:0] < 4'd8);
-
-    always@(*)begin
-    if(     (hcounter >= XB && hcounter < (XB + 11'd3) && vcounter >= YB && vcounter < YE) ||
-            (hcounter >= (XE - 11'd3) && hcounter < XE && vcounter >= YB && vcounter < YE) ||
-            (hcounter >= XB && hcounter < XE && vcounter >= YB && vcounter < (YB + 11'd3)) ||
-            (hcounter >= XB && hcounter < XE && vcounter >= (YE - 11'd3) && vcounter < YE) ||
-            dash)
-    next_margin = 1'b1;
-    else
-    next_margin = 1'b0;
-    end
-    
-    integer i;
-    integer o;
-    integer p;
-    
+//    无框面板: 预览区是 4x4 个 32px 格子组成的槽位(底色由 frame 画)
+//    格子编号从槽位左上角算起, 方块第 0 格画在 (1,3) 的位置, 与原来一致
     reg [1:0]C_num;
     reg [1:0]R_num;
     reg [1:0]C_num2;
     reg [1:0]R_num2;
     reg [3:0]cc;
     reg [3:0]rr;
-    
+
+//    P1 预览槽位的行列号
     always@(*)begin : blk1
-        integer o, p;
-    C_num  = 2'd0;
-    C_num2 = 2'd0;
-    for(o = 0; o < 4; o = o + 1)
-    for(p = 0; p < 4; p = p + 1)
-    if(hcounter >= (XI + 32*o) && hcounter < (XI + 30 + 32*o))begin
-        if(vcounter >= (YS1 + 32*p) && vcounter < (YS1 + 30 + 32*p))
-        C_num = o[1:0];
-        if(duo && (vcounter >= (YS2 + 32*p) && vcounter < (YS2 + 30 + 32*p)))
-        C_num2 = o[1:0];
+        integer o1, p1;
+    C_num = 2'd0;
+    R_num = 2'd0;
+    for(o1 = 0; o1 < 4; o1 = o1 + 1)
+    for(p1 = 0; p1 < 4; p1 = p1 + 1)
+    if((hcounter >= (X1 + 32*o1)) && (hcounter < (X1 + 30 + 32*o1)) &&
+       (vcounter >= (Y1 + 32*p1)) && (vcounter < (Y1 + 30 + 32*p1)))begin
+        C_num = o1[1:0];
+        R_num = p1[1:0];
     end
     end
-    
+
+//    P2 预览槽位的行列号(仅双人)
     always@(*)begin : blk2
-        integer o, p;
-    R_num  = 2'd0;
+        integer o2, p2;
+    C_num2 = 2'd0;
     R_num2 = 2'd0;
-    for(p = 0; p < 4; p = p + 1)
-    for(o = 0; o < 4; o = o + 1)
-    if(hcounter >= (XI + 32*o) && hcounter < (XI + 30 + 32*o))begin
-        if(vcounter >= (YS1 + 32*p) && vcounter < (YS1 + 30 + 32*p))
-        R_num = p[1:0];
-        if(duo && (vcounter >= (YS2 + 32*p) && vcounter < (YS2 + 30 + 32*p)))
-        R_num2 = p[1:0];
+    for(o2 = 0; o2 < 4; o2 = o2 + 1)
+    for(p2 = 0; p2 < 4; p2 = p2 + 1)
+    if(duo && (hcounter >= (X2 + 32*o2)) && (hcounter < (X2 + 30 + 32*o2)) &&
+       (vcounter >= (Y2 + 32*p2)) && (vcounter < (Y2 + 30 + 32*p2)))begin
+        C_num2 = o2[1:0];
+        R_num2 = p2[1:0];
     end
     end
-    
+
+//    槽位底色区域: 双人两块, 单人一块
+    always@(*)begin
+    next_slot = 1'b0;
+    if((hcounter >= X1) && (hcounter < (X1 + 11'd128)) && (vcounter >= Y1) && (vcounter < (Y1 + 11'd128)))
+    next_slot = 1'b1;
+    else if(duo && (hcounter >= X2) && (hcounter < (X2 + 11'd128)) && (vcounter >= Y2) && (vcounter < (Y2 + 11'd128)))
+    next_slot = 1'b1;
+    end
+
     wire [31:0]Tetromino_dout;
-    wire [31:0]Tetromino_dout2;
     reg  [4:0]Tetromino_addr;
+    wire [31:0]Tetromino_dout2;
     reg  [4:0]Tetromino_addr2;
-    
+
     Tetromino Tetromino_inst0(
         .clka(Clk_74M),
         .addra(Tetromino_addr),
@@ -93,39 +80,41 @@ module Next_piece(
         .addra(Tetromino_addr2),
         .douta(Tetromino_dout2)
     );
-    
-    always@(*)begin
+
+//    P1 下一块预览
+    always@(*)begin : blk3
+        integer i1;
     if(Idle)
     next = 1'b0;
     else begin
     Tetromino_addr = {type_t[2:0],2'b0};
     next = 0;
-    for(i = 0; i < 4; i = i + 1)begin
-        cc = 1 + { { 7{Tetromino_dout[i*8+7]} }, Tetromino_dout[(i*8+7)-:4] };
-        rr = 3 + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
-        if((hcounter >= XI) && (hcounter < (XE - 11'd15)) && (vcounter >= YS1) && (vcounter < (YS1 + 11'd128)) && (C_num == cc) && (R_num == rr) && !rr[3])
+    for(i1 = 0; i1 < 4; i1 = i1 + 1)begin
+        cc = 1 + { { 7{Tetromino_dout[i1*8+7]} }, Tetromino_dout[(i1*8+7)-:4] };
+        rr = 3 + { { 7{Tetromino_dout[i1*8+3]} }, Tetromino_dout[(i1*8+3)-:4] };
+        if((C_num == cc) && (R_num == rr) && !rr[3])
         next = 1'b1;
-        end
+    end
     end
     end
 
-    integer i2;
-    reg [3:0]cc2;
-    reg [3:0]rr2;
-
-    always@(*)begin
+//    P2 下一块预览(仅双人)
+    always@(*)begin : blk4
+        integer i2;
     if(Idle || !duo)
     next2 = 1'b0;
     else begin
     Tetromino_addr2 = {type_t2[2:0],2'b0};
     next2 = 0;
     for(i2 = 0; i2 < 4; i2 = i2 + 1)begin
-        cc2 = 1 + { { 7{Tetromino_dout2[i2*8+7]} }, Tetromino_dout2[(i2*8+7)-:4] };
-        rr2 = 3 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
-        if((hcounter >= XI) && (hcounter < (XE - 11'd15)) && (vcounter >= YS2) && (vcounter < (YS2 + 11'd128)) && (C_num2 == cc2) && (R_num2 == rr2) && !rr2[3])
+        cc = 1 + { { 7{Tetromino_dout2[i2*8+7]} }, Tetromino_dout2[(i2*8+7)-:4] };
+        rr = 3 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
+        if((C_num2 == cc) && (R_num2 == rr) && !rr[3])
         next2 = 1'b1;
-        end
     end
     end
-    
+    end
+
+    assign next_margin = 1'b0;//外框与虚线已删, 改为 frame 里的文字标签 + 2px 分隔线
+
 endmodule

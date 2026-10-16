@@ -11,12 +11,16 @@ module scoring(
     input clear_t_t,
     input [4:0]c_clear,
     input [2:0]speed_level,
+    input duo,
     
     output reg [19:0]counter,
     output lit
     );
     
     parameter SCORE_UNIT = 2;
+
+//    分数最右一位的基准 X: 让分数右端贴住场地右边界(双人 1085, 单人 950)
+    wire [10:0]XBASE = duo ? 11'd1065 : 11'd930;
 
     integer i;
     
@@ -114,12 +118,12 @@ module scoring(
     ena_n = 1'b0;
     cnt = 4'd0;
         for(i = 0; i < 8; i = i + 1)begin
-        if( (hcounter >= (916 - i*26) ) && (hcounter < (916 - i*26 + 20) ) &&
+        if( (hcounter >= (XBASE - i*26) ) && (hcounter < (XBASE - i*26 + 20) ) &&
             (vcounter >= 24) && (vcounter < 24 + 44) )begin
             ena = 1'b1;
-            X = 916 - i*26;
+            X = XBASE - i*26;
         end
-        if( (hn >= (916 - i*26 - 1) ) && (hn < (916 - i*26 + 20) ) &&
+        if( (hn >= (XBASE - i*26 - 1) ) && (hn < (XBASE - i*26 + 20) ) &&
             (vcounter >= 24) && (vcounter < 24 + 44) )begin
             ena_n = 1'b1;
             case(i)

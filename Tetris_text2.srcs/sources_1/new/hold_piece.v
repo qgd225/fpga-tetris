@@ -7,82 +7,88 @@ module hold_piece(
     input duo,
     input [2:0]hold_type,
     input en_hold,
-    
-    output reg hold,
-    output reg hold_margin
-    );
-    
-    //    单人: 盒子 x1040-1200, y264-424; 双人: 右移下移到 x1104-1264, y360-520
-    wire [10:0]XB = duo ? 11'd1104 : 11'd1040;
-    wire [10:0]XE = duo ? 11'd1264 : 11'd1200;
-    wire [10:0]YB = duo ? 11'd360  : 11'd264;
-    wire [10:0]YE = duo ? 11'd520  : 11'd424;
-    wire [10:0]XI = duo ? 11'd1121 : 11'd1057;
-    wire [10:0]Y1 = duo ? 11'd377  : 11'd281;
+    input [10:0]X1,
+    input [10:0]Y1,
+    input [10:0]X2,
+    input [10:0]Y2,
 
-    integer i;
-    
+    output reg hold,
+    output hold_margin,
+    output reg hold_slot
+    );
+
+//    Hold 槽位与 Next 同规格(4x4 个 32px 格子), 方块第 0 格画在 (1,3)
     reg [1:0]C_num;
     reg [1:0]R_num;
+    reg [1:0]C_num2;
+    reg [1:0]R_num2;
     reg [3:0]cc;
     reg [3:0]rr;
-    
-    always@(*)begin
-    if(     (hcounter >= XB && hcounter < (XB + 11'd3) && vcounter >= YB && vcounter < YE) ||
-            (hcounter >= (XE - 11'd3) && hcounter < XE && vcounter >= YB && vcounter < YE) ||
-            (hcounter >= XB && hcounter < XE && vcounter >= YB && vcounter < (YB + 11'd3)) ||
-            (hcounter >= XB && hcounter < XE && vcounter >= (YE - 11'd3) && vcounter < YE))
-    hold_margin = 1'b1;
-    else
-    hold_margin = 1'b0;
-    end
-    
-    integer o;
-    integer p;
-    
+
+//    P1 槽位行列号
     always@(*)begin : blk1
-        integer o, p;
-    C_num = 11'd0;
-    for(o = 0; o < 4; o = o + 1)
-    for(p = 0; p < 4; p = p + 1)
-    if(hcounter >= (XI + 32*o) && hcounter < (XI + 30 + 32*o) && vcounter >= (Y1 + 32*p) && vcounter < (Y1 + 30 + 32*p))
-    C_num = o;
+        integer o1, p1;
+    C_num = 2'd0;
+    R_num = 2'd0;
+    for(o1 = 0; o1 < 4; o1 = o1 + 1)
+    for(p1 = 0; p1 < 4; p1 = p1 + 1)
+    if((hcounter >= (X1 + 32*o1)) && (hcounter < (X1 + 30 + 32*o1)) &&
+       (vcounter >= (Y1 + 32*p1)) && (vcounter < (Y1 + 30 + 32*p1)))begin
+        C_num = o1[1:0];
+        R_num = p1[1:0];
     end
-    
+    end
+
+//    P2 槽位行列号(仅双人)
     always@(*)begin : blk2
-        integer o, p;
-    R_num = 11'd0;
-    for(p = 0; p < 4; p = p + 1)
-    for(o = 0; o < 4; o = o + 1)
-    if(hcounter >= (XI + 32*o) && hcounter < (XI + 30 + 32*o) && vcounter >= (Y1 + 32*p) && vcounter < (Y1 + 30 + 32*p))
-    R_num = p;
+        integer o2, p2;
+    C_num2 = 2'd0;
+    R_num2 = 2'd0;
+    for(o2 = 0; o2 < 4; o2 = o2 + 1)
+    for(p2 = 0; p2 < 4; p2 = p2 + 1)
+    if(duo && (hcounter >= (X2 + 32*o2)) && (hcounter < (X2 + 30 + 32*o2)) &&
+       (vcounter >= (Y2 + 32*p2)) && (vcounter < (Y2 + 30 + 32*p2)))begin
+        C_num2 = o2[1:0];
+        R_num2 = p2[1:0];
     end
-    
+    end
+
+//    槽位底色区域
+    always@(*)begin
+    hold_slot = 1'b0;
+    if((hcounter >= X1) && (hcounter < (X1 + 11'd128)) && (vcounter >= Y1) && (vcounter < (Y1 + 11'd128)))
+    hold_slot = 1'b1;
+    else if(duo && (hcounter >= X2) && (hcounter < (X2 + 11'd128)) && (vcounter >= Y2) && (vcounter < (Y2 + 11'd128)))
+    hold_slot = 1'b1;
+    end
+
     wire [31:0]Tetromino_dout;
-    reg  [4:0]Tetromino_addr; 
-    
+    reg  [4:0]Tetromino_addr;
+
     Tetromino Tetromino_inst0(
         .clka(Clk_74M),
         .addra(Tetromino_addr),
-        .douta(Tetromino_dout) 
+        .douta(Tetromino_dout)
     );
-    
-    always@(*)begin
-    if(Idle)
-    hold = 1'b0;
-    else if(!en_hold)
+
+//    Hold 里的方块(Idle 或还没存过时不画)
+    always@(*)begin : blk3
+        integer i1;
+    if(Idle || !en_hold)
     hold = 1'b0;
     else begin
     Tetromino_addr = {hold_type[2:0],2'b0};
     hold = 0;
-    for(i = 0; i < 4; i = i + 1)begin
-        cc = 1 + { { 7{Tetromino_dout[i*8+7]} }, Tetromino_dout[(i*8+7)-:4] };
-        rr = 3 + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
-        if((C_num == cc) && (R_num == rr) && !rr[3]) 
+    for(i1 = 0; i1 < 4; i1 = i1 + 1)begin
+        cc = 1 + { { 7{Tetromino_dout[i1*8+7]} }, Tetromino_dout[(i1*8+7)-:4] };
+        rr = 3 + { { 7{Tetromino_dout[i1*8+3]} }, Tetromino_dout[(i1*8+3)-:4] };
+        if(((C_num == cc) && (R_num == rr) && !rr[3]) ||
+           (duo && (C_num2 == cc) && (R_num2 == rr) && !rr[3]))
         hold = 1'b1;
-        end
     end
     end
-    
-endmodule
+    end
 
+    assign hold_margin = 1'b0;//外框已删
+
+endmodule

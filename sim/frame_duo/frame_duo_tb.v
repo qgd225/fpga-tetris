@@ -1,17 +1,17 @@
 `timescale 1ns/1ps
 
-//===== frame 级双人显示测试: P2 方块/落格/下一块/虚线/面板位置 =====
+//===== frame 级双人显示回归: P2 运动块/落格/下一块/Hold/新 HUD 布局/菜单屏 =====
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
-  assign douta = 32'h0;      // 桩: 单格(偏移 0)
+  assign douta = 32'h0000_0000;      // 桩: 偏移全 0 -> 预览块占 (列1,行3)
 endmodule
 module weiyibiao(input clka, input [4:0] addra, output [7:0] douta);
   assign douta = 8'h00;
 endmodule
 module number(input clka, input ena, input [9:0] addra, output [19:0] douta);
-  assign douta = 20'h0;
+  assign douta = 20'hF_FFFF;         // 桩: 全亮, 便于断言数字区域颜色
 endmodule
 module letter(input clka, input ena, input [10:0] addra, output [19:0] douta);
-  assign douta = 20'h0;
+  assign douta = 20'hF_FFFF;         // 桩: 全亮, 便于断言标签/菜单文字颜色
 endmodule
 
 module frame_duo_tb;
@@ -72,19 +72,24 @@ begin
 end
 endtask
 
-// 颜色常量(与 frame 一致)
-`define CYAN   24'h00CCFF
-`define YELLOW 24'hFFF_F00
-`define RED    24'hE63946
-`define WHITE  24'hFFF_FFF
-`define BLACK  24'h000_000
+//    颜色(与 frame 一致)
+`define CYAN     24'h00CCFF
+`define YELLOW   24'hFFF_F00
+`define RED      24'hE63946
+`define WHITE    24'hFFF_FFF
+`define BLACK    24'h000_000
+`define CY_MENU  24'h00E5FF
+`define PINK2    24'hFF4DA6
+`define GRAY_MID 24'h606060
+`define GRAY_LBL 24'hB0B0B0
+`define SLOT_BG  24'h202020
 
 initial begin
   bad = 0;
   Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk);
-  force dut.Playfield_inst.Drop = 30'd100_000_000;   // 关自动下落
+  force dut.Playfield_inst.Drop = 30'd100_000_000;   // 抑制自动下落
 
-  $display("=== 1) 双人: P2 方块像素(同色表) ===");
+  $display("=== 1) 双人: P2 运动块像素(同色表) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c2 = 5'd20; force dut.Playfield_inst.counter_r2 = 5'd0;
   force dut.Playfield_inst.type2 = 3'd0;
@@ -92,16 +97,16 @@ initial begin
   chk("duo=1 P2 方块=青色", rgb, `CYAN);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd971, 11'd91);
-  chk("duo=0 同一位置无 P2 方块", rgb, `BLACK);
+  chk("duo=0 同位置无 P2 方块", rgb, `BLACK);
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
   clr_state;
 
-  $display("=== 2) 双人: P2 落格后该格显示颜色 ===");
+  $display("=== 2) 双人: P2 落格后显示颜色 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c2 = 5'd10; force dut.Playfield_inst.counter_r2 = 5'd19;
   force dut.Playfield_inst.type2 = 3'd3;
   repeat(4) @(posedge Clk);
-  lock2;                                        // P2 锁到 (10,19)
+  lock2;                                        // P2 落锁 (10,19)
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
   look(11'd641, 11'd689);                       // 第10列 第19行
   chk("duo=1 P2 落格=红色", rgb, `RED);
@@ -109,72 +114,142 @@ initial begin
   duo = 1'b0; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c2 = 5'd10; force dut.Playfield_inst.counter_r2 = 5'd19;
   repeat(4) @(posedge Clk);
-  lock2;                                        // 单机: 不应写入
+  lock2;                                        // 单人: 不应写入
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
   look(11'd641, 11'd689);
   chk("duo=0 P2 落格不显示", rgb, `BLACK);
   clr_state;
 
-  $display("=== 3) 24 列场地右侧格子也能显示 ===");
+  $display("=== 3) 24 列场地最右两列也能显示 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  dut.state_color[23*20 + 5] = 3'd3; dut.Playfield_inst.state[23*20 + 5] = 1'b1;
-  look(11'd1067, 11'd251);                      // 第23列 第5行
-  chk("duo=1 第23列格子=红色", rgb, `RED);
+  dut.state_color[23*20 + 17] = 3'd3; dut.Playfield_inst.state[23*20 + 17] = 1'b1;
+  look(11'd1067, 11'd630);                      // 第23列 第17行
+  chk("duo=1 第23列格=红色", rgb, `RED);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1067, 11'd251);
-  chk("duo=0 第23列在场地外", rgb, `BLACK);
+  look(11'd1067, 11'd630);
+  chk("duo=0 第23列不在场地", rgb, `BLACK);
   clr_state;
-  dut.state_color[23*20 + 5] = 3'd0; dut.Playfield_inst.state[23*20 + 5] = 1'b0;
+  dut.state_color[23*20 + 17] = 3'd0; dut.Playfield_inst.state[23*20 + 17] = 1'b0;
 
-  $display("=== 4) Next 盒子位置(双人右移加高) ===");
+  $display("=== 4) 新面板布局: 色线 + 槽位底色(无框) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd1104, 11'd100);  chk("duo=1 Next 左边框(1104)", rgb, `WHITE);
-  look(11'd1040, 11'd100);  chk("duo=1 单机位置为空", rgb, `BLACK);
-  look(11'd1120, 11'd203);  chk("duo=1 中间虚线亮段", rgb, `WHITE);
-  look(11'd1128, 11'd203);  chk("duo=1 中间虚线暗段", rgb, `BLACK);
+  look(11'd100, 11'd140);   chk("duo=1 P1 Next 槽位", rgb, `SLOT_BG);
+  look(11'd100, 11'd123);   chk("duo=1 P1 Next 色线", rgb, `CY_MENU);
+  look(11'd100, 11'd356);   chk("duo=1 P1 Hold 槽位", rgb, `SLOT_BG);
+  look(11'd100, 11'd339);   chk("duo=1 P1 Hold 色线", rgb, `CY_MENU);
+  look(11'd1230, 11'd140);  chk("duo=1 P2 Next 槽位", rgb, `SLOT_BG);
+  look(11'd1230, 11'd123);  chk("duo=1 P2 Next 色线", rgb, `PINK2);
+  look(11'd1230, 11'd356);  chk("duo=1 P2 Hold 槽位", rgb, `SLOT_BG);
+  look(11'd1230, 11'd339);  chk("duo=1 P2 Hold 色线", rgb, `PINK2);
+  look(11'd1059, 11'd140);  chk("duo=1 单人槽位位置=黑", rgb, `BLACK);
+  look(11'd1059, 11'd123);  chk("duo=1 单人色线位置=黑", rgb, `BLACK);
+  look(11'd1104, 11'd100);  chk("旧 Next 外框位置=黑", rgb, `BLACK);
+  look(11'd1120, 11'd203);  chk("旧中间虚线位置=黑", rgb, `BLACK);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1040, 11'd100);  chk("duo=0 Next 左边框(1040)", rgb, `WHITE);
-  look(11'd1104, 11'd100);  chk("duo=0 双人位置为空", rgb, `BLACK);
+  look(11'd1059, 11'd140);  chk("duo=0 单人 Next 槽位", rgb, `SLOT_BG);
+  look(11'd1059, 11'd123);  chk("duo=0 单人 Next 色线", rgb, `GRAY_MID);
+  look(11'd1059, 11'd356);  chk("duo=0 单人 Hold 槽位", rgb, `SLOT_BG);
+  look(11'd100, 11'd140);   chk("duo=0 双人槽位位置=黑", rgb, `BLACK);
+  look(11'd100, 11'd123);   chk("duo=0 双人色线位置=黑", rgb, `BLACK);
+  look(11'd1230, 11'd140);  chk("duo=0 无 P2 槽位", rgb, `BLACK);
+  look(11'd1230, 11'd123);  chk("duo=0 无 P2 色线", rgb, `BLACK);
+  look(11'd1104, 11'd100);  chk("duo=0 旧 Next 外框位置=黑", rgb, `BLACK);
+  look(11'd1040, 11'd100);  chk("duo=0 旧单人外框位置=黑", rgb, `BLACK);
 
-  $display("=== 5) 双人: P2 下一块预览 ===");
+  $display("=== 5) 下一块预览(锚点随布局迁移) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.type_t2 = 3'd3;
-  look(11'd1161, 11'd316);                      // P2 预览格(1,3)
-  chk("duo=1 P2 下一块=红色", rgb, `RED);
+  force dut.Playfield_inst.type_t  = 3'd2;
+  repeat(4) @(posedge Clk);
+  look(11'd1161, 11'd240);                      // P2 预览 (列1,行3)
+  chk("duo=1 P2 下一块=红", rgb, `RED);
+  look(11'd140, 11'd240);                       // P1 预览 (列1,行3)
+  chk("duo=1 P1 下一块=黄", rgb, `YELLOW);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1161, 11'd316);
-  chk("duo=0 无 P2 下一块", rgb, `BLACK);
-  release dut.Playfield_inst.type_t2;
+  look(11'd140, 11'd240);
+  chk("duo=0 左栏位置无预览", rgb, `BLACK);
+  look(11'd1101, 11'd240);                      // 单人预览 (列1,行3)
+  chk("duo=0 单人下一块=黄", rgb, `YELLOW);
+  look(11'd1161, 11'd240);
+  chk("duo=0 无 P2 预览", rgb, `SLOT_BG);
+  release dut.Playfield_inst.type_t2; release dut.Playfield_inst.type_t;
 
-  $display("=== 6) Hold 盒子位置 ===");
+  $display("=== 6) Hold 位置 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd1104, 11'd400);  chk("duo=1 Hold 左边框(1104,400)", rgb, `WHITE);
+  look(11'd1104, 11'd400);  chk("duo=1 旧 Hold 外框位置=黑", rgb, `BLACK);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1040, 11'd300);  chk("duo=0 Hold 左边框(1040,300)", rgb, `WHITE);
-  look(11'd1104, 11'd400);  chk("duo=0 双人 Hold 位置为空", rgb, `BLACK);
+  look(11'd1040, 11'd300);  chk("duo=0 旧 Hold 外框位置=黑", rgb, `BLACK);
+  look(11'd1230, 11'd356);  chk("duo=0 双人 Hold 位置=黑", rgb, `BLACK);
 
-  $display("=== 7) 单机 P1 显示回归 ===");
+  $display("=== 7) 单人 P1 显示回归 ===");
   duo = 1'b0; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c = 5'd9; force dut.Playfield_inst.counter_r = 5'd0;
   force dut.Playfield_inst.type = 3'd2;
   look(11'd619, 11'd91);                        // 第9列 第0行
-  chk("duo=0 P1 方块=黄色(与原来一致)", rgb, `YELLOW);
+  chk("duo=0 P1 方块=黄", rgb, `YELLOW);
   release dut.Playfield_inst.counter_c; release dut.Playfield_inst.counter_r; release dut.Playfield_inst.type;
 
-  $display("=== 8) 2px 死区不误取相邻格(哨兵修复) ===");
+  $display("=== 8) 2px 死区取色屏蔽(编号搜索修复) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  dut.state_color[20*20 + 3] = 3'd3;              // 占住"旧哨兵会误读"的那格(第20列第3行)
+  dut.state_color[20*20 + 3] = 3'd3;
   dut.Playfield_inst.state[20*20 + 3] = 1'b1;
-  look(11'd351, 11'd200);                        // 列窗口之间的 2px 间隙
+  look(11'd351, 11'd200);                       // 列间 2px 死区
   chk("死区像素=黑", rgb, `BLACK);
   dut.state_color[20*20 + 3] = 3'd0;
   dut.Playfield_inst.state[20*20 + 3] = 1'b0;
-  look(11'd318, 11'd40);                         // 场地上方: 左边框不应出现
-  chk("左边框不再出头(上方=黑)", rgb, `BLACK);
-  look(11'd318, 11'd200);                        // 场地旁边: 左边框仍在
-  chk("左边框仍在(旁边=白)", rgb, `WHITE);
-  look(11'd321, 11'd81);                         // 第0列第0行(有效, 空)
-  chk("有效空格=黑", rgb, `BLACK);
+  look(11'd318, 11'd40);                        // 边框上方: 左边框不应出头
+  chk("左边框不出头(上方=黑)", rgb, `BLACK);
+  look(11'd318, 11'd200);                       // 边框旁: 左边框正常
+  chk("左边框正常(旁边=白)", rgb, `WHITE);
+  look(11'd321, 11'd81);
+  chk("有效格(第0行第0列)", rgb, `BLACK);
+
+  $display("=== 9) 等级 8 段竖条 ===");
+  duo = 1'b0; repeat(4) @(posedge Clk);
+  force dut.Playfield_inst.speed_level = 3'd3; repeat(4) @(posedge Clk);
+  look(11'd293, 11'd440);   chk("lv3 当前段=青", rgb, `CY_MENU);
+  look(11'd293, 11'd520);   chk("lv3 第2段(已达)=灰", rgb, `GRAY_MID);
+  look(11'd293, 11'd690);   chk("lv3 第0段(已达)=灰", rgb, `GRAY_MID);
+  look(11'd293, 11'd360);   chk("lv3 第4段(未达)=暗", rgb, `SLOT_BG);
+  look(11'd293, 11'd88);    chk("竖条顶部段缝=暗", rgb, `SLOT_BG);
+  look(11'd293, 11'd80);    chk("竖条上方=黑", rgb, `BLACK);
+  look(11'd310, 11'd440);   chk("竖条右侧=黑", rgb, `BLACK);
+  force dut.Playfield_inst.speed_level = 3'd0; repeat(4) @(posedge Clk);
+  look(11'd293, 11'd690);   chk("lv0 当前段=青", rgb, `CY_MENU);
+  look(11'd293, 11'd590);   chk("lv0 第1段(未达)=暗", rgb, `SLOT_BG);
+  release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
+
+  $display("=== 10) 菜单屏: 无框选项 + 青色选中标记 ===");
+  Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
+  look(11'd426, 11'd290);   chk("选中项竖条=青", rgb, `CY_MENU);
+  look(11'd600, 11'd337);   chk("选中项下划线=青", rgb, `CY_MENU);
+  look(11'd426, 11'd450);   chk("未选中行无竖条", rgb, `BLACK);
+  look(11'd500, 11'd110);   chk("标题文字=白", rgb, `WHITE);
+  look(11'd500, 11'd280);   chk("选中项文字=白", rgb, `WHITE);
+  look(11'd500, 11'd440);   chk("未选中项文字=灰", rgb, `GRAY_MID);
+  choose_cnt = 4'd1; repeat(4) @(posedge Clk);
+  look(11'd426, 11'd450);   chk("切换后竖条=青", rgb, `CY_MENU);
+  look(11'd600, 11'd497);   chk("切换后下划线=青", rgb, `CY_MENU);
+  look(11'd426, 11'd290);   chk("原选中行无竖条", rgb, `BLACK);
+  look(11'd500, 11'd440);   chk("切换后该项文字=白", rgb, `WHITE);
+  look(11'd500, 11'd280);   chk("切换后原项文字=灰", rgb, `GRAY_MID);
+  choose = 1'b0; choose_cnt = 4'd0; Playing = 1'b1; repeat(4) @(posedge Clk);
+
+  $display("=== 11) 顶栏: 分数右对齐 + 时间 + LV 数字 + 标签 ===");
+  duo = 1'b1; repeat(4) @(posedge Clk);
+  look(11'd1070, 11'd40);   chk("duo=1 分数贴场地右边界", rgb, `WHITE);
+  look(11'd95,  11'd90);    chk("duo=1 NEXT 标签=标签灰", rgb, `GRAY_LBL);
+  duo = 1'b0; repeat(4) @(posedge Clk);
+  look(11'd1070, 11'd40);   chk("duo=0 该处无分数", rgb, `BLACK);
+  look(11'd935,  11'd40);   chk("duo=0 分数贴场地右边界", rgb, `WHITE);
+  look(11'd95,   11'd90);   chk("duo=0 双人标签位置=黑", rgb, `BLACK);
+  look(11'd1059, 11'd90);   chk("duo=0 单人 NEXT 标签", rgb, `GRAY_LBL);
+  look(11'd340,  11'd40);   chk("时间数字=白", rgb, `WHITE);
+  look(11'd290,  11'd40);   chk("LV 数字=白", rgb, `WHITE);
+  look(11'd240,  11'd40);   chk("LV 标签=标签灰", rgb, `GRAY_LBL);
+  Finalize = 1'b1; duo = 1'b1; repeat(4) @(posedge Clk);
+  look(11'd95,   11'd90);   chk("Finalize 标签暗化", rgb, `SLOT_BG);
+  Finalize = 1'b0; repeat(4) @(posedge Clk);
 
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);

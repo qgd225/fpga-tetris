@@ -75,6 +75,24 @@ module frame(
     wire [4:0]cc_t2 [0:3];
     wire [4:0]rr_t2 [0:3];
 
+//============================================================
+//    HUD 布局(唯一来源): 面板锚点 / 标签 / 分隔线 / 槽位 / 等级条 / 等级数字
+//============================================================
+    localparam [10:0] XPNL1 = 11'd94,    //双人 P1 面板(左栏)锚点
+                     XPNL2 = 11'd1121,  //双人 P2 面板(右栏)锚点
+                     XSOLO = 11'd1057,  //单人面板(右栏)锚点
+                     YNEXT = 11'd132,   //预览槽位 Y
+                     YHOLD = 11'd348,   //Hold 槽位 Y
+                     YLBNX = 11'd84,    //NEXT 标签 Y
+                     YLBHD = 11'd300,   //HOLD 标签 Y
+                     YRLNX = 11'd122,   //NEXT 分隔线 Y
+                     YRLHD = 11'd338,   //HOLD 分隔线 Y
+                     XLVLB = 11'd236,   //LV 标签 X
+                     XLDIG = 11'd284,   //等级数字 X(与等级条同轴)
+                     YDIGI = 11'd24;    //标签/数字 Y
+    wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
+    wire [10:0]XPN2 = XPNL2;
+
     reg [15:0]lines_total;
 
     always@(posedge Clk_74M or negedge Reset_n)begin
@@ -251,6 +269,7 @@ module frame(
     .clear_t_t(clear_t_t),
     .c_clear(c_clear),
     .speed_level(speed_level),
+    .duo(duo),
     
     .counter(score),
     .lit(score_lit)
@@ -268,10 +287,15 @@ module frame(
     .duo(duo),
     .type_t(type_t),
     .type_t2(type_t2),
+    .X1(XPN1),
+    .Y1(YNEXT),
+    .X2(XPN2),
+    .Y2(YNEXT),
     
     .next(next),
     .next2(next2),
-    .next_margin(next_margin)
+    .next_margin(next_margin),
+    .next_slot(next_slot)
     );
     
     wire hold;
@@ -286,9 +310,14 @@ module frame(
     .duo(duo),
     .en_hold(en_hold),
     .hold_type(hold_type),
+    .X1(XPN1),
+    .Y1(YHOLD),
+    .X2(XPN2),
+    .Y2(YHOLD),
     
     .hold(hold),
-    .hold_margin(hold_margin)
+    .hold_margin(hold_margin),
+    .hold_slot(hold_slot)
     );
     
     wire level_margin;
@@ -345,6 +374,89 @@ module frame(
     );
     
 
+//    文字标签 NEXT/HOLD/LV: 1x 字号(20x32), 字距 24
+    reg [10:0]lb_X;
+    reg [10:0]lb_Y;
+    reg [4:0] lb_g;
+    reg       lb_ena;
+    integer   li;
+    always@(*)begin
+    lb_X = 11'd0;
+    lb_Y = 11'd0;
+    lb_g = 5'd26;
+    lb_ena = 1'b0;
+    for(li = 0; li < 4; li = li + 1)begin
+        if((hcounter >= (XPN1 + li*24)) && (hcounter < (XPN1 + li*24 + 11'd20)) &&
+           (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
+            lb_ena = 1'b1;
+            lb_X = XPN1 + li*24;
+            lb_Y = YLBNX;
+            lb_g = (li == 0) ? 5'd13 : (li == 1) ? 5'd4 : (li == 2) ? 5'd23 : 5'd19;
+        end
+        if((hcounter >= (XPN1 + li*24)) && (hcounter < (XPN1 + li*24 + 11'd20)) &&
+           (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
+            lb_ena = 1'b1;
+            lb_X = XPN1 + li*24;
+            lb_Y = YLBHD;
+            lb_g = (li == 0) ? 5'd7 : (li == 1) ? 5'd14 : (li == 2) ? 5'd11 : 5'd3;
+        end
+        if(duo)begin
+            if((hcounter >= (XPN2 + li*24)) && (hcounter < (XPN2 + li*24 + 11'd20)) &&
+               (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
+                lb_ena = 1'b1;
+                lb_X = XPN2 + li*24;
+                lb_Y = YLBNX;
+                lb_g = (li == 0) ? 5'd13 : (li == 1) ? 5'd4 : (li == 2) ? 5'd23 : 5'd19;
+            end
+            if((hcounter >= (XPN2 + li*24)) && (hcounter < (XPN2 + li*24 + 11'd20)) &&
+               (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
+                lb_ena = 1'b1;
+                lb_X = XPN2 + li*24;
+                lb_Y = YLBHD;
+                lb_g = (li == 0) ? 5'd7 : (li == 1) ? 5'd14 : (li == 2) ? 5'd11 : 5'd3;
+            end
+        end
+    end
+    for(li = 0; li < 2; li = li + 1)
+    if((hcounter >= (XLVLB + li*24)) && (hcounter < (XLVLB + li*24 + 11'd20)) &&
+       (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd32)))begin
+        lb_ena = 1'b1;
+        lb_X = XLVLB + li*24;
+        lb_Y = YDIGI;
+        lb_g = (li == 0) ? 5'd11 : 5'd21;
+    end
+    end
+
+    wire [5:0]lb_vt = vcounter - lb_Y;
+    wire [19:0]lb_dout;
+    letter letter_hud_inst(
+    .clka(Clk_74M),
+    .ena(lb_ena),
+    .addra({lb_g, lb_vt}),
+    .douta(lb_dout)
+    );
+    wire lbl_lit = lb_ena ? lb_dout[19 - (hcounter - lb_X)] : 1'b0;
+
+//    面板分隔线: 2px, 位于标签下方
+    wire rule1_lit = ((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
+                     ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128)));
+    wire rule2_lit = duo && (((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
+                             ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))));
+
+//    等级数字: 1 位, 与等级条同轴
+    wire [3:0] lv_dig = {1'b0, speed_level};
+    wire [10:0]vdv = vcounter - YDIGI;
+    wire lvd_ena = (hcounter >= XLDIG) && (hcounter < (XLDIG + 11'd20)) &&
+                   (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
+    wire [19:0]lvd_dout;
+    number number_lv_inst(
+    .clka(Clk_74M),
+    .ena(lvd_ena),
+    .addra({lv_dig, vdv[5:0]}),
+    .douta(lvd_dout)
+    );
+    wire lvd_lit = lvd_ena ? lvd_dout[19 - (hcounter - XLDIG)] : 1'b0;
+
     reg over_lit_r;
     reg tick_r;
     reg [3:0]cn_r;
@@ -379,6 +491,13 @@ module frame(
     reg [2:0]type_t2_r;
     reg land_we2_r;
     reg next2_r;
+    reg lbl_r;
+    reg rule1_r;
+    reg rule2_r;
+    reg next_slot_r;
+    reg hold_slot_r;
+    reg lvd_r;
+    reg fin_r;
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -416,6 +535,13 @@ module frame(
     type_t2_r <= 3'd0;
     land_we2_r <= 1'b0;
     next2_r <= 1'b0;
+    lbl_r <= 1'b0;
+    rule1_r <= 1'b0;
+    rule2_r <= 1'b0;
+    next_slot_r <= 1'b0;
+    hold_slot_r <= 1'b0;
+    lvd_r <= 1'b0;
+    fin_r <= 1'b0;
     end
     else begin
     over_lit_r <= over_lit;
@@ -459,6 +585,13 @@ module frame(
     type_t2_r <= type_t2;
     land_we2_r <= land_we2;
     next2_r <= next2;
+    lbl_r <= lbl_lit;
+    rule1_r <= rule1_lit;
+    rule2_r <= rule2_lit;
+    next_slot_r <= next_slot;
+    hold_slot_r <= hold_slot;
+    lvd_r <= lvd_lit;
+    fin_r <= Finalize;
     end
     end
     parameter CYAN = 24'h00CCFF,//青色I
@@ -478,16 +611,16 @@ module frame(
                BLACK = 24'h000_000,//黑色
                WHITE = 24'hFFF_FFF;//白色
     
+
+
     always@(*)begin
     if(!Reset_n)
     rgb = BLACK;
     else if(choose)begin
         if(chs_margin_r)
-        rgb = chs_dim_r ? 24'h606060 : WHITE;
+        rgb = 24'h00E5FF;//选中标记(左侧竖条 + 下方横线)
         else if(chs_text_r)
         rgb = chs_dim_r ? 24'h606060 : WHITE;
-        else if(chs_inner_r)
-        rgb = 24'h101010;
         else
         rgb = BLACK;
         end
@@ -508,20 +641,27 @@ module frame(
           rgb = 24'h303030;
         default:rgb = 24'hFFF_FFF;
         endcase
+    else if(lbl_r)
+    rgb = fin_r ? 24'h202020 : 24'hB0B0B0;//NEXT/HOLD/LV 文字标签
+    else if(rule1_r)
+    rgb = fin_r ? 24'h202020 : (duo ? 24'h00E5FF : 24'h606060);//面板分隔线(P1/单人)
+    else if(rule2_r)
+    rgb = fin_r ? 24'h202020 : 24'hFF4DA6;//P2 面板分隔线
     else if(level_margin_r)begin
-        if(on_r)
-        rgb = 24'h00E5FF;
-        else
-        rgb = 24'h303030;
+        rgb = 24'h202020;//段与段之间的缝
         end
     else if(level_inner_r)begin
-        if(cur_r)
-        rgb = 24'hFFF_F00;
+        if(fin_r)
+        rgb = 24'h202020;
+        else if(cur_r)
+        rgb = 24'h00E5FF;
         else if(on_r)
-        rgb = 24'h00697F;
+        rgb = 24'h606060;
         else
-        rgb = 24'h101010;
+        rgb = 24'h202020;
         end
+    else if(lvd_r)
+    rgb = fin_r ? 24'h202020 : WHITE;//等级数字
     else if(hold_r)begin
         case(hold_type_r)
         0:rgb = CYAN;
@@ -534,8 +674,6 @@ module frame(
         default:rgb = 0;
         endcase
         end
-    else if(hold_margin_r)
-    rgb = WHITE;
     else if(next_r)begin
         case(type_t_r)
         0:rgb = CYAN;
@@ -560,8 +698,10 @@ module frame(
         default:rgb = 0;
         endcase
         end
-    else if(next_margin_r)
-    rgb = WHITE;
+    else if(hold_slot_r)
+    rgb = 24'h202020;//Hold 槽位底色
+    else if(next_slot_r)
+    rgb = 24'h202020;//Next 槽位底色
     else if(score_lit_r)
     rgb = WHITE;
     else if(time_lit_r)
