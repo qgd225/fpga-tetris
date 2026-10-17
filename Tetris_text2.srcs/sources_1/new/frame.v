@@ -89,8 +89,9 @@ module frame(
                      YRLNX = 11'd122,   //NEXT 分隔线 Y
                      YRLHD = 11'd338,   //HOLD 分隔线 Y
                      XLVLB = 11'd236,   //LV 标签 X
-                     XLDIG = 11'd284,   //等级数字 X(与等级条同轴)
-                     YDIGI = 11'd24;    //标签/数字 Y
+                     XLDIG = 11'd288,   //等级数字 X(与等级条同轴)
+                     YLBLV = 11'd36,    //LV 标签 Y(与 44px 高的数字底部对齐)
+                     YDIGI = 11'd24;    //等级数字 Y
     wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
     wire [10:0]XPN2 = XPNL2;
 
@@ -482,15 +483,15 @@ module frame(
     end
     for(li = 0; li < 2; li = li + 1)begin
         if((hcounter >= (XLVLB + li*24)) && (hcounter < (XLVLB + li*24 + 11'd20)) &&
-           (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd32)))begin
+           (vcounter >= YLBLV) && (vcounter < (YLBLV + 11'd32)))begin
             lb_ena = 1'b1;
             lb_X = XLVLB + li*24;
-            lb_Y = YDIGI;
+            lb_Y = YLBLV;
         end
         if((lb_hn >= (XLVLB + li*24 - 11'd1)) && (lb_hn < (XLVLB + li*24 + 11'd20)) &&
-           (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd32)))begin
+           (vcounter >= YLBLV) && (vcounter < (YLBLV + 11'd32)))begin
             lb_ena_n = 1'b1;
-            lb_Y = YDIGI;
+            lb_Y = YLBLV;
             case(li)
             0:lb_g = 5'd11;
             1:lb_g = 5'd21;
@@ -769,23 +770,18 @@ module frame(
     wire dy1 = (((vcounter - YNEXT) & 11'd31) == 11'd31);
     wire dy2 = (((vcounter - YHOLD) & 11'd31) == 11'd31);
     wire slot_dot = (next_slot_r && dy1 && (dx1 || dx2)) || (hold_slot_r && dy2 && (dx1 || dx2));
-//    双人 P1/P2 号码徽标: number ROM 2x(40x88), P1 x138..178 / P2 x1165..1205, y621..709
-    wire bd1  = duo && (hcounter >= 11'd138) && (hcounter < 11'd178) && (vcounter >= 11'd621) && (vcounter <= 11'd709);
-    wire bd2  = duo && (hcounter >= 11'd1165) && (hcounter < 11'd1205) && (vcounter >= 11'd621) && (vcounter <= 11'd709);
-    wire bd1n = duo && (lb_hn >= 11'd138) && (lb_hn < 11'd178) && (vcounter >= 11'd621) && (vcounter <= 11'd709);
-    wire bd2n = duo && (lb_hn >= 11'd1165) && (lb_hn < 11'd1205) && (vcounter >= 11'd621) && (vcounter <= 11'd709);
-    wire [10:0]bdx = bd2 ? (hcounter - 11'd1165) : (hcounter - 11'd138);
-    wire [10:0]bdy = vcounter - 11'd621;
-    wire [5:0]badge_vt = bdy[6:1];
-    wire [3:0]badge_dig = bd2n ? 4'd2 : 4'd1;
-    wire [19:0]badge_dout;
-    number number_badge_inst(
-    .clka(Clk_74M),
-    .ena(bd1n || bd2n),
-    .addra({badge_dig, badge_vt}),
-    .douta(badge_dout)
-    );
-    wire badge_lit = (bd1 || bd2) && badge_dout[19 - bdx[5:1]];
+//    双人 P1/P2 号码徽标: 手绘 7 段(2x, 与 number 字体同风格), 不依赖 ROM 时序
+    wire bd1 = duo && (hcounter >= 11'd138) && (hcounter < 11'd178) && (vcounter >= 11'd621) && (vcounter < 11'd709);
+    wire bd2 = duo && (hcounter >= 11'd1165) && (hcounter < 11'd1205) && (vcounter >= 11'd621) && (vcounter < 11'd709);
+    wire [10:0]bx = bd2 ? (hcounter - 11'd1165) : (hcounter - 11'd138);
+    wire [10:0]by = vcounter - 11'd621;
+    wire seg_a = (bx >= 11'd4) && (bx < 11'd36) && (by >= 11'd2) && (by < 11'd6);
+    wire seg_d = (bx >= 11'd4) && (bx < 11'd36) && (by >= 11'd82) && (by < 11'd86);
+    wire seg_g = (bx >= 11'd4) && (bx < 11'd36) && (by >= 11'd42) && (by < 11'd46);
+    wire seg_b = (bx >= 11'd32) && (bx < 11'd36) && (by >= 11'd6) && (by < 11'd42);
+    wire seg_c = (bx >= 11'd32) && (bx < 11'd36) && (by >= 11'd46) && (by < 11'd82);
+    wire seg_e = (bx >= 11'd4) && (bx < 11'd8) && (by >= 11'd46) && (by < 11'd82);
+    wire badge_lit = bd1 ? (seg_b || seg_c) : (bd2 ? (seg_a || seg_b || seg_g || seg_e || seg_d) : 1'b0);
 
     parameter CYAN = 24'h00CCFF,//青色I
                LIGHT_CYAN = 24'h99EEFF,//浅青色I

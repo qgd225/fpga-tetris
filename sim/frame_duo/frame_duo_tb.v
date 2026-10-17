@@ -339,7 +339,7 @@ initial begin
   look(11'd95,   11'd90);   chk("duo=0 双人标签位置=黑", rgb, `BLACK);
   look(11'd1059, 11'd90);   chk("duo=0 单人 NEXT 标签", rgb, `GRAY_LBL);
   look(11'd340,  11'd40);   chk("时间数字=白", rgb, `WHITE);
-  look(11'd290,  11'd40);   chk("LV 数字=白", rgb, `WHITE);
+  look(11'd292,  11'd40);   chk("LV 数字=白", rgb, `WHITE);
   look(11'd240,  11'd40);   chk("LV 标签=标签灰", rgb, `GRAY_LBL);
   Finalize = 1'b1; duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd95,   11'd90);   chk("Finalize 标签暗化", rgb, `SLOT_BG);
@@ -360,10 +360,10 @@ initial begin
   chk("LV 第2字地址已预取", dut.lb_g, 5'd21);
   chk("LV BRAM 使能已预取", dut.letter_hud_inst.ena, 1'b1);
   chk("LV 地址窗口已开", dut.lb_ena_n, 1'b1);
-  hc = 11'd283; vc = 11'd40; repeat(3) @(posedge Clk);
+  hc = 11'd287; vc = 11'd40; repeat(3) @(posedge Clk);
   chk("LV 数字使能已预取", dut.number_lv_inst.ena, 1'b1);
   chk("LV 数字显示窗口仍关", dut.lvd_ena, 1'b0);
-  hc = 11'd284; vc = 11'd40; repeat(3) @(posedge Clk);
+  hc = 11'd288; vc = 11'd40; repeat(3) @(posedge Clk);
   chk("LV 数字显示窗口已开", dut.lvd_ena, 1'b1);
 
   $display("=== 14) 双人 P2 Hold 在 HOLD 框可见 ===");
@@ -389,13 +389,13 @@ initial begin
   look(11'd1130, 11'd718);  chk("P2 面板底条=粉", rgb, `PINK2);
   look(11'd125, 11'd163);   chk("预览槽点阵=404040", rgb, 24'h404040);
   look(11'd126, 11'd163);   chk("点阵旁=槽底", rgb, `SLOT_BG);
-  look(11'd158, 11'd650);   chk("P1 号码徽标=青", rgb, `CY_MENU);
-  look(11'd1185, 11'd650);  chk("P2 号码徽标=粉", rgb, `PINK2);
+  look(11'd171, 11'd640);   chk("P1 号码徽标=青", rgb, `CY_MENU);
+  look(11'd1185, 11'd624);  chk("P2 号码徽标=粉", rgb, `PINK2);
   look(11'd470, 11'd40);    chk("顶栏发丝线=标签灰", rgb, `GRAY_LBL);
   look(11'd469, 11'd40);    chk("发丝线左侧=黑", rgb, `BLACK);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1060, 11'd718);  chk("单人面板底条=灰", rgb, `GRAY_MID);
-  look(11'd158, 11'd650);   chk("单人无号码徽标", rgb, `BLACK);
+  look(11'd171, 11'd640);   chk("单人无号码徽标", rgb, `BLACK);
   duo = 1'b1; repeat(4) @(posedge Clk);
 
   $display("=== 16) 菜单标题线 ===");
@@ -427,7 +427,6 @@ initial begin
   Finalize = 1'b1; repeat(40) @(posedge Clk);
   look(11'd600, 11'd445);   chk("结束下划线非黑", (rgb !== `BLACK), 1);
   Finalize = 1'b0; repeat(40) @(posedge Clk);
-
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;
