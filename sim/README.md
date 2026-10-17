@@ -364,3 +364,15 @@ LUT as Memory 5（只剩 SRL，**无分布式 RAM**）、FF 4681、F7 1933、F8 
   `duo 83 / level 27` 不变，三套全绿。
 - 综合/实现（新进程从零）：**0 error、0 违例**；LUT **15989（76.87%）**、FF 4682、BRAM 14.5、DSP 4、
   **WNS +0.187ns**、WHS +0.090ns。
+
+## 预览方块（NEXT/HOLD）也加 1px 圆角
+
+- 预览格与场地同几何（格距 32、涂色 30×30），新增预览相位判定：
+  `pvx = (duo && hcounter>=XPN2) ? (hcounter-XPN2)&31 : (hcounter-XPN1)&31`、`pvy = hold_slot_r ? (vcounter-YHOLD)&31 : (vcounter-YNEXT)&31`，
+  `pv_corner = (pvx==0||pvx==29) && (pvy==0||pvy==29)`，并新增 `pv_round_r` 与 `next_r/hold_r/next2_r` **同拍寄存**。
+- 三个预览分支前置 `if(!pv_round_r) rgb = 24'h202020;` —— 缺角画**槽位底色**（不是黑，避免露洞）；E4 换块闪白时形状同样保持圆角。
+- 预览相位按"面板（P1/P2）+ 槽位（NEXT/HOLD）"分别取，不会跨面板/跨槽位串相位。
+- 只改像素：`Next_piece.v / hold_piece.v` 的取形状、槽位、点阵、标签一律未动。
+- 仿真：`frame_duo` 171 → **181**（P1/P2 NEXT 与 HOLD 的"角=202020 + 边/中心=方块色"）；`duo 83 / level 27` 不变，三套全绿。
+- 综合/实现（新进程从零）：**0 error、0 违例**；LUT **16484（79.25%）**、FF 4683、BRAM 14.5、DSP 4、
+  **WNS +0.118ns**、WHS +0.066ns。

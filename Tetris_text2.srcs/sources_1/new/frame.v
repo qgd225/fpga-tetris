@@ -594,6 +594,7 @@ module frame(
     reg ghost_r;
     reg ghost_edge_r;
     reg piece_round_r;
+    reg pv_round_r;
     reg land_we_r;
     reg [2:0]type_r;
     reg [2:0]type_t_r;
@@ -618,6 +619,14 @@ module frame(
     reg rule2_r;
     reg next_slot_r;
     reg hold_slot_r;
+//    预览方块 1px 圆角: 相位按面板/槽位分别取(避免跨面板串相位)
+    wire [10:0]pvx1 = (hcounter - XPN1) & 11'd31;
+    wire [10:0]pvx2 = (hcounter - XPN2) & 11'd31;
+    wire [10:0]pvx = (duo && (hcounter >= XPN2)) ? pvx2 : pvx1;
+    wire [10:0]pvy_n = (vcounter - YNEXT) & 11'd31;
+    wire [10:0]pvy_h = (vcounter - YHOLD) & 11'd31;
+    wire [10:0]pvy = hold_slot_r ? pvy_h : pvy_n;
+    wire pv_corner = ((pvx == 11'd0) || (pvx == 11'd29)) && ((pvy == 11'd0) || (pvy == 11'd29));
     reg lvd_r;
     reg lb_lv_r;
     reg fin_r;
@@ -642,6 +651,7 @@ module frame(
     ghost_r <= 1'b0;
         ghost_edge_r <= 1'b0;
         piece_round_r <= 1'b0;
+        pv_round_r <= 1'b0;
     land_we_r <= 1'b0;
     type_r <= 3'd0;
     type_t_r <= 3'd0;
@@ -689,6 +699,7 @@ module frame(
     ghost_r <= ghost;
         ghost_edge_r <= ghost_edge;
         piece_round_r <= piece_round;
+        pv_round_r <= !pv_corner;
     land_we_r <= land_we;
     type_r <= type;
     type_t_r <= type_t;
@@ -883,7 +894,9 @@ module frame(
     else if(lvd_r)
     rgb = fin_r ? 24'h202020 : (lvflash ? WHITE : lv_color);//等级数字(与 LV 同色)
     else if(hold_r)begin
-        if(hflash)
+        if(!pv_round_r)
+        rgb = 24'h202020;
+        else if(hflash)
         rgb = WHITE;
         else
         case(hold_type_r)
@@ -898,7 +911,9 @@ module frame(
         endcase
         end
     else if(next_r)begin
-        if(nflash1)
+        if(!pv_round_r)
+        rgb = 24'h202020;
+        else if(nflash1)
         rgb = WHITE;
         else
         case(type_t_r)
@@ -913,7 +928,9 @@ module frame(
         endcase
         end
     else if(next2_r)begin
-        if(nflash2)
+        if(!pv_round_r)
+        rgb = 24'h202020;
+        else if(nflash2)
         rgb = WHITE;
         else
         case(type_t2_r)
