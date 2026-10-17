@@ -130,6 +130,8 @@ wire hold_p     = hold_p_flag;
     wire choose;
     wire [3:0]choose_cnt;
     wire duo = (choose_cnt == 4'd1);
+    wire sw_short;
+    wire sw_long;
     
     Game_state_machine Game_state_machine_inst(
     .Clk_74M(Clk_74M),
@@ -140,6 +142,9 @@ wire hold_p     = hold_p_flag;
     .switch_en(switch_e),
     .over(over),
     
+    .sw_short(sw_short),
+    .sw_long(sw_long),
+
     .Choose(choose),
     .Idle(Idle),
     .Playing(Playing),
@@ -167,6 +172,8 @@ wire hold_p     = hold_p_flag;
     wire blk_r2;
     wire snd_hold1;
     wire snd_hold2;
+    wire blk_rot1;
+    wire blk_rot2;
     wire [2:0]snd_clr_n;
     reg [2:0]lvl_d;
     reg lvl_up;
@@ -228,6 +235,8 @@ wire hold_p     = hold_p_flag;
     .blk_r2(blk_r2),
     .snd_hold1(snd_hold1),
     .snd_hold2(snd_hold2),
+    .blk_rot1(blk_rot1),
+    .blk_rot2(blk_rot2),
     .snd_clr_n(snd_clr_n)
     );
     
@@ -250,25 +259,28 @@ wire hold_p     = hold_p_flag;
     .clear(clear),
     .clr_n(snd_clr_n),
     .lvl_up(lvl_up),
-    .sw(switch_r_f),
+    .sw_short(sw_short),
+    .sw_long(sw_long),
     .menu_l(choose && left_p_menu),
     .menu_r(choose && right_p_menu),
     .land1(snd_land1),
     .land2(snd_land2),
     .lft1(left_p && !blk_l1),
     .rgt1(right_p && !blk_r1),
-    .rot1(rotate_p),
+    .rot1(rotate_p && !blk_rot1),
     .hard1(snd_hard1),
     .soft1(snd_soft1),
     .hold1(snd_hold1),
     .blk1(blk_l1 || blk_r1),
     .lft2(kb_left_p && !blk_l2),
     .rgt2(kb_right_p && !blk_r2),
-    .rot2(kb_rotate_p),
+    .rot2(kb_rotate_p && !blk_rot2),
     .hard2(snd_hard2),
     .soft2(snd_soft2),
     .hold2(snd_hold2),
     .blk2(blk_l2 || blk_r2),
+    .blk_rot1(blk_rot1),
+    .blk_rot2(blk_rot2),
     
     .buzz_else(buzz_else)
     );

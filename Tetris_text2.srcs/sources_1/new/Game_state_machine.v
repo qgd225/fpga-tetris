@@ -13,6 +13,8 @@ module Game_state_machine(
     output wire Playing,
     output wire Stop,
     output wire Finalize,
+    output wire sw_short,
+    output wire sw_long,
     output reg [3:0]choose_cnt
     );
     
@@ -26,6 +28,9 @@ module Game_state_machine(
     
     wire hold_pulse  = (counter == MCNT) && (short_press_ok); 
     wire short_press = (short_press_ok) && (switch_r_flag);
+
+    assign sw_short = short_press;
+    assign sw_long = hold_pulse;
     
     always@(posedge Clk_74M or negedge Reset_n)
     if(!Reset_n)

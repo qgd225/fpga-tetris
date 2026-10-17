@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-//===== sound 模块级回归: 事件优先级 / 查表音色 / 序列时长 / 方波翻转 =====
+//===== sound 模块级回归: 事件优先级 / 双音反馈 / 开关长短按 =====
 module sound_tb;
 reg Clk_74M = 0;
 reg Reset_n = 0;
@@ -8,7 +8,8 @@ reg over = 0;
 reg clear = 0;
 reg [2:0]clr_n = 0;
 reg lvl_up = 0;
-reg sw = 0;
+reg sw_short = 0;
+reg sw_long = 0;
 reg menu_l = 0;
 reg menu_r = 0;
 reg land1 = 0;
@@ -27,7 +28,20 @@ reg hard2 = 0;
 reg soft2 = 0;
 reg hold2 = 0;
 reg blk2 = 0;
+reg blk_rot1 = 0;
+reg blk_rot2 = 0;
 wire buzz_else;
+
+reg sm_switch_r = 0;
+reg sm_switch_en = 0;
+wire sm_short;
+wire sm_long;
+wire sm_choose;
+wire sm_idle;
+wire sm_playing;
+wire sm_stop;
+wire sm_finalize;
+wire [3:0]sm_choose_cnt;
 
 sound #(
     .MS_MAX(17'd31),
@@ -39,7 +53,8 @@ sound #(
     .clear(clear),
     .clr_n(clr_n),
     .lvl_up(lvl_up),
-    .sw(sw),
+    .sw_short(sw_short),
+    .sw_long(sw_long),
     .menu_l(menu_l),
     .menu_r(menu_r),
     .land1(land1),
@@ -58,14 +73,35 @@ sound #(
     .soft2(soft2),
     .hold2(hold2),
     .blk2(blk2),
+    .blk_rot1(blk_rot1),
+    .blk_rot2(blk_rot2),
     .buzz_else(buzz_else)
+);
+
+Game_state_machine #(
+    .MCNT(64)
+) gsm(
+    .Clk_74M(Clk_74M),
+    .Reset_n(Reset_n),
+    .left_p(1'b0),
+    .right_p(1'b0),
+    .switch_r_flag(sm_switch_r),
+    .switch_en(sm_switch_en),
+    .over(1'b0),
+    .Choose(sm_choose),
+    .Idle(sm_idle),
+    .Playing(sm_playing),
+    .Stop(sm_stop),
+    .Finalize(sm_finalize),
+    .choose_cnt(sm_choose_cnt),
+    .sw_short(sm_short),
+    .sw_long(sm_long)
 );
 
 integer bad = 0;
 integer checks = 0;
-integer i;
-integer edges;
 integer cycles;
+integer edges;
 integer notes;
 reg prev_buzz;
 reg [3:0]prev_st;
@@ -93,7 +129,8 @@ begin
     clear = 0;
     clr_n = 0;
     lvl_up = 0;
-    sw = 0;
+    sw_short = 0;
+    sw_long = 0;
     menu_l = 0;
     menu_r = 0;
     land1 = 0;
@@ -112,12 +149,16 @@ begin
     soft2 = 0;
     hold2 = 0;
     blk2 = 0;
+    blk_rot1 = 0;
+    blk_rot2 = 0;
 end
 endtask
 
 task do_reset;
 begin
     clear_all;
+    sm_switch_r = 0;
+    sm_switch_en = 0;
     Reset_n = 0;
     repeat(4) @(posedge Clk_74M);
     #1;
@@ -135,16 +176,35 @@ begin
 end
 endtask
 
-task check_event;
-input [8*32-1:0] name;
-input integer exp_en;
+task wait_done;
 begin
-    chk(name, dut.en, exp_en);
-    clear_all;
     while(dut.en != 0)begin
         @(posedge Clk_74M);
         #1;
     end
+end
+endtask
+
+task check_event;
+input [8*40-1:0] name;
+input integer exp_en;
+begin
+    chk(name, dut.en, exp_en);
+    clear_all;
+    wait_done;
+end
+endtask
+
+task wait_st;
+input [3:0] target;
+begin
+    cycles = 0;
+    while((dut.st != target) && (cycles < 200000))begin
+        @(posedge Clk_74M);
+        #1;
+        cycles = cycles + 1;
+    end
+    chk("到达音符状态", dut.st, target);
 end
 endtask
 
@@ -198,25 +258,28 @@ initial begin
     clear = 1; clr_n = 2; one_pulse; check_event("clear2 -> 12", 12);
     clear = 1; clr_n = 3; one_pulse; check_event("clear3 -> 13", 13);
     clear = 1; clr_n = 4; one_pulse; check_event("clear4 -> 14", 14);
-    sw = 1; one_pulse; check_event("sw -> 15", 15);
+    sw_short = 1; one_pulse; check_event("sw_short -> 15", 15);
+    sw_long = 1; one_pulse; check_event("sw_long -> 17", 17);
+    blk_rot1 = 1; one_pulse; check_event("blk_rot1 -> 18", 18);
+    blk_rot2 = 1; one_pulse; check_event("blk_rot2 -> 18", 18);
     over = 1; one_pulse; check_event("over -> 16", 16);
 
     $display("=== 2) 同拍优先级 ===");
     do_reset;
-    over = 1; clear = 1; clr_n = 4; rot1 = 1; one_pulse;
-    check_event("over > clear4 > rotate", 16);
+    over = 1; sw_long = 1; sw_short = 1; one_pulse;
+    check_event("over > switch", 16);
     do_reset;
-    clear = 1; clr_n = 4; rot1 = 1; soft1 = 1; one_pulse;
-    check_event("clear4 > rotate > soft", 14);
+    sw_long = 1; sw_short = 1; one_pulse;
+    check_event("switch_long > switch_short", 17);
+    do_reset;
+    blk1 = 1; blk_rot1 = 1; soft1 = 1; one_pulse;
+    check_event("move_blocked > rotate_blocked", 4);
+    do_reset;
+    blk_rot1 = 1; soft1 = 1; one_pulse;
+    check_event("rotate_blocked > soft", 18);
     do_reset;
     hard1 = 1; land1 = 1; hold1 = 1; one_pulse;
     check_event("hard > land > hold", 9);
-    do_reset;
-    hold1 = 1; rot2 = 1; one_pulse;
-    check_event("hold > rotate", 7);
-    do_reset;
-    blk1 = 1; soft1 = 1; one_pulse;
-    check_event("blocked > soft", 4);
     do_reset;
     rot1 = 1; rot2 = 1; one_pulse;
     check_event("P1/P2 same rotate", 6);
@@ -243,10 +306,7 @@ initial begin
     @(posedge Clk_74M);
     #1;
     chk("clear high starts en=11", dut.en, 11);
-    while(dut.en != 0)begin
-        @(posedge Clk_74M);
-        #1;
-    end
+    wait_done;
     chk("clear held no retrigger", dut.en, 0);
     clear = 0;
     @(posedge Clk_74M);
@@ -257,24 +317,81 @@ initial begin
     chk("clear release then high retrigger", dut.en, 11);
     clear = 0;
 
-    $display("=== 6) 音高/时长查表 ===");
+    $display("=== 6) 控制音高与时序 ===");
     do_reset;
     over = 1; one_pulse;
-    chk("over st0 note=C6", dut.note, 35459);
-    chk("over st0 cnt=200ms", dut.cnt, 200);
+    chk("over st0 note=G5", dut.note, 47360);
+    chk("over st0 cnt=180ms", dut.cnt, 180);
     chk("over st_last=3", dut.st_last, 3);
     clear_all;
-    @(posedge Clk_74M);
-    #1;
+    wait_done;
     do_reset;
-    clear = 1; clr_n = 4; one_pulse;
-    chk("clear4 st0 note=C5", dut.note, 70985);
-    chk("clear4 st_last=4", dut.st_last, 4);
+    menu_l = 1; one_pulse;
+    chk("menu note=F5", dut.note, 53163);
+    chk("menu cnt=18ms", dut.cnt, 18);
     clear_all;
-    @(posedge Clk_74M);
-    #1;
+    wait_done;
+    do_reset;
+    lft1 = 1; one_pulse;
+    chk("move note=E5", dut.note, 56335);
+    chk("move cnt=20ms", dut.cnt, 20);
+    clear_all;
+    wait_done;
+    do_reset;
+    rot1 = 1; one_pulse;
+    chk("rotate note=G5", dut.note, 47360);
+    chk("rotate cnt=20ms", dut.cnt, 20);
+    clear_all;
+    wait_done;
 
-    $display("=== 7) 音符切换时长 ===");
+    $display("=== 7) 被挡双音与开关双音 ===");
+    do_reset;
+    blk1 = 1; one_pulse;
+    chk("move blocked st0 note=E5", dut.note, 56335);
+    chk("move blocked st0 cnt=30ms", dut.cnt, 30);
+    wait_st(1);
+    chk("move blocked rest note=0", dut.note, 0);
+    chk("move blocked rest cnt=8ms", dut.cnt, 8);
+    wait_st(2);
+    chk("move blocked st2 note=C5", dut.note, 70985);
+    chk("move blocked st2 cnt=45ms", dut.cnt, 45);
+    clear_all;
+    wait_done;
+
+    do_reset;
+    blk_rot1 = 1; one_pulse;
+    chk("rotate blocked st0 note=D5", dut.note, 63245);
+    chk("rotate blocked st0 cnt=30ms", dut.cnt, 30);
+    wait_st(1);
+    chk("rotate blocked rest note=0", dut.note, 0);
+    chk("rotate blocked rest cnt=8ms", dut.cnt, 8);
+    wait_st(2);
+    chk("rotate blocked st2 note=B4", dut.note, 75188);
+    chk("rotate blocked st2 cnt=45ms", dut.cnt, 45);
+    clear_all;
+    wait_done;
+
+    do_reset;
+    sw_short = 1; one_pulse;
+    chk("switch short st0 note=E5", dut.note, 56335);
+    chk("switch short st0 cnt=45ms", dut.cnt, 45);
+    wait_st(1);
+    chk("switch short st1 note=G5", dut.note, 47360);
+    chk("switch short st1 cnt=60ms", dut.cnt, 60);
+    clear_all;
+    wait_done;
+
+    do_reset;
+    sw_long = 1; one_pulse;
+    chk("switch long st0 note=G5", dut.note, 47360);
+    chk("switch long st0 cnt=60ms", dut.cnt, 60);
+    wait_st(1);
+    chk("switch long st1 note=C5", dut.note, 70985);
+    chk("switch long st1 cnt=90ms", dut.cnt, 90);
+    clear_all;
+    wait_done;
+
+    $display("=== 8) 音符切换时长 ===");
     do_reset;
     hold1 = 1; one_pulse;
     cycles = 0;
@@ -283,10 +400,11 @@ initial begin
         #1;
         cycles = cycles + 1;
     end
-    chk("hold first note 40ms*32", (cycles >= 1280) && (cycles <= 1281), 1);
+    chk("hold first note 35ms*32", (cycles >= 1120) && (cycles <= 1121), 1);
     clear_all;
+    wait_done;
 
-    $display("=== 8) 方波翻转次数 ===");
+    $display("=== 9) 方波翻转次数 ===");
     do_reset;
     menu_l = 1; one_pulse;
     edges = 0;
@@ -299,15 +417,47 @@ initial begin
             prev_buzz = buzz_else;
         end
     end
-    chk("menu B5 15ms toggle count", edges, 13);
+    chk("menu F5 18ms toggle count", edges, 11);
 
-    $display("=== 9) 复位静音 ===");
+    $display("=== 10) 复位静音 ===");
     do_reset;
     chk("reset en=0", dut.en, 0);
     chk("reset buzz=0", buzz_else, 0);
     repeat(20) @(posedge Clk_74M);
     #1;
     chk("idle buzz=0", buzz_else, 0);
+
+    $display("=== 11) switch 状态机长短按映射 ===");
+    do_reset;
+    sm_switch_en = 1;
+    repeat(8) @(posedge Clk_74M);
+    #1;
+    sm_switch_en = 0;
+    sm_switch_r = 1;
+    @(posedge Clk_74M);
+    #1;
+    chk("state machine short pulse", sm_short, 1);
+    chk("state machine short no long", sm_long, 0);
+    sm_switch_r = 0;
+    @(posedge Clk_74M);
+    #1;
+
+    do_reset;
+    sm_switch_en = 1;
+    cycles = 0;
+    while((sm_long == 0) && (cycles < 200))begin
+        @(posedge Clk_74M);
+        #1;
+        cycles = cycles + 1;
+    end
+    chk("state machine long pulse", sm_long, 1);
+    chk("state machine long no short", sm_short, 0);
+    sm_switch_en = 0;
+    sm_switch_r = 1;
+    @(posedge Clk_74M);
+    #1;
+    chk("long release no short", sm_short, 0);
+    sm_switch_r = 0;
 
     $display("检查项: %0d", checks);
     if(bad == 0)

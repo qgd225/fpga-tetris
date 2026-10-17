@@ -43,6 +43,8 @@ module frame(
     output blk_r2,
     output snd_hold1,
     output snd_hold2,
+    output blk_rot1,
+    output blk_rot2,
     output [2:0]snd_clr_n
     );
     
@@ -263,7 +265,9 @@ module frame(
     .blk_l2(blk_l2),
     .blk_r2(blk_r2),
     .snd_hold1(snd_hold1),
-    .snd_hold2(snd_hold2)
+    .snd_hold2(snd_hold2),
+    .blk_rot1(blk_rot1),
+    .blk_rot2(blk_rot2)
     );
     
     

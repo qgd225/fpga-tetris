@@ -5,7 +5,8 @@ module sound(
     input clear,
     input [2:0]clr_n,
     input lvl_up,
-    input sw,
+    input sw_short,
+    input sw_long,
     input menu_l,
     input menu_r,
     input land1,
@@ -24,6 +25,8 @@ module sound(
     input soft2,
     input hold2,
     input blk2,
+    input blk_rot1,
+    input blk_rot2,
 
     output reg buzz_else
     );
@@ -33,6 +36,8 @@ module sound(
     parameter [3:0]NOTE_SH = 4'd0;
 
 //    音高表: 半周期(74.25MHz / (2*f))
+    parameter [17:0]N_G4 = 18'd94707;
+    parameter [17:0]N_B4 = 18'd75188;
     parameter [17:0]N_C5 = 18'd70985;
     parameter [17:0]N_D5 = 18'd63245;
     parameter [17:0]N_E5 = 18'd56335;
@@ -95,7 +100,9 @@ module sound(
     else if(en == 5'd0)begin
         if(over)
         en <= 5'd16;
-        else if(sw)
+        else if(sw_long)
+        en <= 5'd17;
+        else if(sw_short)
         en <= 5'd15;
         else if(clear && !clear_seen && (clr_n == 3'd4))begin
         en <= 5'd14;
@@ -129,6 +136,8 @@ module sound(
         en <= 5'd5;
         else if(blk1 || blk2)
         en <= 5'd4;
+        else if(blk_rot1 || blk_rot2)
+        en <= 5'd18;
         else if(soft1 || soft2)
         en <= 5'd3;
         else if(menu_l || menu_r)
@@ -140,8 +149,10 @@ module sound(
 //    每条音效的末音符编号
     always@(*)begin
     case(en)
+    5'd17: st_last = 4'd1;
     5'd16: st_last = 4'd3;
     5'd15: st_last = 4'd1;
+    5'd18: st_last = 4'd2;
     5'd14: st_last = 4'd4;
     5'd13: st_last = 4'd3;
     5'd12: st_last = 4'd2;
@@ -152,7 +163,7 @@ module sound(
     5'd7:  st_last = 4'd1;
     5'd6:  st_last = 4'd0;
     5'd5:  st_last = 4'd0;
-    5'd4:  st_last = 4'd0;
+    5'd4:  st_last = 4'd2;
     5'd3:  st_last = 4'd0;
     5'd2:  st_last = 4'd0;
     default: st_last = 4'd0;
@@ -163,11 +174,16 @@ module sound(
     always@(*)begin
     note = 18'd0;
     case(en)
+    5'd17: case(st)
+        4'd0: note = N_G5;
+        4'd1: note = N_C5;
+        default: note = 18'd0;
+        endcase
     5'd16: case(st)
-        4'd0: note = N_C6;
-        4'd1: note = N_G5;
-        4'd2: note = N_E5;
-        4'd3: note = N_C5;
+        4'd0: note = N_G5;
+        4'd1: note = N_E5;
+        4'd2: note = N_C5;
+        4'd3: note = N_G4;
         default: note = 18'd0;
         endcase
     5'd15: case(st)
@@ -175,12 +191,18 @@ module sound(
         4'd1: note = N_G5;
         default: note = 18'd0;
         endcase
+    5'd18: case(st)
+        4'd0: note = N_D5;
+        4'd1: note = 18'd0;
+        4'd2: note = N_B4;
+        default: note = 18'd0;
+        endcase
     5'd14: case(st)
         4'd0: note = N_C5;
-        4'd1: note = N_E5;
-        4'd2: note = N_G5;
-        4'd3: note = N_C6;
-        4'd4: note = N_E6;
+        4'd1: note = N_D5;
+        4'd2: note = N_E5;
+        4'd3: note = N_G5;
+        4'd4: note = N_C6;
         default: note = 18'd0;
         endcase
     5'd13: case(st)
@@ -198,7 +220,7 @@ module sound(
         endcase
     5'd11: case(st)
         4'd0: note = N_E5;
-        4'd1: note = N_C6;
+        4'd1: note = N_G5;
         default: note = 18'd0;
         endcase
     5'd10: case(st)
@@ -208,20 +230,25 @@ module sound(
         endcase
     5'd9: case(st)
         4'd0: note = N_C5;
-        4'd1: note = N_C6;
+        4'd1: note = N_G5;
         default: note = 18'd0;
         endcase
     5'd8: note = N_C5;
     5'd7: case(st)
-        4'd0: note = N_E5;
-        4'd1: note = N_G5;
+        4'd0: note = N_C5;
+        4'd1: note = N_E5;
         default: note = 18'd0;
         endcase
-    5'd6: note = N_E5;
-    5'd5: note = N_G5;
-    5'd4: note = N_C5;
+    5'd6: note = N_G5;
+    5'd5: note = N_E5;
+    5'd4: case(st)
+        4'd0: note = N_E5;
+        4'd1: note = 18'd0;
+        4'd2: note = N_C5;
+        default: note = 18'd0;
+        endcase
     5'd3: note = N_D5;
-    5'd2: note = N_B5;
+    5'd2: note = N_F5;
     default: note = 18'd0;
     endcase
     end
@@ -230,23 +257,34 @@ module sound(
     always@(*)begin
     cnt = 9'd0;
     case(en)
+    5'd17: case(st)
+        4'd0: cnt = 9'd60;
+        4'd1: cnt = 9'd90;
+        default: cnt = 9'd0;
+        endcase
     5'd16: case(st)
-        4'd0: cnt = 9'd200;
-        4'd1: cnt = 9'd200;
-        4'd2: cnt = 9'd200;
-        4'd3: cnt = 9'd400;
+        4'd0: cnt = 9'd180;
+        4'd1: cnt = 9'd180;
+        4'd2: cnt = 9'd180;
+        4'd3: cnt = 9'd360;
         default: cnt = 9'd0;
         endcase
     5'd15: case(st)
-        4'd0: cnt = 9'd60;
+        4'd0: cnt = 9'd45;
         4'd1: cnt = 9'd60;
         default: cnt = 9'd0;
         endcase
+    5'd18: case(st)
+        4'd0: cnt = 9'd30;
+        4'd1: cnt = 9'd8;
+        4'd2: cnt = 9'd45;
+        default: cnt = 9'd0;
+        endcase
     5'd14: case(st)
-        4'd0: cnt = 9'd60;
-        4'd1: cnt = 9'd60;
-        4'd2: cnt = 9'd60;
-        4'd3: cnt = 9'd60;
+        4'd0: cnt = 9'd55;
+        4'd1: cnt = 9'd55;
+        4'd2: cnt = 9'd55;
+        4'd3: cnt = 9'd55;
         4'd4: cnt = 9'd120;
         default: cnt = 9'd0;
         endcase
@@ -275,20 +313,25 @@ module sound(
         endcase
     5'd9: case(st)
         4'd0: cnt = 9'd40;
-        4'd1: cnt = 9'd30;
-        default: cnt = 9'd0;
-        endcase
-    5'd8: cnt = 9'd25;
-    5'd7: case(st)
-        4'd0: cnt = 9'd40;
         4'd1: cnt = 9'd40;
         default: cnt = 9'd0;
         endcase
+    5'd8: cnt = 9'd28;
+    5'd7: case(st)
+        4'd0: cnt = 9'd35;
+        4'd1: cnt = 9'd35;
+        default: cnt = 9'd0;
+        endcase
     5'd6: cnt = 9'd20;
-    5'd5: cnt = 9'd15;
-    5'd4: cnt = 9'd30;
-    5'd3: cnt = 9'd12;
-    5'd2: cnt = 9'd15;
+    5'd5: cnt = 9'd20;
+    5'd4: case(st)
+        4'd0: cnt = 9'd30;
+        4'd1: cnt = 9'd8;
+        4'd2: cnt = 9'd45;
+        default: cnt = 9'd0;
+        endcase
+    5'd3: cnt = 9'd15;
+    5'd2: cnt = 9'd18;
     default: cnt = 9'd0;
     endcase
     end

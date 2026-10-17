@@ -75,7 +75,9 @@ module Playfield(
     output wire blk_l2,
     output wire blk_r2,
     output wire snd_hold1,
-    output wire snd_hold2
+    output wire snd_hold2,
+    output wire blk_rot1,
+    output wire blk_rot2
     );
 
 //============================================================
@@ -1117,6 +1119,8 @@ module Playfield(
     assign blk_r2 = right_p_flag2 && boundary_collision_right2;
     assign snd_hold1 = hold_up;
     assign snd_hold2 = hold_up2;
+    assign blk_rot1 = Playing && rotate_p_flag && (rot_block || lock_we);
+    assign blk_rot2 = Playing && rotate_p_flag2 && (rot_block2 || lock_we2);
     assign land_pulse2 = (lock_counter2 == 5940000) ? 1 : 0;
     assign lock_we2  = (lock_t2) || (lock_cnt2 != 2'd0);
     assign lock_idx2 = (lock_t2) ? 2'd0 : lock_cnt2;
