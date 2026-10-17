@@ -136,7 +136,7 @@ initial begin
   repeat(4) @(posedge Clk);
   lock2;                                        // P2 落锁 (10,19)
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
-  look(11'd641, 11'd689);                       // 第10列 第19行
+  look(11'd643, 11'd691);                       // 第10列 第19行
   chk("duo=1 P2 落格=红色", rgb, `RED);
   clr_state;
   duo = 1'b0; repeat(4) @(posedge Clk);
@@ -144,7 +144,7 @@ initial begin
   repeat(4) @(posedge Clk);
   lock2;                                        // 单人: 不应写入
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
-  look(11'd641, 11'd689);
+  look(11'd643, 11'd691);
   chk("duo=0 P2 落格不显示", rgb, `BLACK);
   clr_state;
 
@@ -459,6 +459,50 @@ initial begin
   Finalize = 1'b1; repeat(40) @(posedge Clk);
   look(11'd600, 11'd445);   chk("结束下划线非黑", (rgb !== `BLACK), 1);
   Finalize = 1'b0; repeat(40) @(posedge Clk);
+  $display("=== 18) 实心方块 2px 圆角 ===");
+  duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0;
+  dut.state_color[0] = 3'd0;
+  dut.Playfield_inst.state[0] = 1'b0;
+  repeat(40) @(posedge Clk);
+  force dut.Playfield_inst.Piece = 1'b1;
+  force dut.Playfield_inst.type = 3'd2;
+  repeat(4) @(posedge Clk);
+  look(11'd321, 11'd81);   chk("下落块左上角=黑", rgb, `BLACK);
+  look(11'd322, 11'd82);   chk("下落块角内2px=黑", rgb, `BLACK);
+  look(11'd323, 11'd81);   chk("下落块左边缘=黄", rgb, `YELLOW);
+  look(11'd321, 11'd83);   chk("下落块上边缘=黄", rgb, `YELLOW);
+  look(11'd336, 11'd96);   chk("下落块中心=黄", rgb, `YELLOW);
+  force dut.Playfield_inst.Piece = 1'b0;
+  force dut.Playfield_inst.Piece2 = 1'b1;
+  force dut.Playfield_inst.type2 = 3'd4;
+  repeat(4) @(posedge Clk);
+  look(11'd321, 11'd81);   chk("P2 下落块角=黑", rgb, `BLACK);
+  look(11'd323, 11'd81);   chk("P2 下落块边=绿", rgb, 24'h55A630);
+  force dut.Playfield_inst.Piece2 = 1'b0;
+  dut.state_color[0] = 3'd3;
+  dut.Playfield_inst.state[0] = 1'b1;
+  repeat(4) @(posedge Clk);
+  look(11'd321, 11'd81);   chk("已锁格角=黑", rgb, `BLACK);
+  look(11'd323, 11'd81);   chk("已锁格边=红", rgb, `RED);
+  force dut.Playfield_inst.Piece = 1'b1;
+  force dut.Playfield_inst.type = 3'd2;
+  force dut.land_we = 1'b1;
+  repeat(4) @(posedge Clk);
+  look(11'd321, 11'd81);   chk("落锁闪白角=黑", rgb, `BLACK);
+  look(11'd323, 11'd81);   chk("落锁闪白边=白", rgb, 24'hEEEEEE);
+  release dut.land_we;
+  release dut.Playfield_inst.Piece;
+  release dut.Playfield_inst.type;
+  force dut.clear_t_r = 1'b1;
+  force dut.flash_r = 1'b1;
+  repeat(4) @(posedge Clk);
+  look(11'd321, 11'd81);   chk("消行闪白角=黑", rgb, `BLACK);
+  look(11'd323, 11'd81);   chk("消行闪白边=白", rgb, 24'hEEEEEE);
+  release dut.clear_t_r;
+  release dut.flash_r;
+  dut.state_color[0] = 3'd0;
+  dut.Playfield_inst.state[0] = 1'b0;
+  repeat(4) @(posedge Clk);
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;

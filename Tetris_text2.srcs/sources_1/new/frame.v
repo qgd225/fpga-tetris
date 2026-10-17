@@ -573,6 +573,8 @@ module frame(
     wire glx_cn = (glx < 11'd1) || (glx > 11'd28);
     wire gly_cn = (gly < 11'd1) || (gly > 11'd28);
     wire ghost_edge = (glx_bd || gly_bd) && !(glx_cn && gly_cn);
+//    实心方块 2px 圆角: 四角各切 2x2(与幽灵同样用 glx_bd/gly_bd)
+    wire piece_round = !(glx_bd && gly_bd);
 
     reg over_lit_r;
     reg tick_r;
@@ -591,6 +593,7 @@ module frame(
     reg Piece_r;
     reg ghost_r;
     reg ghost_edge_r;
+    reg piece_round_r;
     reg land_we_r;
     reg [2:0]type_r;
     reg [2:0]type_t_r;
@@ -638,6 +641,7 @@ module frame(
     Piece_r <= 1'b0;
     ghost_r <= 1'b0;
         ghost_edge_r <= 1'b0;
+        piece_round_r <= 1'b0;
     land_we_r <= 1'b0;
     type_r <= 3'd0;
     type_t_r <= 3'd0;
@@ -684,6 +688,7 @@ module frame(
     Piece_r <= Piece;
     ghost_r <= ghost;
         ghost_edge_r <= ghost_edge;
+        piece_round_r <= piece_round;
     land_we_r <= land_we;
     type_r <= type;
     type_t_r <= type_t;
@@ -937,7 +942,9 @@ module frame(
     else if(margin_r)
     rgb = WHITE;
     else if(Piece_r)begin
-        if(land_we_r)
+        if(!piece_round_r)
+        rgb = BLACK;
+        else if(land_we_r)
         rgb = 24'hEEEEEE;
         else
         case(type_r)
@@ -968,7 +975,9 @@ module frame(
         rgb = BLACK;
         end
     else if(cell_r)begin
-        if(clear_t_r)begin
+        if(!piece_round_r)
+        rgb = BLACK;
+        else if(clear_t_r)begin
             case(sc_r)
             0:rgb = CYAN;
             1:rgb = PURPPLE;
@@ -995,7 +1004,9 @@ module frame(
         endcase
     end
     else if(Piece2_r)begin
-        if(land_we2_r)
+        if(!piece_round_r)
+        rgb = BLACK;
+        else if(land_we2_r)
         rgb = 24'hEEEEEE;
         else
         case(type2_r)
