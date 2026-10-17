@@ -573,8 +573,8 @@ module frame(
     wire glx_cn = (glx < 11'd1) || (glx > 11'd28);
     wire gly_cn = (gly < 11'd1) || (gly > 11'd28);
     wire ghost_edge = (glx_bd || gly_bd) && !(glx_cn && gly_cn);
-//    实心方块 2px 圆角: 四角各切 2x2(与幽灵同样用 glx_bd/gly_bd)
-    wire piece_round = !(glx_bd && gly_bd);
+//    实心方块 1px 圆角: 四角各切 1x1(与幽灵切角同一判定)
+    wire piece_round = !(glx_cn && gly_cn);
 
     reg over_lit_r;
     reg tick_r;

@@ -468,7 +468,7 @@ initial begin
   force dut.Playfield_inst.type = 3'd2;
   repeat(4) @(posedge Clk);
   look(11'd321, 11'd81);   chk("下落块左上角=黑", rgb, `BLACK);
-  look(11'd322, 11'd82);   chk("下落块角内2px=黑", rgb, `BLACK);
+  look(11'd322, 11'd82);   chk("下落块角内第2像素=黄", rgb, `YELLOW);
   look(11'd323, 11'd81);   chk("下落块左边缘=黄", rgb, `YELLOW);
   look(11'd321, 11'd83);   chk("下落块上边缘=黄", rgb, `YELLOW);
   look(11'd336, 11'd96);   chk("下落块中心=黄", rgb, `YELLOW);
