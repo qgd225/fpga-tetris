@@ -94,6 +94,9 @@ module frame(
                      YDIGI = 11'd24;    //等级数字 Y
     wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
     wire [10:0]XPN2 = XPNL2;
+//    NEXT/HOLD 标签居中: 4 字 x 24 间距(实宽 92) 在 128 宽面板里左边距 18
+    wire [10:0]XLBN1 = XPN1 + 11'd18;
+    wire [10:0]XLBN2 = XPN2 + 11'd18;
 
     reg [15:0]lines_total;
 
@@ -408,13 +411,13 @@ module frame(
     lb_ena_n = 1'b0;
     lb_lv = 1'b0;
     for(li = 0; li < 4; li = li + 1)begin
-        if((hcounter >= (XPN1 + li*24)) && (hcounter < (XPN1 + li*24 + 11'd20)) &&
+        if((hcounter >= (XLBN1 + li*24)) && (hcounter < (XLBN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
             lb_ena = 1'b1;
-            lb_X = XPN1 + li*24;
+            lb_X = XLBN1 + li*24;
             lb_Y = YLBNX;
         end
-        if((lb_hn >= (XPN1 + li*24 - 11'd1)) && (lb_hn < (XPN1 + li*24 + 11'd20)) &&
+        if((lb_hn >= (XLBN1 + li*24 - 11'd1)) && (lb_hn < (XLBN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
             lb_ena_n = 1'b1;
             lb_Y = YLBNX;
@@ -426,13 +429,13 @@ module frame(
             default:lb_g = 5'd26;
             endcase
         end
-        if((hcounter >= (XPN1 + li*24)) && (hcounter < (XPN1 + li*24 + 11'd20)) &&
+        if((hcounter >= (XLBN1 + li*24)) && (hcounter < (XLBN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
             lb_ena = 1'b1;
-            lb_X = XPN1 + li*24;
+            lb_X = XLBN1 + li*24;
             lb_Y = YLBHD;
         end
-        if((lb_hn >= (XPN1 + li*24 - 11'd1)) && (lb_hn < (XPN1 + li*24 + 11'd20)) &&
+        if((lb_hn >= (XLBN1 + li*24 - 11'd1)) && (lb_hn < (XLBN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
             lb_ena_n = 1'b1;
             lb_Y = YLBHD;
@@ -445,13 +448,13 @@ module frame(
             endcase
         end
         if(duo)begin
-            if((hcounter >= (XPN2 + li*24)) && (hcounter < (XPN2 + li*24 + 11'd20)) &&
+            if((hcounter >= (XLBN2 + li*24)) && (hcounter < (XLBN2 + li*24 + 11'd20)) &&
                (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
                 lb_ena = 1'b1;
-                lb_X = XPN2 + li*24;
+                lb_X = XLBN2 + li*24;
                 lb_Y = YLBNX;
             end
-            if((lb_hn >= (XPN2 + li*24 - 11'd1)) && (lb_hn < (XPN2 + li*24 + 11'd20)) &&
+            if((lb_hn >= (XLBN2 + li*24 - 11'd1)) && (lb_hn < (XLBN2 + li*24 + 11'd20)) &&
                (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
                 lb_ena_n = 1'b1;
                 lb_Y = YLBNX;
@@ -463,13 +466,13 @@ module frame(
                 default:lb_g = 5'd26;
                 endcase
             end
-            if((hcounter >= (XPN2 + li*24)) && (hcounter < (XPN2 + li*24 + 11'd20)) &&
+            if((hcounter >= (XLBN2 + li*24)) && (hcounter < (XLBN2 + li*24 + 11'd20)) &&
                (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
                 lb_ena = 1'b1;
-                lb_X = XPN2 + li*24;
+                lb_X = XLBN2 + li*24;
                 lb_Y = YLBHD;
             end
-            if((lb_hn >= (XPN2 + li*24 - 11'd1)) && (lb_hn < (XPN2 + li*24 + 11'd20)) &&
+            if((lb_hn >= (XLBN2 + li*24 - 11'd1)) && (lb_hn < (XLBN2 + li*24 + 11'd20)) &&
                (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
                 lb_ena_n = 1'b1;
                 lb_Y = YLBHD;
@@ -627,6 +630,11 @@ module frame(
     wire [10:0]pvy_h = (vcounter - YHOLD) & 11'd31;
     wire [10:0]pvy = hold_slot_r ? pvy_h : pvy_n;
     wire pv_corner = ((pvx == 11'd0) || (pvx == 11'd29)) && ((pvy == 11'd0) || (pvy == 11'd29));
+//    新配色: 场地底色 vs 外部 / P1P2 槽位底色
+    wire [10:0]XR = duo ? 11'd1088 : 11'd960;
+    wire in_field = (hcounter >= 11'd321) && (hcounter < XR) && (vcounter >= 11'd81);
+    wire [23:0]field_bg = 24'h0A0F16;
+    wire [23:0]slot_bg = (duo && (hcounter >= XPN2)) ? 24'h1E0812 : 24'h081A1E;
     reg lvd_r;
     reg lb_lv_r;
     reg fin_r;
@@ -895,7 +903,7 @@ module frame(
     rgb = fin_r ? 24'h202020 : (lvflash ? WHITE : lv_color);//等级数字(与 LV 同色)
     else if(hold_r)begin
         if(!pv_round_r)
-        rgb = 24'h202020;
+        rgb = slot_bg;
         else if(hflash)
         rgb = WHITE;
         else
@@ -912,7 +920,7 @@ module frame(
         end
     else if(next_r)begin
         if(!pv_round_r)
-        rgb = 24'h202020;
+        rgb = slot_bg;
         else if(nflash1)
         rgb = WHITE;
         else
@@ -929,7 +937,7 @@ module frame(
         end
     else if(next2_r)begin
         if(!pv_round_r)
-        rgb = 24'h202020;
+        rgb = slot_bg;
         else if(nflash2)
         rgb = WHITE;
         else
@@ -947,9 +955,9 @@ module frame(
     else if(slot_dot)
     rgb = 24'h404040;//预览槽点阵
     else if(hold_slot_r)
-    rgb = 24'h202020;//Hold 槽位底色
+    rgb = slot_bg;//Hold 槽位底色
     else if(next_slot_r)
-    rgb = 24'h202020;//Next 槽位底色
+    rgb = slot_bg;//Next 槽位底色
     else if(badge_lit)
     rgb = bd2 ? 24'hFF4DA6 : 24'h00E5FF;//P1/P2 号码徽标
     else if(score_lit_r)
@@ -960,7 +968,7 @@ module frame(
     rgb = WHITE;
     else if(Piece_r)begin
         if(!piece_round_r)
-        rgb = BLACK;
+        rgb = field_bg;
         else if(land_we_r)
         rgb = 24'hEEEEEE;
         else
@@ -989,11 +997,11 @@ module frame(
         endcase
         end
         else
-        rgb = BLACK;
+        rgb = field_bg;
         end
     else if(cell_r)begin
         if(!piece_round_r)
-        rgb = BLACK;
+        rgb = field_bg;
         else if(clear_t_r)begin
             case(sc_r)
             0:rgb = CYAN;
@@ -1022,7 +1030,7 @@ module frame(
     end
     else if(Piece2_r)begin
         if(!piece_round_r)
-        rgb = BLACK;
+        rgb = field_bg;
         else if(land_we2_r)
         rgb = 24'hEEEEEE;
         else
@@ -1051,10 +1059,10 @@ module frame(
         endcase
         end
         else
-        rgb = BLACK;
+        rgb = field_bg;
         end
     else
-    rgb = BLACK;
+    rgb = in_field ? field_bg : BLACK;
     end
     
 endmodule

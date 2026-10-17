@@ -45,8 +45,8 @@ parameter DST_PORT   = 16'd5000;
 parameter FPS_DIV    = 1;                        // 1=60fps  2=30fps  3=20fps
 parameter PAL_FRAMES = 60;                       // 每 60 帧插一个调色板包(=1s@60fps)
 parameter LINE_LEN   = 16'd1287;                 // 7 字节包头 + 1280 个标号
-parameter PAL_LEN    = 16'd112;                  // 4 + 27*4
-parameter PAL_N      = 8'd27;
+parameter PAL_LEN    = 16'd124;                  // 4 + 30*4
+parameter PAL_N      = 8'd30;
 parameter KB_TIMEOUT = 24'd14_850_000;              // 200ms @74.25MHz 没有按键包就全部松开
 parameter KB_RST_CNT = 25'd1_485_000;               // 小键盘9复位把 Reset_n 拉低 20ms
 parameter KB_ACT_CNT = 25'd22_275_000;              // 收到按键包后 kb_activity 亮 0.3s
@@ -222,6 +222,9 @@ always@(*)begin
   24'h30_30_30: code_r = 8'd24;
   24'h00_E5_FF: code_r = 8'd25;
   24'h00_69_7F: code_r = 8'd26;
+  24'h0A_0F_16: code_r = 8'd27;
+  24'h08_1A_1E: code_r = 8'd28;
+  24'h1E_08_12: code_r = 8'd29;
   default:      code_r = 8'd0;
   endcase
 end
@@ -350,7 +353,7 @@ always@(posedge Clk_74M or negedge Reset_n)begin
             else if(h0_lat)      seq <= SEQ_H0;
             else                 seq <= SEQ_HDR;
   SEQ_HDR:  if(seq_idx == 7'd6)   seq <= SEQ_IDLE;
-  SEQ_PAL:  if(seq_idx == 7'd111) seq <= SEQ_PTOG;
+  SEQ_PAL:  if(seq_idx == 7'd123) seq <= SEQ_PTOG;
   SEQ_PTOG: seq <= SEQ_H0;
   SEQ_H0:   if(seq_idx == 7'd6)   seq <= SEQ_IDLE;
   default:  seq <= SEQ_IDLE;

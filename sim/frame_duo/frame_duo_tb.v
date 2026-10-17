@@ -74,7 +74,7 @@ endfunction
 task chk;
 input [8*30-1:0] name; input [23:0] got; input [23:0] exp;
 begin
-  if(got !== exp)begin $display("  FAIL %0s got=%h exp=%h", name, got, exp); bad = bad + 1; end
+  if(got !== exp)begin $display("  FAIL %0s got=%h exp=%h @(%0d,%0d)", name, got, exp, hc, vc); bad = bad + 1; end
   else $display("  ok   %0s = %h", name, got);
 end
 endtask
@@ -111,6 +111,9 @@ endtask
 `define GRAY_MID 24'h606060
 `define GRAY_LBL 24'hB0B0B0
 `define SLOT_BG  24'h202020
+`define FLDBG    24'h0A0F16
+`define SLOT_P1  24'h081A1E
+`define SLOT_P2  24'h1E0812
 
 initial begin
   bad = 0;
@@ -145,7 +148,7 @@ initial begin
   lock2;                                        // 单人: 不应写入
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
   look(11'd643, 11'd691);
-  chk("duo=0 P2 落格不显示", rgb, `BLACK);
+  chk("duo=0 P2 落格不显示", rgb, `FLDBG);
   clr_state;
 
   $display("=== 3) 24 列场地最右两列也能显示 ===");
@@ -161,27 +164,27 @@ initial begin
 
   $display("=== 4) 新面板布局: 色线 + 槽位底色(无框) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd100, 11'd140);   chk("duo=1 P1 Next 槽位", rgb, `SLOT_BG);
+  look(11'd100, 11'd140);   chk("duo=1 P1 Next 槽位", rgb, `SLOT_P1);
   look(11'd100, 11'd123);   chk("duo=1 P1 Next 色线", rgb, `CY_MENU);
-  look(11'd100, 11'd356);   chk("duo=1 P1 Hold 槽位", rgb, `SLOT_BG);
+  look(11'd100, 11'd356);   chk("duo=1 P1 Hold 槽位", rgb, `SLOT_P1);
   look(11'd100, 11'd339);   chk("duo=1 P1 Hold 色线", rgb, `CY_MENU);
-  look(11'd1230, 11'd140);  chk("duo=1 P2 Next 槽位", rgb, `SLOT_BG);
+  look(11'd1230, 11'd140);  chk("duo=1 P2 Next 槽位", rgb, `SLOT_P2);
   look(11'd1230, 11'd123);  chk("duo=1 P2 Next 色线", rgb, `PINK2);
-  look(11'd1230, 11'd356);  chk("duo=1 P2 Hold 槽位", rgb, `SLOT_BG);
+  look(11'd1230, 11'd356);  chk("duo=1 P2 Hold 槽位", rgb, `SLOT_P2);
   look(11'd1230, 11'd339);  chk("duo=1 P2 Hold 色线", rgb, `PINK2);
-  look(11'd1059, 11'd140);  chk("duo=1 单人槽位位置=黑", rgb, `BLACK);
-  look(11'd1059, 11'd123);  chk("duo=1 单人色线位置=黑", rgb, `BLACK);
+  look(11'd1059, 11'd140);  chk("duo=1 单人槽位位置=黑", rgb, `FLDBG);
+  look(11'd1059, 11'd123);  chk("duo=1 单人色线位置=黑", rgb, `FLDBG);
   look(11'd1104, 11'd100);  chk("旧 Next 外框位置=黑", rgb, `BLACK);
   look(11'd1120, 11'd203);  chk("旧中间虚线位置=黑", rgb, `BLACK);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1059, 11'd140);  chk("duo=0 单人 Next 槽位", rgb, `SLOT_BG);
+  look(11'd1059, 11'd140);  chk("duo=0 单人 Next 槽位", rgb, `SLOT_P1);
   look(11'd1059, 11'd123);  chk("duo=0 单人 Next 色线", rgb, `GRAY_MID);
-  look(11'd1059, 11'd356);  chk("duo=0 单人 Hold 槽位", rgb, `SLOT_BG);
+  look(11'd1059, 11'd356);  chk("duo=0 单人 Hold 槽位", rgb, `SLOT_P1);
   look(11'd100, 11'd140);   chk("duo=0 双人槽位位置=黑", rgb, `BLACK);
   look(11'd100, 11'd123);   chk("duo=0 双人色线位置=黑", rgb, `BLACK);
   look(11'd1230, 11'd140);  chk("duo=0 无 P2 槽位", rgb, `BLACK);
   look(11'd1230, 11'd123);  chk("duo=0 无 P2 色线", rgb, `BLACK);
-  look(11'd1104, 11'd100);  chk("duo=0 旧 Next 外框位置=黑", rgb, `BLACK);
+  look(11'd1104, 11'd500);  chk("duo=0 旧 Next 外框位置=黑", rgb, `BLACK);
   look(11'd1040, 11'd100);  chk("duo=0 旧单人外框位置=黑", rgb, `BLACK);
 
   $display("=== 5) 下一块预览(锚点随布局迁移) ===");
@@ -199,7 +202,7 @@ initial begin
   look(11'd1101, 11'd240);                      // 单人预览 (列1,行3)
   chk("duo=0 单人下一块=黄", rgb, `YELLOW);
   look(11'd1161, 11'd240);
-  chk("duo=0 无 P2 预览", rgb, `SLOT_BG);
+  chk("duo=0 无 P2 预览", rgb, `SLOT_P1);
   release dut.Playfield_inst.type_t2; release dut.Playfield_inst.type_t;
 
   $display("=== 6) Hold 位置 ===");
@@ -222,7 +225,7 @@ initial begin
   dut.state_color[20*20 + 3] = 3'd3;
   dut.Playfield_inst.state[20*20 + 3] = 1'b1;
   look(11'd351, 11'd200);                       // 列间 2px 死区
-  chk("死区像素=黑", rgb, `BLACK);
+  chk("死区像素=黑", rgb, `FLDBG);
   dut.state_color[20*20 + 3] = 3'd0;
   dut.Playfield_inst.state[20*20 + 3] = 1'b0;
   look(11'd318, 11'd40);                        // 边框上方: 左边框不应出头
@@ -230,11 +233,11 @@ initial begin
   look(11'd318, 11'd200);                       // 边框旁: 左边框正常
   chk("左边框正常(旁边=白)", rgb, `WHITE);
   look(11'd321, 11'd81);
-  chk("有效格(第0行第0列)", rgb, `BLACK);
+  chk("有效格(第0行第0列)", rgb, `FLDBG);
 
   $display("=== 9) 幽灵空心框: 边带浅色 / 内部纯黑 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd351, 11'd85);   chk("格末死区=黑", rgb, `BLACK);
+  look(11'd351, 11'd85);   chk("格末死区=黑", rgb, `FLDBG);
   force dut.Playfield_inst.Piece = 1'b0;  force dut.Playfield_inst.Piece2 = 1'b0;
   force dut.Playfield_inst.ghost = 1'b1;  force dut.Playfield_inst.type = 3'd0;
   force dut.Playfield_inst.ghost2 = 1'b0;
@@ -243,14 +246,14 @@ initial begin
   look(11'd349, 11'd108);  chk("幽灵右边带=浅青", rgb, 24'h99EEFF);
   look(11'd325, 11'd82);   chk("幽灵上边带=浅青", rgb, 24'h99EEFF);
   look(11'd348, 11'd109);  chk("幽灵下边带=浅青", rgb, 24'h99EEFF);
-  look(11'd325, 11'd85);   chk("幽灵内部=纯黑", rgb, `BLACK);
-  look(11'd348, 11'd108);  chk("幽灵内部靠角=纯黑", rgb, `BLACK);
+  look(11'd325, 11'd85);   chk("幽灵内部=纯黑", rgb, `FLDBG);
+  look(11'd348, 11'd108);  chk("幽灵内部靠角=纯黑", rgb, `FLDBG);
   force dut.Playfield_inst.ghost = 1'b0;
   force dut.Playfield_inst.ghost2 = 1'b1; force dut.Playfield_inst.type2 = 3'd3;
   repeat(4) @(posedge Clk);
   look(11'd322, 11'd85);   chk("P2 幽灵左边带=浅红", rgb, 24'hFFB3B9);
   look(11'd348, 11'd109);  chk("P2 幽灵下边带=浅红", rgb, 24'hFFB3B9);
-  look(11'd325, 11'd85);   chk("P2 幽灵内部=纯黑", rgb, `BLACK);
+  look(11'd325, 11'd85);   chk("P2 幽灵内部=纯黑", rgb, `FLDBG);
   force dut.Playfield_inst.ghost2 = 1'b0;
   force dut.Playfield_inst.Piece = 1'b1; force dut.Playfield_inst.type = 3'd0;
   repeat(4) @(posedge Clk);
@@ -297,11 +300,11 @@ initial begin
   force dut.Playfield_inst.ghost = 1'b1; force dut.Playfield_inst.ghost2 = 1'b0;
   force dut.Playfield_inst.type = 3'd0;
   repeat(3) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("左上角切角=黑", rgb, `BLACK);
+  look(11'd321, 11'd81);   chk("左上角切角=黑", rgb, `FLDBG);
   look(11'd322, 11'd81);   chk("左上角右侧=浅青", rgb, 24'h99EEFF);
   look(11'd321, 11'd82);   chk("左上角下侧=浅青", rgb, 24'h99EEFF);
-  look(11'd350, 11'd81);   chk("右上角切角=黑", rgb, `BLACK);
-  look(11'd321, 11'd110);  chk("左下角切角=黑", rgb, `BLACK);
+  look(11'd350, 11'd81);   chk("右上角切角=黑", rgb, `FLDBG);
+  look(11'd321, 11'd110);  chk("左下角切角=黑", rgb, `FLDBG);
   release dut.Playfield_inst.ghost; release dut.Playfield_inst.type;
   repeat(2) @(posedge Clk);
 
@@ -362,29 +365,29 @@ initial begin
   $display("=== 12) 顶栏: 分数右对齐 + 时间 + LV 数字 + 标签 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("duo=1 分数贴场地右边界", rgb, `WHITE);
-  look(11'd95,  11'd90);    chk("duo=1 NEXT 标签=标签灰", rgb, `GRAY_LBL);
+  look(11'd113,  11'd90);   chk("duo=1 NEXT 标签=标签灰", rgb, `GRAY_LBL);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("duo=0 该处无分数", rgb, `BLACK);
   look(11'd935,  11'd40);   chk("duo=0 分数贴场地右边界", rgb, `WHITE);
   look(11'd95,   11'd90);   chk("duo=0 双人标签位置=黑", rgb, `BLACK);
-  look(11'd1059, 11'd90);   chk("duo=0 单人 NEXT 标签", rgb, `GRAY_LBL);
+  look(11'd1077, 11'd90);   chk("duo=0 单人 NEXT 标签", rgb, `GRAY_LBL);
   look(11'd340,  11'd40);   chk("时间数字=白", rgb, `WHITE);
   force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
   look(11'd292,  11'd40);   chk("LV 数字=等级色", rgb, 24'h00E5FF);
   look(11'd240,  11'd40);   chk("LV 标签=等级色", rgb, 24'h00E5FF);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
   Finalize = 1'b1; duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd95,   11'd90);   chk("Finalize 标签暗化", rgb, `SLOT_BG);
+  look(11'd113,   11'd90);   chk("Finalize 标签暗化", rgb, `SLOT_BG);
   Finalize = 1'b0; repeat(4) @(posedge Clk);
 
   $display("=== 13) 标签字模 1 像素预取(修第 1 列串字) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  hc = 11'd94 + 11'd23; vc = 11'd100; repeat(3) @(posedge Clk);
+  hc = 11'd94 + 11'd41; vc = 11'd100; repeat(3) @(posedge Clk);
   chk("NEXT 第2字地址已预取", dut.lb_g, 5'd4);
   chk("BRAM 使能已预取(ena_n)", dut.letter_hud_inst.ena, 1'b1);
   chk("显示窗口此时仍关", dut.lb_ena, 1'b0);
   chk("地址窗口已开", dut.lb_ena_n, 1'b1);
-  hc = 11'd94 + 11'd24; vc = 11'd100; repeat(3) @(posedge Clk);
+  hc = 11'd94 + 11'd42; vc = 11'd100; repeat(3) @(posedge Clk);
   chk("NEXT 第2字第1列取到字模", dut.lb_g, 5'd4);
   chk("NEXT 第2字第1列亮", dut.lbl_r, 1'b1);
   chk("显示窗口已开", dut.lb_ena, 1'b1);
@@ -403,7 +406,7 @@ initial begin
   force dut.Playfield_inst.type2 = 3'd3;
   force dut.Playfield_inst.type_t2 = 3'd0;
   hd2 = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd140, 11'd458);  chk("P2 hold 前 HOLD 框为空", rgb, 24'h202020);
+  look(11'd140, 11'd458);  chk("P2 hold 前 HOLD 框为空", rgb, `SLOT_P1);
   hd2 = 1'b1; @(posedge Clk); hd2 = 1'b0; repeat(2) @(posedge Clk);
   chk("P2 en_hold2=1", dut.Playfield_inst.en_hold2, 1'b1);
   chk("共用槽存的是 P2 的块", dut.Playfield_inst.hold_type, 3'd3);
@@ -420,7 +423,9 @@ initial begin
   look(11'd100, 11'd718);   chk("P1 面板底条=青", rgb, `CY_MENU);
   look(11'd1130, 11'd718);  chk("P2 面板底条=粉", rgb, `PINK2);
   look(11'd125, 11'd163);   chk("预览槽点阵=404040", rgb, 24'h404040);
-  look(11'd126, 11'd163);   chk("点阵旁=槽底", rgb, `SLOT_BG);
+  look(11'd400, 11'd300);   chk("场地内底色=0A0F16", rgb, `FLDBG);
+  look(11'd250, 11'd600);   chk("场地外底色=黑", rgb, `BLACK);
+  look(11'd126, 11'd163);   chk("点阵旁=槽底", rgb, `SLOT_P1);
   look(11'd171, 11'd640);   chk("P1 号码徽标=青", rgb, `CY_MENU);
   look(11'd1185, 11'd624);  chk("P2 号码徽标=粉", rgb, `PINK2);
   look(11'd470, 11'd40);    chk("顶栏发丝线=标签灰", rgb, `GRAY_LBL);
@@ -467,7 +472,7 @@ initial begin
   force dut.Playfield_inst.Piece = 1'b1;
   force dut.Playfield_inst.type = 3'd2;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("下落块左上角=黑", rgb, `BLACK);
+  look(11'd321, 11'd81);   chk("下落块左上角=黑", rgb, `FLDBG);
   look(11'd322, 11'd82);   chk("下落块角内第2像素=黄", rgb, `YELLOW);
   look(11'd323, 11'd81);   chk("下落块左边缘=黄", rgb, `YELLOW);
   look(11'd321, 11'd83);   chk("下落块上边缘=黄", rgb, `YELLOW);
@@ -476,19 +481,19 @@ initial begin
   force dut.Playfield_inst.Piece2 = 1'b1;
   force dut.Playfield_inst.type2 = 3'd4;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("P2 下落块角=黑", rgb, `BLACK);
+  look(11'd321, 11'd81);   chk("P2 下落块角=黑", rgb, `FLDBG);
   look(11'd323, 11'd81);   chk("P2 下落块边=绿", rgb, 24'h55A630);
   force dut.Playfield_inst.Piece2 = 1'b0;
   dut.state_color[0] = 3'd3;
   dut.Playfield_inst.state[0] = 1'b1;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("已锁格角=黑", rgb, `BLACK);
+  look(11'd321, 11'd81);   chk("已锁格角=黑", rgb, `FLDBG);
   look(11'd323, 11'd81);   chk("已锁格边=红", rgb, `RED);
   force dut.Playfield_inst.Piece = 1'b1;
   force dut.Playfield_inst.type = 3'd2;
   force dut.land_we = 1'b1;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("落锁闪白角=黑", rgb, `BLACK);
+  look(11'd321, 11'd81);   chk("落锁闪白角=黑", rgb, `FLDBG);
   look(11'd323, 11'd81);   chk("落锁闪白边=白", rgb, 24'hEEEEEE);
   release dut.land_we;
   release dut.Playfield_inst.Piece;
@@ -496,7 +501,7 @@ initial begin
   force dut.clear_t_r = 1'b1;
   force dut.flash_r = 1'b1;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("消行闪白角=黑", rgb, `BLACK);
+  look(11'd321, 11'd81);   chk("消行闪白角=黑", rgb, `FLDBG);
   look(11'd323, 11'd81);   chk("消行闪白边=白", rgb, 24'hEEEEEE);
   release dut.clear_t_r;
   release dut.flash_r;
@@ -508,17 +513,17 @@ initial begin
   force dut.Playfield_inst.type_t = 3'd2;
   force dut.Playfield_inst.type_t2 = 3'd4;
   repeat(40) @(posedge Clk);
-  look(11'd126, 11'd228);   chk("P1 NEXT 预览角=槽底", rgb, `SLOT_BG);
+  look(11'd126, 11'd228);   chk("P1 NEXT 预览角=槽底", rgb, `SLOT_P1);
   look(11'd128, 11'd228);   chk("P1 NEXT 预览边=黄", rgb, `YELLOW);
   look(11'd126, 11'd230);   chk("P1 NEXT 预览下边=黄", rgb, `YELLOW);
   look(11'd140, 11'd240);   chk("P1 NEXT 预览中心=黄", rgb, `YELLOW);
-  look(11'd1153, 11'd228);  chk("P2 NEXT 预览角=槽底", rgb, `SLOT_BG);
+  look(11'd1153, 11'd228);  chk("P2 NEXT 预览角=槽底", rgb, `SLOT_P2);
   look(11'd1155, 11'd228);  chk("P2 NEXT 预览边=绿", rgb, 24'h55A630);
   look(11'd1167, 11'd240);  chk("P2 NEXT 预览中心=绿", rgb, 24'h55A630);
   force dut.Playfield_inst.hold_type = 3'd3;
   force dut.en_hold = 1'b1;
   repeat(40) @(posedge Clk);
-  look(11'd126, 11'd444);   chk("HOLD 预览角=槽底", rgb, `SLOT_BG);
+  look(11'd126, 11'd444);   chk("HOLD 预览角=槽底", rgb, `SLOT_P1);
   look(11'd128, 11'd444);   chk("HOLD 预览边=红", rgb, `RED);
   look(11'd140, 11'd456);   chk("HOLD 预览中心=红", rgb, `RED);
   release dut.Playfield_inst.hold_type;
