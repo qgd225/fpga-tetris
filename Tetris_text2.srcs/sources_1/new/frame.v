@@ -377,16 +377,20 @@ module frame(
     
 
 //    文字标签 NEXT/HOLD/LV: 1x 字号(20x32), 字距 24
+//    地址与 BRAM 使能提前 1 像素(ena_n 用 lb_hn, 左边界多减 1): 否则每字第 1 列会串上一字第 1 列
     reg [10:0]lb_X;
     reg [10:0]lb_Y;
     reg [4:0] lb_g;
     reg       lb_ena;
+    reg       lb_ena_n;
     integer   li;
-    integer   lj;
+    wire [10:0]lb_hn = hcounter + 11'd1;
     always@(*)begin
     lb_X = 11'd0;
     lb_Y = 11'd0;
+    lb_g = 5'd26;
     lb_ena = 1'b0;
+    lb_ena_n = 1'b0;
     for(li = 0; li < 4; li = li + 1)begin
         if((hcounter >= (XPN1 + li*24)) && (hcounter < (XPN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
@@ -394,11 +398,35 @@ module frame(
             lb_X = XPN1 + li*24;
             lb_Y = YLBNX;
         end
+        if((lb_hn >= (XPN1 + li*24 - 11'd1)) && (lb_hn < (XPN1 + li*24 + 11'd20)) &&
+           (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
+            lb_ena_n = 1'b1;
+            lb_Y = YLBNX;
+            case(li)
+            0:lb_g = 5'd13;
+            1:lb_g = 5'd4;
+            2:lb_g = 5'd23;
+            3:lb_g = 5'd19;
+            default:lb_g = 5'd26;
+            endcase
+        end
         if((hcounter >= (XPN1 + li*24)) && (hcounter < (XPN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
             lb_ena = 1'b1;
             lb_X = XPN1 + li*24;
             lb_Y = YLBHD;
+        end
+        if((lb_hn >= (XPN1 + li*24 - 11'd1)) && (lb_hn < (XPN1 + li*24 + 11'd20)) &&
+           (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
+            lb_ena_n = 1'b1;
+            lb_Y = YLBHD;
+            case(li)
+            0:lb_g = 5'd7;
+            1:lb_g = 5'd14;
+            2:lb_g = 5'd11;
+            3:lb_g = 5'd3;
+            default:lb_g = 5'd26;
+            endcase
         end
         if(duo)begin
             if((hcounter >= (XPN2 + li*24)) && (hcounter < (XPN2 + li*24 + 11'd20)) &&
@@ -407,54 +435,63 @@ module frame(
                 lb_X = XPN2 + li*24;
                 lb_Y = YLBNX;
             end
+            if((lb_hn >= (XPN2 + li*24 - 11'd1)) && (lb_hn < (XPN2 + li*24 + 11'd20)) &&
+               (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
+                lb_ena_n = 1'b1;
+                lb_Y = YLBNX;
+                case(li)
+                0:lb_g = 5'd13;
+                1:lb_g = 5'd4;
+                2:lb_g = 5'd23;
+                3:lb_g = 5'd19;
+                default:lb_g = 5'd26;
+                endcase
+            end
             if((hcounter >= (XPN2 + li*24)) && (hcounter < (XPN2 + li*24 + 11'd20)) &&
                (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
                 lb_ena = 1'b1;
                 lb_X = XPN2 + li*24;
                 lb_Y = YLBHD;
             end
+            if((lb_hn >= (XPN2 + li*24 - 11'd1)) && (lb_hn < (XPN2 + li*24 + 11'd20)) &&
+               (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
+                lb_ena_n = 1'b1;
+                lb_Y = YLBHD;
+                case(li)
+                0:lb_g = 5'd7;
+                1:lb_g = 5'd14;
+                2:lb_g = 5'd11;
+                3:lb_g = 5'd3;
+                default:lb_g = 5'd26;
+                endcase
+            end
         end
     end
-    for(li = 0; li < 2; li = li + 1)
-    if((hcounter >= (XLVLB + li*24)) && (hcounter < (XLVLB + li*24 + 11'd20)) &&
-       (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd32)))begin
-        lb_ena = 1'b1;
-        lb_X = XLVLB + li*24;
-        lb_Y = YDIGI;
-    end
-    end
-
-//    字模地址比显示早 1 像素: letter 是 READ_LATENCY=1 的 BRAM, 否则每字第 1 列会串上一字最后一列
-    wire [10:0]lb_hn = hcounter + 11'd1;
-    always@(*)begin
-    lb_g = 5'd26;
-    for(lj = 0; lj < 4; lj = lj + 1)begin
-        if((lb_hn >= (XPN1 + lj*24 - 11'd1)) && (lb_hn < (XPN1 + lj*24 + 11'd20)) &&
-           (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))
-        lb_g = (lj == 0) ? 5'd13 : (lj == 1) ? 5'd4 : (lj == 2) ? 5'd23 : 5'd19;
-        if((lb_hn >= (XPN1 + lj*24 - 11'd1)) && (lb_hn < (XPN1 + lj*24 + 11'd20)) &&
-           (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))
-        lb_g = (lj == 0) ? 5'd7 : (lj == 1) ? 5'd14 : (lj == 2) ? 5'd11 : 5'd3;
-        if(duo)begin
-            if((lb_hn >= (XPN2 + lj*24 - 11'd1)) && (lb_hn < (XPN2 + lj*24 + 11'd20)) &&
-               (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))
-            lb_g = (lj == 0) ? 5'd13 : (lj == 1) ? 5'd4 : (lj == 2) ? 5'd23 : 5'd19;
-            if((lb_hn >= (XPN2 + lj*24 - 11'd1)) && (lb_hn < (XPN2 + lj*24 + 11'd20)) &&
-               (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))
-            lb_g = (lj == 0) ? 5'd7 : (lj == 1) ? 5'd14 : (lj == 2) ? 5'd11 : 5'd3;
+    for(li = 0; li < 2; li = li + 1)begin
+        if((hcounter >= (XLVLB + li*24)) && (hcounter < (XLVLB + li*24 + 11'd20)) &&
+           (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd32)))begin
+            lb_ena = 1'b1;
+            lb_X = XLVLB + li*24;
+            lb_Y = YDIGI;
+        end
+        if((lb_hn >= (XLVLB + li*24 - 11'd1)) && (lb_hn < (XLVLB + li*24 + 11'd20)) &&
+           (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd32)))begin
+            lb_ena_n = 1'b1;
+            lb_Y = YDIGI;
+            case(li)
+            0:lb_g = 5'd11;
+            1:lb_g = 5'd21;
+            default:lb_g = 5'd26;
+            endcase
         end
     end
-    for(lj = 0; lj < 2; lj = lj + 1)
-    if((lb_hn >= (XLVLB + lj*24 - 11'd1)) && (lb_hn < (XLVLB + lj*24 + 11'd20)) &&
-       (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd32)))
-    lb_g = (lj == 0) ? 5'd11 : 5'd21;
     end
 
     wire [5:0]lb_vt = vcounter - lb_Y;
     wire [19:0]lb_dout;
     letter letter_hud_inst(
     .clka(Clk_74M),
-    .ena(lb_ena),
+    .ena(lb_ena_n),
     .addra({lb_g, lb_vt}),
     .douta(lb_dout)
     );

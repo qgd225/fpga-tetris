@@ -340,11 +340,17 @@ initial begin
   duo = 1'b1; repeat(4) @(posedge Clk);
   hc = 11'd94 + 11'd23; vc = 11'd100; repeat(3) @(posedge Clk);
   chk("NEXT 第2字地址已预取", dut.lb_g, 5'd4);
+  chk("BRAM 使能已预取(ena_n)", dut.letter_hud_inst.ena, 1'b1);
+  chk("显示窗口此时仍关", dut.lb_ena, 1'b0);
+  chk("地址窗口已开", dut.lb_ena_n, 1'b1);
   hc = 11'd94 + 11'd24; vc = 11'd100; repeat(3) @(posedge Clk);
   chk("NEXT 第2字第1列取到字模", dut.lb_g, 5'd4);
   chk("NEXT 第2字第1列亮", dut.lbl_r, 1'b1);
+  chk("显示窗口已开", dut.lb_ena, 1'b1);
   hc = 11'd236 + 11'd23; vc = 11'd40; repeat(3) @(posedge Clk);
   chk("LV 第2字地址已预取", dut.lb_g, 5'd21);
+  chk("LV BRAM 使能已预取", dut.letter_hud_inst.ena, 1'b1);
+  chk("LV 地址窗口已开", dut.lb_ena_n, 1'b1);
 
   $display("=== 14) 双人 P2 Hold 在 HOLD 框可见 ===");
   duo = 1'b1; Playing = 1'b1; repeat(4) @(posedge Clk);

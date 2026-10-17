@@ -231,3 +231,16 @@ LUT as Memory 5（只剩 SRL，**无分布式 RAM**）、FF 4681、F7 1933、F8 
   FF 4566、BRAM 14.5/50、DSP 5、LUTRAM 0（4 个 SRL）；**WNS +0.019ns、WHS +0.094ns、违例 0**。
   余量已经很薄（最差路径在 `hdmi_inst` 里，是 `rgb` 取色锥被复制过去的），
   下一步候选：把 20 级 24 位 `rgb` 优先链改成"一位命中码 + 一次取色"。
+
+## 修「每字第 1 列串上一字第 1 列」：letter 的 ena 改用 ena_n
+
+- **根因**：`letter_hud_inst.ena` 接的是显示窗口 `lb_ena`（晚 1 拍），而项目里其它 4 个 ROM
+  （`game_over/scoring/timer/choose_menu`）全都接 `ena_n`（提前 1 拍）。于是 `hc = X-1` 那拍 BRAM 不读、
+  `hc = X` 时输出仍是上一字字模，取位又是 `douta[19]` → **上一字第 1 列窜到当前字第 1 列**。
+- **改法**：标签块按 `game_over` 的写法重排成**一个** `always@(*)`（`lb_X/lb_Y/lb_g/lb_ena/lb_ena_n`
+  默认值 + 每个字格"显示窗口 / 地址窗口"两段 `if` + `case(li)` 取字形），BRAM 使能改 `lb_ena_n`；
+  `lb_Y` 在**显示与地址两侧都赋值**（否则 `hc=X-1` 预取到的行偏移是默认 0），`lb_X` 仍只在显示侧。
+- 仿真：`frame_duo` 97 → **103**（新增 `letter_hud_inst.ena`/`lb_ena_n`/`lb_ena` 时序断言；
+  旧代码在 `XPN1+23` 处 `ena=0` 必挂）。`duo 83 / level 27` 不变，三套全绿。
+- 面积/时序（新进程从零重跑）：LUT 17501 → **17267(synth)** / 17365 → **17139(impl, 82.40%)**；
+  FF 4566、BRAM 14.5/50、DSP 5、LUTRAM 0；**WNS +0.019 → +0.199ns**、WHS +0.072ns、违例 0。
