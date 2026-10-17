@@ -497,6 +497,9 @@ always@(*)begin
   5'd24: pal_rgb = 24'h30_30_30;
   5'd25: pal_rgb = 24'h00_E5_FF;
   5'd26: pal_rgb = 24'h00_69_7F;
+  5'd27:  pal_rgb = 24'h0A_0F_16;
+  5'd28:  pal_rgb = 24'h08_1A_1E;
+  5'd29:  pal_rgb = 24'h1E_08_12;
   default: pal_rgb = 24'h00_00_00;
   endcase
 end

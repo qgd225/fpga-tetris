@@ -366,6 +366,7 @@ initial begin
   duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("duo=1 分数贴场地右边界", rgb, `WHITE);
   look(11'd113,  11'd90);   chk("duo=1 NEXT 标签=标签灰", rgb, `GRAY_LBL);
+  look(11'd95,   11'd90);   chk("duo=1 标签旧位置=黑(已居中)", rgb, `BLACK);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("duo=0 该处无分数", rgb, `BLACK);
   look(11'd935,  11'd40);   chk("duo=0 分数贴场地右边界", rgb, `WHITE);
