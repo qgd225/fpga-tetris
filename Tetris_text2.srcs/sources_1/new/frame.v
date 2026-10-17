@@ -88,8 +88,8 @@ module frame(
                      YLBHD = 11'd300,   //HOLD 标签 Y
                      YRLNX = 11'd122,   //NEXT 分隔线 Y
                      YRLHD = 11'd338,   //HOLD 分隔线 Y
-                     XLVLB = 11'd236,   //LV 标签 X
-                     XLDIG = 11'd288,   //等级数字 X(与等级条同轴)
+                     XLVLB = 11'd232,   //LV 标签 X
+                     XLDIG = 11'd283,   //等级数字 X(与等级条同轴)
                      YLBLV = 11'd36,    //LV 标签 Y(与 44px 高的数字底部对齐)
                      YDIGI = 11'd24;    //等级数字 Y
     wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
@@ -397,6 +397,7 @@ module frame(
     reg [4:0] lb_g;
     reg       lb_ena;
     reg       lb_ena_n;
+    reg       lb_lv;
     integer   li;
     wire [10:0]lb_hn = hcounter + 11'd1;
     always@(*)begin
@@ -405,6 +406,7 @@ module frame(
     lb_g = 5'd26;
     lb_ena = 1'b0;
     lb_ena_n = 1'b0;
+    lb_lv = 1'b0;
     for(li = 0; li < 4; li = li + 1)begin
         if((hcounter >= (XPN1 + li*24)) && (hcounter < (XPN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
@@ -487,6 +489,7 @@ module frame(
             lb_ena = 1'b1;
             lb_X = XLVLB + li*24;
             lb_Y = YLBLV;
+            lb_lv = 1'b1;
         end
         if((lb_hn >= (XLVLB + li*24 - 11'd1)) && (lb_hn < (XLVLB + li*24 + 11'd20)) &&
            (vcounter >= YLBLV) && (vcounter < (YLBLV + 11'd32)))begin
@@ -540,6 +543,26 @@ module frame(
     .douta(lvd_dout)
     );
     wire lvd_lit = lvd_ena ? lvd_dout[19 - (hcounter - XLDIG)] : 1'b0;
+//    等级色: 8 级热力渐变(青->绿->黄->橙->红->粉->紫->白)
+    reg [23:0]lv_color;
+    always@(*)begin
+    case(speed_level)
+    0:lv_color = 24'h00E5FF;
+    1:lv_color = 24'h55A630;
+    2:lv_color = 24'hFFF_F00;
+    3:lv_color = 24'hF77F24;
+    4:lv_color = 24'hE63946;
+    5:lv_color = 24'hFF4DA6;
+    6:lv_color = 24'h9933CC;
+    7:lv_color = 24'hFFF_FFF;
+    default:lv_color = 24'h00E5FF;
+    endcase
+    end
+
+//    LV 组下方 2px 等级色横线: 并入等级数字分支(同色)
+    wire lv_rule_lit = (hcounter >= 11'd232) && (hcounter < 11'd306) &&
+                       (vcounter >= 11'd72) && (vcounter < 11'd74);
+    wire lvd_all_lit = lvd_lit || lv_rule_lit;
 
 //    幽灵框: 2px 边带 + 四角各切 1x1(内部纯黑, 与实心下落方块区分)
 //    判定必须与 ghost_r 同拍寄存: ghost_r 比 hcounter 晚 1 拍, 否则框会左窄右宽
@@ -593,6 +616,7 @@ module frame(
     reg next_slot_r;
     reg hold_slot_r;
     reg lvd_r;
+    reg lb_lv_r;
     reg fin_r;
 
     always@(posedge Clk_74M or negedge Reset_n)begin
@@ -639,6 +663,7 @@ module frame(
     next_slot_r <= 1'b0;
     hold_slot_r <= 1'b0;
     lvd_r <= 1'b0;
+    lb_lv_r <= 1'b0;
     fin_r <= 1'b0;
     end
     else begin
@@ -690,7 +715,8 @@ module frame(
     rule2_r <= rule2_lit;
     next_slot_r <= next_slot;
     hold_slot_r <= hold_slot;
-    lvd_r <= lvd_lit;
+    lvd_r <= lvd_all_lit;
+    lb_lv_r <= lb_lv;
     fin_r <= Finalize;
     end
     end
@@ -829,7 +855,7 @@ module frame(
         default:rgb = 24'hFFF_FFF;
         endcase
     else if(lbl_r)
-    rgb = fin_r ? 24'h202020 : 24'hB0B0B0;//NEXT/HOLD/LV 文字标签
+    rgb = fin_r ? 24'h202020 : (lb_lv_r ? lv_color : 24'hB0B0B0);//NEXT/HOLD 标签灰, LV 用等级色
     else if(rule1_r)
     rgb = fin_r ? 24'h202020 : (lflash1 ? WHITE : (duo ? 24'h00E5FF : 24'h606060));//面板分隔线(P1/单人)
     else if(rule2_r)
@@ -843,14 +869,14 @@ module frame(
         else if(lvflash)
         rgb = WHITE;
         else if(cur_r)
-        rgb = 24'h00E5FF;
+        rgb = WHITE;
         else if(on_r)
-        rgb = 24'h606060;
+        rgb = lv_color;
         else
-        rgb = 24'h202020;
+        rgb = 24'h303030;
         end
     else if(lvd_r)
-    rgb = fin_r ? 24'h202020 : WHITE;//等级数字
+    rgb = fin_r ? 24'h202020 : (lvflash ? WHITE : lv_color);//等级数字(与 LV 同色)
     else if(hold_r)begin
         if(hflash)
         rgb = WHITE;

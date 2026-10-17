@@ -55,6 +55,22 @@ frame #(.EFF_TICK(21'd8)) dut(
 );
 
 integer bad;
+integer ybar;
+function [23:0] lvcol;
+input [2:0] v;
+begin
+case(v)
+3'd0: lvcol = 24'h00E5FF;
+3'd1: lvcol = 24'h55A630;
+3'd2: lvcol = 24'hFFF_F00;
+3'd3: lvcol = 24'hF77F24;
+3'd4: lvcol = 24'hE63946;
+3'd5: lvcol = 24'hFF4DA6;
+3'd6: lvcol = 24'h9933CC;
+default: lvcol = 24'hFFF_FFF;
+endcase
+end
+endfunction
 task chk;
 input [8*30-1:0] name; input [23:0] got; input [23:0] exp;
 begin
@@ -289,19 +305,33 @@ initial begin
   release dut.Playfield_inst.ghost; release dut.Playfield_inst.type;
   repeat(2) @(posedge Clk);
 
-  $display("=== 10) 等级 8 段竖条 ===");
+  $display("=== 10) 等级: 8 级热力色 + 加宽条 + LV 组 ==");
   duo = 1'b0; repeat(4) @(posedge Clk);
-  force dut.Playfield_inst.speed_level = 3'd3; repeat(40) @(posedge Clk);
-  look(11'd293, 11'd440);   chk("lv3 当前段=青", rgb, `CY_MENU);
-  look(11'd293, 11'd520);   chk("lv3 第2段(已达)=灰", rgb, `GRAY_MID);
-  look(11'd293, 11'd690);   chk("lv3 第0段(已达)=灰", rgb, `GRAY_MID);
-  look(11'd293, 11'd360);   chk("lv3 第4段(未达)=暗", rgb, `SLOT_BG);
-  look(11'd293, 11'd88);    chk("竖条顶部段缝=暗", rgb, `SLOT_BG);
-  look(11'd293, 11'd80);    chk("竖条上方=黑", rgb, `BLACK);
-  look(11'd310, 11'd440);   chk("竖条右侧=黑", rgb, `BLACK);
+  for(k = 0; k < 8; k = k + 1)begin
+    force dut.Playfield_inst.speed_level = k[2:0];
+    repeat(40) @(posedge Clk);
+    ybar = 88 + (7 - k) * 78 + 40;
+    look(11'd293, ybar[10:0]);   chk("当前段=白", rgb, `WHITE);
+    if(k > 0)begin
+      ybar = 88 + (7 - (k-1)) * 78 + 40;
+      look(11'd293, ybar[10:0]); chk("已点亮段=等级色", rgb, lvcol(k[2:0]));
+    end
+    if(k < 7)begin
+      ybar = 88 + (7 - (k+1)) * 78 + 40;
+      look(11'd293, ybar[10:0]); chk("未点亮段=303030", rgb, 24'h303030);
+    end
+  end
   force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
-  look(11'd293, 11'd690);   chk("lv0 当前段=青", rgb, `CY_MENU);
-  look(11'd293, 11'd590);   chk("lv0 第1段(未达)=暗", rgb, `SLOT_BG);
+  look(11'd279, 11'd440);   chk("条左外=黑", rgb, `BLACK);
+  look(11'd280, 11'd440);   chk("条左边=303030", rgb, 24'h303030);
+  look(11'd305, 11'd440);   chk("条右边=303030", rgb, 24'h303030);
+  look(11'd306, 11'd440);   chk("条右外=黑", rgb, `BLACK);
+  look(11'd293, 11'd88);    chk("段缝=202020", rgb, `SLOT_BG);
+  look(11'd292, 11'd40);    chk("等级数字=等级色0", rgb, 24'h00E5FF);
+  look(11'd234, 11'd50);    chk("LV 标签=等级色0", rgb, 24'h00E5FF);
+  look(11'd240, 11'd72);    chk("LV 组色线=等级色0", rgb, 24'h00E5FF);
+  look(11'd240, 11'd74);    chk("色线下方=黑", rgb, `BLACK);
+  look(11'd340, 11'd40);    chk("时间仍为白", rgb, `WHITE);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
 
   $display("=== 11) 菜单屏: 无框选项 + 青色选中标记 ===");
@@ -339,8 +369,10 @@ initial begin
   look(11'd95,   11'd90);   chk("duo=0 双人标签位置=黑", rgb, `BLACK);
   look(11'd1059, 11'd90);   chk("duo=0 单人 NEXT 标签", rgb, `GRAY_LBL);
   look(11'd340,  11'd40);   chk("时间数字=白", rgb, `WHITE);
-  look(11'd292,  11'd40);   chk("LV 数字=白", rgb, `WHITE);
-  look(11'd240,  11'd40);   chk("LV 标签=标签灰", rgb, `GRAY_LBL);
+  force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
+  look(11'd292,  11'd40);   chk("LV 数字=等级色", rgb, 24'h00E5FF);
+  look(11'd240,  11'd40);   chk("LV 标签=等级色", rgb, 24'h00E5FF);
+  release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
   Finalize = 1'b1; duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd95,   11'd90);   chk("Finalize 标签暗化", rgb, `SLOT_BG);
   Finalize = 1'b0; repeat(4) @(posedge Clk);
@@ -360,10 +392,10 @@ initial begin
   chk("LV 第2字地址已预取", dut.lb_g, 5'd21);
   chk("LV BRAM 使能已预取", dut.letter_hud_inst.ena, 1'b1);
   chk("LV 地址窗口已开", dut.lb_ena_n, 1'b1);
-  hc = 11'd287; vc = 11'd40; repeat(3) @(posedge Clk);
+  hc = 11'd282; vc = 11'd40; repeat(3) @(posedge Clk);
   chk("LV 数字使能已预取", dut.number_lv_inst.ena, 1'b1);
   chk("LV 数字显示窗口仍关", dut.lvd_ena, 1'b0);
-  hc = 11'd288; vc = 11'd40; repeat(3) @(posedge Clk);
+  hc = 11'd283; vc = 11'd40; repeat(3) @(posedge Clk);
   chk("LV 数字显示窗口已开", dut.lvd_ena, 1'b1);
 
   $display("=== 14) 双人 P2 Hold 在 HOLD 框可见 ===");
@@ -417,7 +449,7 @@ initial begin
   force dut.Playfield_inst.speed_level = 3'd5; repeat(2) @(posedge Clk);
   look(11'd293, 11'd280);   chk("升级瞬间当前段=白", rgb, `WHITE);
   repeat(40) @(posedge Clk);
-  look(11'd293, 11'd280);   chk("升级后当前段回青", rgb, `CY_MENU);
+  look(11'd293, 11'd280);   chk("升级后当前段回青", rgb, `WHITE);
   release dut.Playfield_inst.speed_level; repeat(40) @(posedge Clk);
   force dut.Playfield_inst.score = 20'd777; repeat(2) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("加分瞬间分数=青", rgb, `CY_MENU);
