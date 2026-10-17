@@ -80,6 +80,7 @@ module choose_menu(
                 if( (hn >= (TX + i*48 - 1)) && (hn < (TX + i*48 + 40)) &&
                     (vcounter >= TY) && (vcounter < (TY + 64)) )begin
                     ena_n = 1'b1;
+                    Y = TY;
                     case(i)
                     0:cnt = 5'd19;
                     1:cnt = 5'd4;
@@ -103,6 +104,7 @@ module choose_menu(
                 if( (hn >= (OX + i*48 - 1)) && (hn < (OX + i*48 + 40)) &&
                     (vcounter >= OY1) && (vcounter < (OY1 + 64)) )begin
                     ena_n = 1'b1;
+                    Y = OY1;
                     case(i)
                     0:cnt = 5'd18;
                     1:cnt = 5'd14;
@@ -125,6 +127,7 @@ module choose_menu(
                 if( (hn >= (OX + i*48 - 1)) && (hn < (OX + i*48 + 40)) &&
                     (vcounter >= OY2) && (vcounter < (OY2 + 64)) )begin
                     ena_n = 1'b1;
+                    Y = OY2;
                     case(i)
                     0:cnt = 5'd3;
                     1:cnt = 5'd20;
@@ -150,6 +153,8 @@ module choose_menu(
                 if( (hn >= (HX1 + i*24 - 1)) && (hn < (HX1 + i*24 + 20)) &&
                     (vcounter >= HY1) && (vcounter < (HY1 + 32)) )begin
                     ena_n = 1'b1;
+                    Y = HY1;
+                    big = 1'b0;
                     case(i)
                     0:cnt = 5'd11;
                     1:cnt = 5'd4;
@@ -184,6 +189,8 @@ module choose_menu(
                 if( (hn >= (HX2 + i*24 - 1)) && (hn < (HX2 + i*24 + 20)) &&
                     (vcounter >= HY2) && (vcounter < (HY2 + 32)) )begin
                     ena_n = 1'b1;
+                    Y = HY2;
+                    big = 1'b0;
                     case(i)
                     0:cnt = 5'd18;
                     1:cnt = 5'd22;

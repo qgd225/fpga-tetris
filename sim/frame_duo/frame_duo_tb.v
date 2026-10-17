@@ -306,6 +306,15 @@ initial begin
 
   $display("=== 11) 菜单屏: 无框选项 + 青色选中标记 ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
+  hc = 11'd495; vc = 11'd110; repeat(3) @(posedge Clk);       // 标题第 1 字前 1 像素
+  chk("标题取址已预取", dut.choose_menu_inst.ena_n, 1'b1);
+  chk("标题取址 Y 正确", dut.choose_menu_inst.Y, 11'd96);
+  chk("标题 vt 正确(2x)", dut.choose_menu_inst.vt, 6'd7);
+  chk("菜单字模使能已预取", dut.choose_menu_inst.letter_inst0.ena, 1'b1);
+  hc = 11'd437; vc = 11'd570; repeat(3) @(posedge Clk);       // 提示 1 第 1 字前 1 像素
+  chk("提示取址 Y 正确", dut.choose_menu_inst.Y, 11'd560);
+  chk("提示 big=0(1x)", dut.choose_menu_inst.big, 1'b0);
+  chk("提示 vt 正确(1x)", dut.choose_menu_inst.vt, 6'd10);
   look(11'd426, 11'd290);   chk("选中项竖条=青", rgb, `CY_MENU);
   look(11'd600, 11'd337);   chk("选中项下划线=青", rgb, `CY_MENU);
   look(11'd426, 11'd450);   chk("未选中行无竖条", rgb, `BLACK);
@@ -351,6 +360,11 @@ initial begin
   chk("LV 第2字地址已预取", dut.lb_g, 5'd21);
   chk("LV BRAM 使能已预取", dut.letter_hud_inst.ena, 1'b1);
   chk("LV 地址窗口已开", dut.lb_ena_n, 1'b1);
+  hc = 11'd283; vc = 11'd40; repeat(3) @(posedge Clk);
+  chk("LV 数字使能已预取", dut.number_lv_inst.ena, 1'b1);
+  chk("LV 数字显示窗口仍关", dut.lvd_ena, 1'b0);
+  hc = 11'd284; vc = 11'd40; repeat(3) @(posedge Clk);
+  chk("LV 数字显示窗口已开", dut.lvd_ena, 1'b1);
 
   $display("=== 14) 双人 P2 Hold 在 HOLD 框可见 ===");
   duo = 1'b1; Playing = 1'b1; repeat(4) @(posedge Clk);

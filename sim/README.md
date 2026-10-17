@@ -244,3 +244,27 @@ LUT as Memory 5（只剩 SRL，**无分布式 RAM**）、FF 4681、F7 1933、F8 
   旧代码在 `XPN1+23` 处 `ena=0` 必挂）。`duo 83 / level 27` 不变，三套全绿。
 - 面积/时序（新进程从零重跑）：LUT 17501 → **17267(synth)** / 17365 → **17139(impl, 82.40%)**；
   FF 4566、BRAM 14.5/50、DSP 5、LUTRAM 0；**WNS +0.019 → +0.199ns**、WHS +0.072ns、违例 0。
+
+## 补修另外两处同类渲染错位：choose 菜单 + 等级数字（附全部 ROM 渲染点审计）
+
+审计范围：`letter` / `number` / `Tetromino` / `weiyibiao` 的**所有**例化点。
+
+| 渲染点 | ROM | BRAM ena | 取址是否随像素变 | 取址侧 vt/Y | 结论 |
+| --- | --- | --- | --- | --- | --- |
+| `frame` 标签 NEXT/HOLD/LV | letter | `lb_ena_n` | 是 | 已补 | 已修 |
+| **`choose_menu` 标题/两选项/两行提示** | letter | `ena_n` | 是 | **只给 cnt、没给 Y（1x 也没给 big）** | **本次修** |
+| **`frame` 等级数字** | number | **原来接显示窗口 `lvd_ena`** | 否 | vt/X 与像素无关，但 ena 晚 1 拍 | **本次修** |
+| `game_over` GAME OVER | letter | `ena_n` | 是 | `vt=(vcounter-368)/2` 字面量 | OK |
+| `scoring` 分数 | number | `ena_n` | 是 | `vt=vcounter-24` 字面量 | OK |
+| `timer` 时间 | number | `ena_n` | 是 | `vt=vcounter-24` 字面量 | OK |
+| `Next_piece` / `hold_piece` / `Playfield` 的 Tetromino、`weiyibiao` | — | 无 ena | 否（地址只随 `type`/`rot` 变） | — | OK |
+
+- **choose_menu**：5 个字格的 `ena_n` 分支补 `Y = <该盒 Y>`；两行 1x 提示同时补 `big = 1'b0`
+  （否则预取那拍用 2x 的 `vt` 公式）。原来预取那拍 `Y=0` → `vt = vcounter`，字模取到错行，
+  表现就是"每字第 1 列不对"。
+- **frame 等级数字**：新增 `lvd_ena_n`（`lb_hn` 左边界 -1）并把 `number_lv_inst.ena` 改接它，
+  修掉"每行第 1 列串上一行"。
+- 仿真：`frame_duo` 103 → **113**（新增菜单 `ena_n/Y/vt/big` 与等级数字 `ena` 时序断言）；
+  `duo 83 / level 27` 不变，三套全绿。
+- 面积/时序（新进程从零重跑）：LUT 17267 → **17518(synth)** / 17139 → **17398(impl, 83.64%)**；
+  FF 4568、BRAM 14.5/50、DSP 5、LUTRAM 0；**WNS +0.199 → +0.075ns**、WHS +0.070ns、违例 0。

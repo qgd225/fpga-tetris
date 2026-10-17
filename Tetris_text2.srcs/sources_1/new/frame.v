@@ -508,10 +508,13 @@ module frame(
     wire [10:0]vdv = vcounter - YDIGI;
     wire lvd_ena = (hcounter >= XLDIG) && (hcounter < (XLDIG + 11'd20)) &&
                    (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
+//    取字使能提前 1 像素(number 也是 READ_LATENCY=1): 否则每行第 1 列会串上一行
+    wire lvd_ena_n = (lb_hn >= (XLDIG - 11'd1)) && (lb_hn < (XLDIG + 11'd20)) &&
+                     (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
     wire [19:0]lvd_dout;
     number number_lv_inst(
     .clka(Clk_74M),
-    .ena(lvd_ena),
+    .ena(lvd_ena_n),
     .addra({lv_dig, vdv[5:0]}),
     .douta(lvd_dout)
     );
