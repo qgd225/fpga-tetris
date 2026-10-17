@@ -9,7 +9,8 @@ module choose_menu(
     output margin,
     output inner,
     output text,
-    output dim
+    output dim,
+    output reg breath
     );
     
 //    菜单屏: 标题 TETRIS + 两行选项(SOLO PVE / DUO PVE) + 青色选中标记 + 两行操作提示
@@ -60,6 +61,21 @@ module choose_menu(
     reg in2;
 
     wire [10:0]hn = hcounter + 11'd1;
+
+//    E6: 选中标记呼吸(约 1.2s 一轮)
+    reg [26:0]br_cnt;
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)begin
+    br_cnt <= 27'd0;
+    breath <= 1'b0;
+    end
+    else if(br_cnt == 27'd44_550_000)begin
+    br_cnt <= 27'd0;
+    breath <= !breath;
+    end
+    else
+    br_cnt <= br_cnt + 27'd1;
+    end
 
     always@(*)begin
     X = 11'd0;

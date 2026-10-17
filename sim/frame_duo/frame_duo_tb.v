@@ -372,9 +372,12 @@ initial begin
   force dut.Playfield_inst.type_t2 = 3'd0;
   hd2 = 1'b0; repeat(4) @(posedge Clk);
   look(11'd140, 11'd458);  chk("P2 hold 前 HOLD 框为空", rgb, 24'h202020);
-  hd2 = 1'b1; @(posedge Clk); hd2 = 1'b0; repeat(8) @(posedge Clk);
+  hd2 = 1'b1; @(posedge Clk); hd2 = 1'b0; repeat(2) @(posedge Clk);
   chk("P2 en_hold2=1", dut.Playfield_inst.en_hold2, 1'b1);
   chk("共用槽存的是 P2 的块", dut.Playfield_inst.hold_type, 3'd3);
+  look(11'd140, 11'd458);
+  chk("换块瞬间 HOLD 预览闪白", rgb, `WHITE);
+  repeat(40) @(posedge Clk);
   look(11'd140, 11'd458);
   chk("P2 hold 后 HOLD 框显示方块", rgb, `RED);
   release dut.Playfield_inst.type2; release dut.Playfield_inst.type_t2;
@@ -384,16 +387,24 @@ initial begin
   repeat(40) @(posedge Clk);
   look(11'd100, 11'd718);   chk("P1 面板底条=青", rgb, `CY_MENU);
   look(11'd1130, 11'd718);  chk("P2 面板底条=粉", rgb, `PINK2);
+  look(11'd125, 11'd163);   chk("预览槽点阵=404040", rgb, 24'h404040);
+  look(11'd126, 11'd163);   chk("点阵旁=槽底", rgb, `SLOT_BG);
+  look(11'd158, 11'd650);   chk("P1 号码徽标=青", rgb, `CY_MENU);
+  look(11'd1185, 11'd650);  chk("P2 号码徽标=粉", rgb, `PINK2);
   look(11'd470, 11'd40);    chk("顶栏发丝线=标签灰", rgb, `GRAY_LBL);
   look(11'd469, 11'd40);    chk("发丝线左侧=黑", rgb, `BLACK);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1060, 11'd718);  chk("单人面板底条=灰", rgb, `GRAY_MID);
+  look(11'd158, 11'd650);   chk("单人无号码徽标", rgb, `BLACK);
   duo = 1'b1; repeat(4) @(posedge Clk);
 
   $display("=== 16) 菜单标题线 ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
   look(11'd600, 11'd181);   chk("菜单标题线=青", rgb, `CY_MENU);
   look(11'd600, 11'd179);   chk("标题线上方=黑", rgb, `BLACK);
+  force dut.choose_menu_inst.breath = 1'b1; repeat(4) @(posedge Clk);
+  look(11'd426, 11'd290);   chk("菜单选中标记呼吸=暗青", rgb, 24'h00697F);
+  release dut.choose_menu_inst.breath; repeat(4) @(posedge Clk);
   choose = 1'b0; Playing = 1'b1; repeat(4) @(posedge Clk);
 
   $display("=== 17) UI 特效: 落锁脉冲/升级闪白/分数闪青/结束下划线 ===");
@@ -408,6 +419,11 @@ initial begin
   repeat(40) @(posedge Clk);
   look(11'd293, 11'd280);   chk("升级后当前段回青", rgb, `CY_MENU);
   release dut.Playfield_inst.speed_level; repeat(40) @(posedge Clk);
+  force dut.Playfield_inst.score = 20'd777; repeat(2) @(posedge Clk);
+  look(11'd1070, 11'd40);   chk("加分瞬间分数=青", rgb, `CY_MENU);
+  repeat(40) @(posedge Clk);
+  look(11'd1070, 11'd40);   chk("加分后分数=白", rgb, `WHITE);
+  release dut.Playfield_inst.score; repeat(40) @(posedge Clk);
   Finalize = 1'b1; repeat(40) @(posedge Clk);
   look(11'd600, 11'd445);   chk("结束下划线非黑", (rgb !== `BLACK), 1);
   Finalize = 1'b0; repeat(40) @(posedge Clk);

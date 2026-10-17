@@ -140,6 +140,17 @@ module frame(
     assign rr_t2[3] = rr_d2[4:0];
     
     reg [2:0]state_color[0:479];
+
+//    取格行字: 20 行, 每行 24 列(state) / 24x3 位(颜色号); 纯连线, 0 LUT
+    wire [23:0]row_f[0:19];
+    wire [71:0]scw[0:19];
+    genvar gr, gc;
+    generate for(gr = 0; gr < 20; gr = gr + 1)begin : gen_rowf
+        for(gc = 0; gc < 24; gc = gc + 1)begin : gen_colf
+            assign row_f[gr][gc] = state[gc*20+gr];
+            assign scw[gr][gc*3 +: 3] = state_color[gc*20+gr];
+        end
+    end endgenerate
     
     integer c;
     integer m;
@@ -360,6 +371,7 @@ module frame(
     wire chs_inner;
     wire chs_text;
     wire chs_dim;
+    wire chs_breath;
     
     choose_menu choose_menu_inst(
     .Clk_74M(Clk_74M),
@@ -372,7 +384,8 @@ module frame(
     .margin(chs_margin),
     .inner(chs_inner),
     .text(chs_text),
-    .dim(chs_dim)
+    .dim(chs_dim),
+    .breath(chs_breath)
     );
     
 
@@ -566,6 +579,7 @@ module frame(
     reg chs_inner_r;
     reg chs_text_r;
     reg chs_dim_r;
+    reg chs_breath_r;
     reg Piece2_r;
     reg ghost2_r;
     reg [2:0]type2_r;
@@ -611,6 +625,7 @@ module frame(
     chs_inner_r <= 1'b0;
     chs_text_r <= 1'b0;
     chs_dim_r <= 1'b0;
+    chs_breath_r <= 1'b0;
     Piece2_r <= 1'b0;
     ghost2_r <= 1'b0;
     type2_r <= 3'd0;
@@ -649,8 +664,8 @@ module frame(
     hold_type_r <= hold_type;
     //    场地取色: 编号必须在场地内(哨兵 24 或 20 表示不在任何格)
     if((C_num <= 5'd23) && (R_num <= 5'd19))begin
-    cell_r <= state[(C_num*20) + R_num];
-    sc_r <= state_color[(C_num*20) + R_num];
+    cell_r <= row_f[R_num][C_num];
+    sc_r <= scw[R_num][C_num*3 +: 3];
     end
     else begin
     cell_r <= 1'b0;
@@ -662,6 +677,7 @@ module frame(
     chs_inner_r <= chs_inner;
     chs_text_r <= chs_text;
     chs_dim_r <= chs_dim;
+    chs_breath_r <= chs_breath;
     Piece2_r <= Piece2;
     ghost2_r <= ghost2;
     type2_r <= type2;
@@ -689,17 +705,27 @@ module frame(
     else
     eff_cnt <= eff_cnt + 21'd1;
     end
-    reg [1:0]lf1, lf2, lvf;
+    reg [1:0]lf1, lf2, lvf, nf1, nf2, hf, scf;
     reg [2:0]lvl_d;
+    reg [2:0]hold_d;
+    reg [19:0]score_d;
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     lf1 <= 2'd0;
     lf2 <= 2'd0;
     lvf <= 2'd0;
+    nf1 <= 2'd0;
+    nf2 <= 2'd0;
+    hf <= 2'd0;
+    scf <= 2'd0;
     lvl_d <= 3'd0;
+    hold_d <= 3'd0;
+    score_d <= 20'd0;
     end
     else begin
     lvl_d <= speed_level;
+    hold_d <= hold_type;
+    score_d <= score;
     if(lock_we)
     lf1 <= 2'd3;
     else if(eff_tick && (lf1 != 2'd0))
@@ -712,11 +738,54 @@ module frame(
     lvf <= 2'd3;
     else if(eff_tick && (lvf != 2'd0))
     lvf <= lvf - 2'd1;
+    if(land_we)
+    nf1 <= 2'd2;
+    else if(eff_tick && (nf1 != 2'd0))
+    nf1 <= nf1 - 2'd1;
+    if(land_we2)
+    nf2 <= 2'd2;
+    else if(eff_tick && (nf2 != 2'd0))
+    nf2 <= nf2 - 2'd1;
+    if(hold_type != hold_d)
+    hf <= 2'd2;
+    else if(eff_tick && (hf != 2'd0))
+    hf <= hf - 2'd1;
+    if(score != score_d)
+    scf <= 2'd3;
+    else if(eff_tick && (scf != 2'd0))
+    scf <= scf - 2'd1;
     end
     end
     wire lflash1 = (lf1 != 2'd0);
     wire lflash2 = (lf2 != 2'd0);
     wire lvflash = (lvf != 2'd0);
+    wire nflash1 = (nf1 != 2'd0);
+    wire nflash2 = (nf2 != 2'd0);
+    wire hflash = (hf != 2'd0);
+    wire scflash = (scf != 2'd0);
+//    预览槽 32px 点阵(只在槽位内, 优先级低于预览方块)
+    wire dx1 = (((hcounter - XPN1) & 11'd31) == 11'd31);
+    wire dx2 = (((hcounter - XPN2) & 11'd31) == 11'd31);
+    wire dy1 = (((vcounter - YNEXT) & 11'd31) == 11'd31);
+    wire dy2 = (((vcounter - YHOLD) & 11'd31) == 11'd31);
+    wire slot_dot = (next_slot_r && dy1 && (dx1 || dx2)) || (hold_slot_r && dy2 && (dx1 || dx2));
+//    双人 P1/P2 号码徽标: number ROM 2x(40x88), P1 x138..178 / P2 x1165..1205, y621..709
+    wire bd1  = duo && (hcounter >= 11'd138) && (hcounter < 11'd178) && (vcounter >= 11'd621) && (vcounter <= 11'd709);
+    wire bd2  = duo && (hcounter >= 11'd1165) && (hcounter < 11'd1205) && (vcounter >= 11'd621) && (vcounter <= 11'd709);
+    wire bd1n = duo && (lb_hn >= 11'd138) && (lb_hn < 11'd178) && (vcounter >= 11'd621) && (vcounter <= 11'd709);
+    wire bd2n = duo && (lb_hn >= 11'd1165) && (lb_hn < 11'd1205) && (vcounter >= 11'd621) && (vcounter <= 11'd709);
+    wire [10:0]bdx = bd2 ? (hcounter - 11'd1165) : (hcounter - 11'd138);
+    wire [10:0]bdy = vcounter - 11'd621;
+    wire [5:0]badge_vt = bdy[6:1];
+    wire [3:0]badge_dig = bd2n ? 4'd2 : 4'd1;
+    wire [19:0]badge_dout;
+    number number_badge_inst(
+    .clka(Clk_74M),
+    .ena(bd1n || bd2n),
+    .addra({badge_dig, badge_vt}),
+    .douta(badge_dout)
+    );
+    wire badge_lit = (bd1 || bd2) && badge_dout[19 - bdx[5:1]];
 
     parameter CYAN = 24'h00CCFF,//青色I
                LIGHT_CYAN = 24'h99EEFF,//浅青色I
@@ -740,7 +809,7 @@ module frame(
     rgb = BLACK;
     else if(choose)begin
         if(chs_margin_r)
-        rgb = 24'h00E5FF;//选中标记(左侧竖条 + 下方横线)
+        rgb = chs_breath_r ? 24'h00697F : 24'h00E5FF;//选中标记(带呼吸)
         else if(chs_text_r)
         rgb = chs_dim_r ? 24'h606060 : WHITE;
         else
@@ -787,6 +856,9 @@ module frame(
     else if(lvd_r)
     rgb = fin_r ? 24'h202020 : WHITE;//等级数字
     else if(hold_r)begin
+        if(hflash)
+        rgb = WHITE;
+        else
         case(hold_type_r)
         0:rgb = CYAN;
         1:rgb = PURPPLE;
@@ -799,6 +871,9 @@ module frame(
         endcase
         end
     else if(next_r)begin
+        if(nflash1)
+        rgb = WHITE;
+        else
         case(type_t_r)
         0:rgb = CYAN;
         1:rgb = PURPPLE;
@@ -811,6 +886,9 @@ module frame(
         endcase
         end
     else if(next2_r)begin
+        if(nflash2)
+        rgb = WHITE;
+        else
         case(type_t2_r)
         0:rgb = CYAN;
         1:rgb = PURPPLE;
@@ -822,12 +900,16 @@ module frame(
         default:rgb = 0;
         endcase
         end
+    else if(slot_dot)
+    rgb = 24'h404040;//预览槽点阵
     else if(hold_slot_r)
     rgb = 24'h202020;//Hold 槽位底色
     else if(next_slot_r)
     rgb = 24'h202020;//Next 槽位底色
+    else if(badge_lit)
+    rgb = bd2 ? 24'hFF4DA6 : 24'h00E5FF;//P1/P2 号码徽标
     else if(score_lit_r)
-    rgb = WHITE;
+    rgb = (scflash && (!fin_r)) ? 24'h00E5FF : WHITE;
     else if(time_lit_r)
     rgb = WHITE;
     else if(margin_r)
