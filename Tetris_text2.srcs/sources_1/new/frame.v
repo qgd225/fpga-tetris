@@ -496,12 +496,19 @@ module frame(
     .douta(lb_dout)
     );
     wire lbl_lit = lb_ena ? lb_dout[19 - (hcounter - lb_X)] : 1'b0;
+//    顶栏发丝线(时间/分数分组) 与 结束画面下划线: 都走标签灰
+    wire top_rule_lit = (hcounter >= 11'd470) && (hcounter <= 11'd470) &&
+                        (vcounter >= 11'd24) && (vcounter < 11'd68);
+    wire over_line_lit = Finalize && (hcounter >= 11'd449) && (hcounter <= 11'd825) &&
+                         (vcounter >= 11'd444) && (vcounter <= 11'd446);
 
 //    面板分隔线: 2px, 位于标签下方
     wire rule1_lit = ((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
-                     ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128)));
+                     ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
+                     ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128)));
     wire rule2_lit = duo && (((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
-                             ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))));
+                             ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
+                             ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))));
 
 //    等级数字: 1 位, 与等级条同轴
     wire [3:0] lv_dig = {1'b0, speed_level};
@@ -661,7 +668,7 @@ module frame(
     type_t2_r <= type_t2;
     land_we2_r <= land_we2;
     next2_r <= next2;
-    lbl_r <= lbl_lit;
+    lbl_r <= lbl_lit || top_rule_lit;
     rule1_r <= rule1_lit;
     rule2_r <= rule2_lit;
     next_slot_r <= next_slot;
@@ -670,6 +677,47 @@ module frame(
     fin_r <= Finalize;
     end
     end
+//    UI 特效: 60Hz 节拍 + 落锁脉冲(E1) / 升级闪白(E2)
+    parameter [20:0]EFF_TICK = 21'd1_237_499;//仿真可覆盖
+    reg [20:0]eff_cnt;
+    wire eff_tick = (eff_cnt == EFF_TICK);
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)
+    eff_cnt <= 21'd0;
+    else if(eff_tick)
+    eff_cnt <= 21'd0;
+    else
+    eff_cnt <= eff_cnt + 21'd1;
+    end
+    reg [1:0]lf1, lf2, lvf;
+    reg [2:0]lvl_d;
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)begin
+    lf1 <= 2'd0;
+    lf2 <= 2'd0;
+    lvf <= 2'd0;
+    lvl_d <= 3'd0;
+    end
+    else begin
+    lvl_d <= speed_level;
+    if(lock_we)
+    lf1 <= 2'd3;
+    else if(eff_tick && (lf1 != 2'd0))
+    lf1 <= lf1 - 2'd1;
+    if(lock_we2)
+    lf2 <= 2'd3;
+    else if(eff_tick && (lf2 != 2'd0))
+    lf2 <= lf2 - 2'd1;
+    if(speed_level != lvl_d)
+    lvf <= 2'd3;
+    else if(eff_tick && (lvf != 2'd0))
+    lvf <= lvf - 2'd1;
+    end
+    end
+    wire lflash1 = (lf1 != 2'd0);
+    wire lflash2 = (lf2 != 2'd0);
+    wire lvflash = (lvf != 2'd0);
+
     parameter CYAN = 24'h00CCFF,//青色I
                LIGHT_CYAN = 24'h99EEFF,//浅青色I
                PURPPLE = 24'h9933CC,//紫色T
@@ -698,7 +746,7 @@ module frame(
         else
         rgb = BLACK;
         end
-    else if(over_lit_r)
+    else if(over_lit_r || over_line_lit)
         case(cn_r)
         0:rgb = 24'h101010;
         1:rgb = 24'h202020;
@@ -718,15 +766,17 @@ module frame(
     else if(lbl_r)
     rgb = fin_r ? 24'h202020 : 24'hB0B0B0;//NEXT/HOLD/LV 文字标签
     else if(rule1_r)
-    rgb = fin_r ? 24'h202020 : (duo ? 24'h00E5FF : 24'h606060);//面板分隔线(P1/单人)
+    rgb = fin_r ? 24'h202020 : (lflash1 ? WHITE : (duo ? 24'h00E5FF : 24'h606060));//面板分隔线(P1/单人)
     else if(rule2_r)
-    rgb = fin_r ? 24'h202020 : 24'hFF4DA6;//P2 面板分隔线
+    rgb = fin_r ? 24'h202020 : (lflash2 ? WHITE : 24'hFF4DA6);//P2 面板分隔线
     else if(level_margin_r)begin
         rgb = 24'h202020;//段与段之间的缝
         end
     else if(level_inner_r)begin
         if(fin_r)
         rgb = 24'h202020;
+        else if(lvflash)
+        rgb = WHITE;
         else if(cur_r)
         rgb = 24'h00E5FF;
         else if(on_r)

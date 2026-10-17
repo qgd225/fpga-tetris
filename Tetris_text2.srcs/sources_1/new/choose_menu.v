@@ -43,7 +43,9 @@ module choose_menu(
     wire lin2 = choose && sel2 && (hcounter >= OX) && (hcounter < (OX + LU)) &&
                 (vcounter >= UY2) && (vcounter < (UY2 + UH));
 
-    assign margin = bar1 || lin1 || bar2 || lin2;
+    wire rule_t = choose && (hcounter >= 11'd496) && (hcounter < 11'd784) &&
+                  (vcounter >= 11'd180) && (vcounter < 11'd182);
+    assign margin = bar1 || lin1 || bar2 || lin2 || rule_t;
     assign inner  = 1'b0;
 
     integer i;

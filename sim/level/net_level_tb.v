@@ -24,7 +24,7 @@ integer bad, m;
 
 always #6.734 Clk_74M = ~Clk_74M;
 
-frame dut(
+frame #(.EFF_TICK(21'd8)) dut(
   .Clk_74M(Clk_74M), .Reset_n(Rst), .hcounter(hc), .vcounter(vc),
   .left_p_flag(left_p), .right_p_flag(right_p), .drop_r_flag(drop_r), .drop_en(drop_en),
   .rotate_p_flag(rotate_p), .switch_r_flag(switch_r), .hold_p_flag(hold_p),

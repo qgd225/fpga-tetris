@@ -42,7 +42,7 @@ integer n2;
 integer seen_gap;
 always@(posedge Clk) if(scan_en) hc <= hc + 11'd1;
 
-frame dut(
+frame #(.EFF_TICK(21'd8)) dut(
   .Clk_74M(Clk), .Reset_n(Rst), .hcounter(hc), .vcounter(vc),
   .left_p_flag(l1), .right_p_flag(r1), .drop_r_flag(d1), .drop_en(de1),
   .rotate_p_flag(rt1), .switch_r_flag(sw1), .hold_p_flag(hd1),
@@ -291,7 +291,7 @@ initial begin
 
   $display("=== 10) 等级 8 段竖条 ===");
   duo = 1'b0; repeat(4) @(posedge Clk);
-  force dut.Playfield_inst.speed_level = 3'd3; repeat(4) @(posedge Clk);
+  force dut.Playfield_inst.speed_level = 3'd3; repeat(40) @(posedge Clk);
   look(11'd293, 11'd440);   chk("lv3 当前段=青", rgb, `CY_MENU);
   look(11'd293, 11'd520);   chk("lv3 第2段(已达)=灰", rgb, `GRAY_MID);
   look(11'd293, 11'd690);   chk("lv3 第0段(已达)=灰", rgb, `GRAY_MID);
@@ -299,7 +299,7 @@ initial begin
   look(11'd293, 11'd88);    chk("竖条顶部段缝=暗", rgb, `SLOT_BG);
   look(11'd293, 11'd80);    chk("竖条上方=黑", rgb, `BLACK);
   look(11'd310, 11'd440);   chk("竖条右侧=黑", rgb, `BLACK);
-  force dut.Playfield_inst.speed_level = 3'd0; repeat(4) @(posedge Clk);
+  force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
   look(11'd293, 11'd690);   chk("lv0 当前段=青", rgb, `CY_MENU);
   look(11'd293, 11'd590);   chk("lv0 第1段(未达)=暗", rgb, `SLOT_BG);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
@@ -378,6 +378,39 @@ initial begin
   look(11'd140, 11'd458);
   chk("P2 hold 后 HOLD 框显示方块", rgb, `RED);
   release dut.Playfield_inst.type2; release dut.Playfield_inst.type_t2;
+
+  $display("=== 15) UI 升级: 面板底条/预览点阵/顶栏发丝线 ===");
+  duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0; Idle = 1'b0; Stop = 1'b0;
+  repeat(40) @(posedge Clk);
+  look(11'd100, 11'd718);   chk("P1 面板底条=青", rgb, `CY_MENU);
+  look(11'd1130, 11'd718);  chk("P2 面板底条=粉", rgb, `PINK2);
+  look(11'd470, 11'd40);    chk("顶栏发丝线=标签灰", rgb, `GRAY_LBL);
+  look(11'd469, 11'd40);    chk("发丝线左侧=黑", rgb, `BLACK);
+  duo = 1'b0; repeat(4) @(posedge Clk);
+  look(11'd1060, 11'd718);  chk("单人面板底条=灰", rgb, `GRAY_MID);
+  duo = 1'b1; repeat(4) @(posedge Clk);
+
+  $display("=== 16) 菜单标题线 ===");
+  Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
+  look(11'd600, 11'd181);   chk("菜单标题线=青", rgb, `CY_MENU);
+  look(11'd600, 11'd179);   chk("标题线上方=黑", rgb, `BLACK);
+  choose = 1'b0; Playing = 1'b1; repeat(4) @(posedge Clk);
+
+  $display("=== 17) UI 特效: 落锁脉冲/升级闪白/分数闪青/结束下划线 ===");
+  duo = 1'b1; repeat(40) @(posedge Clk);
+  look(11'd100, 11'd123);   chk("脉冲前 P1 色线=青", rgb, `CY_MENU);
+  force dut.lock_we = 1'b1; @(posedge Clk); release dut.lock_we;
+  look(11'd100, 11'd123);   chk("落锁瞬间 P1 色线=白", rgb, `WHITE);
+  repeat(40) @(posedge Clk);
+  look(11'd100, 11'd123);   chk("脉冲后 P1 色线回青", rgb, `CY_MENU);
+  force dut.Playfield_inst.speed_level = 3'd5; repeat(2) @(posedge Clk);
+  look(11'd293, 11'd280);   chk("升级瞬间当前段=白", rgb, `WHITE);
+  repeat(40) @(posedge Clk);
+  look(11'd293, 11'd280);   chk("升级后当前段回青", rgb, `CY_MENU);
+  release dut.Playfield_inst.speed_level; repeat(40) @(posedge Clk);
+  Finalize = 1'b1; repeat(40) @(posedge Clk);
+  look(11'd600, 11'd445);   chk("结束下划线非黑", (rgb !== `BLACK), 1);
+  Finalize = 1'b0; repeat(40) @(posedge Clk);
 
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
