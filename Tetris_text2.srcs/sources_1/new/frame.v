@@ -56,6 +56,7 @@ module frame(
     wire [2:0]type_d;
     wire [2:0]hold_type;
     wire en_hold;
+    wire en_hold2;
     wire land_we;
     wire [19:0]line_t;
     wire clear_flash;
@@ -207,6 +208,7 @@ module frame(
     .clear_row(clear_row),
     .type_d(type_d),
     .en_hold(en_hold),
+    .en_hold2(en_hold2),
     .hold_type(hold_type),
     .speed_level(speed_level),
     .land_we(land_we),
@@ -308,7 +310,7 @@ module frame(
     .vcounter(vcounter),
     .Idle(Idle),
     .duo(duo),
-    .en_hold(en_hold),
+    .en_hold(en_hold | (duo && en_hold2)),
     .hold_type(hold_type),
     .X1(XPN1),
     .Y1(YHOLD),
@@ -380,10 +382,10 @@ module frame(
     reg [4:0] lb_g;
     reg       lb_ena;
     integer   li;
+    integer   lj;
     always@(*)begin
     lb_X = 11'd0;
     lb_Y = 11'd0;
-    lb_g = 5'd26;
     lb_ena = 1'b0;
     for(li = 0; li < 4; li = li + 1)begin
         if((hcounter >= (XPN1 + li*24)) && (hcounter < (XPN1 + li*24 + 11'd20)) &&
@@ -391,14 +393,12 @@ module frame(
             lb_ena = 1'b1;
             lb_X = XPN1 + li*24;
             lb_Y = YLBNX;
-            lb_g = (li == 0) ? 5'd13 : (li == 1) ? 5'd4 : (li == 2) ? 5'd23 : 5'd19;
         end
         if((hcounter >= (XPN1 + li*24)) && (hcounter < (XPN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
             lb_ena = 1'b1;
             lb_X = XPN1 + li*24;
             lb_Y = YLBHD;
-            lb_g = (li == 0) ? 5'd7 : (li == 1) ? 5'd14 : (li == 2) ? 5'd11 : 5'd3;
         end
         if(duo)begin
             if((hcounter >= (XPN2 + li*24)) && (hcounter < (XPN2 + li*24 + 11'd20)) &&
@@ -406,14 +406,12 @@ module frame(
                 lb_ena = 1'b1;
                 lb_X = XPN2 + li*24;
                 lb_Y = YLBNX;
-                lb_g = (li == 0) ? 5'd13 : (li == 1) ? 5'd4 : (li == 2) ? 5'd23 : 5'd19;
             end
             if((hcounter >= (XPN2 + li*24)) && (hcounter < (XPN2 + li*24 + 11'd20)) &&
                (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))begin
                 lb_ena = 1'b1;
                 lb_X = XPN2 + li*24;
                 lb_Y = YLBHD;
-                lb_g = (li == 0) ? 5'd7 : (li == 1) ? 5'd14 : (li == 2) ? 5'd11 : 5'd3;
             end
         end
     end
@@ -423,8 +421,33 @@ module frame(
         lb_ena = 1'b1;
         lb_X = XLVLB + li*24;
         lb_Y = YDIGI;
-        lb_g = (li == 0) ? 5'd11 : 5'd21;
     end
+    end
+
+//    字模地址比显示早 1 像素: letter 是 READ_LATENCY=1 的 BRAM, 否则每字第 1 列会串上一字最后一列
+    wire [10:0]lb_hn = hcounter + 11'd1;
+    always@(*)begin
+    lb_g = 5'd26;
+    for(lj = 0; lj < 4; lj = lj + 1)begin
+        if((lb_hn >= (XPN1 + lj*24 - 11'd1)) && (lb_hn < (XPN1 + lj*24 + 11'd20)) &&
+           (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))
+        lb_g = (lj == 0) ? 5'd13 : (lj == 1) ? 5'd4 : (lj == 2) ? 5'd23 : 5'd19;
+        if((lb_hn >= (XPN1 + lj*24 - 11'd1)) && (lb_hn < (XPN1 + lj*24 + 11'd20)) &&
+           (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))
+        lb_g = (lj == 0) ? 5'd7 : (lj == 1) ? 5'd14 : (lj == 2) ? 5'd11 : 5'd3;
+        if(duo)begin
+            if((lb_hn >= (XPN2 + lj*24 - 11'd1)) && (lb_hn < (XPN2 + lj*24 + 11'd20)) &&
+               (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))
+            lb_g = (lj == 0) ? 5'd13 : (lj == 1) ? 5'd4 : (lj == 2) ? 5'd23 : 5'd19;
+            if((lb_hn >= (XPN2 + lj*24 - 11'd1)) && (lb_hn < (XPN2 + lj*24 + 11'd20)) &&
+               (vcounter >= YLBHD) && (vcounter < (YLBHD + 11'd32)))
+            lb_g = (lj == 0) ? 5'd7 : (lj == 1) ? 5'd14 : (lj == 2) ? 5'd11 : 5'd3;
+        end
+    end
+    for(lj = 0; lj < 2; lj = lj + 1)
+    if((lb_hn >= (XLVLB + lj*24 - 11'd1)) && (lb_hn < (XLVLB + lj*24 + 11'd20)) &&
+       (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd32)))
+    lb_g = (lj == 0) ? 5'd11 : 5'd21;
     end
 
     wire [5:0]lb_vt = vcounter - lb_Y;
@@ -457,6 +480,16 @@ module frame(
     );
     wire lvd_lit = lvd_ena ? lvd_dout[19 - (hcounter - XLDIG)] : 1'b0;
 
+//    幽灵框: 2px 边带 + 四角各切 1x1(内部纯黑, 与实心下落方块区分)
+//    判定必须与 ghost_r 同拍寄存: ghost_r 比 hcounter 晚 1 拍, 否则框会左窄右宽
+    wire [10:0]glx = (hcounter - 11'd321) & 11'd31;
+    wire [10:0]gly = (vcounter - 11'd81) & 11'd31;
+    wire glx_bd = (glx < 11'd2) || (glx > 11'd27);
+    wire gly_bd = (gly < 11'd2) || (gly > 11'd27);
+    wire glx_cn = (glx < 11'd1) || (glx > 11'd28);
+    wire gly_cn = (gly < 11'd1) || (gly > 11'd28);
+    wire ghost_edge = (glx_bd || gly_bd) && !(glx_cn && gly_cn);
+
     reg over_lit_r;
     reg tick_r;
     reg [3:0]cn_r;
@@ -473,6 +506,7 @@ module frame(
     reg margin_r;
     reg Piece_r;
     reg ghost_r;
+    reg ghost_edge_r;
     reg land_we_r;
     reg [2:0]type_r;
     reg [2:0]type_t_r;
@@ -517,6 +551,7 @@ module frame(
     margin_r <= 1'b0;
     Piece_r <= 1'b0;
     ghost_r <= 1'b0;
+        ghost_edge_r <= 1'b0;
     land_we_r <= 1'b0;
     type_r <= 3'd0;
     type_t_r <= 3'd0;
@@ -560,6 +595,7 @@ module frame(
     margin_r <= margin;
     Piece_r <= Piece;
     ghost_r <= ghost;
+        ghost_edge_r <= ghost_edge;
     land_we_r <= land_we;
     type_r <= type;
     type_t_r <= type_t;
@@ -611,12 +647,6 @@ module frame(
                BLACK = 24'h000_000,//黑色
                WHITE = 24'hFFF_FFF;//白色
     
-
-//    幽灵框: 只在格内 2px 边带画浅色, 内部纯黑(与实心下落方块区分)
-    wire [10:0]glx = (hcounter - 11'd321) & 11'd31;
-    wire [10:0]gly = (vcounter - 11'd81) & 11'd31;
-    wire ghost_edge = (glx < 11'd2) || (glx > 11'd27) || (gly < 11'd2) || (gly > 11'd27);
-
     always@(*)begin
     if(!Reset_n)
     rgb = BLACK;
@@ -728,7 +758,7 @@ module frame(
         endcase
         end
     else if(ghost_r)begin
-        if(ghost_edge)begin
+        if(ghost_edge_r)begin
         case(type_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -786,7 +816,7 @@ module frame(
         endcase
         end
     else if(ghost2_r)begin
-        if(ghost_edge)begin
+        if(ghost_edge_r)begin
         case(type2_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;

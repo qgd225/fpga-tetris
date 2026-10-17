@@ -112,6 +112,8 @@ module Tetris(
 
 wire left_p     = left_p_flag;
 wire right_p    = right_p_flag;
+wire left_p_menu  = left_p_flag | kb_left_p;
+wire right_p_menu = right_p_flag | kb_right_p;
 wire drop_r_f   = drop_r_flag;
 wire drop_e     = drop_en;
 wire rotate_p   = rotate_p_flag;
@@ -132,8 +134,8 @@ wire hold_p     = hold_p_flag;
     Game_state_machine Game_state_machine_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
-    .left_p(left_p),
-    .right_p(right_p),
+    .left_p(left_p_menu),
+    .right_p(right_p_menu),
     .switch_r_flag(switch_r_f),
     .switch_en(switch_e),
     .over(over),

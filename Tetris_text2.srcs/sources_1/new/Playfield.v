@@ -46,6 +46,7 @@ module Playfield(
     output wire [1:0]lock_idx,
     output reg [2:0]type_d,
     output reg en_hold,
+    output reg en_hold2,
     output reg [2:0]hold_type,
     output reg [2:0]speed_level,
     output wire land_we,
@@ -224,7 +225,6 @@ module Playfield(
     reg en_rotate2;
     reg [5:0]cc_r2, rr_r2;
     reg rot_block2;
-    reg en_hold2;
     reg en_hold_t2;
     wire hold_up2 = !en_hold_t2 && en_hold2;
     wire hold_down2 = en_hold_t2 && !en_hold2;

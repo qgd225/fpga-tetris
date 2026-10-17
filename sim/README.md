@@ -205,3 +205,29 @@ LUT as Memory 5（只剩 SRL，**无分布式 RAM**）、FF 4681、F7 1933、F8 
 - PC 端颜色核对：画面用到的 **26 种颜色全部精确命中 27 色调色板**（表外色会被
   `net_screen_tx` 的 `default: code_r = 8'd0` 变成黑）；调色板只剩 `00_69_7F` 未用。
   注意两处"同色/近似"：P2 分隔线 `FF4DA6` 与 J 方块同色；强调青 `00E5FF` 与 I 方块 `00CCFF` 很接近。
+
+## 修 1 拍错位（标签/幽灵）+ 幽灵四角缺口框 + PC 控菜单 / 双人 Hold
+
+- **标签字模预取**：`letter` 是 `READ_LATENCY=1` 的 BRAM，而 `NEXT/HOLD/LV` 的取字地址用当前 `hcounter`
+  → 每字第 1 列拿到上一字最后 1 列。改为地址侧用 `hcounter+1` 且左边界多减 1
+  （与 `game_over/scoring/timer/choose_menu` 同口径）。显示侧 20px 窗口与取位索引不动。
+- **幽灵四角缺口框**：`glx_bd=(glx<2)||(glx>27)`、`gly_bd=(gly<2)||(gly>27)`、
+  `glx_cn=(glx<1)||(glx>28)`、`gly_cn=(gly<1)||(gly>28)`、`ghost_edge=(glx_bd||gly_bd)&&!(glx_cn&&gly_cn)`
+  = 2px 边带 + 四角各切 1×1；内部纯黑、框色仍 `LIGHT_*`、外接仍 30×30px。
+- **幽灵左窄右宽(同一类 1 拍错位)**：`ghost_r` 比 `hcounter` 晚 1 拍，而旧 `ghost_edge` 用当前 `hcounter`
+  → 左边带 1px、右边带 2px（对截图实测：左 1px 发暗 / 右 3px@1.5 缩放）。新增 `ghost_edge_r`
+  与 `ghost_r` 同拍寄存后修好。
+- **PC 控 choose 界面**：新增 `left_p_menu/right_p_menu = 板载|PC`，**只**喂 `Game_state_machine`；
+  `frame`(P1 玩法) 与 `sound` 仍用板载原信号，P1 行为不变。PC 的开始/暂停原本就通（`switch_r_f/switch_e`）。
+- **双人 P2 Hold 显示**：`Playfield` 引出 `en_hold2`，`hold_piece` 门控改 `en_hold | (duo && en_hold2)`。
+  （P2 hold 的玩法通路本来就通，`sim/duo` 第 10 组已证；之前是 HOLD 框只认 P1 的 `en_hold` 所以看起来没反应。）
+- **像素画 skill**：安装 `Gamezxz/pixel-art-studio` 并按其 Loop 出图 + 逐条评审
+  （产物与评审在 `sim_check/ghost_art/`）。2×2 缺口在相邻格交界会形成 6px 黑口、四方块散成 4 个独立窗，
+  故定稿 **1×1 缺口**。
+- 仿真：`duo 83 / frame_duo 97(+15) / level 27` 全绿。新增关键回归：`hcounter` 每拍 +1 的**动态扫描**
+  （要求单格边带正好 2px×2 条；旧代码会得到 1px+2px）、四角切角取色、`lb_g` 在字格前 1 像素已预取、
+  P2 hold 后 `en_hold2/hold_type/HOLD 框`三者一致。
+- 面积/时序（新进程从零重跑）：synth LUT 17327 → **17501 (84.1%)**；impl 17202 → **17365 (83.49%)**；
+  FF 4566、BRAM 14.5/50、DSP 5、LUTRAM 0（4 个 SRL）；**WNS +0.019ns、WHS +0.094ns、违例 0**。
+  余量已经很薄（最差路径在 `hdmi_inst` 里，是 `rgb` 取色锥被复制过去的），
+  下一步候选：把 20 级 24 位 `rgb` 优先链改成"一位命中码 + 一次取色"。

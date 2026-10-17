@@ -30,6 +30,18 @@ wire [13:0] time_sec;
 
 always #6.734 Clk = ~Clk;
 
+reg scan_en = 0;
+reg [79:0]lit;
+reg prev;
+integer nrun;
+integer nbad;
+integer runlen;
+integer k;
+integer n1;
+integer n2;
+integer seen_gap;
+always@(posedge Clk) if(scan_en) hc <= hc + 11'd1;
+
 frame dut(
   .Clk_74M(Clk), .Reset_n(Rst), .hcounter(hc), .vcounter(vc),
   .left_p_flag(l1), .right_p_flag(r1), .drop_r_flag(d1), .drop_en(de1),
@@ -233,6 +245,50 @@ initial begin
   release dut.Playfield_inst.type;  release dut.Playfield_inst.type2;
   repeat(4) @(posedge Clk);
 
+  //    动态扫描: 用真实幽灵(不 force ghost), hcounter 每拍 +1, 抓 1 拍错位导致的左窄右宽
+  force dut.Playfield_inst.counter_c = 5'd8;
+  force dut.Playfield_inst.counter_r = 5'd0;
+  force dut.Playfield_inst.counter_ghost_r_t = 5'd19;
+  force dut.Playfield_inst.ghost_done = 1'b1;
+  force dut.Playfield_inst.type = 3'd0;
+  vc = 11'd700; hc = 11'd575; repeat(3) @(posedge Clk);
+  scan_en = 1'b1;
+  for(k = 0; k < 70; k = k + 1)begin
+    @(posedge Clk); #1; lit[k] = (rgb === 24'h99EEFF) ? 1'b1 : 1'b0;
+  end
+  scan_en = 1'b0;
+  nrun = 0; nbad = 0; runlen = 0; prev = 1'b0;
+  for(k = 0; k < 70; k = k + 1)begin
+    if(lit[k])begin
+      if(!prev) runlen = 1;
+      else      runlen = runlen + 1;
+    end
+    else if(prev)begin
+      nrun = nrun + 1;
+      if(runlen != 2) nbad = nbad + 1;
+    end
+    prev = lit[k];
+  end
+  if(prev)begin nrun = nrun + 1; if(runlen != 2) nbad = nbad + 1; end
+  chk("扫描: 每条边带都正好 2px", nbad, 0);
+  chk("扫描: 单格正好 2 条边带", nrun, 2);
+  release dut.Playfield_inst.counter_c; release dut.Playfield_inst.counter_r;
+  release dut.Playfield_inst.counter_ghost_r_t; release dut.Playfield_inst.ghost_done;
+  release dut.Playfield_inst.type;
+  repeat(2) @(posedge Clk);
+
+  //    四角各切 1x1: 角点黑, 紧邻边带亮
+  force dut.Playfield_inst.ghost = 1'b1; force dut.Playfield_inst.ghost2 = 1'b0;
+  force dut.Playfield_inst.type = 3'd0;
+  repeat(3) @(posedge Clk);
+  look(11'd321, 11'd81);   chk("左上角切角=黑", rgb, `BLACK);
+  look(11'd322, 11'd81);   chk("左上角右侧=浅青", rgb, 24'h99EEFF);
+  look(11'd321, 11'd82);   chk("左上角下侧=浅青", rgb, 24'h99EEFF);
+  look(11'd350, 11'd81);   chk("右上角切角=黑", rgb, `BLACK);
+  look(11'd321, 11'd110);  chk("左下角切角=黑", rgb, `BLACK);
+  release dut.Playfield_inst.ghost; release dut.Playfield_inst.type;
+  repeat(2) @(posedge Clk);
+
   $display("=== 10) 等级 8 段竖条 ===");
   duo = 1'b0; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.speed_level = 3'd3; repeat(4) @(posedge Clk);
@@ -279,6 +335,29 @@ initial begin
   Finalize = 1'b1; duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd95,   11'd90);   chk("Finalize 标签暗化", rgb, `SLOT_BG);
   Finalize = 1'b0; repeat(4) @(posedge Clk);
+
+  $display("=== 13) 标签字模 1 像素预取(修第 1 列串字) ===");
+  duo = 1'b1; repeat(4) @(posedge Clk);
+  hc = 11'd94 + 11'd23; vc = 11'd100; repeat(3) @(posedge Clk);
+  chk("NEXT 第2字地址已预取", dut.lb_g, 5'd4);
+  hc = 11'd94 + 11'd24; vc = 11'd100; repeat(3) @(posedge Clk);
+  chk("NEXT 第2字第1列取到字模", dut.lb_g, 5'd4);
+  chk("NEXT 第2字第1列亮", dut.lbl_r, 1'b1);
+  hc = 11'd236 + 11'd23; vc = 11'd40; repeat(3) @(posedge Clk);
+  chk("LV 第2字地址已预取", dut.lb_g, 5'd21);
+
+  $display("=== 14) 双人 P2 Hold 在 HOLD 框可见 ===");
+  duo = 1'b1; Playing = 1'b1; repeat(4) @(posedge Clk);
+  force dut.Playfield_inst.type2 = 3'd3;
+  force dut.Playfield_inst.type_t2 = 3'd0;
+  hd2 = 1'b0; repeat(4) @(posedge Clk);
+  look(11'd140, 11'd458);  chk("P2 hold 前 HOLD 框为空", rgb, 24'h202020);
+  hd2 = 1'b1; @(posedge Clk); hd2 = 1'b0; repeat(8) @(posedge Clk);
+  chk("P2 en_hold2=1", dut.Playfield_inst.en_hold2, 1'b1);
+  chk("共用槽存的是 P2 的块", dut.Playfield_inst.hold_type, 3'd3);
+  look(11'd140, 11'd458);
+  chk("P2 hold 后 HOLD 框显示方块", rgb, `RED);
+  release dut.Playfield_inst.type2; release dut.Playfield_inst.type_t2;
 
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
