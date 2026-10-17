@@ -30,7 +30,20 @@ module frame(
     output [2:0]speed_level,
     output [19:0]score,
     output [15:0]lines,
-    output [13:0]time_sec
+    output [13:0]time_sec,
+    output snd_land1,
+    output snd_land2,
+    output snd_hard1,
+    output snd_hard2,
+    output snd_soft1,
+    output snd_soft2,
+    output blk_l1,
+    output blk_r1,
+    output blk_l2,
+    output blk_r2,
+    output snd_hold1,
+    output snd_hold2,
+    output [2:0]snd_clr_n
     );
     
     
@@ -238,7 +251,19 @@ module frame(
     .rr_d2(rr_d2),
     .lock_we2(lock_we2),
     .lock_idx2(lock_idx2),
-    .land_we2(land_we2)
+    .land_we2(land_we2),
+    .snd_land1(snd_land1),
+    .snd_land2(snd_land2),
+    .snd_hard1(snd_hard1),
+    .snd_hard2(snd_hard2),
+    .snd_soft1(snd_soft1),
+    .snd_soft2(snd_soft2),
+    .blk_l1(blk_l1),
+    .blk_r1(blk_r1),
+    .blk_l2(blk_l2),
+    .blk_r2(blk_r2),
+    .snd_hold1(snd_hold1),
+    .snd_hold2(snd_hold2)
     );
     
     
@@ -1065,4 +1090,7 @@ module frame(
     rgb = in_field ? field_bg : BLACK;
     end
     
+//    消行音效编号(只读)
+    assign snd_clr_n = c_clear[2:0];
+
 endmodule

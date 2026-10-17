@@ -155,6 +155,33 @@ wire hold_p     = hold_p_flag;
     wire [19:0]score;
     wire [15:0]lines;
     wire [13:0]time_sec;
+    wire snd_land1;
+    wire snd_land2;
+    wire snd_hard1;
+    wire snd_hard2;
+    wire snd_soft1;
+    wire snd_soft2;
+    wire blk_l1;
+    wire blk_r1;
+    wire blk_l2;
+    wire blk_r2;
+    wire snd_hold1;
+    wire snd_hold2;
+    wire [2:0]snd_clr_n;
+    reg [2:0]lvl_d;
+    reg lvl_up;
+
+//    升级检测: speed_level 变化产生 1 拍脉冲(给音效)
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)begin
+    lvl_d <= 3'd0;
+    lvl_up <= 1'b0;
+    end
+    else begin
+    lvl_d <= speed_level;
+    lvl_up <= Playing && (speed_level > lvl_d);
+    end
+    end
    
    frame frame_inst(
     .Clk_74M(Clk_74M),
@@ -188,7 +215,20 @@ wire hold_p     = hold_p_flag;
     .speed_level(speed_level),
     .score(score),
     .lines(lines),
-    .time_sec(time_sec)
+    .time_sec(time_sec),
+    .snd_land1(snd_land1),
+    .snd_land2(snd_land2),
+    .snd_hard1(snd_hard1),
+    .snd_hard2(snd_hard2),
+    .snd_soft1(snd_soft1),
+    .snd_soft2(snd_soft2),
+    .blk_l1(blk_l1),
+    .blk_r1(blk_r1),
+    .blk_l2(blk_l2),
+    .blk_r2(blk_r2),
+    .snd_hold1(snd_hold1),
+    .snd_hold2(snd_hold2),
+    .snd_clr_n(snd_clr_n)
     );
     
 //   音频输出
@@ -208,10 +248,27 @@ wire hold_p     = hold_p_flag;
     .Reset_n(Reset_n),
     .over(over),
     .clear(clear),
-    .drop(drop_r_f),
-    .rotate(rotate_p),
-    .right(right_p),
-    .left(left_p),
+    .clr_n(snd_clr_n),
+    .lvl_up(lvl_up),
+    .sw(switch_r_f),
+    .menu_l(choose && left_p_menu),
+    .menu_r(choose && right_p_menu),
+    .land1(snd_land1),
+    .land2(snd_land2),
+    .lft1(left_p && !blk_l1),
+    .rgt1(right_p && !blk_r1),
+    .rot1(rotate_p),
+    .hard1(snd_hard1),
+    .soft1(snd_soft1),
+    .hold1(snd_hold1),
+    .blk1(blk_l1 || blk_r1),
+    .lft2(kb_left_p && !blk_l2),
+    .rgt2(kb_right_p && !blk_r2),
+    .rot2(kb_rotate_p),
+    .hard2(snd_hard2),
+    .soft2(snd_soft2),
+    .hold2(snd_hold2),
+    .blk2(blk_l2 || blk_r2),
     
     .buzz_else(buzz_else)
     );

@@ -63,7 +63,19 @@ module Playfield(
     output wire lock_we2,
     output wire [1:0]lock_idx2,
     output wire land_we2,
-    output wire [2:0]type_t2_out
+    output wire [2:0]type_t2_out,
+    output wire snd_land1,
+    output wire snd_land2,
+    output wire snd_hard1,
+    output wire snd_hard2,
+    output wire snd_soft1,
+    output wire snd_soft2,
+    output wire blk_l1,
+    output wire blk_r1,
+    output wire blk_l2,
+    output wire blk_r2,
+    output wire snd_hold1,
+    output wire snd_hold2
     );
 
 //============================================================
@@ -1091,6 +1103,20 @@ module Playfield(
     assign R_num2 = R_num;
 
     assign land_we2  = (lock_counter2 != 0) && (lock_counter2 != 5940000) && (lock_counter2[21]);
+
+//    音效事件(只读引出): 硬降/软降/左右被挡/换块
+    assign snd_land1 = lock_t;
+    assign snd_land2 = lock_t2;
+    assign snd_hard1 = drop_hold;
+    assign snd_hard2 = drop_hold2;
+    assign snd_soft1 = drop_r;
+    assign snd_soft2 = drop_r2;
+    assign blk_l1 = left_p_flag && boundary_collision_left;
+    assign blk_r1 = right_p_flag && boundary_collision_right;
+    assign blk_l2 = left_p_flag2 && boundary_collision_left2;
+    assign blk_r2 = right_p_flag2 && boundary_collision_right2;
+    assign snd_hold1 = hold_up;
+    assign snd_hold2 = hold_up2;
     assign land_pulse2 = (lock_counter2 == 5940000) ? 1 : 0;
     assign lock_we2  = (lock_t2) || (lock_cnt2 != 2'd0);
     assign lock_idx2 = (lock_t2) ? 2'd0 : lock_cnt2;
