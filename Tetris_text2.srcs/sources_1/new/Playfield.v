@@ -1595,11 +1595,21 @@ module Playfield(
 //    P1 solo hint
 wire [479:0]hint_row_bits = {row_w[19],row_w[18],row_w[17],row_w[16],row_w[15],row_w[14],row_w[13],row_w[12],row_w[11],row_w[10],row_w[9],row_w[8],row_w[7],row_w[6],row_w[5],row_w[4],row_w[3],row_w[2],row_w[1],row_w[0]};
 reg playing_d;
+reg lock_we_d;
 always@(posedge Clk_74M or negedge Reset_n)begin
-if(!Reset_n) playing_d <= 1'b0;
-else playing_d <= Playing;
+if(!Reset_n)begin
+playing_d <= 1'b0;
+lock_we_d <= 1'b0;
 end
-wire hint_start = !duo && Playing && (new_piece1 || hold_up || clear_down || field_chg || !playing_d);
+else begin
+playing_d <= Playing;
+lock_we_d <= lock_we;
+end
+end
+// 四格锁存写完后再重算提示, 避免基于半写入棋盘得到错误落点
+wire hint_lock_done = lock_we_d && !lock_we;
+wire hint_start = !duo && Playing && (hold_up || clear_down || hint_lock_done ||
+                   ((new_piece1 || field_chg) && !lock_we) || !playing_d);
 solo_hint solo_hint_inst(
 .Clk_74M(Clk_74M), .Reset_n(Reset_n), .start(hint_start), .duo(duo), .Playing(Playing),
 .type(type), .row_bits(hint_row_bits),

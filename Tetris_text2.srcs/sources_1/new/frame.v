@@ -725,7 +725,10 @@ module frame(
     wire hint_box = (((gly_r == 11'd3) || (gly_r == 11'd26)) && (glx_r > 11'd2) && (glx_r < 11'd27) && (glx_r[2:0] < 3'd4)) ||
                     (((glx_r == 11'd3) || (glx_r == 11'd26)) && (gly_r > 11'd2) && (gly_r < 11'd27) && (gly_r[2:0] < 3'd4));
     wire hint_dot = (glx_r >= 11'd14) && (glx_r <= 11'd15) && (gly_r >= 11'd14) && (gly_r <= 11'd15);
-    wire hint_cell_lit = hint_hit_r && (hint_box || hint_dot) && !cell_r && !Piece_r && !Piece2_r;
+    wire [4:0]hint_r_safe = (R_num <= 5'd19) ? R_num : 5'd0;
+    wire [4:0]hint_c_safe = (C_num <= 5'd23) ? C_num : 5'd0;
+    wire hint_occupied_now = row_f[hint_r_safe][hint_c_safe] || Piece || Piece2;
+    wire hint_cell_lit = hint_hit_r && (hint_box || hint_dot);
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -848,7 +851,7 @@ module frame(
     lb_lv_r <= lb_lv;
     fin_r <= Finalize;
     hint_type_r <= hint_type;
-    hint_hit_r <= hint_show && !duo && Playing && hint_match;
+    hint_hit_r <= hint_show && !duo && Playing && hint_match && !hint_occupied_now;
     end
     end
 //    UI ��Ч: 60Hz ���� + ��������(E1) / ��������(E2)

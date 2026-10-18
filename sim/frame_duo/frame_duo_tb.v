@@ -706,10 +706,12 @@ initial begin
     look(11'd389,11'd404); chk("hint top dash gap", rgb, `FLDBG);
     look(11'd399,11'd415); chk("hint center dot", rgb, hintcol(k[2:0]));
   end
-  force dut.cell_r = 1'b1; force dut.sc_r = 3'd3; force dut.piece_round_r = 1'b1;
+  dut.Playfield_inst.state[2*20+10] = 1'b1;
+  dut.state_color[2*20+10] = 3'd3;
+  dut.state_owner[2*20+10] = 1'b0;
   repeat(5) @(posedge Clk);
-  look(11'd399,11'd415); chk("hint clipped by locked cell", rgb, `RED);
-  release dut.cell_r; release dut.sc_r; release dut.piece_round_r;
+  look(11'd399,11'd415); chk("hint clipped by real locked cell", rgb, `RED);
+  clr_state;
   repeat(5) @(posedge Clk);
   hint_show = 1'b0; duo=0; Playing=1; repeat(5) @(posedge Clk);
   look(11'd399,11'd415); chk("hint hidden after short/release", rgb, `FLDBG);
