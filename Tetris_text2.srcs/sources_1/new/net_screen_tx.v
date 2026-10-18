@@ -46,7 +46,7 @@ parameter FPS_DIV    = 1;                        // 1=60fps  2=30fps  3=20fps
 parameter PAL_FRAMES = 60;                       // 每 60 帧插一个调色板包(=1s@60fps)
 parameter LINE_LEN   = 16'd1287;                 // 7 字节包头 + 1280 个标号
 parameter PAL_LEN    = 16'd160;                  // 4 + 39*4
-parameter [6:0] PAL_LAST = 7'd159;              // = 4 + PAL_N*4 - 1 (包尾序号)
+parameter [7:0] PAL_LAST = 8'd159;              // = 4 + PAL_N*4 - 1 (包尾序号)
 parameter PAL_N      = 8'd39;
 parameter KB_TIMEOUT = 24'd14_850_000;              // 200ms @74.25MHz 没有按键包就全部松开
 parameter KB_RST_CNT = 25'd1_485_000;               // 小键盘9复位把 Reset_n 拉低 20ms
@@ -253,7 +253,7 @@ localparam SEQ_RES  = 4'd7;   // 写结果包 13 字节
 localparam SEQ_RTOG = 4'd8;   // tx_start（结果包）
 
 reg [3:0]  seq;
-reg [6:0]  seq_idx;
+reg [7:0]  seq_idx;
 reg [15:0] frame_cnt;
 reg [3:0]  fps_cnt;
 reg [7:0]  pal_cnt;
@@ -473,7 +473,7 @@ always@(*)begin
   endcase
 end
 
-wire [4:0] pel     = seq_idx[6:2] - 5'd1;
+wire [5:0] pel     = seq_idx[7:2] - 6'd1;
 wire [1:0] psub    = seq_idx[1:0];
 
 reg [23:0] pal_rgb;
@@ -509,15 +509,15 @@ always@(*)begin
   5'd27:  pal_rgb = 24'h0A_0F_16;
   5'd28:  pal_rgb = 24'h08_1A_1E;
   5'd29:  pal_rgb = 24'h1E_08_12;
-  5'd30:  pal_rgb = 24'h04_63_7E;
-  5'd31:  pal_rgb = 24'h47_1F_67;
-  5'd32:  pal_rgb = 24'h74_79_0D;
-  5'd33:  pal_rgb = 24'h69_22_2C;
-  5'd34:  pal_rgb = 24'h29_52_23;
-  5'd35:  pal_rgb = 24'h71_41_1D;
-  5'd36:  pal_rgb = 24'h74_2B_56;
-  5'd37:  pal_rgb = 24'h6B_F0_FF;
-  5'd38:  pal_rgb = 24'hFF_98_CB;
+  6'd30:  pal_rgb = 24'h04_63_7E;
+  6'd31:  pal_rgb = 24'h47_1F_67;
+  6'd32:  pal_rgb = 24'h74_79_0D;
+  6'd33:  pal_rgb = 24'h69_22_2C;
+  6'd34:  pal_rgb = 24'h29_52_23;
+  6'd35:  pal_rgb = 24'h71_41_1D;
+  6'd36:  pal_rgb = 24'h74_2B_56;
+  6'd37:  pal_rgb = 24'h6B_F0_FF;
+  6'd38:  pal_rgb = 24'hFF_98_CB;
   default: pal_rgb = 24'h00_00_00;
   endcase
 end
