@@ -164,9 +164,9 @@ module sound(
     5'd15: st_last = 4'd1;
     5'd18: st_last = 4'd2;
     5'd14: st_last = 4'd4;
-    5'd13: st_last = 4'd3;
-    5'd12: st_last = 4'd2;
-    5'd11: st_last = 4'd1;
+    5'd13: st_last = 4'd4;
+    5'd12: st_last = 4'd4;
+    5'd11: st_last = 4'd4;
     5'd10: st_last = 4'd1;
     5'd9:  st_last = 4'd1;
     5'd8:  st_last = 4'd0;
@@ -217,20 +217,26 @@ module sound(
         endcase
     5'd13: case(st)
         4'd0: note = N_C5;
-        4'd1: note = N_E5;
-        4'd2: note = N_G5;
-        4'd3: note = N_C6;
+        4'd1: note = N_D5;
+        4'd2: note = N_E5;
+        4'd3: note = N_G5;
+        4'd4: note = N_C6;
         default: note = 18'd0;
         endcase
     5'd12: case(st)
         4'd0: note = N_C5;
-        4'd1: note = N_E5;
-        4'd2: note = N_G5;
+        4'd1: note = N_D5;
+        4'd2: note = N_E5;
+        4'd3: note = N_G5;
+        4'd4: note = N_C6;
         default: note = 18'd0;
         endcase
     5'd11: case(st)
-        4'd0: note = N_E5;
-        4'd1: note = N_G5;
+        4'd0: note = N_C5;
+        4'd1: note = N_D5;
+        4'd2: note = N_E5;
+        4'd3: note = N_G5;
+        4'd4: note = N_C6;
         default: note = 18'd0;
         endcase
     5'd10: case(st)
@@ -293,27 +299,33 @@ module sound(
     5'd14: case(st)
         4'd0: cnt = 9'd30;
         4'd1: cnt = 9'd30;
-        4'd2: cnt = 9'd35;
-        4'd3: cnt = 9'd35;
-        4'd4: cnt = 9'd60;
+        4'd2: cnt = 9'd30;
+        4'd3: cnt = 9'd30;
+        4'd4: cnt = 9'd110;
         default: cnt = 9'd0;
         endcase
     5'd13: case(st)
         4'd0: cnt = 9'd30;
         4'd1: cnt = 9'd30;
         4'd2: cnt = 9'd30;
-        4'd3: cnt = 9'd45;
+        4'd3: cnt = 9'd30;
+        4'd4: cnt = 9'd90;
         default: cnt = 9'd0;
         endcase
     5'd12: case(st)
         4'd0: cnt = 9'd30;
         4'd1: cnt = 9'd30;
-        4'd2: cnt = 9'd45;
+        4'd2: cnt = 9'd30;
+        4'd3: cnt = 9'd30;
+        4'd4: cnt = 9'd75;
         default: cnt = 9'd0;
         endcase
     5'd11: case(st)
         4'd0: cnt = 9'd30;
-        4'd1: cnt = 9'd45;
+        4'd1: cnt = 9'd30;
+        4'd2: cnt = 9'd30;
+        4'd3: cnt = 9'd30;
+        4'd4: cnt = 9'd60;
         default: cnt = 9'd0;
         endcase
     5'd10: case(st)

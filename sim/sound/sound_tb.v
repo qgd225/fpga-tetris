@@ -295,9 +295,9 @@ initial begin
     clear_all;
 
     $display("=== 4) 消行序列长度 ===");
-    run_clear_sequence(1, 2, "clear1 note count");
-    run_clear_sequence(2, 3, "clear2 note count");
-    run_clear_sequence(3, 4, "clear3 note count");
+    run_clear_sequence(1, 5, "clear1 note count");
+    run_clear_sequence(2, 5, "clear2 note count");
+    run_clear_sequence(3, 5, "clear3 note count");
     run_clear_sequence(4, 5, "clear4 note count");
 
     $display("=== 5) 消行高电平只响一次 ===");
@@ -345,13 +345,13 @@ initial begin
     wait_done;
 
     do_reset; clear = 1; clr_n = 1; one_pulse;
-    chk("clear1 st0 cnt=30ms", dut.cnt, 30); chk("clear1 st_last=1", dut.st_last, 1);
+    chk("clear1 st0 cnt=30ms", dut.cnt, 30); chk("clear1 st_last=4", dut.st_last, 4);
     clear_all; wait_done;
     do_reset; clear = 1; clr_n = 2; one_pulse;
-    chk("clear2 st0 cnt=30ms", dut.cnt, 30); chk("clear2 st_last=2", dut.st_last, 2);
+    chk("clear2 st0 cnt=30ms", dut.cnt, 30); chk("clear2 st_last=4", dut.st_last, 4);
     clear_all; wait_done;
     do_reset; clear = 1; clr_n = 3; one_pulse;
-    chk("clear3 st0 cnt=30ms", dut.cnt, 30); chk("clear3 st_last=3", dut.st_last, 3);
+    chk("clear3 st0 cnt=30ms", dut.cnt, 30); chk("clear3 st_last=4", dut.st_last, 4);
     clear_all; wait_done;
     do_reset; clear = 1; clr_n = 4; one_pulse;
     chk("clear4 st0 cnt=30ms", dut.cnt, 30); chk("clear4 st_last=4", dut.st_last, 4);
