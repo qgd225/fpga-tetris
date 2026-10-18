@@ -190,6 +190,33 @@ initial begin
     chk("分数 BCD 逐位一致(7 个值)", badv, 0);
   end
 
+  $display("=== 8) level energy bar geometry ===");
+  begin : level_geom
+    force dut.Playfield_inst.speed_level = 3'd3;
+    repeat(4) @(posedge Clk_74M);
+    hc = 11'd293; vc = 11'd400; #1;
+    chk("segment margin", dut.level_inst.margin, 1);
+    hc = 11'd293; vc = 11'd402; #1;
+    chk("current inner", dut.level_inst.inner, 1);
+    chk("current segment", dut.level_inst.cur, 1);
+    chk("current cap", dut.level_inst.cap, 1);
+    vc = 11'd408; #1;
+    chk("cap ends at 6px", dut.level_inst.cap, 0);
+    vc = 11'd440; #1;
+    chk("current body lit", dut.level_inst.on, 1);
+    vc = 11'd360; #1;
+    chk("above segment unlit", dut.level_inst.on, 0);
+    hc = 11'd279; vc = 11'd440; #1;
+    chk("outside left", dut.level_inst.inner, 0);
+    hc = 11'd280; #1;
+    chk("width starts 280", dut.level_inst.inner, 1);
+    hc = 11'd307; #1;
+    chk("width ends 307", dut.level_inst.inner, 1);
+    hc = 11'd308; #1;
+    chk("outside right", dut.level_inst.inner, 0);
+    release dut.Playfield_inst.speed_level;
+    hc = 11'd0; vc = 11'd0;
+  end
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;

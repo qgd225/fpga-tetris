@@ -257,15 +257,12 @@ initial begin
   look(11'd325, 11'd85);   chk("P2 ghost inner tick", rgb, 24'hFFB3B9);
   look(11'd330, 11'd90);   chk("P2 ghost interior black", rgb, `FLDBG);
   force dut.Playfield_inst.ghost2 = 1'b0;
-  //    ghost restart event -> 2-frame DASH RING
+  //    ghost restart must not trigger dynamic dash ring
   force dut.Playfield_inst.ghost = 1'b1; force dut.Playfield_inst.type = 3'd0;
-  l1 = 1'b1; @(posedge Clk); #1; l1 = 1'b0; @(posedge Clk); #1;
-  chk("ghost event arms dash", dut.gd1, 2);
-  look(11'd331, 11'd85); chk("ghost dash pixel", rgb, 24'h99EEFF);
-  force dut.gd1 = 2'd0; repeat(2) @(posedge Clk);
-  look(11'd331, 11'd85); chk("ghost dash off", rgb, `FLDBG);
-  release dut.gd1;
-  force dut.Playfield_inst.Piece = 1'b1; force dut.Playfield_inst.type = 3'd0;
+  l1 = 1'b1; @(posedge Clk); #1; l1 = 1'b0; repeat(4) @(posedge Clk);
+  look(11'd331, 11'd85); chk("ghost no rescan flash", rgb, `FLDBG);
+  repeat(8) @(posedge Clk);
+  look(11'd331, 11'd85); chk("ghost stays static", rgb, `FLDBG);  force dut.Playfield_inst.Piece = 1'b1; force dut.Playfield_inst.type = 3'd0;
   repeat(4) @(posedge Clk);
   look(11'd330, 11'd90);   chk("下落方块内部=实色", rgb, 24'h00CCFF);
   look(11'd322, 11'd85);   chk("falling edge P1 soft", rgb, 24'h6BF0FF);
@@ -318,35 +315,37 @@ initial begin
   release dut.Playfield_inst.ghost; release dut.Playfield_inst.type;
   repeat(2) @(posedge Clk);
 
-  $display("=== 10) 等级: 8 级热力色 + 加宽条 + LV 组 ==");
+  $display("=== 10) level energy bar: bottom-up + cap + frame ===\n");
   duo = 1'b0; repeat(4) @(posedge Clk);
   for(k = 0; k < 8; k = k + 1)begin
     force dut.Playfield_inst.speed_level = k[2:0];
     repeat(40) @(posedge Clk);
     ybar = 88 + (7 - k) * 78 + 40;
-    look(11'd293, ybar[10:0]);   chk("当前段=白", rgb, `WHITE);
+    look(11'd293, ybar[10:0]); chk("current body level color", rgb, lvcol(k[2:0]));
+    look(11'd293, (ybar-37));  chk("current cap white", rgb, `WHITE);
     if(k > 0)begin
       ybar = 88 + (7 - (k-1)) * 78 + 40;
-      look(11'd293, ybar[10:0]); chk("已点亮段=等级色", rgb, lvcol(k[2:0]));
+      look(11'd293, ybar[10:0]); chk("achieved body color", rgb, lvcol(k[2:0]));
     end
     if(k < 7)begin
       ybar = 88 + (7 - (k+1)) * 78 + 40;
-      look(11'd293, ybar[10:0]); chk("未点亮段=303030", rgb, 24'h303030);
+      look(11'd293, ybar[10:0]); chk("unlit body dark", rgb, 24'h303030);
     end
   end
   force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
-  look(11'd279, 11'd440);   chk("条左外=黑", rgb, `BLACK);
-  look(11'd280, 11'd440);   chk("条左边=303030", rgb, 24'h303030);
-  look(11'd305, 11'd440);   chk("条右边=303030", rgb, 24'h303030);
-  look(11'd306, 11'd440);   chk("条右外=黑", rgb, `BLACK);
-  look(11'd293, 11'd88);    chk("段缝=202020", rgb, `SLOT_BG);
-  look(11'd292, 11'd40);    chk("等级数字=等级色0", rgb, 24'h00E5FF);
-  look(11'd234, 11'd50);    chk("LV 标签=等级色0", rgb, 24'h00E5FF);
-  look(11'd240, 11'd72);    chk("LV 组色线=等级色0", rgb, 24'h00E5FF);
-  look(11'd240, 11'd74);    chk("色线下方=黑", rgb, `BLACK);
-  look(11'd340, 11'd40);    chk("时间仍为白", rgb, `WHITE);
+  look(11'd277, 11'd440);   chk("level frame left", rgb, 24'h606060);
+  look(11'd279, 11'd440);   chk("outside bar black", rgb, `BLACK);
+  look(11'd280, 11'd440);   chk("bar left inner", rgb, 24'h303030);
+  look(11'd306, 11'd440);   chk("bar inner right", rgb, 24'h303030);
+  look(11'd307, 11'd440);   chk("bar right inner", rgb, 24'h303030);
+  look(11'd310, 11'd440);   chk("level frame right", rgb, 24'h606060);
+  look(11'd293, 11'd88);    chk("segment gap dark", rgb, `SLOT_BG);
+  look(11'd292, 11'd40);    chk("level digit color", rgb, 24'h00E5FF);
+  look(11'd234, 11'd50);    chk("LV label color", rgb, 24'h00E5FF);
+  look(11'd240, 11'd72);    chk("LV rule color", rgb, 24'h00E5FF);
+  look(11'd240, 11'd74);    chk("LV rule below black", rgb, `BLACK);
+  look(11'd340, 11'd40);    chk("time still white", rgb, `WHITE);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
-
   $display("=== 11) 菜单屏: 无框选项 + 青色选中标记 ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
   hc = 11'd495; vc = 11'd110; repeat(3) @(posedge Clk);       // 标题第 1 字前 1 像素
@@ -388,8 +387,11 @@ initial begin
   look(11'd240,  11'd40);   chk("LV 标签=等级色", rgb, 24'h00E5FF);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
   Finalize = 1'b1; duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd113,   11'd90);   chk("Finalize 标签暗化", rgb, `SLOT_BG);
-  Finalize = 1'b0; repeat(4) @(posedge Clk);
+  look(11'd113,   11'd90);   chk("Finalize label dim", rgb, `SLOT_BG);
+  look(11'd292,   11'd40);   chk("Finalize LV digit kept", rgb, 24'h00E5FF);
+  look(11'd234,   11'd50);   chk("Finalize LV label kept", rgb, 24'h00E5FF);
+  look(11'd293,   11'd674);  chk("Finalize level bar kept", rgb, 24'h00E5FF);
+  look(11'd277,   11'd440);  chk("Finalize level frame kept", rgb, 24'h606060);  Finalize = 1'b0; repeat(4) @(posedge Clk);
 
   $display("=== 13) 标签字模 1 像素预取(修第 1 列串字) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
@@ -465,7 +467,7 @@ initial begin
   force dut.Playfield_inst.speed_level = 3'd5; repeat(2) @(posedge Clk);
   look(11'd293, 11'd280);   chk("升级瞬间当前段=白", rgb, `WHITE);
   repeat(40) @(posedge Clk);
-  look(11'd293, 11'd280);   chk("升级后当前段回青", rgb, `WHITE);
+  look(11'd293, 11'd280);   chk("升级后当前段回青", rgb, 24'hFF4DA6);
   release dut.Playfield_inst.speed_level; repeat(40) @(posedge Clk);
   force dut.Playfield_inst.score = 20'd777; repeat(2) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("加分瞬间分数=青", rgb, `CY_MENU);

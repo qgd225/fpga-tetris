@@ -8,14 +8,15 @@ module level(
     output margin,
     output inner,
     output on,
-    output cur
+    output cur,
+    output cap
     );
 
 //    等级: 场地左侧 8 段竖条(x 284..302, y 88..712), 每段 78px, 段顶部 2px 是缝
 //    margin=缝(画暗色)  inner=段体  on=已达段  cur=当前段
     parameter [10:0]BX = 11'd280,
                      BY = 11'd88,
-                     BW = 11'd26,
+                     BW = 11'd28,
                      SH = 11'd78;
 
     wire [10:0]Yr = vcounter - BY;
@@ -35,5 +36,6 @@ module level(
     assign inner  = in_bar && (Rr >= 11'd2);
     assign on     = (sib <= {1'b0, speed_level});
     assign cur    = (sib == {1'b0, speed_level});
+    assign cap    = in_bar && cur && (Rr >= 11'd2) && (Rr < 11'd8);
 
 endmodule
