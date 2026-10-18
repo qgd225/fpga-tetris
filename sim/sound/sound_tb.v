@@ -344,6 +344,19 @@ initial begin
     clear_all;
     wait_done;
 
+    do_reset; clear = 1; clr_n = 1; one_pulse;
+    chk("clear1 st0 cnt=30ms", dut.cnt, 30); chk("clear1 st_last=1", dut.st_last, 1);
+    clear_all; wait_done;
+    do_reset; clear = 1; clr_n = 2; one_pulse;
+    chk("clear2 st0 cnt=30ms", dut.cnt, 30); chk("clear2 st_last=2", dut.st_last, 2);
+    clear_all; wait_done;
+    do_reset; clear = 1; clr_n = 3; one_pulse;
+    chk("clear3 st0 cnt=30ms", dut.cnt, 30); chk("clear3 st_last=3", dut.st_last, 3);
+    clear_all; wait_done;
+    do_reset; clear = 1; clr_n = 4; one_pulse;
+    chk("clear4 st0 cnt=30ms", dut.cnt, 30); chk("clear4 st_last=4", dut.st_last, 4);
+    clear_all; wait_done;
+
     $display("=== 7) 被挡双音与开关双音 ===");
     do_reset;
     blk1 = 1; one_pulse;

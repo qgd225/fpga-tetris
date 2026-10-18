@@ -673,6 +673,7 @@ module frame(
     reg [2:0]sc_r;
     reg owner_r;
     reg clear_t_r;
+    reg clear_shrink_r;
     reg flash_r;
     reg chs_margin_r;
     reg chs_inner_r;
@@ -740,6 +741,7 @@ module frame(
     sc_r <= 3'd0;
     owner_r <= 1'b0;
     clear_t_r <= 1'b0;
+    clear_shrink_r <= 1'b0;
     flash_r <= 1'b0;
     chs_margin_r <= 1'b0;
     chs_inner_r <= 1'b0;
@@ -801,6 +803,7 @@ module frame(
     owner_r <= 1'b0;
     end
     clear_t_r <= clear_t;
+    clear_shrink_r <= (clear_t) && (line_t[R_num]) && (clear_flash);
     flash_r <= (clear_t) && (line_t[R_num]) && (!clear_flash);
     chs_margin_r <= chs_margin;
     chs_inner_r <= chs_inner;
@@ -1411,6 +1414,8 @@ module frame(
             endcase
             if(flash_r)
             rgb = 24'hEEEEEE;
+            if(clear_shrink_r && !((glx_r >= 11'd11) && (glx_r <= 11'd20) && (gly_r >= 11'd11) && (gly_r <= 11'd20)))
+            rgb = field_bg;
         end
         else if(block_glint)
         rgb = WHITE;

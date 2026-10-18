@@ -588,6 +588,15 @@ initial begin
   release dut.piece_cmin1; release dut.piece_cmax1;
   release dut.piece_rmin1; release dut.piece_rmax1;
   clr_state; repeat(4) @(posedge Clk);
+  $display("=== 23) clear pixel collapse ===\n");
+  duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0; clr_state;
+  dut.state_color[0] = 3'd3; dut.Playfield_inst.state[0] = 1'b1;
+  force dut.clear_t_r = 1'b1; force dut.clear_shrink_r = 1'b1;
+  repeat(4) @(posedge Clk);
+  look(11'd321, 11'd81); chk("collapse edge black", rgb, `FLDBG);
+  look(11'd332, 11'd92); chk("collapse center color", rgb, `RED);
+  release dut.clear_t_r; release dut.clear_shrink_r;
+  clr_state; repeat(4) @(posedge Clk);
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;

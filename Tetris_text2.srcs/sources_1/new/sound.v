@@ -281,29 +281,29 @@ module sound(
         default: cnt = 9'd0;
         endcase
     5'd14: case(st)
-        4'd0: cnt = 9'd55;
-        4'd1: cnt = 9'd55;
-        4'd2: cnt = 9'd55;
-        4'd3: cnt = 9'd55;
-        4'd4: cnt = 9'd120;
+        4'd0: cnt = 9'd30;
+        4'd1: cnt = 9'd30;
+        4'd2: cnt = 9'd35;
+        4'd3: cnt = 9'd35;
+        4'd4: cnt = 9'd60;
         default: cnt = 9'd0;
         endcase
     5'd13: case(st)
-        4'd0: cnt = 9'd60;
-        4'd1: cnt = 9'd60;
-        4'd2: cnt = 9'd60;
-        4'd3: cnt = 9'd120;
+        4'd0: cnt = 9'd30;
+        4'd1: cnt = 9'd30;
+        4'd2: cnt = 9'd30;
+        4'd3: cnt = 9'd45;
         default: cnt = 9'd0;
         endcase
     5'd12: case(st)
-        4'd0: cnt = 9'd60;
-        4'd1: cnt = 9'd60;
-        4'd2: cnt = 9'd120;
+        4'd0: cnt = 9'd30;
+        4'd1: cnt = 9'd30;
+        4'd2: cnt = 9'd45;
         default: cnt = 9'd0;
         endcase
     5'd11: case(st)
-        4'd0: cnt = 9'd60;
-        4'd1: cnt = 9'd120;
+        4'd0: cnt = 9'd30;
+        4'd1: cnt = 9'd45;
         default: cnt = 9'd0;
         endcase
     5'd10: case(st)
