@@ -55,6 +55,9 @@ module sound(
     reg ms_tick;
     reg [4:0]en;
     reg clear_seen;
+    reg over_pending;
+    reg over_d;
+    wire over_rise = over && !over_d;
     reg tick;
     reg [17:0]note;
     reg [17:0]note_q;
@@ -91,15 +94,22 @@ module sound(
     if(!Reset_n)begin
     en <= 5'd0;
     clear_seen <= 1'b0;
+    over_pending <= 1'b0;
+    over_d <= 1'b0;
     end
     else begin
+    over_d <= over;
+    if(over_rise)
+    over_pending <= 1'b1;
     if(!clear)
     clear_seen <= 1'b0;
     if(tick)
     en <= 5'd0;
     else if(en == 5'd0)begin
-        if(over)
+        if(over || over_pending)begin
         en <= 5'd16;
+        over_pending <= 1'b0;
+        end
         else if(sw_long)
         en <= 5'd17;
         else if(sw_short)

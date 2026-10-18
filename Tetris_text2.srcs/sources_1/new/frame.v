@@ -1029,11 +1029,13 @@ module frame(
 
     //    Impact Glass edges and 8px SOFT white L glint
     wire block_light = (glx_r == 11'd1) || (gly_r == 11'd1);
+    wire block_soft = (glx_r >= 11'd6) && (glx_r <= 11'd11) && (gly_r == 11'd26);//左下6x1柔光
     wire block_dark = (glx_r == 11'd30) || (gly_r == 11'd30);
     wire block_glint = (((gly_r == 11'd2) || (gly_r == 11'd3)) && (glx_r >= 11'd2) && (glx_r <= 11'd9)) ||
                        (((glx_r == 11'd2) || (glx_r == 11'd3)) && (gly_r >= 11'd2) && (gly_r <= 11'd9)) ||
                        ((glx_r >= 11'd3) && (glx_r <= 11'd4) && (gly_r >= 11'd3) && (gly_r <= 11'd4));
     wire pv_light = (pvx_r == 11'd1) || (pvy_r == 11'd1);
+    wire pv_soft = (pvx_r >= 11'd6) && (pvx_r <= 11'd11) && (pvy_r == 11'd26);//预览左下6x1柔光
     wire pv_dark = (pvx_r == 11'd30) || (pvy_r == 11'd30);
     wire pv_glint = (((pvy_r == 11'd2) || (pvy_r == 11'd3)) && (pvx_r >= 11'd2) && (pvx_r <= 11'd9)) ||
                     (((pvx_r == 11'd2) || (pvx_r == 11'd3)) && (pvy_r >= 11'd2) && (pvy_r <= 11'd9)) ||
@@ -1146,6 +1148,9 @@ module frame(
           rgb = 24'h303030;
         default:rgb = 24'hFFF_FFF;
         endcase
+    else if(Finalize && (hcounter >= 11'd432) && (hcounter <= 11'd847) &&
+            (vcounter >= 11'd348) && (vcounter <= 11'd451) && (hcounter[0] ^ vcounter[0]))
+    rgb = 24'h101010;//结束画面中心区域棋盘压暗
     else if(lbl_r)
     rgb = fin_r ? 24'h202020 : (lb_lv_r ? lv_color : 24'hB0B0B0);//NEXT/HOLD 标签灰, LV 用等级色
     else if(rule1_r)
@@ -1176,7 +1181,7 @@ module frame(
         rgb = WHITE;
         else if(pv_glint)
         rgb = WHITE;
-        else if(pv_light)
+        else if(pv_light || pv_soft)
         case(hold_type_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -1217,7 +1222,7 @@ module frame(
         rgb = WHITE;
         else if(pv_glint)
         rgb = WHITE;
-        else if(pv_light)
+        else if(pv_light || pv_soft)
         case(type_t_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -1258,7 +1263,7 @@ module frame(
         rgb = WHITE;
         else if(pv_glint)
         rgb = WHITE;
-        else if(pv_light)
+        else if(pv_light || pv_soft)
         case(type_t2_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -1329,7 +1334,7 @@ module frame(
         rgb = 24'hEEEEEE;
         else if(block_glint)
         rgb = WHITE;
-        else if(block_light)begin
+        else if(block_light || block_soft)begin
         if(duo)
         rgb = P1_SOFT;
         else
@@ -1420,7 +1425,7 @@ module frame(
         end
         else if(block_glint)
         rgb = WHITE;
-        else if(block_light)begin
+        else if(block_light || block_soft)begin
         if(duo)
         rgb = owner_r ? P2_SOFT : P1_SOFT;
         else
@@ -1465,7 +1470,7 @@ module frame(
         rgb = 24'hEEEEEE;
         else if(block_glint)
         rgb = WHITE;
-        else if(block_light)begin
+        else if(block_light || block_soft)begin
         if(duo)
         rgb = P2_SOFT;
         else

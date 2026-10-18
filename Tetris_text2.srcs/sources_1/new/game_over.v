@@ -20,10 +20,6 @@ module game_over(
 
     wire [10:0]hn = hcounter + 11'd1;
 
-//    E3: GAME OVER 逐字点亮 —— 每 120ms 点亮一个字
-    reg [2:0]rev;
-    reg [6:0]rev_ms;
-
     always@(*)begin
     X = 11'd0;
     Y = 11'd0;
@@ -32,12 +28,12 @@ module game_over(
     cnt = 4'd0;
         if(Finalize)begin
             for(i = 0; i < 4; i = i + 1)begin
-                if( (rev >= i) && (hcounter >= (593 - i*48) ) && (hcounter < (593 - i*48 + 20*2) ) &&
+                if( (hcounter >= (596 - i*48) ) && (hcounter < (596 - i*48 + 20*2) ) &&
                     (vcounter >= 368) && (vcounter < 368 + 32*2) )begin
                     ena = 1'b1;
-                    X = 593 - i*48;
+                    X = 596 - i*48;
                 end
-                if( (rev >= i) && (hn >= (593 - i*48 - 1) ) && (hn < (593 - i*48 + 20*2) ) &&
+                if( (hn >= (596 - i*48 - 1) ) && (hn < (596 - i*48 + 20*2) ) &&
                     (vcounter >= 368) && (vcounter < 368 + 32*2) )begin
                     ena_n = 1'b1;
                     case(i)
@@ -48,12 +44,12 @@ module game_over(
                     default:cnt = 4'd0;
                     endcase
                 end
-                if( (rev >= (i + 4)) && (hcounter >= (785 - i*48) ) && (hcounter < (785 - i*48 + 20*2) ) &&
+                if( (hcounter >= (788 - i*48) ) && (hcounter < (788 - i*48 + 20*2) ) &&
                     (vcounter >= 368) && (vcounter < 368 + 32*2) )begin
                     ena = 1'b1;
-                    X = 785 - i*48;
+                    X = 788 - i*48;
                 end
-                if( (rev >= (i + 4)) && (hn >= (785 - i*48 - 1) ) && (hn < (785 - i*48 + 20*2) ) &&
+                if( (hn >= (788 - i*48 - 1) ) && (hn < (788 - i*48 + 20*2) ) &&
                     (vcounter >= 368) && (vcounter < 368 + 32*2) )begin
                     ena_n = 1'b1;
                     case(i)
@@ -105,27 +101,6 @@ module game_over(
     end
     end
     
-    always@(posedge Clk_74M or negedge Reset_n)begin
-    if(!Reset_n)begin
-    rev <= 3'd0;
-    rev_ms <= 7'd0;
-    end
-    else if(!Finalize)begin
-    rev <= 3'd0;
-    rev_ms <= 7'd0;
-    end
-    else if(ms_tick)begin
-        if(rev == 3'd7)
-        rev_ms <= 7'd0;
-        else if(rev_ms == 7'd119)begin
-        rev_ms <= 7'd0;
-        rev <= rev + 3'd1;
-        end
-        else
-        rev_ms <= rev_ms + 7'd1;
-    end
-    end
-
     reg [19:0]counter;
     
     always@(posedge Clk_74M or negedge Reset_n)begin

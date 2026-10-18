@@ -472,7 +472,25 @@ initial begin
     chk("long release no short", sm_short, 0);
     sm_switch_r = 0;
 
-    $display("¼ì²éÏî: %0d", checks);
+    $display("=== 12) over pending while another sound plays ===");
+    do_reset;
+    menu_l = 1; one_pulse;
+    chk("pending: menu starts", dut.en, 2);
+    over = 1; @(posedge Clk_74M); #1; over = 0;
+    chk("pending captured", dut.over_pending, 1);
+    chk("pending: current sound unchanged", dut.en, 2);
+    cycles = 0;
+    while((dut.en != 16) && (cycles < 200000))begin
+      @(posedge Clk_74M); #1;
+      cycles = cycles + 1;
+    end
+    chk("pending starts over", dut.en, 16);
+    clear_all;
+    wait_done;
+    chk("over plays once", dut.en, 0);
+    repeat(100) @(posedge Clk_74M);
+    chk("over does not retrigger", dut.en, 0);
+    $display("²âÊÔ: %0d", checks);
     if(bad == 0)
         $display("=== ALL PASS ===");
     else
