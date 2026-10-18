@@ -45,9 +45,9 @@ parameter DST_PORT   = 16'd5000;
 parameter FPS_DIV    = 1;                        // 1=60fps  2=30fps  3=20fps
 parameter PAL_FRAMES = 60;                       // 每 60 帧插一个调色板包(=1s@60fps)
 parameter LINE_LEN   = 16'd1287;                 // 7 字节包头 + 1280 个标号
-parameter PAL_LEN    = 16'd124;                  // 4 + 30*4
-parameter [6:0] PAL_LAST = 7'd123;              // = 4 + PAL_N*4 - 1 (包尾序号)
-parameter PAL_N      = 8'd30;
+parameter PAL_LEN    = 16'd160;                  // 4 + 39*4
+parameter [6:0] PAL_LAST = 7'd159;              // = 4 + PAL_N*4 - 1 (包尾序号)
+parameter PAL_N      = 8'd39;
 parameter KB_TIMEOUT = 24'd14_850_000;              // 200ms @74.25MHz 没有按键包就全部松开
 parameter KB_RST_CNT = 25'd1_485_000;               // 小键盘9复位把 Reset_n 拉低 20ms
 parameter KB_ACT_CNT = 25'd22_275_000;              // 收到按键包后 kb_activity 亮 0.3s
@@ -226,6 +226,15 @@ always@(*)begin
   24'h0A_0F_16: code_r = 8'd27;
   24'h08_1A_1E: code_r = 8'd28;
   24'h1E_08_12: code_r = 8'd29;
+  24'h04_63_7E: code_r = 8'd30;
+  24'h47_1F_67: code_r = 8'd31;
+  24'h74_79_0D: code_r = 8'd32;
+  24'h69_22_2C: code_r = 8'd33;
+  24'h29_52_23: code_r = 8'd34;
+  24'h71_41_1D: code_r = 8'd35;
+  24'h74_2B_56: code_r = 8'd36;
+  24'h6B_F0_FF: code_r = 8'd37;
+  24'hFF_98_CB: code_r = 8'd38;
   default:      code_r = 8'd0;
   endcase
 end
@@ -500,6 +509,15 @@ always@(*)begin
   5'd27:  pal_rgb = 24'h0A_0F_16;
   5'd28:  pal_rgb = 24'h08_1A_1E;
   5'd29:  pal_rgb = 24'h1E_08_12;
+  5'd30:  pal_rgb = 24'h04_63_7E;
+  5'd31:  pal_rgb = 24'h47_1F_67;
+  5'd32:  pal_rgb = 24'h74_79_0D;
+  5'd33:  pal_rgb = 24'h69_22_2C;
+  5'd34:  pal_rgb = 24'h29_52_23;
+  5'd35:  pal_rgb = 24'h71_41_1D;
+  5'd36:  pal_rgb = 24'h74_2B_56;
+  5'd37:  pal_rgb = 24'h6B_F0_FF;
+  5'd38:  pal_rgb = 24'hFF_98_CB;
   default: pal_rgb = 24'h00_00_00;
   endcase
 end

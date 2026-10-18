@@ -654,6 +654,8 @@ module frame(
     wire ghost_dash = gd_top || gd_bot || gd_lft || gd_rgt;
     reg piece_round_r;
     reg pv_round_r;
+    reg [10:0]pvx_r;
+    reg [10:0]pvy_r;
     reg land_we_r;
     reg [2:0]type_r;
     reg [2:0]type_t_r;
@@ -718,6 +720,8 @@ module frame(
         gly_r <= 11'd0;
         piece_round_r <= 1'b0;
         pv_round_r <= 1'b0;
+        pvx_r <= 11'd0;
+        pvy_r <= 11'd0;
     land_we_r <= 1'b0;
     type_r <= 3'd0;
     type_t_r <= 3'd0;
@@ -768,6 +772,8 @@ module frame(
         gly_r <= gly;
         piece_round_r <= piece_round;
         pv_round_r <= !pv_corner;
+        pvx_r <= pvx;
+        pvy_r <= pvy;
     land_we_r <= land_we;
     type_r <= type;
     type_t_r <= type_t;
@@ -969,7 +975,14 @@ module frame(
                PINK = 24'hFF4DA6,//亮粉色J
                LIGHT_PINK = 24'hFFB3D9,//浅粉色J
                BLACK = 24'h000_000,//黑色
-               WHITE = 24'hFFF_FFF;//白色
+               WHITE = 24'hFFF_FFF,//白色
+               DARK_I = 24'h04_63_7E,
+               DARK_T = 24'h47_1F_67,
+               DARK_O = 24'h74_79_0D,
+               DARK_S = 24'h69_22_2C,
+               DARK_Z = 24'h29_52_23,
+               DARK_L = 24'h71_41_1D,
+               DARK_J = 24'h74_2B_76;
     
     // danger band and side rails
     wire [23:0]col_mask = duo ? 24'hFFFFFF : 24'h0FFFFF;
@@ -994,6 +1007,18 @@ module frame(
                       (vcounter >= 11'd81) && (vcounter < 11'd721);
     wire rail_l_white = lflash1 || danger_active || (mbl1 != 2'd0) || (mbl2 != 2'd0);
     wire rail_r_white = (duo ? lflash2 : lflash1) || danger_active || (mbr1 != 2'd0) || (mbr2 != 2'd0);
+
+    //    Impact Glass edges and 8px SOFT white L glint
+    wire block_light = (glx_r == 11'd1) || (gly_r == 11'd1);
+    wire block_dark = (glx_r == 11'd30) || (gly_r == 11'd30);
+    wire block_glint = (((gly_r == 11'd2) || (gly_r == 11'd3)) && (glx_r >= 11'd2) && (glx_r <= 11'd9)) ||
+                       (((glx_r == 11'd2) || (glx_r == 11'd3)) && (gly_r >= 11'd2) && (gly_r <= 11'd9)) ||
+                       ((glx_r >= 11'd3) && (glx_r <= 11'd4) && (gly_r >= 11'd3) && (gly_r <= 11'd4));
+    wire pv_light = (pvx_r == 11'd1) || (pvy_r == 11'd1);
+    wire pv_dark = (pvx_r == 11'd30) || (pvy_r == 11'd30);
+    wire pv_glint = (((pvy_r == 11'd2) || (pvy_r == 11'd3)) && (pvx_r >= 11'd2) && (pvx_r <= 11'd9)) ||
+                    (((pvx_r == 11'd2) || (pvx_r == 11'd3)) && (pvy_r >= 11'd2) && (pvy_r <= 11'd9)) ||
+                    ((pvx_r >= 11'd3) && (pvx_r <= 11'd4) && (pvy_r >= 11'd3) && (pvy_r <= 11'd4));
 
     wire rot_pulse1 = (rotf1 == 3'd6) || (rotf1 == 3'd5) || (rotf1 == 3'd3) || (rotf1 == 3'd2) || (rotf1 == 3'd1);
     wire rot_pulse2 = (rotf2 == 3'd6) || (rotf2 == 3'd5) || (rotf2 == 3'd3) || (rotf2 == 3'd2) || (rotf2 == 3'd1);
@@ -1093,6 +1118,30 @@ module frame(
         rgb = slot_bg;
         else if(hflash)
         rgb = WHITE;
+        else if(pv_glint)
+        rgb = WHITE;
+        else if(pv_light)
+        case(hold_type_r)
+        0:rgb = LIGHT_CYAN;
+        1:rgb = LIGHT_PURPPLE;
+        2:rgb = LIGHT_YELLOW;
+        3:rgb = LIGHT_RED;
+        4:rgb = LIGHT_GREEN;
+        5:rgb = LIGHT_ORANGE;
+        6:rgb = LIGHT_PINK;
+        default:rgb = 0;
+        endcase
+        else if(pv_dark)
+        case(hold_type_r)
+        0:rgb = DARK_I;
+        1:rgb = DARK_T;
+        2:rgb = DARK_O;
+        3:rgb = DARK_S;
+        4:rgb = DARK_Z;
+        5:rgb = DARK_L;
+        6:rgb = DARK_J;
+        default:rgb = 0;
+        endcase
         else
         case(hold_type_r)
         0:rgb = CYAN;
@@ -1110,6 +1159,30 @@ module frame(
         rgb = slot_bg;
         else if(nflash1)
         rgb = WHITE;
+        else if(pv_glint)
+        rgb = WHITE;
+        else if(pv_light)
+        case(type_t_r)
+        0:rgb = LIGHT_CYAN;
+        1:rgb = LIGHT_PURPPLE;
+        2:rgb = LIGHT_YELLOW;
+        3:rgb = LIGHT_RED;
+        4:rgb = LIGHT_GREEN;
+        5:rgb = LIGHT_ORANGE;
+        6:rgb = LIGHT_PINK;
+        default:rgb = 0;
+        endcase
+        else if(pv_dark)
+        case(type_t_r)
+        0:rgb = DARK_I;
+        1:rgb = DARK_T;
+        2:rgb = DARK_O;
+        3:rgb = DARK_S;
+        4:rgb = DARK_Z;
+        5:rgb = DARK_L;
+        6:rgb = DARK_J;
+        default:rgb = 0;
+        endcase
         else
         case(type_t_r)
         0:rgb = CYAN;
@@ -1127,6 +1200,30 @@ module frame(
         rgb = slot_bg;
         else if(nflash2)
         rgb = WHITE;
+        else if(pv_glint)
+        rgb = WHITE;
+        else if(pv_light)
+        case(type_t2_r)
+        0:rgb = LIGHT_CYAN;
+        1:rgb = LIGHT_PURPPLE;
+        2:rgb = LIGHT_YELLOW;
+        3:rgb = LIGHT_RED;
+        4:rgb = LIGHT_GREEN;
+        5:rgb = LIGHT_ORANGE;
+        6:rgb = LIGHT_PINK;
+        default:rgb = 0;
+        endcase
+        else if(pv_dark)
+        case(type_t2_r)
+        0:rgb = DARK_I;
+        1:rgb = DARK_T;
+        2:rgb = DARK_O;
+        3:rgb = DARK_S;
+        4:rgb = DARK_Z;
+        5:rgb = DARK_L;
+        6:rgb = DARK_J;
+        default:rgb = 0;
+        endcase
         else
         case(type_t2_r)
         0:rgb = CYAN;
@@ -1170,6 +1267,30 @@ module frame(
         rgb = field_bg;
         else if(land_we_r)
         rgb = 24'hEEEEEE;
+        else if(block_glint)
+        rgb = WHITE;
+        else if(block_light)
+        case(type_r)
+        0:rgb = LIGHT_CYAN;
+        1:rgb = LIGHT_PURPPLE;
+        2:rgb = LIGHT_YELLOW;
+        3:rgb = LIGHT_RED;
+        4:rgb = LIGHT_GREEN;
+        5:rgb = LIGHT_ORANGE;
+        6:rgb = LIGHT_PINK;
+        default:rgb = 0;
+        endcase
+        else if(block_dark)
+        case(type_r)
+        0:rgb = DARK_I;
+        1:rgb = DARK_T;
+        2:rgb = DARK_O;
+        3:rgb = DARK_S;
+        4:rgb = DARK_Z;
+        5:rgb = DARK_L;
+        6:rgb = DARK_J;
+        default:rgb = 0;
+        endcase
         else
         case(type_r)
         0:rgb = CYAN;
@@ -1227,6 +1348,30 @@ module frame(
             if(flash_r)
             rgb = 24'hEEEEEE;
         end
+        else if(block_glint)
+        rgb = WHITE;
+        else if(block_light)
+        case(sc_r)
+        0:rgb = LIGHT_CYAN;
+        1:rgb = LIGHT_PURPPLE;
+        2:rgb = LIGHT_YELLOW;
+        3:rgb = LIGHT_RED;
+        4:rgb = LIGHT_GREEN;
+        5:rgb = LIGHT_ORANGE;
+        6:rgb = LIGHT_PINK;
+        default:rgb = 0;
+        endcase
+        else if(block_dark)
+        case(sc_r)
+        0:rgb = DARK_I;
+        1:rgb = DARK_T;
+        2:rgb = DARK_O;
+        3:rgb = DARK_S;
+        4:rgb = DARK_Z;
+        5:rgb = DARK_L;
+        6:rgb = DARK_J;
+        default:rgb = 0;
+        endcase
         else
         case(sc_r)
         0:rgb = CYAN;
@@ -1244,6 +1389,30 @@ module frame(
         rgb = field_bg;
         else if(land_we2_r)
         rgb = 24'hEEEEEE;
+        else if(block_glint)
+        rgb = WHITE;
+        else if(block_light)
+        case(type2_r)
+        0:rgb = LIGHT_CYAN;
+        1:rgb = LIGHT_PURPPLE;
+        2:rgb = LIGHT_YELLOW;
+        3:rgb = LIGHT_RED;
+        4:rgb = LIGHT_GREEN;
+        5:rgb = LIGHT_ORANGE;
+        6:rgb = LIGHT_PINK;
+        default:rgb = 0;
+        endcase
+        else if(block_dark)
+        case(type2_r)
+        0:rgb = DARK_I;
+        1:rgb = DARK_T;
+        2:rgb = DARK_O;
+        3:rgb = DARK_S;
+        4:rgb = DARK_Z;
+        5:rgb = DARK_L;
+        6:rgb = DARK_J;
+        default:rgb = 0;
+        endcase
         else
         case(type2_r)
         0:rgb = CYAN;

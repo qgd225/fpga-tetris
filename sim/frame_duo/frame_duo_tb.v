@@ -139,7 +139,7 @@ initial begin
   repeat(4) @(posedge Clk);
   lock2;                                        // P2 落锁 (10,19)
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
-  look(11'd643, 11'd691);                       // 第10列 第19行
+  look(11'd656, 11'd704);                       // 第10列 第19行
   chk("duo=1 P2 落格=红色", rgb, `RED);
   clr_state;
   duo = 1'b0; repeat(4) @(posedge Clk);
@@ -267,8 +267,8 @@ initial begin
   release dut.gd1;
   force dut.Playfield_inst.Piece = 1'b1; force dut.Playfield_inst.type = 3'd0;
   repeat(4) @(posedge Clk);
-  look(11'd325, 11'd85);   chk("下落方块内部=实色", rgb, 24'h00CCFF);
-  look(11'd322, 11'd85);   chk("下落方块边带=实色", rgb, 24'h00CCFF);
+  look(11'd330, 11'd90);   chk("下落方块内部=实色", rgb, 24'h00CCFF);
+  look(11'd322, 11'd85);   chk("下落方块边带=浅青", rgb, 24'h99EEFF);
   release dut.Playfield_inst.Piece; release dut.Playfield_inst.Piece2;
   release dut.Playfield_inst.ghost; release dut.Playfield_inst.ghost2;
   release dut.Playfield_inst.type;  release dut.Playfield_inst.type2;
@@ -484,7 +484,7 @@ initial begin
   force dut.Playfield_inst.type = 3'd2;
   repeat(4) @(posedge Clk);
   look(11'd321, 11'd81);   chk("下落块左上角=黑", rgb, `FLDBG);
-  look(11'd322, 11'd82);   chk("下落块角内第2像素=黄", rgb, `YELLOW);
+  look(11'd322, 11'd82);   chk("corner inner light", rgb, 24'hFFFF99);
   look(11'd323, 11'd81);   chk("下落块左边缘=黄", rgb, `YELLOW);
   look(11'd321, 11'd83);   chk("下落块上边缘=黄", rgb, `YELLOW);
   look(11'd336, 11'd96);   chk("下落块中心=黄", rgb, `YELLOW);
