@@ -92,6 +92,8 @@ module frame(
     wire [4:0]rr_t2 [0:3];
     wire ghost_ev1;
     wire ghost_ev2;
+    wire [4:0]piece_cmin1, piece_cmax1, piece_rmin1, piece_rmax1;
+    wire [4:0]piece_cmin2, piece_cmax2, piece_rmin2, piece_rmax2;
 
 //============================================================
 //    HUD 布局(唯一来源): 面板锚点 / 标签 / 分隔线 / 槽位 / 等级条 / 等级数字
@@ -271,7 +273,11 @@ module frame(
     .blk_rot1(blk_rot1),
     .blk_rot2(blk_rot2),
     .ghost_ev1(ghost_ev1),
-    .ghost_ev2(ghost_ev2)
+    .ghost_ev2(ghost_ev2),
+    .piece_cmin1(piece_cmin1), .piece_cmax1(piece_cmax1),
+    .piece_rmin1(piece_rmin1), .piece_rmax1(piece_rmax1),
+    .piece_cmin2(piece_cmin2), .piece_cmax2(piece_cmax2),
+    .piece_rmin2(piece_rmin2), .piece_rmax2(piece_rmax2)
     );
     
     
@@ -812,6 +818,9 @@ module frame(
     end
     reg [1:0]lf1, lf2, lvf, nf1, nf2, hf, scf;
     reg [1:0]gd1, gd2;
+    reg [2:0]rotf1, rotf2;
+    reg [1:0]mbl1, mbl2, mbr1, mbr2;
+    reg [1:0]hdf1, hdf2;
     reg ghost_ev1_d, ghost_ev2_d;
     wire ghost_pulse1 = ghost_ev1 && !ghost_ev1_d;
     wire ghost_pulse2 = ghost_ev2 && !ghost_ev2_d;
@@ -829,6 +838,14 @@ module frame(
     scf <= 2'd0;
     gd1 <= 2'd0;
     gd2 <= 2'd0;
+    rotf1 <= 3'd0;
+    rotf2 <= 3'd0;
+    mbl1 <= 2'd0;
+    mbl2 <= 2'd0;
+    mbr1 <= 2'd0;
+    mbr2 <= 2'd0;
+    hdf1 <= 2'd0;
+    hdf2 <= 2'd0;
     ghost_ev1_d <= 1'b0;
     ghost_ev2_d <= 1'b0;
     lvl_d <= 3'd0;
@@ -841,6 +858,38 @@ module frame(
     score_d <= score;
     ghost_ev1_d <= ghost_ev1;
     ghost_ev2_d <= ghost_ev2;
+    if(blk_rot1)
+    rotf1 <= 3'd6;
+    else if(eff_tick && (rotf1 != 3'd0))
+    rotf1 <= rotf1 - 3'd1;
+    if(blk_rot2)
+    rotf2 <= 3'd6;
+    else if(eff_tick && (rotf2 != 3'd0))
+    rotf2 <= rotf2 - 3'd1;
+    if(blk_l1)
+    mbl1 <= 2'd2;
+    else if(eff_tick && (mbl1 != 2'd0))
+    mbl1 <= mbl1 - 2'd1;
+    if(blk_r1)
+    mbr1 <= 2'd2;
+    else if(eff_tick && (mbr1 != 2'd0))
+    mbr1 <= mbr1 - 2'd1;
+    if(blk_l2)
+    mbl2 <= 2'd2;
+    else if(eff_tick && (mbl2 != 2'd0))
+    mbl2 <= mbl2 - 2'd1;
+    if(blk_r2)
+    mbr2 <= 2'd2;
+    else if(eff_tick && (mbr2 != 2'd0))
+    mbr2 <= mbr2 - 2'd1;
+    if(snd_hard1)
+    hdf1 <= 2'd2;
+    else if(eff_tick && (hdf1 != 2'd0))
+    hdf1 <= hdf1 - 2'd1;
+    if(snd_hard2)
+    hdf2 <= 2'd2;
+    else if(eff_tick && (hdf2 != 2'd0))
+    hdf2 <= hdf2 - 2'd1;
     if(ghost_pulse1)
     gd1 <= 2'd2;
     else if(eff_tick && (gd1 != 2'd0))
@@ -943,8 +992,50 @@ module frame(
                       (vcounter >= 11'd81) && (vcounter < 11'd721);
     wire rail_r_lit = (hcounter >= (XR + 11'd4)) && (hcounter <= (XR + 11'd7)) &&
                       (vcounter >= 11'd81) && (vcounter < 11'd721);
-    wire rail_l_white = lflash1 || danger_active;
-    wire rail_r_white = (duo ? lflash2 : lflash1) || danger_active;
+    wire rail_l_white = lflash1 || danger_active || (mbl1 != 2'd0) || (mbl2 != 2'd0);
+    wire rail_r_white = (duo ? lflash2 : lflash1) || danger_active || (mbr1 != 2'd0) || (mbr2 != 2'd0);
+
+    wire rot_pulse1 = (rotf1 == 3'd6) || (rotf1 == 3'd5) || (rotf1 == 3'd3) || (rotf1 == 3'd2) || (rotf1 == 3'd1);
+    wire rot_pulse2 = (rotf2 == 3'd6) || (rotf2 == 3'd5) || (rotf2 == 3'd3) || (rotf2 == 3'd2) || (rotf2 == 3'd1);
+    wire [10:0]pcl1 = 11'd321 + {piece_cmin1, 5'd0};
+    wire [10:0]pcr1 = 11'd321 + {piece_cmax1, 5'd0} + 11'd31;
+    wire [10:0]ptp1 = 11'd81 + {piece_rmin1, 5'd0};
+    wire [10:0]pbt1 = 11'd81 + {piece_rmax1, 5'd0} + 11'd31;
+    wire [10:0]pcl2 = 11'd321 + {piece_cmin2, 5'd0};
+    wire [10:0]pcr2 = 11'd321 + {piece_cmax2, 5'd0} + 11'd31;
+    wire [10:0]ptp2 = 11'd81 + {piece_rmin2, 5'd0};
+    wire [10:0]pbt2 = 11'd81 + {piece_rmax2, 5'd0} + 11'd31;
+    wire rot_corner1 = rot_pulse1 && (piece_cmax1 >= piece_cmin1) &&
+        (((hcounter >= pcl1) && (hcounter < pcl1 + 11'd6) && (vcounter == ptp1)) ||
+         ((vcounter >= ptp1) && (vcounter < ptp1 + 11'd6) && (hcounter == pcl1)) ||
+         ((hcounter >= pcr1 - 11'd5) && (hcounter <= pcr1) && (vcounter == ptp1)) ||
+         ((vcounter >= ptp1) && (vcounter < ptp1 + 11'd6) && (hcounter == pcr1)) ||
+         ((hcounter >= pcl1) && (hcounter < pcl1 + 11'd6) && (vcounter == pbt1)) ||
+         ((vcounter >= pbt1 - 11'd5) && (vcounter <= pbt1) && (hcounter == pcl1)) ||
+         ((hcounter >= pcr1 - 11'd5) && (hcounter <= pcr1) && (vcounter == pbt1)) ||
+         ((vcounter >= pbt1 - 11'd5) && (vcounter <= pbt1) && (hcounter == pcr1)));
+    wire rot_corner2 = duo && rot_pulse2 && (piece_cmax2 >= piece_cmin2) &&
+        (((hcounter >= pcl2) && (hcounter < pcl2 + 11'd6) && (vcounter == ptp2)) ||
+         ((vcounter >= ptp2) && (vcounter < ptp2 + 11'd6) && (hcounter == pcl2)) ||
+         ((hcounter >= pcr2 - 11'd5) && (hcounter <= pcr2) && (vcounter == ptp2)) ||
+         ((vcounter >= ptp2) && (vcounter < ptp2 + 11'd6) && (hcounter == pcr2)) ||
+         ((hcounter >= pcl2) && (hcounter < pcl2 + 11'd6) && (vcounter == pbt2)) ||
+         ((vcounter >= pbt2 - 11'd5) && (vcounter <= pbt2) && (hcounter == pcl2)) ||
+         ((hcounter >= pcr2 - 11'd5) && (hcounter <= pcr2) && (vcounter == pbt2)) ||
+         ((vcounter >= pbt2 - 11'd5) && (vcounter <= pbt2) && (hcounter == pcr2)));
+    wire [10:0]hdx1 = (pcl1 + pcr1) >> 1;
+    wire [10:0]hdx2 = (pcl2 + pcr2) >> 1;
+    wire hard_fx1 = (hdf1 != 2'd0) &&
+        (hcounter >= hdx1 - 11'd6) && (hcounter <= hdx1 + 11'd6) &&
+        (vcounter >= pbt1 - 11'd6) && (vcounter <= pbt1 + 11'd6) &&
+        ((hcounter == hdx1 - 11'd6) || (hcounter == hdx1 + 11'd6) ||
+         (vcounter == pbt1 - 11'd6) || (vcounter == pbt1 + 11'd6));
+    wire hard_fx2 = duo && (hdf2 != 2'd0) &&
+        (hcounter >= hdx2 - 11'd6) && (hcounter <= hdx2 + 11'd6) &&
+        (vcounter >= pbt2 - 11'd6) && (vcounter <= pbt2 + 11'd6) &&
+        ((hcounter == hdx2 - 11'd6) || (hcounter == hdx2 + 11'd6) ||
+         (vcounter == pbt2 - 11'd6) || (vcounter == pbt2 + 11'd6));
+
 
     always@(*)begin
     if(!Reset_n)
@@ -1070,6 +1161,10 @@ module frame(
     rgb = WHITE;
     else if(danger_dot && !cell_r && !Piece_r && !ghost_r && !Piece2_r && !ghost2_r)
     rgb = danger_color;
+    else if(rot_corner1 || hard_fx1)
+    rgb = 24'h00E5FF;
+    else if(rot_corner2 || hard_fx2)
+    rgb = PINK;
     else if(Piece_r)begin
         if(!piece_round_r)
         rgb = field_bg;

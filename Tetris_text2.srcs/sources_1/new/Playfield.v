@@ -79,7 +79,15 @@ module Playfield(
     output wire blk_rot1,
     output wire blk_rot2,
     output wire ghost_ev1,
-    output wire ghost_ev2
+    output wire ghost_ev2,
+    output reg [4:0]piece_cmin1,
+    output reg [4:0]piece_cmax1,
+    output reg [4:0]piece_rmin1,
+    output reg [4:0]piece_rmax1,
+    output reg [4:0]piece_cmin2,
+    output reg [4:0]piece_cmax2,
+    output reg [4:0]piece_rmin2,
+    output reg [4:0]piece_rmax2
     );
 
 //============================================================
@@ -339,6 +347,10 @@ module Playfield(
     always@(*)begin
         Tetromino_addr = {type[2:0], rot[1:0]};
         Piece = 1'b0;
+        piece_cmin1 = 5'd24;
+        piece_cmax1 = 5'd0;
+        piece_rmin1 = 5'd24;
+        piece_rmax1 = 5'd0;
         land = 1'b0;
         boundary_collision_left = 1'b0;
         boundary_collision_right = 1'b0;
@@ -353,6 +365,12 @@ module Playfield(
         for(i = 0; i < 4; i = i + 1)begin
             cc = counter_c + { { 7{Tetromino_dout[i*8+7]} }, Tetromino_dout[(i*8+7)-:4] };
             rr = counter_r + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
+            if(!rr[5] && (cc <= (COL - 1'b1)) && (rr <= 11'd19))begin
+                if(cc < piece_cmin1) piece_cmin1 = cc;
+                if(cc > piece_cmax1) piece_cmax1 = cc;
+                if(rr < piece_rmin1) piece_rmin1 = rr;
+                if(rr > piece_rmax1) piece_rmax1 = rr;
+            end
             //    与对方运动方块互撞: 左右阻挡 / 下行顶住(不算落底) / 重合
             if(duo)begin
                 if(or2_0 == rr)begin
@@ -1221,6 +1239,10 @@ module Playfield(
     always@(*)begin
         Tetromino_addr2 = {type2[2:0], rot2[1:0]};
         Piece2 = 1'b0;
+        piece_cmin2 = 5'd24;
+        piece_cmax2 = 5'd0;
+        piece_rmin2 = 5'd24;
+        piece_rmax2 = 5'd0;
         land2 = 1'b0;
         boundary_collision_left2 = 1'b0;
         boundary_collision_right2 = 1'b0;
@@ -1236,6 +1258,12 @@ module Playfield(
         for(i2 = 0; i2 < 4; i2 = i2 + 1)begin
             cc2 = counter_c2 + { { 7{Tetromino_dout2[i2*8+7]} }, Tetromino_dout2[(i2*8+7)-:4] };
             rr2 = counter_r2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
+            if(!rr2[5] && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19))begin
+                if(cc2 < piece_cmin2) piece_cmin2 = cc2;
+                if(cc2 > piece_cmax2) piece_cmax2 = cc2;
+                if(rr2 < piece_rmin2) piece_rmin2 = rr2;
+                if(rr2 > piece_rmax2) piece_rmax2 = rr2;
+            end
             //    与对方运动方块互撞
             if(duo)begin
                 if(or1_0 == rr2)begin
