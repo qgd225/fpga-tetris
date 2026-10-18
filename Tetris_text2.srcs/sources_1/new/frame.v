@@ -47,6 +47,7 @@ module frame(
     output blk_rot2,
     output [2:0]snd_clr_n
     );
+    reg [23:0]rgb_c;
     
     
 //    游戏区
@@ -641,9 +642,9 @@ module frame(
     reg score_lit_r;
     reg time_lit_r;
     reg margin_r;
-    reg Piece_r;
-    reg ghost_r;
-    reg ghost_edge_r;
+    (* DONT_TOUCH = "TRUE" *) reg Piece_r;
+    (* DONT_TOUCH = "TRUE" *) reg ghost_r;
+    (* DONT_TOUCH = "TRUE" *) reg ghost_edge_r;
     reg [10:0]glx_r;
     reg [10:0]gly_r;
     //    ghost inner ticks / dash ring: registered local coordinates, aligned with ghost_r
@@ -669,7 +670,7 @@ module frame(
     reg [2:0]type_r;
     reg [2:0]type_t_r;
     reg [2:0]hold_type_r;
-    reg cell_r;
+    (* DONT_TOUCH = "TRUE" *) reg cell_r;
     reg [2:0]sc_r;
     reg owner_r;
     reg clear_t_r;
@@ -680,8 +681,8 @@ module frame(
     reg chs_text_r;
     reg chs_dim_r;
     reg chs_breath_r;
-    reg Piece2_r;
-    reg ghost2_r;
+    (* DONT_TOUCH = "TRUE" *) reg Piece2_r;
+    (* DONT_TOUCH = "TRUE" *) reg ghost2_r;
     reg [2:0]type2_r;
     reg [2:0]type_t2_r;
     reg land_we2_r;
@@ -844,6 +845,8 @@ module frame(
     reg [2:0]rotf1, rotf2;
     reg [1:0]mbl1, mbl2, mbr1, mbr2;
     reg [1:0]hdf1, hdf2;
+    (* DONT_TOUCH = "TRUE" *) reg [4:0]pcmin1_r, pcmax1_r, prmin1_r, prmax1_r;
+    (* DONT_TOUCH = "TRUE" *) reg [4:0]pcmin2_r, pcmax2_r, prmin2_r, prmax2_r;
     reg ghost_ev1_d, ghost_ev2_d;
     wire ghost_pulse1 = ghost_ev1 && !ghost_ev1_d;
     wire ghost_pulse2 = ghost_ev2 && !ghost_ev2_d;
@@ -1041,17 +1044,27 @@ module frame(
                     (((pvx_r == 11'd2) || (pvx_r == 11'd3)) && (pvy_r >= 11'd2) && (pvy_r <= 11'd9)) ||
                     ((pvx_r >= 11'd3) && (pvx_r <= 11'd4) && (pvy_r >= 11'd3) && (pvy_r <= 11'd4));
 
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)begin
+    pcmin1_r <= 5'd0; pcmax1_r <= 5'd0; prmin1_r <= 5'd0; prmax1_r <= 5'd0;
+    pcmin2_r <= 5'd0; pcmax2_r <= 5'd0; prmin2_r <= 5'd0; prmax2_r <= 5'd0;
+    end
+    else begin
+    pcmin1_r <= piece_cmin1; pcmax1_r <= piece_cmax1; prmin1_r <= piece_rmin1; prmax1_r <= piece_rmax1;
+    pcmin2_r <= piece_cmin2; pcmax2_r <= piece_cmax2; prmin2_r <= piece_rmin2; prmax2_r <= piece_rmax2;
+    end
+    end
     wire rot_pulse1 = (rotf1 == 3'd6) || (rotf1 == 3'd5) || (rotf1 == 3'd3) || (rotf1 == 3'd2) || (rotf1 == 3'd1);
     wire rot_pulse2 = (rotf2 == 3'd6) || (rotf2 == 3'd5) || (rotf2 == 3'd3) || (rotf2 == 3'd2) || (rotf2 == 3'd1);
-    wire [10:0]pcl1 = 11'd321 + {piece_cmin1, 5'd0};
-    wire [10:0]pcr1 = 11'd321 + {piece_cmax1, 5'd0} + 11'd31;
-    wire [10:0]ptp1 = 11'd81 + {piece_rmin1, 5'd0};
-    wire [10:0]pbt1 = 11'd81 + {piece_rmax1, 5'd0} + 11'd31;
-    wire [10:0]pcl2 = 11'd321 + {piece_cmin2, 5'd0};
-    wire [10:0]pcr2 = 11'd321 + {piece_cmax2, 5'd0} + 11'd31;
-    wire [10:0]ptp2 = 11'd81 + {piece_rmin2, 5'd0};
-    wire [10:0]pbt2 = 11'd81 + {piece_rmax2, 5'd0} + 11'd31;
-    wire rot_corner1 = rot_pulse1 && (piece_cmax1 >= piece_cmin1) &&
+    wire [10:0]pcl1 = 11'd321 + {pcmin1_r, 5'd0};
+    wire [10:0]pcr1 = 11'd321 + {pcmax1_r, 5'd0} + 11'd31;
+    wire [10:0]ptp1 = 11'd81 + {prmin1_r, 5'd0};
+    wire [10:0]pbt1 = 11'd81 + {prmax1_r, 5'd0} + 11'd31;
+    wire [10:0]pcl2 = 11'd321 + {pcmin2_r, 5'd0};
+    wire [10:0]pcr2 = 11'd321 + {pcmax2_r, 5'd0} + 11'd31;
+    wire [10:0]ptp2 = 11'd81 + {prmin2_r, 5'd0};
+    wire [10:0]pbt2 = 11'd81 + {prmax2_r, 5'd0} + 11'd31;
+    wire rot_corner1 = rot_pulse1 && (pcmax1_r >= pcmin1_r) &&
         (((hcounter >= pcl1) && (hcounter < pcl1 + 11'd6) && (vcounter == ptp1)) ||
          ((vcounter >= ptp1) && (vcounter < ptp1 + 11'd6) && (hcounter == pcl1)) ||
          ((hcounter >= pcr1 - 11'd5) && (hcounter <= pcr1) && (vcounter == ptp1)) ||
@@ -1060,7 +1073,7 @@ module frame(
          ((vcounter >= pbt1 - 11'd5) && (vcounter <= pbt1) && (hcounter == pcl1)) ||
          ((hcounter >= pcr1 - 11'd5) && (hcounter <= pcr1) && (vcounter == pbt1)) ||
          ((vcounter >= pbt1 - 11'd5) && (vcounter <= pbt1) && (hcounter == pcr1)));
-    wire rot_corner2 = duo && rot_pulse2 && (piece_cmax2 >= piece_cmin2) &&
+    wire rot_corner2 = duo && rot_pulse2 && (pcmax2_r >= pcmin2_r) &&
         (((hcounter >= pcl2) && (hcounter < pcl2 + 11'd6) && (vcounter == ptp2)) ||
          ((vcounter >= ptp2) && (vcounter < ptp2 + 11'd6) && (hcounter == pcl2)) ||
          ((hcounter >= pcr2 - 11'd5) && (hcounter <= pcr2) && (vcounter == ptp2)) ||
@@ -1099,7 +1112,7 @@ module frame(
     wire [10:0]brr2 = pcr2 + 11'd9;
     wire [10:0]brt2 = ptp2 - 11'd9;
     wire [10:0]brb2 = pbt2 + 11'd9;
-    wire bracket1 = duo && (piece_cmax1 >= piece_cmin1) &&
+    wire bracket1 = duo && (pcmax1_r >= pcmin1_r) &&
         (((hcounter >= brl1) && (hcounter < brl1 + 11'd18) && (vcounter >= brt1) && (vcounter < brt1 + 11'd2)) ||
          ((vcounter >= brt1) && (vcounter < brt1 + 11'd18) && (hcounter >= brl1) && (hcounter < brl1 + 11'd2)) ||
          ((hcounter >= brr1 - 11'd17) && (hcounter <= brr1) && (vcounter >= brt1) && (vcounter < brt1 + 11'd2)) ||
@@ -1108,7 +1121,7 @@ module frame(
          ((vcounter >= brb1 - 11'd17) && (vcounter <= brb1) && (hcounter >= brl1) && (hcounter < brl1 + 11'd2)) ||
          ((hcounter >= brr1 - 11'd17) && (hcounter <= brr1) && (vcounter > brb1 - 11'd2) && (vcounter <= brb1)) ||
          ((vcounter >= brb1 - 11'd17) && (vcounter <= brb1) && (hcounter > brr1 - 11'd2) && (hcounter <= brr1)));
-    wire bracket2 = duo && (piece_cmax2 >= piece_cmin2) &&
+    wire bracket2 = duo && (pcmax2_r >= pcmin2_r) &&
         (((hcounter >= brl2) && (hcounter < brl2 + 11'd18) && (vcounter >= brt2) && (vcounter < brt2 + 11'd2)) ||
          ((vcounter >= brt2) && (vcounter < brt2 + 11'd18) && (hcounter >= brl2) && (hcounter < brl2 + 11'd2)) ||
          ((hcounter >= brr2 - 11'd17) && (hcounter <= brr2) && (vcounter >= brt2) && (vcounter < brt2 + 11'd2)) ||
@@ -1122,425 +1135,431 @@ module frame(
 
     always@(*)begin
     if(!Reset_n)
-    rgb = BLACK;
+    rgb_c = BLACK;
     else if(choose)begin
         if(chs_margin_r)
-        rgb = chs_breath_r ? 24'h00697F : 24'h00E5FF;//选中标记(带呼吸)
+        rgb_c = chs_breath_r ? 24'h00697F : 24'h00E5FF;//选中标记(带呼吸)
         else if(chs_text_r)
-        rgb = chs_dim_r ? 24'h606060 : WHITE;
+        rgb_c = chs_dim_r ? 24'h606060 : WHITE;
         else
-        rgb = BLACK;
+        rgb_c = BLACK;
         end
     else if(over_lit_r || over_line_lit)
         case(cn_r)
-        0:rgb = 24'h101010;
-        1:rgb = 24'h202020;
-        2:rgb = 24'h404040;
-        3:rgb = 24'h606060;
-        4:rgb = 24'h909090;
-        5:rgb = 24'hB0B0B0;
-        6:rgb = 24'hD8D8D8;
-        7:rgb = 24'hFFF_FFF;
-        8:rgb = 24'hFFF_FFF;
+        0:rgb_c = 24'h101010;
+        1:rgb_c = 24'h202020;
+        2:rgb_c = 24'h404040;
+        3:rgb_c = 24'h606060;
+        4:rgb_c = 24'h909090;
+        5:rgb_c = 24'hB0B0B0;
+        6:rgb_c = 24'hD8D8D8;
+        7:rgb_c = 24'hFFF_FFF;
+        8:rgb_c = 24'hFFF_FFF;
         9:if(tick_r)
-          rgb = 24'hFFF_FFF;
+          rgb_c = 24'hFFF_FFF;
           else
-          rgb = 24'h303030;
-        default:rgb = 24'hFFF_FFF;
+          rgb_c = 24'h303030;
+        default:rgb_c = 24'hFFF_FFF;
         endcase
     else if(Finalize && (hcounter >= 11'd432) && (hcounter <= 11'd847) &&
             (vcounter >= 11'd348) && (vcounter <= 11'd451) && (hcounter[0] ^ vcounter[0]))
-    rgb = 24'h101010;//结束画面中心区域棋盘压暗
+    rgb_c = 24'h101010;//结束画面中心区域棋盘压暗
     else if(lbl_r)
-    rgb = fin_r ? 24'h202020 : (lb_lv_r ? lv_color : 24'hB0B0B0);//NEXT/HOLD 标签灰, LV 用等级色
+    rgb_c = fin_r ? 24'h202020 : (lb_lv_r ? lv_color : 24'hB0B0B0);//NEXT/HOLD 标签灰, LV 用等级色
     else if(rule1_r)
-    rgb = fin_r ? 24'h202020 : (lflash1 ? WHITE : (duo ? 24'h00E5FF : 24'h606060));//面板分隔线(P1/单人)
+    rgb_c = fin_r ? 24'h202020 : (lflash1 ? WHITE : (duo ? 24'h00E5FF : 24'h606060));//面板分隔线(P1/单人)
     else if(rule2_r)
-    rgb = fin_r ? 24'h202020 : (lflash2 ? WHITE : 24'hFF4DA6);//P2 面板分隔线
+    rgb_c = fin_r ? 24'h202020 : (lflash2 ? WHITE : 24'hFF4DA6);//P2 面板分隔线
     else if(level_margin_r)begin
-        rgb = 24'h202020;//段与段之间的缝
+        rgb_c = 24'h202020;//段与段之间的缝
         end
     else if(level_inner_r)begin
         if(fin_r)
-        rgb = 24'h202020;
+        rgb_c = 24'h202020;
         else if(lvflash)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(cur_r)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(on_r)
-        rgb = lv_color;
+        rgb_c = lv_color;
         else
-        rgb = 24'h303030;
+        rgb_c = 24'h303030;
         end
     else if(lvd_r)
-    rgb = fin_r ? 24'h202020 : (lvflash ? WHITE : lv_color);//等级数字(与 LV 同色)
+    rgb_c = fin_r ? 24'h202020 : (lvflash ? WHITE : lv_color);//等级数字(与 LV 同色)
     else if(hold_r)begin
         if(!pv_round_r)
-        rgb = slot_bg;
+        rgb_c = slot_bg;
         else if(hflash)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(pv_glint)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(pv_light || pv_soft)
         case(hold_type_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         else if(pv_dark)
         case(hold_type_r)
-        0:rgb = DARK_I;
-        1:rgb = DARK_T;
-        2:rgb = DARK_O;
-        3:rgb = DARK_S;
-        4:rgb = DARK_Z;
-        5:rgb = DARK_L;
-        6:rgb = DARK_J;
-        default:rgb = 0;
+        0:rgb_c = DARK_I;
+        1:rgb_c = DARK_T;
+        2:rgb_c = DARK_O;
+        3:rgb_c = DARK_S;
+        4:rgb_c = DARK_Z;
+        5:rgb_c = DARK_L;
+        6:rgb_c = DARK_J;
+        default:rgb_c = 0;
         endcase
         else
         case(hold_type_r)
-        0:rgb = CYAN;
-        1:rgb = PURPPLE;
-        2:rgb = YELLOW;
-        3:rgb = RED;
-        4:rgb = GREEN;
-        5:rgb = ORANGE;
-        6:rgb = PINK;
-        default:rgb = 0;
+        0:rgb_c = CYAN;
+        1:rgb_c = PURPPLE;
+        2:rgb_c = YELLOW;
+        3:rgb_c = RED;
+        4:rgb_c = GREEN;
+        5:rgb_c = ORANGE;
+        6:rgb_c = PINK;
+        default:rgb_c = 0;
         endcase
         end
     else if(next_r)begin
         if(!pv_round_r)
-        rgb = slot_bg;
+        rgb_c = slot_bg;
         else if(nflash1)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(pv_glint)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(pv_light || pv_soft)
         case(type_t_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         else if(pv_dark)
         case(type_t_r)
-        0:rgb = DARK_I;
-        1:rgb = DARK_T;
-        2:rgb = DARK_O;
-        3:rgb = DARK_S;
-        4:rgb = DARK_Z;
-        5:rgb = DARK_L;
-        6:rgb = DARK_J;
-        default:rgb = 0;
+        0:rgb_c = DARK_I;
+        1:rgb_c = DARK_T;
+        2:rgb_c = DARK_O;
+        3:rgb_c = DARK_S;
+        4:rgb_c = DARK_Z;
+        5:rgb_c = DARK_L;
+        6:rgb_c = DARK_J;
+        default:rgb_c = 0;
         endcase
         else
         case(type_t_r)
-        0:rgb = CYAN;
-        1:rgb = PURPPLE;
-        2:rgb = YELLOW;
-        3:rgb = RED;
-        4:rgb = GREEN;
-        5:rgb = ORANGE;
-        6:rgb = PINK;
-        default:rgb = 0;
+        0:rgb_c = CYAN;
+        1:rgb_c = PURPPLE;
+        2:rgb_c = YELLOW;
+        3:rgb_c = RED;
+        4:rgb_c = GREEN;
+        5:rgb_c = ORANGE;
+        6:rgb_c = PINK;
+        default:rgb_c = 0;
         endcase
         end
     else if(next2_r)begin
         if(!pv_round_r)
-        rgb = slot_bg;
+        rgb_c = slot_bg;
         else if(nflash2)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(pv_glint)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(pv_light || pv_soft)
         case(type_t2_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         else if(pv_dark)
         case(type_t2_r)
-        0:rgb = DARK_I;
-        1:rgb = DARK_T;
-        2:rgb = DARK_O;
-        3:rgb = DARK_S;
-        4:rgb = DARK_Z;
-        5:rgb = DARK_L;
-        6:rgb = DARK_J;
-        default:rgb = 0;
+        0:rgb_c = DARK_I;
+        1:rgb_c = DARK_T;
+        2:rgb_c = DARK_O;
+        3:rgb_c = DARK_S;
+        4:rgb_c = DARK_Z;
+        5:rgb_c = DARK_L;
+        6:rgb_c = DARK_J;
+        default:rgb_c = 0;
         endcase
         else
         case(type_t2_r)
-        0:rgb = CYAN;
-        1:rgb = PURPPLE;
-        2:rgb = YELLOW;
-        3:rgb = RED;
-        4:rgb = GREEN;
-        5:rgb = ORANGE;
-        6:rgb = PINK;
-        default:rgb = 0;
+        0:rgb_c = CYAN;
+        1:rgb_c = PURPPLE;
+        2:rgb_c = YELLOW;
+        3:rgb_c = RED;
+        4:rgb_c = GREEN;
+        5:rgb_c = ORANGE;
+        6:rgb_c = PINK;
+        default:rgb_c = 0;
         endcase
         end
     else if(slot_dot)
-    rgb = 24'h404040;//预览槽点阵
+    rgb_c = 24'h404040;//预览槽点阵
     else if(hold_slot_r)
-    rgb = slot_bg;//Hold 槽位底色
+    rgb_c = slot_bg;//Hold 槽位底色
     else if(next_slot_r)
-    rgb = slot_bg;//Next 槽位底色
+    rgb_c = slot_bg;//Next 槽位底色
     else if(badge_lit)
-    rgb = bd2 ? 24'hFF4DA6 : 24'h00E5FF;//P1/P2 号码徽标
+    rgb_c = bd2 ? 24'hFF4DA6 : 24'h00E5FF;//P1/P2 号码徽标
     else if(score_lit_r)
-    rgb = (scflash && (!fin_r)) ? 24'h00E5FF : WHITE;
+    rgb_c = (scflash && (!fin_r)) ? 24'h00E5FF : WHITE;
     else if(time_lit_r)
-    rgb = WHITE;
+    rgb_c = WHITE;
     else if(rail_l_lit)
-    rgb = rail_l_white ? WHITE : 24'h00E5FF;
+    rgb_c = rail_l_white ? WHITE : 24'h00E5FF;
     else if(rail_r_lit)
-    rgb = rail_r_white ? WHITE : (duo ? PINK : 24'h00E5FF);
+    rgb_c = rail_r_white ? WHITE : (duo ? PINK : 24'h00E5FF);
     else if(danger_line)
-    rgb = danger_color;
+    rgb_c = danger_color;
     else if(margin_r)
-    rgb = WHITE;
+    rgb_c = WHITE;
     else if(danger_dot && !cell_r && !Piece_r && !ghost_r && !Piece2_r && !ghost2_r)
-    rgb = danger_color;
+    rgb_c = danger_color;
     else if(rot_corner1 || hard_fx1)
-    rgb = 24'h00E5FF;
+    rgb_c = 24'h00E5FF;
     else if(rot_corner2 || hard_fx2)
-    rgb = PINK;
+    rgb_c = PINK;
     else if(bracket1)
-    rgb = 24'h00E5FF;
+    rgb_c = 24'h00E5FF;
     else if(bracket2)
-    rgb = PINK;
+    rgb_c = PINK;
     else if(Piece_r)begin
         if(!piece_round_r)
-        rgb = field_bg;
+        rgb_c = field_bg;
         else if(land_we_r)
-        rgb = 24'hEEEEEE;
+        rgb_c = 24'hEEEEEE;
         else if(block_glint)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(block_light || block_soft)begin
         if(duo)
-        rgb = P1_SOFT;
+        rgb_c = P1_SOFT;
         else
         case(type_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         end
         else if(block_dark)
         case(type_r)
-        0:rgb = DARK_I;
-        1:rgb = DARK_T;
-        2:rgb = DARK_O;
-        3:rgb = DARK_S;
-        4:rgb = DARK_Z;
-        5:rgb = DARK_L;
-        6:rgb = DARK_J;
-        default:rgb = 0;
+        0:rgb_c = DARK_I;
+        1:rgb_c = DARK_T;
+        2:rgb_c = DARK_O;
+        3:rgb_c = DARK_S;
+        4:rgb_c = DARK_Z;
+        5:rgb_c = DARK_L;
+        6:rgb_c = DARK_J;
+        default:rgb_c = 0;
         endcase
         else
         case(type_r)
-        0:rgb = CYAN;
-        1:rgb = PURPPLE;
-        2:rgb = YELLOW;
-        3:rgb = RED;
-        4:rgb = GREEN;
-        5:rgb = ORANGE;
-        6:rgb = PINK;
-        default:rgb = 0;
+        0:rgb_c = CYAN;
+        1:rgb_c = PURPPLE;
+        2:rgb_c = YELLOW;
+        3:rgb_c = RED;
+        4:rgb_c = GREEN;
+        5:rgb_c = ORANGE;
+        6:rgb_c = PINK;
+        default:rgb_c = 0;
         endcase
         end
     else if(ghost_r)begin
         if(ghost_tick || (gd1 != 2'd0 && ghost_dash))begin
         case(type_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         end
         else if(ghost_edge_r)begin
         case(type_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         end
         else
-        rgb = field_bg;
+        rgb_c = field_bg;
         end
     else if(lock_rim1)
-    rgb = WHITE;
+    rgb_c = WHITE;
     else if(lock_rim2)
-    rgb = WHITE;
+    rgb_c = WHITE;
     else if(cell_r)begin
         if(!piece_round_r)
-        rgb = field_bg;
+        rgb_c = field_bg;
         else if(clear_t_r)begin
             case(sc_r)
-            0:rgb = CYAN;
-            1:rgb = PURPPLE;
-            2:rgb = YELLOW;
-            3:rgb = RED;
-            4:rgb = GREEN;
-            5:rgb = ORANGE;
-            6:rgb = PINK;
-            default:rgb = 0;
+            0:rgb_c = CYAN;
+            1:rgb_c = PURPPLE;
+            2:rgb_c = YELLOW;
+            3:rgb_c = RED;
+            4:rgb_c = GREEN;
+            5:rgb_c = ORANGE;
+            6:rgb_c = PINK;
+            default:rgb_c = 0;
             endcase
             if(flash_r)
-            rgb = 24'hEEEEEE;
+            rgb_c = 24'hEEEEEE;
             if(clear_shrink_r && !((glx_r >= 11'd11) && (glx_r <= 11'd20) && (gly_r >= 11'd11) && (gly_r <= 11'd20)))
-            rgb = field_bg;
+            rgb_c = field_bg;
         end
         else if(block_glint)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(block_light || block_soft)begin
         if(duo)
-        rgb = owner_r ? P2_SOFT : P1_SOFT;
+        rgb_c = owner_r ? P2_SOFT : P1_SOFT;
         else
         case(sc_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         end
         else if(block_dark)
         case(sc_r)
-        0:rgb = DARK_I;
-        1:rgb = DARK_T;
-        2:rgb = DARK_O;
-        3:rgb = DARK_S;
-        4:rgb = DARK_Z;
-        5:rgb = DARK_L;
-        6:rgb = DARK_J;
-        default:rgb = 0;
+        0:rgb_c = DARK_I;
+        1:rgb_c = DARK_T;
+        2:rgb_c = DARK_O;
+        3:rgb_c = DARK_S;
+        4:rgb_c = DARK_Z;
+        5:rgb_c = DARK_L;
+        6:rgb_c = DARK_J;
+        default:rgb_c = 0;
         endcase
         else
         case(sc_r)
-        0:rgb = CYAN;
-        1:rgb = PURPPLE;
-        2:rgb = YELLOW;
-        3:rgb = RED;
-        4:rgb = GREEN;
-        5:rgb = ORANGE;
-        6:rgb = PINK;
-        default:rgb = 0;
+        0:rgb_c = CYAN;
+        1:rgb_c = PURPPLE;
+        2:rgb_c = YELLOW;
+        3:rgb_c = RED;
+        4:rgb_c = GREEN;
+        5:rgb_c = ORANGE;
+        6:rgb_c = PINK;
+        default:rgb_c = 0;
         endcase
     end
     else if(Piece2_r)begin
         if(!piece_round_r)
-        rgb = field_bg;
+        rgb_c = field_bg;
         else if(land_we2_r)
-        rgb = 24'hEEEEEE;
+        rgb_c = 24'hEEEEEE;
         else if(block_glint)
-        rgb = WHITE;
+        rgb_c = WHITE;
         else if(block_light || block_soft)begin
         if(duo)
-        rgb = P2_SOFT;
+        rgb_c = P2_SOFT;
         else
         case(type2_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         end
         else if(block_dark)
         case(type2_r)
-        0:rgb = DARK_I;
-        1:rgb = DARK_T;
-        2:rgb = DARK_O;
-        3:rgb = DARK_S;
-        4:rgb = DARK_Z;
-        5:rgb = DARK_L;
-        6:rgb = DARK_J;
-        default:rgb = 0;
+        0:rgb_c = DARK_I;
+        1:rgb_c = DARK_T;
+        2:rgb_c = DARK_O;
+        3:rgb_c = DARK_S;
+        4:rgb_c = DARK_Z;
+        5:rgb_c = DARK_L;
+        6:rgb_c = DARK_J;
+        default:rgb_c = 0;
         endcase
         else
         case(type2_r)
-        0:rgb = CYAN;
-        1:rgb = PURPPLE;
-        2:rgb = YELLOW;
-        3:rgb = RED;
-        4:rgb = GREEN;
-        5:rgb = ORANGE;
-        6:rgb = PINK;
-        default:rgb = 0;
+        0:rgb_c = CYAN;
+        1:rgb_c = PURPPLE;
+        2:rgb_c = YELLOW;
+        3:rgb_c = RED;
+        4:rgb_c = GREEN;
+        5:rgb_c = ORANGE;
+        6:rgb_c = PINK;
+        default:rgb_c = 0;
         endcase
         end
     else if(ghost2_r)begin
         if(ghost_tick || (gd2 != 2'd0 && ghost_dash))begin
         case(type2_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         end
         else if(ghost_edge_r)begin
         case(type2_r)
-        0:rgb = LIGHT_CYAN;
-        1:rgb = LIGHT_PURPPLE;
-        2:rgb = LIGHT_YELLOW;
-        3:rgb = LIGHT_RED;
-        4:rgb = LIGHT_GREEN;
-        5:rgb = LIGHT_ORANGE;
-        6:rgb = LIGHT_PINK;
-        default:rgb = 0;
+        0:rgb_c = LIGHT_CYAN;
+        1:rgb_c = LIGHT_PURPPLE;
+        2:rgb_c = LIGHT_YELLOW;
+        3:rgb_c = LIGHT_RED;
+        4:rgb_c = LIGHT_GREEN;
+        5:rgb_c = LIGHT_ORANGE;
+        6:rgb_c = LIGHT_PINK;
+        default:rgb_c = 0;
         endcase
         end
         else
-        rgb = field_bg;
+        rgb_c = field_bg;
         end
     else
-    rgb = in_field ? field_bg : BLACK;
+    rgb_c = in_field ? field_bg : BLACK;
     end
     
 //    消行音效编号(只读)
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)
+    rgb <= BLACK;
+    else
+    rgb <= rgb_c;
+    end
     assign snd_clr_n = c_clear[2:0];
 
 endmodule

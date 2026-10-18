@@ -106,6 +106,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/control_route.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/imports/new/eth_udp_gmii/crc32_d8.v">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PPRDIR/../BX72_tx/BX72_tx.srcs/sources_1/new/eth_udp_gmii/crc32_d8.v"/>

@@ -80,7 +80,7 @@ end
 endtask
 task look;
 input [10:0] x; input [10:0] y;
-begin hc = x; vc = y; repeat(3) @(posedge Clk); end
+begin hc = x; vc = y; repeat(4) @(posedge Clk); end
 endtask
 task lock2;
 begin
