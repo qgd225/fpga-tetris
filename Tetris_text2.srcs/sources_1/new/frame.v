@@ -163,15 +163,18 @@ module frame(
     assign rr_t2[3] = rr_d2[4:0];
     
     reg [2:0]state_color[0:479];
+    reg state_owner[0:479];
 
-//    取格行字: 20 行, 每行 24 列(state) / 24x3 位(颜色号); 纯连线, 0 LUT
+//    取格行字: 20 行, 每行 24 列(state) / 24x3 位(颜色号) / owner; 纯连线, 0 LUT
     wire [23:0]row_f[0:19];
     wire [71:0]scw[0:19];
+    wire [23:0]row_ow[0:19];
     genvar gr, gc;
     generate for(gr = 0; gr < 20; gr = gr + 1)begin : gen_rowf
         for(gc = 0; gc < 24; gc = gc + 1)begin : gen_colf
             assign row_f[gr][gc] = state[gc*20+gr];
             assign scw[gr][gc*3 +: 3] = state_color[gc*20+gr];
+            assign row_ow[gr][gc] = state_owner[gc*20+gr];
         end
     end endgenerate
     
@@ -181,16 +184,22 @@ module frame(
     
     always @(posedge Clk_74M) begin
     if(lock_we || (duo && lock_we2))begin
-        if(lock_we && (cc_t[lock_idx] <= (duo ? 5'd23 : 5'd19)) && (rr_t[lock_idx] <= 5'd19))
+        if(lock_we && (cc_t[lock_idx] <= (duo ? 5'd23 : 5'd19)) && (rr_t[lock_idx] <= 5'd19))begin
         state_color[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= type_d;
-        if(duo && lock_we2 && (cc_t2[lock_idx2] <= 5'd23) && (rr_t2[lock_idx2] <= 5'd19))
+        state_owner[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= 1'b0;
+        end
+        if(duo && lock_we2 && (cc_t2[lock_idx2] <= 5'd23) && (rr_t2[lock_idx2] <= 5'd19))begin
         state_color[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= type_d2;
+        state_owner[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= 1'b1;
+        end
     end
     else if(clear_time && !clear_t && !clear_pulse)begin 
         for(c = 0; c < 24; c = c + 1)
             for(m = 1; m < 20; m = m + 1)
-                if(m <= clear_row)
+                if(m <= clear_row)begin
                 state_color[c*20 + m] <= state_color[c*20 + m - 1];
+                state_owner[c*20 + m] <= state_owner[c*20 + m - 1];
+                end
         end
     end
     
@@ -662,6 +671,7 @@ module frame(
     reg [2:0]hold_type_r;
     reg cell_r;
     reg [2:0]sc_r;
+    reg owner_r;
     reg clear_t_r;
     reg flash_r;
     reg chs_margin_r;
@@ -728,6 +738,7 @@ module frame(
     hold_type_r <= 3'd0;
     cell_r <= 1'b0;
     sc_r <= 3'd0;
+    owner_r <= 1'b0;
     clear_t_r <= 1'b0;
     flash_r <= 1'b0;
     chs_margin_r <= 1'b0;
@@ -782,10 +793,12 @@ module frame(
     if((C_num <= 5'd23) && (R_num <= 5'd19))begin
     cell_r <= row_f[R_num][C_num];
     sc_r <= scw[R_num][C_num*3 +: 3];
+    owner_r <= row_ow[R_num][C_num];
     end
     else begin
     cell_r <= 1'b0;
     sc_r <= 3'd0;
+    owner_r <= 1'b0;
     end
     clear_t_r <= clear_t;
     flash_r <= (clear_t) && (line_t[R_num]) && (!clear_flash);
@@ -982,7 +995,9 @@ module frame(
                DARK_S = 24'h69_22_2C,
                DARK_Z = 24'h29_52_23,
                DARK_L = 24'h71_41_1D,
-               DARK_J = 24'h74_2B_76;
+               DARK_J = 24'h74_2B_56,
+               P1_SOFT = 24'h6B_F0_FF,
+               P2_SOFT = 24'hFF_98_CB;
     
     // danger band and side rails
     wire [23:0]col_mask = duo ? 24'hFFFFFF : 24'h0FFFFF;
@@ -1059,7 +1074,44 @@ module frame(
         (hcounter >= hdx2 - 11'd6) && (hcounter <= hdx2 + 11'd6) &&
         (vcounter >= pbt2 - 11'd6) && (vcounter <= pbt2 + 11'd6) &&
         ((hcounter == hdx2 - 11'd6) || (hcounter == hdx2 + 11'd6) ||
-         (vcounter == pbt2 - 11'd6) || (vcounter == pbt2 + 11'd6));
+         (vcounter == pbt2 - 11'd6) || (vcounter == pbt2 + 11'd6));
+    wire [4:0]lk_c1 = cc_t[lock_idx];
+    wire [4:0]lk_r1 = rr_t[lock_idx];
+    wire [4:0]lk_c2 = cc_t2[lock_idx2];
+    wire [4:0]lk_r2 = rr_t2[lock_idx2];
+    wire lock_rim1 = lflash1 && (C_num == lk_c1) && (R_num == lk_r1) && piece_round_r &&
+        (((glx_r == 11'd1) || (glx_r == 11'd2) || (glx_r == 11'd29) || (glx_r == 11'd30)) ||
+         ((gly_r == 11'd1) || (gly_r == 11'd2) || (gly_r == 11'd29) || (gly_r == 11'd30)));
+    wire lock_rim2 = duo && lflash2 && (C_num == lk_c2) && (R_num == lk_r2) && piece_round_r &&
+        (((glx_r == 11'd1) || (glx_r == 11'd2) || (glx_r == 11'd29) || (glx_r == 11'd30)) ||
+         ((gly_r == 11'd1) || (gly_r == 11'd2) || (gly_r == 11'd29) || (gly_r == 11'd30)));
+    wire [10:0]brl1 = pcl1 - 11'd9;
+    wire [10:0]brr1 = pcr1 + 11'd9;
+    wire [10:0]brt1 = ptp1 - 11'd9;
+    wire [10:0]brb1 = pbt1 + 11'd9;
+    wire [10:0]brl2 = pcl2 - 11'd9;
+    wire [10:0]brr2 = pcr2 + 11'd9;
+    wire [10:0]brt2 = ptp2 - 11'd9;
+    wire [10:0]brb2 = pbt2 + 11'd9;
+    wire bracket1 = duo && (piece_cmax1 >= piece_cmin1) &&
+        (((hcounter >= brl1) && (hcounter < brl1 + 11'd18) && (vcounter >= brt1) && (vcounter < brt1 + 11'd2)) ||
+         ((vcounter >= brt1) && (vcounter < brt1 + 11'd18) && (hcounter >= brl1) && (hcounter < brl1 + 11'd2)) ||
+         ((hcounter >= brr1 - 11'd17) && (hcounter <= brr1) && (vcounter >= brt1) && (vcounter < brt1 + 11'd2)) ||
+         ((vcounter >= brt1) && (vcounter < brt1 + 11'd18) && (hcounter > brr1 - 11'd2) && (hcounter <= brr1)) ||
+         ((hcounter >= brl1) && (hcounter < brl1 + 11'd18) && (vcounter > brb1 - 11'd2) && (vcounter <= brb1)) ||
+         ((vcounter >= brb1 - 11'd17) && (vcounter <= brb1) && (hcounter >= brl1) && (hcounter < brl1 + 11'd2)) ||
+         ((hcounter >= brr1 - 11'd17) && (hcounter <= brr1) && (vcounter > brb1 - 11'd2) && (vcounter <= brb1)) ||
+         ((vcounter >= brb1 - 11'd17) && (vcounter <= brb1) && (hcounter > brr1 - 11'd2) && (hcounter <= brr1)));
+    wire bracket2 = duo && (piece_cmax2 >= piece_cmin2) &&
+        (((hcounter >= brl2) && (hcounter < brl2 + 11'd18) && (vcounter >= brt2) && (vcounter < brt2 + 11'd2)) ||
+         ((vcounter >= brt2) && (vcounter < brt2 + 11'd18) && (hcounter >= brl2) && (hcounter < brl2 + 11'd2)) ||
+         ((hcounter >= brr2 - 11'd17) && (hcounter <= brr2) && (vcounter >= brt2) && (vcounter < brt2 + 11'd2)) ||
+         ((vcounter >= brt2) && (vcounter < brt2 + 11'd18) && (hcounter > brr2 - 11'd2) && (hcounter <= brr2)) ||
+         ((hcounter >= brl2) && (hcounter < brl2 + 11'd18) && (vcounter > brb2 - 11'd2) && (vcounter <= brb2)) ||
+         ((vcounter >= brb2 - 11'd17) && (vcounter <= brb2) && (hcounter >= brl2) && (hcounter < brl2 + 11'd2)) ||
+         ((hcounter >= brr2 - 11'd17) && (hcounter <= brr2) && (vcounter > brb2 - 11'd2) && (vcounter <= brb2)) ||
+         ((vcounter >= brb2 - 11'd17) && (vcounter <= brb2) && (hcounter > brr2 - 11'd2) && (hcounter <= brr2)));
+
 
 
     always@(*)begin
@@ -1262,6 +1314,10 @@ module frame(
     rgb = 24'h00E5FF;
     else if(rot_corner2 || hard_fx2)
     rgb = PINK;
+    else if(bracket1)
+    rgb = 24'h00E5FF;
+    else if(bracket2)
+    rgb = PINK;
     else if(Piece_r)begin
         if(!piece_round_r)
         rgb = field_bg;
@@ -1269,7 +1325,10 @@ module frame(
         rgb = 24'hEEEEEE;
         else if(block_glint)
         rgb = WHITE;
-        else if(block_light)
+        else if(block_light)begin
+        if(duo)
+        rgb = P1_SOFT;
+        else
         case(type_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -1280,6 +1339,7 @@ module frame(
         6:rgb = LIGHT_PINK;
         default:rgb = 0;
         endcase
+        end
         else if(block_dark)
         case(type_r)
         0:rgb = DARK_I;
@@ -1331,6 +1391,10 @@ module frame(
         else
         rgb = field_bg;
         end
+    else if(lock_rim1)
+    rgb = WHITE;
+    else if(lock_rim2)
+    rgb = WHITE;
     else if(cell_r)begin
         if(!piece_round_r)
         rgb = field_bg;
@@ -1350,7 +1414,10 @@ module frame(
         end
         else if(block_glint)
         rgb = WHITE;
-        else if(block_light)
+        else if(block_light)begin
+        if(duo)
+        rgb = owner_r ? P2_SOFT : P1_SOFT;
+        else
         case(sc_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -1361,6 +1428,7 @@ module frame(
         6:rgb = LIGHT_PINK;
         default:rgb = 0;
         endcase
+        end
         else if(block_dark)
         case(sc_r)
         0:rgb = DARK_I;
@@ -1391,7 +1459,10 @@ module frame(
         rgb = 24'hEEEEEE;
         else if(block_glint)
         rgb = WHITE;
-        else if(block_light)
+        else if(block_light)begin
+        if(duo)
+        rgb = P2_SOFT;
+        else
         case(type2_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -1402,6 +1473,7 @@ module frame(
         6:rgb = LIGHT_PINK;
         default:rgb = 0;
         endcase
+        end
         else if(block_dark)
         case(type2_r)
         0:rgb = DARK_I;
