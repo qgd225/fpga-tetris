@@ -20,7 +20,8 @@ module Key(
     output drop_en,
     output rotate_p_flag,
     output rst_key_en,
-    output hold_p_flag
+    output hold_p_flag,
+    output hold_held
     );
     
     key_filter key_filter_inst0(
@@ -75,7 +76,8 @@ module Key(
     .Clk(Clk),
     .Reset_n(Reset_n),
     .key(hold),
-    .key_r_flag(hold_p_flag)
+    .key_r_flag(hold_p_flag),
+    .key_held(hold_held)
     );
 
 endmodule

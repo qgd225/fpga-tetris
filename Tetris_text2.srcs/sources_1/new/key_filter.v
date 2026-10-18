@@ -4,7 +4,8 @@ module key_filter(
     key,
     key_p_flag,
     key_r_flag,
-    key_en
+    key_en,
+    key_held
     );
     
     input key;
@@ -13,6 +14,7 @@ module key_filter(
     
     output wire key_p_flag;
     output wire key_r_flag;
+    output wire key_held;
     output reg key_en;
     
     reg [19:0]counter_cnt;
@@ -96,5 +98,6 @@ module key_filter(
     
     assign key_p_flag = (key_en) && (!key_en_tx);
     assign key_r_flag = (!key_en) && (key_en_tx);
+    assign key_held = !sync_d1_key;
     
 endmodule

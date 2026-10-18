@@ -87,7 +87,12 @@ module Playfield(
     output reg [4:0]piece_cmin2,
     output reg [4:0]piece_cmax2,
     output reg [4:0]piece_rmin2,
-    output reg [4:0]piece_rmax2
+    output reg [4:0]piece_rmax2,
+    output wire hint_valid,
+    output wire [2:0]hint_type,
+    output wire [4:0]hint_c0, hint_c1, hint_c2, hint_c3,
+    output wire [4:0]hint_r0, hint_r1, hint_r2, hint_r3,
+    output wire [4:0]hint_col
     );
 
 //============================================================
@@ -1587,4 +1592,21 @@ module Playfield(
         en_hold_t2 <= en_hold2;
     end
 
+
+//    P1 solo hint
+wire [479:0]hint_row_bits = {row_w[19],row_w[18],row_w[17],row_w[16],row_w[15],row_w[14],row_w[13],row_w[12],row_w[11],row_w[10],row_w[9],row_w[8],row_w[7],row_w[6],row_w[5],row_w[4],row_w[3],row_w[2],row_w[1],row_w[0]};
+reg playing_d;
+always@(posedge Clk_74M or negedge Reset_n)begin
+if(!Reset_n) playing_d <= 1'b0;
+else playing_d <= Playing;
+end
+wire hint_start = !duo && Playing && (new_piece1 || hold_up || clear_down || field_chg || !playing_d);
+solo_hint solo_hint_inst(
+.Clk_74M(Clk_74M), .Reset_n(Reset_n), .start(hint_start), .duo(duo), .Playing(Playing),
+.type(type), .row_bits(hint_row_bits),
+.hint_valid(hint_valid), .hint_type(hint_type),
+.hint_c0(hint_c0), .hint_c1(hint_c1), .hint_c2(hint_c2), .hint_c3(hint_c3),
+.hint_r0(hint_r0), .hint_r1(hint_r1), .hint_r2(hint_r2), .hint_r3(hint_r3),
+.hint_col(hint_col)
+);
 endmodule

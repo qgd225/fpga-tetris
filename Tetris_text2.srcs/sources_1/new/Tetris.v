@@ -46,6 +46,7 @@ module Tetris(
     wire kb_switch_r;
     wire kb_switch_en;
     wire kb_hold_p;
+    wire kb_hold_en;
     wire kb_reset_en;
     wire kb_activity;
 
@@ -85,6 +86,7 @@ module Tetris(
     wire drop_en;
     wire rotate_p_flag;
     wire hold_p_flag;
+    wire hold_held;
     
     Key Key_inst(
     .Clk(Clk_74M),
@@ -107,7 +109,8 @@ module Tetris(
     .drop_en(drop_en),
     .rotate_p_flag(rotate_p_flag),
     .rst_key_en(rst_key_en),
-    .hold_p_flag(hold_p_flag)
+    .hold_p_flag(hold_p_flag),
+    .hold_held(hold_held)
     );
 
 wire p1_left, p1_right, p1_drop_r, p1_drop_en, p1_rotate, p1_hold;
@@ -122,7 +125,9 @@ wire drop_e     = p1_drop_en;
 wire rotate_p   = p1_rotate;
 wire switch_r_f = switch_r_flag | kb_switch_r;
 wire switch_e   = switch_en     | kb_switch_en;
-wire hold_p     = p1_hold;
+wire hold_route = p1_hold;
+wire solo_hold_short;
+wire solo_hold_long;
 //    游戏状态机
     wire Idle;  
     wire Playing;
@@ -132,6 +137,14 @@ wire hold_p     = p1_hold;
     wire choose;
     wire [3:0]choose_cnt;
     wire duo = (choose_cnt == 4'd1);
+hold_gesture hold_gesture_inst(
+.Clk_74M(Clk_74M),
+.Reset_n(Reset_n),
+.held(hold_held | kb_hold_en),
+.short_pulse(solo_hold_short),
+.long_level(solo_hold_long)
+);
+wire hold_p = duo ? hold_route : solo_hold_short;
 //    单人: PC + 板载键都控制 P1; 双人: 板载 P1, PC P2
 control_route control_route_inst(
 .duo(duo),
@@ -233,6 +246,7 @@ control_route control_route_inst(
     .rotate_p_flag(rotate_p),
     .switch_r_flag(switch_r_f),
     .hold_p_flag(hold_p),
+    .hint_show(!duo && solo_hold_long),
     .Idle(Idle),
     .choose(choose),
     .choose_cnt(choose_cnt),
@@ -350,6 +364,7 @@ control_route control_route_inst(
     .kb_switch_r(kb_switch_r),
     .kb_switch_en(kb_switch_en),
     .kb_hold_p(kb_hold_p),
+    .kb_hold_en(kb_hold_en),
     .kb_reset_en(kb_reset_en),
     .kb_activity(kb_activity)
     );

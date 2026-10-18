@@ -29,6 +29,7 @@ module net_screen_tx(
   output        kb_switch_r,
   output        kb_switch_en,
   output        kb_hold_p,
+  output        kb_hold_en,
   output        kb_reset_en,
   output        kb_activity,
 
@@ -671,6 +672,7 @@ assign kb_left_p    = kb_bits[0] && (!kb_bits_d[0]);
 assign kb_right_p   = kb_bits[1] && (!kb_bits_d[1]);
 assign kb_rotate_p  = kb_bits[3] && (!kb_bits_d[3]);
 assign kb_hold_p    = kb_bits[4] && (!kb_bits_d[4]);
+assign kb_hold_en   = kb_bits[4];
 assign kb_drop_en   = kb_bits[2];
 assign kb_drop_r    = (!kb_bits[2]) && kb_bits_d[2];
 assign kb_switch_en = kb_bits[5];

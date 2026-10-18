@@ -31,7 +31,7 @@ frame #(.EFF_TICK(21'd8)) dut(
   .Idle(Idle), .Playing(Playing), .Stop(Stop), .Finalize(Finalize),
   .duo(1'b0),
   .left_p_flag2(1'b0), .right_p_flag2(1'b0), .drop_r_flag2(1'b0), .drop_en2(1'b0),
-  .rotate_p_flag2(1'b0), .hold_p_flag2(1'b0),
+  .rotate_p_flag2(1'b0), .hold_p_flag2(1'b0), .hint_show(1'b0),
   .rgb(rgb), .over(over), .clear(clear), .speed_level(speed_level),
   .score(score), .lines(lines), .time_sec(time_sec));
 

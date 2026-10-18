@@ -23,6 +23,7 @@ module frame(
     input drop_en2,
     input rotate_p_flag2,
     input hold_p_flag2,
+    input hint_show,
     
     output reg [23:0]rgb,
     output over,
@@ -50,7 +51,7 @@ module frame(
     reg [23:0]rgb_c;
     
     
-//    ÓÎÏ·Çø
+//    ï¿½ï¿½Ï·ï¿½ï¿½
     wire [4:0]C_num;
     wire [4:0]R_num;
     wire [479:0]state;
@@ -77,7 +78,7 @@ module frame(
     wire [19:0]line_t;
     wire clear_flash;
     
-    //    P2(Ë«ÈË)ÏÔÊ¾ÓÃ
+    //    P2(Ë«ï¿½ï¿½)ï¿½ï¿½Ê¾ï¿½ï¿½
     wire Piece2;
     wire ghost2;
     wire [2:0]type2;
@@ -95,26 +96,31 @@ module frame(
     wire ghost_ev2;
     wire [4:0]piece_cmin1, piece_cmax1, piece_rmin1, piece_rmax1;
     wire [4:0]piece_cmin2, piece_cmax2, piece_rmin2, piece_rmax2;
+    wire hint_valid;
+    wire [2:0]hint_type;
+    wire [4:0]hint_c0, hint_c1, hint_c2, hint_c3;
+    wire [4:0]hint_r0, hint_r1, hint_r2, hint_r3;
+    wire [4:0]hint_col;
 
 //============================================================
-//    HUD ²¼¾Ö(Î¨Ò»À´Ô´): Ãæ°åÃªµã / ±êÇ© / ·Ö¸ôÏß / ²ÛÎ» / µÈ¼¶Ìõ / µÈ¼¶Êý×Ö
+//    HUD ï¿½ï¿½ï¿½ï¿½(Î¨Ò»ï¿½ï¿½Ô´): ï¿½ï¿½ï¿½Ãªï¿½ï¿½ / ï¿½ï¿½Ç© / ï¿½Ö¸ï¿½ï¿½ï¿½ / ï¿½ï¿½Î» / ï¿½È¼ï¿½ï¿½ï¿½ / ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½
 //============================================================
-    localparam [10:0] XPNL1 = 11'd94,    //Ë«ÈË P1 Ãæ°å(×óÀ¸)Ãªµã
-                     XPNL2 = 11'd1121,  //Ë«ÈË P2 Ãæ°å(ÓÒÀ¸)Ãªµã
-                     XSOLO = 11'd1057,  //µ¥ÈËÃæ°å(ÓÒÀ¸)Ãªµã
-                     YNEXT = 11'd132,   //Ô¤ÀÀ²ÛÎ» Y
-                     YHOLD = 11'd348,   //Hold ²ÛÎ» Y
-                     YLBNX = 11'd84,    //NEXT ±êÇ© Y
-                     YLBHD = 11'd300,   //HOLD ±êÇ© Y
-                     YRLNX = 11'd122,   //NEXT ·Ö¸ôÏß Y
-                     YRLHD = 11'd338,   //HOLD ·Ö¸ôÏß Y
-                     XLVLB = 11'd232,   //LV ±êÇ© X
-                     XLDIG = 11'd283,   //µÈ¼¶Êý×Ö X(ÓëµÈ¼¶ÌõÍ¬Öá)
-                     YLBLV = 11'd36,    //LV ±êÇ© Y(Óë 44px ¸ßµÄÊý×Öµ×²¿¶ÔÆë)
-                     YDIGI = 11'd24;    //µÈ¼¶Êý×Ö Y
+    localparam [10:0] XPNL1 = 11'd94,    //Ë«ï¿½ï¿½ P1 ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½)Ãªï¿½ï¿½
+                     XPNL2 = 11'd1121,  //Ë«ï¿½ï¿½ P2 ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½)Ãªï¿½ï¿½
+                     XSOLO = 11'd1057,  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½)Ãªï¿½ï¿½
+                     YNEXT = 11'd132,   //Ô¤ï¿½ï¿½ï¿½ï¿½Î» Y
+                     YHOLD = 11'd348,   //Hold ï¿½ï¿½Î» Y
+                     YLBNX = 11'd84,    //NEXT ï¿½ï¿½Ç© Y
+                     YLBHD = 11'd300,   //HOLD ï¿½ï¿½Ç© Y
+                     YRLNX = 11'd122,   //NEXT ï¿½Ö¸ï¿½ï¿½ï¿½ Y
+                     YRLHD = 11'd338,   //HOLD ï¿½Ö¸ï¿½ï¿½ï¿½ Y
+                     XLVLB = 11'd232,   //LV ï¿½ï¿½Ç© X
+                     XLDIG = 11'd283,   //ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½ X(ï¿½ï¿½È¼ï¿½ï¿½ï¿½Í¬ï¿½ï¿½)
+                     YLBLV = 11'd36,    //LV ï¿½ï¿½Ç© Y(ï¿½ï¿½ 44px ï¿½ßµï¿½ï¿½ï¿½ï¿½Öµ×²ï¿½ï¿½ï¿½ï¿½ï¿½)
+                     YDIGI = 11'd24;    //ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½ Y
     wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
     wire [10:0]XPN2 = XPNL2;
-//    NEXT/HOLD ±êÇ©¾ÓÖÐ: 4 ×Ö x 24 ¼ä¾à(Êµ¿í 92) ÔÚ 128 ¿íÃæ°åÀï×ó±ß¾à 18
+//    NEXT/HOLD ï¿½ï¿½Ç©ï¿½ï¿½ï¿½ï¿½: 4 ï¿½ï¿½ x 24 ï¿½ï¿½ï¿½(Êµï¿½ï¿½ 92) ï¿½ï¿½ 128 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¾ï¿½ 18
     wire [10:0]XLBN1 = XPN1 + 11'd18;
     wire [10:0]XLBN2 = XPN2 + 11'd18;
 
@@ -166,7 +172,7 @@ module frame(
     reg [2:0]state_color[0:479];
     reg state_owner[0:479];
 
-//    È¡¸ñÐÐ×Ö: 20 ÐÐ, Ã¿ÐÐ 24 ÁÐ(state) / 24x3 Î»(ÑÕÉ«ºÅ) / owner; ´¿Á¬Ïß, 0 LUT
+//    È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: 20 ï¿½ï¿½, Ã¿ï¿½ï¿½ 24 ï¿½ï¿½(state) / 24x3 Î»(ï¿½ï¿½É«ï¿½ï¿½) / owner; ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, 0 LUT
     wire [23:0]row_f[0:19];
     wire [71:0]scw[0:19];
     wire [23:0]row_ow[0:19];
@@ -287,7 +293,10 @@ module frame(
     .piece_cmin1(piece_cmin1), .piece_cmax1(piece_cmax1),
     .piece_rmin1(piece_rmin1), .piece_rmax1(piece_rmax1),
     .piece_cmin2(piece_cmin2), .piece_cmax2(piece_cmax2),
-    .piece_rmin2(piece_rmin2), .piece_rmax2(piece_rmax2)
+    .piece_rmin2(piece_rmin2), .piece_rmax2(piece_rmax2),
+    .hint_valid(hint_valid), .hint_type(hint_type),
+    .hint_c0(hint_c0), .hint_c1(hint_c1), .hint_c2(hint_c2), .hint_c3(hint_c3),
+    .hint_r0(hint_r0), .hint_r1(hint_r1), .hint_r2(hint_r2), .hint_r3(hint_r3), .hint_col(hint_col)
     );
     
     
@@ -444,8 +453,8 @@ module frame(
     );
     
 
-//    ÎÄ×Ö±êÇ© NEXT/HOLD/LV: 1x ×ÖºÅ(20x32), ×Ö¾à 24
-//    µØÖ·Óë BRAM Ê¹ÄÜÌáÇ° 1 ÏñËØ(ena_n ÓÃ lb_hn, ×ó±ß½ç¶à¼õ 1): ·ñÔòÃ¿×ÖµÚ 1 ÁÐ»á´®ÉÏÒ»×ÖµÚ 1 ÁÐ
+//    ï¿½ï¿½ï¿½Ö±ï¿½Ç© NEXT/HOLD/LV: 1x ï¿½Öºï¿½(20x32), ï¿½Ö¾ï¿½ 24
+//    ï¿½ï¿½Ö·ï¿½ï¿½ BRAM Ê¹ï¿½ï¿½ï¿½ï¿½Ç° 1 ï¿½ï¿½ï¿½ï¿½(ena_n ï¿½ï¿½ lb_hn, ï¿½ï¿½ß½ï¿½ï¿½ï¿½ 1): ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½Öµï¿½ 1 ï¿½Ð»á´®ï¿½ï¿½Ò»ï¿½Öµï¿½ 1 ï¿½ï¿½
     reg [10:0]lb_X;
     reg [10:0]lb_Y;
     reg [4:0] lb_g;
@@ -567,13 +576,13 @@ module frame(
     .douta(lb_dout)
     );
     wire lbl_lit = lb_ena ? lb_dout[19 - (hcounter - lb_X)] : 1'b0;
-//    ¶¥À¸·¢Ë¿Ïß(Ê±¼ä/·ÖÊý·Ö×é) Óë ½áÊø»­ÃæÏÂ»®Ïß: ¶¼×ß±êÇ©»Ò
+//    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¿ï¿½ï¿½(Ê±ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â»ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ß±ï¿½Ç©ï¿½ï¿½
     wire top_rule_lit = (hcounter >= 11'd470) && (hcounter <= 11'd470) &&
                         (vcounter >= 11'd24) && (vcounter < 11'd68);
     wire over_line_lit = Finalize && (hcounter >= 11'd449) && (hcounter <= 11'd825) &&
                          (vcounter >= 11'd444) && (vcounter <= 11'd446);
 
-//    Ãæ°å·Ö¸ôÏß: 2px, Î»ÓÚ±êÇ©ÏÂ·½
+//    ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½: 2px, Î»ï¿½Ú±ï¿½Ç©ï¿½Â·ï¿½
     wire rule1_lit = ((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128)));
@@ -583,12 +592,12 @@ module frame(
                              ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
                              ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))));
 
-//    µÈ¼¶Êý×Ö: 1 Î», ÓëµÈ¼¶ÌõÍ¬Öá
+//    ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½: 1 Î», ï¿½ï¿½È¼ï¿½ï¿½ï¿½Í¬ï¿½ï¿½
     wire [3:0] lv_dig = {1'b0, speed_level};
     wire [10:0]vdv = vcounter - YDIGI;
     wire lvd_ena = (hcounter >= XLDIG) && (hcounter < (XLDIG + 11'd20)) &&
                    (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
-//    È¡×ÖÊ¹ÄÜÌáÇ° 1 ÏñËØ(number Ò²ÊÇ READ_LATENCY=1): ·ñÔòÃ¿ÐÐµÚ 1 ÁÐ»á´®ÉÏÒ»ÐÐ
+//    È¡ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½Ç° 1 ï¿½ï¿½ï¿½ï¿½(number Ò²ï¿½ï¿½ READ_LATENCY=1): ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½Ðµï¿½ 1 ï¿½Ð»á´®ï¿½ï¿½Ò»ï¿½ï¿½
     wire lvd_ena_n = (lb_hn >= (XLDIG - 11'd1)) && (lb_hn < (XLDIG + 11'd20)) &&
                      (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
     wire [19:0]lvd_dout;
@@ -599,7 +608,7 @@ module frame(
     .douta(lvd_dout)
     );
     wire lvd_lit = lvd_ena ? lvd_dout[19 - (hcounter - XLDIG)] : 1'b0;
-//    µÈ¼¶É«: 8 ¼¶ÈÈÁ¦½¥±ä(Çà->ÂÌ->»Æ->³È->ºì->·Û->×Ï->°×)
+//    ï¿½È¼ï¿½É«: 8 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½->ï¿½ï¿½->ï¿½ï¿½->ï¿½ï¿½->ï¿½ï¿½->ï¿½ï¿½->ï¿½ï¿½->ï¿½ï¿½)
     reg [23:0]lv_color;
     always@(*)begin
     case(speed_level)
@@ -615,13 +624,13 @@ module frame(
     endcase
     end
 
-//    LV ×éÏÂ·½ 2px µÈ¼¶É«ºáÏß: ²¢ÈëµÈ¼¶Êý×Ö·ÖÖ§(Í¬É«)
+//    LV ï¿½ï¿½ï¿½Â·ï¿½ 2px ï¿½È¼ï¿½É«ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ï¿½Ö·ï¿½Ö§(Í¬É«)
     wire lv_rule_lit = (hcounter >= 11'd232) && (hcounter < 11'd306) &&
                        (vcounter >= 11'd72) && (vcounter < 11'd74);
     wire lvd_all_lit = lvd_lit || lv_rule_lit;
 
-//    ÓÄÁé¿ò: 2px ±ß´ø + ËÄ½Ç¸÷ÇÐ 1x1(ÄÚ²¿´¿ºÚ, ÓëÊµÐÄÏÂÂä·½¿éÇø·Ö)
-//    ÅÐ¶¨±ØÐëÓë ghost_r Í¬ÅÄ¼Ä´æ: ghost_r ±È hcounter Íí 1 ÅÄ, ·ñÔò¿ò»á×óÕ­ÓÒ¿í
+//    ï¿½ï¿½ï¿½ï¿½ï¿½: 2px ï¿½ß´ï¿½ + ï¿½Ä½Ç¸ï¿½ï¿½ï¿½ 1x1(ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ä·½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+//    ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ghost_r Í¬ï¿½Ä¼Ä´ï¿½: ghost_r ï¿½ï¿½ hcounter ï¿½ï¿½ 1 ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ­ï¿½Ò¿ï¿½
     wire [10:0]glx = (hcounter - 11'd321) & 11'd31;
     wire [10:0]gly = (vcounter - 11'd81) & 11'd31;
     wire glx_bd = (glx < 11'd2) || (glx > 11'd27);
@@ -629,7 +638,7 @@ module frame(
     wire glx_cn = (glx < 11'd1) || (glx > 11'd28);
     wire gly_cn = (gly < 11'd1) || (gly > 11'd28);
     wire ghost_edge = (glx_bd || gly_bd) && !(glx_cn && gly_cn);
-//    ÊµÐÄ·½¿é 1px Ô²½Ç: ËÄ½Ç¸÷ÇÐ 1x1(ÓëÓÄÁéÇÐ½ÇÍ¬Ò»ÅÐ¶¨)
+//    Êµï¿½Ä·ï¿½ï¿½ï¿½ 1px Ô²ï¿½ï¿½: ï¿½Ä½Ç¸ï¿½ï¿½ï¿½ 1x1(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½Í¬Ò»ï¿½Ð¶ï¿½)
     wire piece_round = !(glx_cn && gly_cn);
 
     reg over_lit_r;
@@ -692,7 +701,7 @@ module frame(
     reg rule2_r;
     reg next_slot_r;
     reg hold_slot_r;
-//    Ô¤ÀÀ·½¿é 1px Ô²½Ç: ÏàÎ»°´Ãæ°å/²ÛÎ»·Ö±ðÈ¡(±ÜÃâ¿çÃæ°å´®ÏàÎ»)
+//    Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 1px Ô²ï¿½ï¿½: ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½Î»ï¿½Ö±ï¿½È¡(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½å´®ï¿½ï¿½Î»)
     wire [10:0]pvx1 = (hcounter - XPN1) & 11'd31;
     wire [10:0]pvx2 = (hcounter - XPN2) & 11'd31;
     wire [10:0]pvx = (duo && (hcounter >= XPN2)) ? pvx2 : pvx1;
@@ -700,7 +709,7 @@ module frame(
     wire [10:0]pvy_h = (vcounter - YHOLD) & 11'd31;
     wire [10:0]pvy = hold_slot_r ? pvy_h : pvy_n;
     wire pv_corner = ((pvx == 11'd0) || (pvx == 11'd29)) && ((pvy == 11'd0) || (pvy == 11'd29));
-//    ÐÂÅäÉ«: ³¡µØµ×É« vs Íâ²¿ / P1P2 ²ÛÎ»µ×É«
+//    ï¿½ï¿½ï¿½ï¿½É«: ï¿½ï¿½ï¿½Øµï¿½É« vs ï¿½â²¿ / P1P2 ï¿½ï¿½Î»ï¿½ï¿½É«
     wire [10:0]XR = duo ? 11'd1088 : 11'd960;
     wire in_field = (hcounter >= 11'd321) && (hcounter < XR) && (vcounter >= 11'd81);
     wire [23:0]field_bg = 24'h0A0F16;
@@ -708,6 +717,21 @@ module frame(
     reg lvd_r;
     reg lb_lv_r;
     reg fin_r;
+    reg [23:0]hint_color;
+    reg hint_show_r, hint_valid_r, hint_hit_r;
+    reg [2:0]hint_type_r;
+    reg [4:0]hint_c0_r, hint_c1_r, hint_c2_r, hint_c3_r;
+    reg [4:0]hint_r0_r, hint_r1_r, hint_r2_r, hint_r3_r;
+    reg [4:0]hint_col_r;
+    wire hint_match = hint_valid && (hint_type == type) &&
+        ((C_num == hint_c0 && R_num == hint_r0) || (C_num == hint_c1 && R_num == hint_r1) ||
+         (C_num == hint_c2 && R_num == hint_r2) || (C_num == hint_c3 && R_num == hint_r3));
+    wire hint_box = (((gly_r == 11'd3) || (gly_r == 11'd26)) && (glx_r > 11'd2) && (glx_r < 11'd27) && (glx_r[2:0] < 3'd4)) ||
+                    (((glx_r == 11'd3) || (glx_r == 11'd26)) && (gly_r > 11'd2) && (gly_r < 11'd27) && (gly_r[2:0] < 3'd4));
+    wire hint_dot = (glx_r >= 11'd14) && (glx_r <= 11'd15) && (gly_r >= 11'd14) && (gly_r <= 11'd15);
+    wire hint_cell_lit = hint_hit_r && (hint_box || hint_dot);
+    wire hint_mark_lit = hint_show_r && hint_valid_r && (hint_type_r == type_r) && (vcounter >= 11'd714) && (vcounter <= 11'd720) &&
+                         (hcounter >= (11'd335 + (hint_col_r << 5))) && (hcounter < (11'd339 + (hint_col_r << 5)));
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -764,6 +788,9 @@ module frame(
     lvd_r <= 1'b0;
     lb_lv_r <= 1'b0;
     fin_r <= 1'b0;
+    hint_show_r <= 1'b0; hint_valid_r <= 1'b0; hint_hit_r <= 1'b0; hint_type_r <= 3'd0;
+    hint_c0_r <= 0; hint_c1_r <= 0; hint_c2_r <= 0; hint_c3_r <= 0;
+    hint_r0_r <= 0; hint_r1_r <= 0; hint_r2_r <= 0; hint_r3_r <= 0; hint_col_r <= 0;
     end
     else begin
     over_lit_r <= over_lit;
@@ -794,7 +821,7 @@ module frame(
     type_r <= type;
     type_t_r <= type_t;
     hold_type_r <= hold_type;
-    //    ³¡µØÈ¡É«: ±àºÅ±ØÐëÔÚ³¡µØÄÚ(ÉÚ±ø 24 »ò 20 ±íÊ¾²»ÔÚÈÎºÎ¸ñ)
+    //    ï¿½ï¿½ï¿½ï¿½È¡É«: ï¿½ï¿½Å±ï¿½ï¿½ï¿½ï¿½Ú³ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½Ú±ï¿½ 24 ï¿½ï¿½ 20 ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ÎºÎ¸ï¿½)
     if((C_num <= 5'd23) && (R_num <= 5'd19))begin
     cell_r <= row_f[R_num][C_num];
     sc_r <= scw[R_num][C_num*3 +: 3];
@@ -806,7 +833,7 @@ module frame(
     owner_r <= 1'b0;
     end
     clear_t_r <= clear_t;
-    //    ÏûÐÐÑ¹Ëõ: 1~4 ÐÐÖ»Òª¸ÃÐÐ²ÎÓëÏûÐÐ¾Í³ÖÐøÊÕËõ, ²»ÊÜ°×ÉÁÏàÎ»Ó°Ïì
+    //    ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½: 1~4 ï¿½ï¿½Ö»Òªï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¾Í³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½Ü°ï¿½ï¿½ï¿½ï¿½ï¿½Î»Ó°ï¿½ï¿½
     clear_shrink_r <= (clear_t) && (line_t[R_num]);
     flash_r <= (clear_t) && (line_t[R_num]) && (!clear_flash);
     chs_margin_r <= chs_margin;
@@ -828,10 +855,14 @@ module frame(
     lvd_r <= lvd_all_lit;
     lb_lv_r <= lb_lv;
     fin_r <= Finalize;
+    hint_show_r <= hint_show && !duo && Playing; hint_valid_r <= hint_valid;
+    hint_type_r <= hint_type; hint_c0_r <= hint_c0; hint_c1_r <= hint_c1; hint_c2_r <= hint_c2; hint_c3_r <= hint_c3;
+    hint_r0_r <= hint_r0; hint_r1_r <= hint_r1; hint_r2_r <= hint_r2; hint_r3_r <= hint_r3; hint_col_r <= hint_col;
+    hint_hit_r <= hint_show && !duo && Playing && hint_match;
     end
     end
-//    UI ÌØÐ§: 60Hz ½ÚÅÄ + ÂäËøÂö³å(E1) / Éý¼¶ÉÁ°×(E2)
-    parameter [20:0]EFF_TICK = 21'd1_237_499;//·ÂÕæ¿É¸²¸Ç
+//    UI ï¿½ï¿½Ð§: 60Hz ï¿½ï¿½ï¿½ï¿½ + ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(E1) / ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(E2)
+    parameter [20:0]EFF_TICK = 21'd1_237_499;//ï¿½ï¿½ï¿½ï¿½É¸ï¿½ï¿½ï¿½
     reg [20:0]eff_cnt;
     wire eff_tick = (eff_cnt == EFF_TICK);
     always@(posedge Clk_74M or negedge Reset_n)begin
@@ -945,13 +976,13 @@ module frame(
     wire nflash2 = (nf2 != 2'd0);
     wire hflash = (hf != 2'd0);
     wire scflash = (scf != 2'd0);
-//    Ô¤ÀÀ²Û 32px µãÕó(Ö»ÔÚ²ÛÎ»ÄÚ, ÓÅÏÈ¼¶µÍÓÚÔ¤ÀÀ·½¿é)
+//    Ô¤ï¿½ï¿½ï¿½ï¿½ 32px ï¿½ï¿½ï¿½ï¿½(Ö»ï¿½Ú²ï¿½Î»ï¿½ï¿½, ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
     wire dx1 = (((hcounter - XPN1) & 11'd31) == 11'd31);
     wire dx2 = (((hcounter - XPN2) & 11'd31) == 11'd31);
     wire dy1 = (((vcounter - YNEXT) & 11'd31) == 11'd31);
     wire dy2 = (((vcounter - YHOLD) & 11'd31) == 11'd31);
     wire slot_dot = (next_slot_r && dy1 && (dx1 || dx2)) || (hold_slot_r && dy2 && (dx1 || dx2));
-//    Ë«ÈË P1/P2 ºÅÂë»Õ±ê: ÊÖ»æ 7 ¶Î(2x, Óë number ×ÖÌåÍ¬·ç¸ñ), ²»ÒÀÀµ ROM Ê±Ðò
+//    Ë«ï¿½ï¿½ P1/P2 ï¿½ï¿½ï¿½ï¿½Õ±ï¿½: ï¿½Ö»ï¿½ 7 ï¿½ï¿½(2x, ï¿½ï¿½ number ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½), ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ROM Ê±ï¿½ï¿½
     wire bd1 = duo && (hcounter >= 11'd138) && (hcounter < 11'd178) && (vcounter >= 11'd621) && (vcounter < 11'd709);
     wire bd2 = duo && (hcounter >= 11'd1165) && (hcounter < 11'd1205) && (vcounter >= 11'd621) && (vcounter < 11'd709);
     wire [10:0]bx = bd2 ? (hcounter - 11'd1165) : (hcounter - 11'd138);
@@ -964,22 +995,22 @@ module frame(
     wire seg_e = (bx >= 11'd4) && (bx < 11'd8) && (by >= 11'd46) && (by < 11'd82);
     wire badge_lit = bd1 ? (seg_b || seg_c) : (bd2 ? (seg_a || seg_b || seg_g || seg_e || seg_d) : 1'b0);
 
-    parameter CYAN = 24'h00CCFF,//ÇàÉ«I
-               LIGHT_CYAN = 24'h99EEFF,//Ç³ÇàÉ«I
-               PURPPLE = 24'h9933CC,//×ÏÉ«T
-               LIGHT_PURPPLE = 24'hD9B3E6,//Ç³×ÏÉ«T
-               YELLOW = 24'hFFF_F00,//»ÆÉ«O
-               LIGHT_YELLOW = 24'hFFFF99,//Ç³»ÆÉ«O
-               RED = 24'hE63946,//ºìÉ«S
-               LIGHT_RED = 24'hFFB3B9,//Ç³ºìÉ«S
-               GREEN = 24'h55A630,//ÂÌÉ«Z
-               LIGHT_GREEN = 24'hBDE0AA,//Ç³ÂÌÉ«Z
-               ORANGE = 24'hF77F24,//³ÈÉ«L
-               LIGHT_ORANGE = 24'hFFD9B3,//Ç³³ÈÉ«L
-               PINK = 24'hFF4DA6,//ÁÁ·ÛÉ«J
-               LIGHT_PINK = 24'hFFB3D9,//Ç³·ÛÉ«J
-               BLACK = 24'h000_000,//ºÚÉ«
-               WHITE = 24'hFFF_FFF,//°×É«
+    parameter CYAN = 24'h00CCFF,//ï¿½ï¿½É«I
+               LIGHT_CYAN = 24'h99EEFF,//Ç³ï¿½ï¿½É«I
+               PURPPLE = 24'h9933CC,//ï¿½ï¿½É«T
+               LIGHT_PURPPLE = 24'hD9B3E6,//Ç³ï¿½ï¿½É«T
+               YELLOW = 24'hFFF_F00,//ï¿½ï¿½É«O
+               LIGHT_YELLOW = 24'hFFFF99,//Ç³ï¿½ï¿½É«O
+               RED = 24'hE63946,//ï¿½ï¿½É«S
+               LIGHT_RED = 24'hFFB3B9,//Ç³ï¿½ï¿½É«S
+               GREEN = 24'h55A630,//ï¿½ï¿½É«Z
+               LIGHT_GREEN = 24'hBDE0AA,//Ç³ï¿½ï¿½É«Z
+               ORANGE = 24'hF77F24,//ï¿½ï¿½É«L
+               LIGHT_ORANGE = 24'hFFD9B3,//Ç³ï¿½ï¿½É«L
+               PINK = 24'hFF4DA6,//ï¿½ï¿½ï¿½ï¿½É«J
+               LIGHT_PINK = 24'hFFB3D9,//Ç³ï¿½ï¿½É«J
+               BLACK = 24'h000_000,//ï¿½ï¿½É«
+               WHITE = 24'hFFF_FFF,//ï¿½ï¿½É«
                DARK_I = 24'h04_63_7E,
                DARK_T = 24'h47_1F_67,
                DARK_O = 24'h74_79_0D,
@@ -1016,13 +1047,13 @@ module frame(
 
     //    Impact Glass edges and 8px SOFT white L glint
     wire block_light = (glx_r == 11'd1) || (gly_r == 11'd1);
-    wire block_soft = (glx_r >= 11'd6) && (glx_r <= 11'd11) && (gly_r == 11'd26);//×óÏÂ6x1Èá¹â
+    wire block_soft = (glx_r >= 11'd6) && (glx_r <= 11'd11) && (gly_r == 11'd26);//ï¿½ï¿½ï¿½ï¿½6x1ï¿½ï¿½ï¿½
     wire block_dark = (glx_r == 11'd30) || (gly_r == 11'd30);
     wire block_glint = (((gly_r == 11'd2) || (gly_r == 11'd3)) && (glx_r >= 11'd2) && (glx_r <= 11'd9)) ||
                        (((glx_r == 11'd2) || (glx_r == 11'd3)) && (gly_r >= 11'd2) && (gly_r <= 11'd9)) ||
                        ((glx_r >= 11'd3) && (glx_r <= 11'd4) && (gly_r >= 11'd3) && (gly_r <= 11'd4));
     wire pv_light = (pvx_r == 11'd1) || (pvy_r == 11'd1);
-    wire pv_soft = (pvx_r >= 11'd6) && (pvx_r <= 11'd11) && (pvy_r == 11'd26);//Ô¤ÀÀ×óÏÂ6x1Èá¹â
+    wire pv_soft = (pvx_r >= 11'd6) && (pvx_r <= 11'd11) && (pvy_r == 11'd26);//Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½6x1ï¿½ï¿½ï¿½
     wire pv_dark = (pvx_r == 11'd30) || (pvy_r == 11'd30);
     wire pv_glint = (((pvy_r == 11'd2) || (pvy_r == 11'd3)) && (pvx_r >= 11'd2) && (pvx_r <= 11'd9)) ||
                     (((pvx_r == 11'd2) || (pvx_r == 11'd3)) && (pvy_r >= 11'd2) && (pvy_r <= 11'd9)) ||
@@ -1118,11 +1149,19 @@ module frame(
 
 
     always@(*)begin
+    case(hint_type_r)
+    0:hint_color=24'h00CCFF; 1:hint_color=24'h9933CC; 2:hint_color=24'hFFFF00;
+    3:hint_color=24'hE63946; 4:hint_color=24'h55A630; 5:hint_color=24'hF77F24;
+    6:hint_color=24'hFF4DA6; default:hint_color=24'h0;
+    endcase
+    end
+
+    always@(*)begin
     if(!Reset_n)
     rgb_c = BLACK;
     else if(choose)begin
         if(chs_margin_r)
-        rgb_c = chs_breath_r ? 24'h00697F : 24'h00E5FF;//Ñ¡ÖÐ±ê¼Ç(´øºôÎü)
+        rgb_c = chs_breath_r ? 24'h00697F : 24'h00E5FF;//Ñ¡ï¿½Ð±ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
         else if(chs_text_r)
         rgb_c = chs_dim_r ? 24'h606060 : WHITE;
         else
@@ -1147,17 +1186,17 @@ module frame(
         endcase
     else if(Finalize && (hcounter >= 11'd432) && (hcounter <= 11'd847) &&
             (vcounter >= 11'd348) && (vcounter <= 11'd451) && (hcounter[0] ^ vcounter[0]))
-    rgb_c = 24'h101010;//½áÊø»­ÃæÖÐÐÄÇøÓòÆåÅÌÑ¹°µ
+    rgb_c = 24'h101010;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½
     else if(level_frame_lit)
     rgb_c = 24'h606060;
     else if(lbl_r)
-    rgb_c = lb_lv_r ? lv_color : (fin_r ? 24'h202020 : 24'hB0B0B0);//NEXT/HOLD ±êÇ©»Ò, LV ÓÃµÈ¼¶É«
+    rgb_c = lb_lv_r ? lv_color : (fin_r ? 24'h202020 : 24'hB0B0B0);//NEXT/HOLD ï¿½ï¿½Ç©ï¿½ï¿½, LV ï¿½ÃµÈ¼ï¿½É«
     else if(rule1_r)
-    rgb_c = fin_r ? 24'h202020 : (lflash1 ? WHITE : (duo ? 24'h00E5FF : 24'h606060));//Ãæ°å·Ö¸ôÏß(P1/µ¥ÈË)
+    rgb_c = fin_r ? 24'h202020 : (lflash1 ? WHITE : (duo ? 24'h00E5FF : 24'h606060));//ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½(P1/ï¿½ï¿½ï¿½ï¿½)
     else if(rule2_r)
-    rgb_c = fin_r ? 24'h202020 : (lflash2 ? WHITE : 24'hFF4DA6);//P2 Ãæ°å·Ö¸ôÏß
+    rgb_c = fin_r ? 24'h202020 : (lflash2 ? WHITE : 24'hFF4DA6);//P2 ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½
     else if(level_margin_r)begin
-        rgb_c = 24'h202020;//¶ÎÓë¶ÎÖ®¼äµÄ·ì
+        rgb_c = 24'h202020;//ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½Ä·ï¿½
         end
     else if(level_inner_r)begin
         if(lvflash)
@@ -1172,7 +1211,7 @@ module frame(
         rgb_c = 24'h303030;
         end
     else if(lvd_r)
-    rgb_c = lvflash ? WHITE : lv_color;//µÈ¼¶Êý×Ö(Óë LV Í¬É«)
+    rgb_c = lvflash ? WHITE : lv_color;//ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ LV Í¬É«)
     else if(hold_r)begin
         if(!pv_round_r)
         rgb_c = slot_bg;
@@ -1297,13 +1336,13 @@ module frame(
         endcase
         end
     else if(slot_dot)
-    rgb_c = 24'h404040;//Ô¤ÀÀ²ÛµãÕó
+    rgb_c = 24'h404040;//Ô¤ï¿½ï¿½ï¿½Ûµï¿½ï¿½ï¿½
     else if(hold_slot_r)
-    rgb_c = slot_bg;//Hold ²ÛÎ»µ×É«
+    rgb_c = slot_bg;//Hold ï¿½ï¿½Î»ï¿½ï¿½É«
     else if(next_slot_r)
-    rgb_c = slot_bg;//Next ²ÛÎ»µ×É«
+    rgb_c = slot_bg;//Next ï¿½ï¿½Î»ï¿½ï¿½É«
     else if(badge_lit)
-    rgb_c = bd2 ? 24'hFF4DA6 : 24'h00E5FF;//P1/P2 ºÅÂë»Õ±ê
+    rgb_c = bd2 ? 24'hFF4DA6 : 24'h00E5FF;//P1/P2 ï¿½ï¿½ï¿½ï¿½Õ±ï¿½
     else if(score_lit_r)
     rgb_c = (scflash && (!fin_r)) ? 24'h00E5FF : WHITE;
     else if(time_lit_r)
@@ -1314,6 +1353,8 @@ module frame(
     rgb_c = rail_r_white ? WHITE : (duo ? PINK : 24'h00E5FF);
     else if(danger_line)
     rgb_c = danger_color;
+    else if(hint_mark_lit)
+    rgb_c = hint_color;
     else if(margin_r)
     rgb_c = WHITE;
     else if(danger_dot && !cell_r && !Piece_r && !ghost_r && !Piece2_r && !ghost2_r)
@@ -1399,6 +1440,8 @@ module frame(
         else
         rgb_c = field_bg;
         end
+    else if(hint_cell_lit)
+    rgb_c = hint_color;
     else if(lock_rim1)
     rgb_c = WHITE;
     else if(lock_rim2)
@@ -1539,7 +1582,7 @@ module frame(
     rgb_c = in_field ? field_bg : BLACK;
     end
     
-//    ÏûÐÐÒôÐ§±àºÅ(Ö»¶Á)
+//    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½(Ö»ï¿½ï¿½)
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     rgb <= BLACK;
