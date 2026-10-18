@@ -1074,7 +1074,7 @@ module frame(
         (hcounter >= hdx2 - 11'd6) && (hcounter <= hdx2 + 11'd6) &&
         (vcounter >= pbt2 - 11'd6) && (vcounter <= pbt2 + 11'd6) &&
         ((hcounter == hdx2 - 11'd6) || (hcounter == hdx2 + 11'd6) ||
-         (vcounter == pbt2 - 11'd6) || (vcounter == pbt2 + 11'd6));
+         (vcounter == pbt2 - 11'd6) || (vcounter == pbt2 + 11'd6));
     wire [4:0]lk_c1 = cc_t[lock_idx];
     wire [4:0]lk_r1 = rr_t[lock_idx];
     wire [4:0]lk_c2 = cc_t2[lock_idx2];
