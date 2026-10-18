@@ -59,6 +59,7 @@ scores = []
 last_res = {"seq": None, "t": 0.0}
 cur_res = {"got":False, "seq":0, "score":0, "level":0, "lines":0, "secs":0}
 SCORE_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scoreboard.csv")
+STARTUP_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "startup_error.log")
 
 kb_lock = threading.Lock()
 kb_bits = 0
@@ -329,6 +330,9 @@ def res_handle(d):
 
 
 def main():
+    # 先创建窗口句柄，确保启动失败时不会留下一个无界面的后台进程
+    root = tk.Tk()
+    root.withdraw()
     res_csv_load()
     print("成绩文件: %s" % SCORE_CSV)
     print("画面目标: 监听 %d 端口 <- FPGA" % LISTEN_PORT)
@@ -337,7 +341,6 @@ def main():
     start_listener()
     threading.Thread(target=tx_loop, daemon=True).start()
 
-    root = tk.Tk()
     root.title("Tetris_text2  (画面 udp:%d  ->  按键 %s:%d)" % (LISTEN_PORT, FPGA_IP, FPGA_PORT))
     label = tk.Label(root, text="等待画面...", fg="white", bg="black", font=("Consolas", 12), anchor="w")
     label.pack(fill="x")
@@ -391,8 +394,32 @@ def main():
             top_lab.config(text=top5_text())
         root.after(33, tick)
 
+    root.update_idletasks()
+    root.geometry("+0+0")
+    root.deiconify()
+    root.lift()
+    root.attributes("-topmost", True)
+    root.after(500, lambda: root.attributes("-topmost", False))
     tick()
     root.mainloop()
+
+
+def report_startup_error(title, message):
+    # 同时写日志和弹窗；不再 input() 卡住无窗口进程
+    import traceback
+    detail = traceback.format_exc()
+    text = "%s\n\n%s\n\n日志: %s" % (message, detail, STARTUP_LOG)
+    print(text)
+    try:
+        with open(STARTUP_LOG, "w", encoding="utf-8") as f:
+            f.write(text)
+    except Exception:
+        pass
+    try:
+        import ctypes
+        ctypes.windll.user32.MessageBoxW(0, text, title, 0x10)
+    except Exception:
+        pass
 
 
 try:
@@ -400,22 +427,13 @@ try:
     from PIL import Image, ImageTk
 except Exception as _e:
     print("启动失败: 缺少图形依赖（%s）" % _e)
-    print("请双击 启动-画面和按键.bat，它会自动 pip install pillow pynput")
-    try:
-        input("按回车退出...")
-    except Exception:
-        pass
+    print("请双击 tools\\双击启动.bat，它会自动安装 pillow 和 pynput")
+    report_startup_error("Tetris PC 启动失败", "缺少图形依赖：%s" % _e)
     sys.exit(1)
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as _e:
-        import traceback
-        traceback.print_exc()
-        print("出错了: %s" % _e)
-        try:
-            input("按回车退出...")
-        except Exception:
-            pass
+        report_startup_error("Tetris PC 启动失败", "接收端启动失败：%s" % _e)
         sys.exit(1)
