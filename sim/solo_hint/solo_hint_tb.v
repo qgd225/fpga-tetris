@@ -33,14 +33,14 @@ reg [2:0] type=0;
 reg [479:0] rows=0;
 wire hint_valid;
 wire [2:0] hint_type;
-wire [4:0] hint_c0,hint_c1,hint_c2,hint_c3,hint_r0,hint_r1,hint_r2,hint_r3,hint_col;
+wire [4:0] hint_c0,hint_c1,hint_c2,hint_c3,hint_r0,hint_r1,hint_r2,hint_r3;
 integer bad=0, cyc;
 
 always #5 Clk=~Clk;
 solo_hint dut(.Clk_74M(Clk),.Reset_n(Rst),.start(start),.duo(duo),.Playing(Playing),.type(type),.row_bits(rows),
 .hint_valid(hint_valid),.hint_type(hint_type),
 .hint_c0(hint_c0),.hint_c1(hint_c1),.hint_c2(hint_c2),.hint_c3(hint_c3),
-.hint_r0(hint_r0),.hint_r1(hint_r1),.hint_r2(hint_r2),.hint_r3(hint_r3),.hint_col(hint_col));
+.hint_r0(hint_r0),.hint_r1(hint_r1),.hint_r2(hint_r2),.hint_r3(hint_r3));
 
 task chk;
 input [8*44-1:0] name;

@@ -100,7 +100,6 @@ module frame(
     wire [2:0]hint_type;
     wire [4:0]hint_c0, hint_c1, hint_c2, hint_c3;
     wire [4:0]hint_r0, hint_r1, hint_r2, hint_r3;
-    wire [4:0]hint_col;
 
 //============================================================
 //    HUD ����(Ψһ��Դ): ���ê�� / ��ǩ / �ָ��� / ��λ / �ȼ��� / �ȼ�����
@@ -296,7 +295,7 @@ module frame(
     .piece_rmin2(piece_rmin2), .piece_rmax2(piece_rmax2),
     .hint_valid(hint_valid), .hint_type(hint_type),
     .hint_c0(hint_c0), .hint_c1(hint_c1), .hint_c2(hint_c2), .hint_c3(hint_c3),
-    .hint_r0(hint_r0), .hint_r1(hint_r1), .hint_r2(hint_r2), .hint_r3(hint_r3), .hint_col(hint_col)
+    .hint_r0(hint_r0), .hint_r1(hint_r1), .hint_r2(hint_r2), .hint_r3(hint_r3)
     );
     
     
@@ -718,20 +717,15 @@ module frame(
     reg lb_lv_r;
     reg fin_r;
     reg [23:0]hint_color;
-    reg hint_show_r, hint_valid_r, hint_hit_r;
+    reg hint_hit_r;
     reg [2:0]hint_type_r;
-    reg [4:0]hint_c0_r, hint_c1_r, hint_c2_r, hint_c3_r;
-    reg [4:0]hint_r0_r, hint_r1_r, hint_r2_r, hint_r3_r;
-    reg [4:0]hint_col_r;
     wire hint_match = hint_valid && (hint_type == type) &&
         ((C_num == hint_c0 && R_num == hint_r0) || (C_num == hint_c1 && R_num == hint_r1) ||
          (C_num == hint_c2 && R_num == hint_r2) || (C_num == hint_c3 && R_num == hint_r3));
     wire hint_box = (((gly_r == 11'd3) || (gly_r == 11'd26)) && (glx_r > 11'd2) && (glx_r < 11'd27) && (glx_r[2:0] < 3'd4)) ||
                     (((glx_r == 11'd3) || (glx_r == 11'd26)) && (gly_r > 11'd2) && (gly_r < 11'd27) && (gly_r[2:0] < 3'd4));
     wire hint_dot = (glx_r >= 11'd14) && (glx_r <= 11'd15) && (gly_r >= 11'd14) && (gly_r <= 11'd15);
-    wire hint_cell_lit = hint_hit_r && (hint_box || hint_dot);
-    wire hint_mark_lit = hint_show_r && hint_valid_r && (hint_type_r == type_r) && (vcounter >= 11'd714) && (vcounter <= 11'd720) &&
-                         (hcounter >= (11'd335 + (hint_col_r << 5))) && (hcounter < (11'd339 + (hint_col_r << 5)));
+    wire hint_cell_lit = hint_hit_r && (hint_box || hint_dot) && !cell_r && !Piece_r && !Piece2_r;
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -788,9 +782,7 @@ module frame(
     lvd_r <= 1'b0;
     lb_lv_r <= 1'b0;
     fin_r <= 1'b0;
-    hint_show_r <= 1'b0; hint_valid_r <= 1'b0; hint_hit_r <= 1'b0; hint_type_r <= 3'd0;
-    hint_c0_r <= 0; hint_c1_r <= 0; hint_c2_r <= 0; hint_c3_r <= 0;
-    hint_r0_r <= 0; hint_r1_r <= 0; hint_r2_r <= 0; hint_r3_r <= 0; hint_col_r <= 0;
+    hint_hit_r <= 1'b0; hint_type_r <= 3'd0;
     end
     else begin
     over_lit_r <= over_lit;
@@ -855,9 +847,7 @@ module frame(
     lvd_r <= lvd_all_lit;
     lb_lv_r <= lb_lv;
     fin_r <= Finalize;
-    hint_show_r <= hint_show && !duo && Playing; hint_valid_r <= hint_valid;
-    hint_type_r <= hint_type; hint_c0_r <= hint_c0; hint_c1_r <= hint_c1; hint_c2_r <= hint_c2; hint_c3_r <= hint_c3;
-    hint_r0_r <= hint_r0; hint_r1_r <= hint_r1; hint_r2_r <= hint_r2; hint_r3_r <= hint_r3; hint_col_r <= hint_col;
+    hint_type_r <= hint_type;
     hint_hit_r <= hint_show && !duo && Playing && hint_match;
     end
     end
@@ -1353,8 +1343,6 @@ module frame(
     rgb_c = rail_r_white ? WHITE : (duo ? PINK : 24'h00E5FF);
     else if(danger_line)
     rgb_c = danger_color;
-    else if(hint_mark_lit)
-    rgb_c = hint_color;
     else if(margin_r)
     rgb_c = WHITE;
     else if(danger_dot && !cell_r && !Piece_r && !ghost_r && !Piece2_r && !ghost2_r)

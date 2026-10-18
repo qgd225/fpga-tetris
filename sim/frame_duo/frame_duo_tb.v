@@ -688,7 +688,7 @@ initial begin
   release dut.en_hold; release dut.Playfield_inst.hold_type;
   release dut.Playfield_inst.type_t; release dut.Playfield_inst.type_t2;
   clr_state; repeat(4) @(posedge Clk);
-  $display("=== 26) solo hold hint: dashed target / 2x2 dot / bottom mark ===\n");
+  $display("=== 26) solo hold hint: dashed target / 2x2 dot / no lock overlap ===\n");
   duo=0; Playing=1; choose=0; Finalize=0; clr_state;
   force dut.Playfield_inst.type = 3'd0;
   force dut.hint_valid = 1'b1;
@@ -697,7 +697,6 @@ initial begin
   force dut.hint_c2 = 5'd2; force dut.hint_c3 = 5'd2;
   force dut.hint_r0 = 5'd10; force dut.hint_r1 = 5'd10;
   force dut.hint_r2 = 5'd10; force dut.hint_r3 = 5'd10;
-  force dut.hint_col = 5'd2;
   hint_show = 1'b1;
   for(k=0;k<7;k=k+1)begin
     force dut.Playfield_inst.type = k[2:0];
@@ -706,10 +705,12 @@ initial begin
     look(11'd388,11'd404); chk("hint top dash on", rgb, hintcol(k[2:0]));
     look(11'd389,11'd404); chk("hint top dash gap", rgb, `FLDBG);
     look(11'd399,11'd415); chk("hint center dot", rgb, hintcol(k[2:0]));
-    look(11'd399,11'd714); chk("hint bottom mark", rgb, hintcol(k[2:0]));
-    look(11'd399,11'd719); chk("hint bottom mark to edge", rgb, hintcol(k[2:0]));
-    look(11'd403,11'd714); chk("hint mark outside", rgb, `FLDBG);
   end
+  force dut.cell_r = 1'b1; force dut.sc_r = 3'd3; force dut.piece_round_r = 1'b1;
+  repeat(5) @(posedge Clk);
+  look(11'd399,11'd415); chk("hint clipped by locked cell", rgb, `RED);
+  release dut.cell_r; release dut.sc_r; release dut.piece_round_r;
+  repeat(5) @(posedge Clk);
   hint_show = 1'b0; duo=0; Playing=1; repeat(5) @(posedge Clk);
   look(11'd399,11'd415); chk("hint hidden after short/release", rgb, `FLDBG);
   hint_show = 1'b1; duo=1; repeat(5) @(posedge Clk);
@@ -722,7 +723,6 @@ initial begin
   release dut.Playfield_inst.type; release dut.hint_valid; release dut.hint_type;
   release dut.hint_c0; release dut.hint_c1; release dut.hint_c2; release dut.hint_c3;
   release dut.hint_r0; release dut.hint_r1; release dut.hint_r2; release dut.hint_r3;
-  release dut.hint_col;
   hint_show=0; duo=0; Playing=1; clr_state; repeat(4) @(posedge Clk);
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);

@@ -12,8 +12,7 @@ module solo_hint(
     output reg hint_valid,
     output reg [2:0] hint_type,
     output reg [4:0] hint_c0, hint_c1, hint_c2, hint_c3,
-    output reg [4:0] hint_r0, hint_r1, hint_r2, hint_r3,
-    output reg [4:0] hint_col
+    output reg [4:0] hint_r0, hint_r1, hint_r2, hint_r3
     );
     localparam S_IDLE=5'd0, S_INIT=5'd1, S_TOP=5'd2, S_HOLE=5'd3,
                S_CAND=5'd4, S_SHAPE=5'd5, S_ROM=5'd6, S_CELL=5'd7,
@@ -44,7 +43,6 @@ module solo_hint(
     reg signed [6:0] cc_s, rr_s;
     reg signed [16:0] score_calc, best_score;
     reg best_valid;
-    reg [4:0] best_center;
     integer i;
     wire [6:0] col_s;
     wire [23:0] board[0:19];
@@ -93,13 +91,13 @@ module solo_hint(
     state<=S_IDLE; start_d<=1'b0; pending<=1'b0; search_type<=3'd0;
     hint_valid<=1'b0; hint_type<=3'd0;
     hint_c0<=0;hint_c1<=0;hint_c2<=0;hint_c3<=0;
-    hint_r0<=0;hint_r1<=0;hint_r2<=0;hint_r3<=0;hint_col<=0;
+    hint_r0<=0;hint_r1<=0;hint_r2<=0;hint_r3<=0;
     rot<=0;best_rot<=0;col<=0;top_c<=0;top_r<=0;hole_c<=0;hole_r<=0;
     clear_row<=0;eval_c<=0;rom_addr<=0;build_i<=0;over_i<=0;
     min_land<=31;ptop<=31;ptop_calc<=31;newtop_temp<=0;bad_cand<=1'b1;shp_r<=0;
     holes_total<=0;cand_total<=0;cand_bump<=0;cand_max<=0;prev_top<=0;
     cand_clears<=0;cand_overhang<=0;clear_pop<=0;piece_mask<=0;clear_now<=0;own_below<=0;
-    best_score<=-17'sd32768;best_valid<=1'b0;best_center<=0;
+    best_score<=-17'sd32768;best_valid<=1'b0;
     for(i=0;i<4;i=i+1)begin best_c[i]<=0;best_r[i]<=0;cell_c[i]<=0;cell_r[i]<=0;tmp_dy[i]<=0;end
     for(i=0;i<20;i=i+1)tops[i]<=5'd20;
     end
@@ -291,15 +289,10 @@ module solo_hint(
             best_score <= score_calc;
             best_valid <= 1'b1;
             best_rot <= rot;
-            ptop = 31;
-            newtop_temp = 0;
             for(i=0;i<4;i=i+1)begin
                 best_c[i] <= cell_c[i];
                 best_r[i] <= cell_r[i];
-                if(cell_c[i] < ptop) ptop = cell_c[i];
-                if(cell_c[i] > newtop_temp) newtop_temp = cell_c[i];
             end
-            best_center <= (ptop + newtop_temp) >> 1;
         end
         state <= S_NEXT;
     end
@@ -323,7 +316,6 @@ module solo_hint(
         hint_type <= search_type;
         hint_c0 <= best_c[0]; hint_c1 <= best_c[1]; hint_c2 <= best_c[2]; hint_c3 <= best_c[3];
         hint_r0 <= best_r[0]; hint_r1 <= best_r[1]; hint_r2 <= best_r[2]; hint_r3 <= best_r[3];
-        hint_col <= best_center;
         if(pending)begin
             pending <= 1'b0;
             state <= S_INIT;
