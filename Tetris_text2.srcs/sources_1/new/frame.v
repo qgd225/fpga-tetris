@@ -90,6 +90,8 @@ module frame(
     wire next2;
     wire [4:0]cc_t2 [0:3];
     wire [4:0]rr_t2 [0:3];
+    wire ghost_ev1;
+    wire ghost_ev2;
 
 //============================================================
 //    HUD 布局(唯一来源): 面板锚点 / 标签 / 分隔线 / 槽位 / 等级条 / 等级数字
@@ -267,7 +269,9 @@ module frame(
     .snd_hold1(snd_hold1),
     .snd_hold2(snd_hold2),
     .blk_rot1(blk_rot1),
-    .blk_rot2(blk_rot2)
+    .blk_rot2(blk_rot2),
+    .ghost_ev1(ghost_ev1),
+    .ghost_ev2(ghost_ev2)
     );
     
     
@@ -625,6 +629,23 @@ module frame(
     reg Piece_r;
     reg ghost_r;
     reg ghost_edge_r;
+    reg [10:0]glx_r;
+    reg [10:0]gly_r;
+    //    ghost inner ticks / dash ring: registered local coordinates, aligned with ghost_r
+    wire gt_tl = ((glx_r >= 11'd4) && (glx_r <= 11'd8) && (gly_r == 11'd4)) ||
+                 ((glx_r == 11'd4) && (gly_r >= 11'd5) && (gly_r <= 11'd8));
+    wire gt_tr = ((glx_r >= 11'd23) && (glx_r <= 11'd27) && (gly_r == 11'd4)) ||
+                 ((glx_r == 11'd27) && (gly_r >= 11'd5) && (gly_r <= 11'd8));
+    wire gt_bl = ((glx_r >= 11'd4) && (glx_r <= 11'd8) && (gly_r == 11'd27)) ||
+                 ((glx_r == 11'd4) && (gly_r >= 11'd23) && (gly_r <= 11'd26));
+    wire gt_br = ((glx_r >= 11'd23) && (glx_r <= 11'd27) && (gly_r == 11'd27)) ||
+                 ((glx_r == 11'd27) && (gly_r >= 11'd23) && (gly_r <= 11'd26));
+    wire ghost_tick = gt_tl || gt_tr || gt_bl || gt_br;
+    wire gd_top = (gly_r == 11'd4) && (((glx_r >= 11'd8) && (glx_r <= 11'd12)) || ((glx_r >= 11'd19) && (glx_r <= 11'd23)));
+    wire gd_bot = (gly_r == 11'd27) && (((glx_r >= 11'd8) && (glx_r <= 11'd12)) || ((glx_r >= 11'd19) && (glx_r <= 11'd23)));
+    wire gd_lft = (glx_r == 11'd4) && (((gly_r >= 11'd8) && (gly_r <= 11'd12)) || ((gly_r >= 11'd19) && (gly_r <= 11'd23)));
+    wire gd_rgt = (glx_r == 11'd27) && (((gly_r >= 11'd8) && (gly_r <= 11'd12)) || ((gly_r >= 11'd19) && (gly_r <= 11'd23)));
+    wire ghost_dash = gd_top || gd_bot || gd_lft || gd_rgt;
     reg piece_round_r;
     reg pv_round_r;
     reg land_we_r;
@@ -687,6 +708,8 @@ module frame(
     Piece_r <= 1'b0;
     ghost_r <= 1'b0;
         ghost_edge_r <= 1'b0;
+        glx_r <= 11'd0;
+        gly_r <= 11'd0;
         piece_round_r <= 1'b0;
         pv_round_r <= 1'b0;
     land_we_r <= 1'b0;
@@ -735,6 +758,8 @@ module frame(
     Piece_r <= Piece;
     ghost_r <= ghost;
         ghost_edge_r <= ghost_edge;
+        glx_r <= glx;
+        gly_r <= gly;
         piece_round_r <= piece_round;
         pv_round_r <= !pv_corner;
     land_we_r <= land_we;
@@ -786,6 +811,10 @@ module frame(
     eff_cnt <= eff_cnt + 21'd1;
     end
     reg [1:0]lf1, lf2, lvf, nf1, nf2, hf, scf;
+    reg [1:0]gd1, gd2;
+    reg ghost_ev1_d, ghost_ev2_d;
+    wire ghost_pulse1 = ghost_ev1 && !ghost_ev1_d;
+    wire ghost_pulse2 = ghost_ev2 && !ghost_ev2_d;
     reg [2:0]lvl_d;
     reg [2:0]hold_d;
     reg [19:0]score_d;
@@ -798,6 +827,10 @@ module frame(
     nf2 <= 2'd0;
     hf <= 2'd0;
     scf <= 2'd0;
+    gd1 <= 2'd0;
+    gd2 <= 2'd0;
+    ghost_ev1_d <= 1'b0;
+    ghost_ev2_d <= 1'b0;
     lvl_d <= 3'd0;
     hold_d <= 3'd0;
     score_d <= 20'd0;
@@ -806,6 +839,16 @@ module frame(
     lvl_d <= speed_level;
     hold_d <= hold_type;
     score_d <= score;
+    ghost_ev1_d <= ghost_ev1;
+    ghost_ev2_d <= ghost_ev2;
+    if(ghost_pulse1)
+    gd1 <= 2'd2;
+    else if(eff_tick && (gd1 != 2'd0))
+    gd1 <= gd1 - 2'd1;
+    if(ghost_pulse2)
+    gd2 <= 2'd2;
+    else if(eff_tick && (gd2 != 2'd0))
+    gd2 <= gd2 - 2'd1;
     if(lock_we)
     lf1 <= 2'd3;
     else if(eff_tick && (lf1 != 2'd0))
@@ -1045,7 +1088,19 @@ module frame(
         endcase
         end
     else if(ghost_r)begin
-        if(ghost_edge_r)begin
+        if(ghost_tick || (gd1 != 2'd0 && ghost_dash))begin
+        case(type_r)
+        0:rgb = LIGHT_CYAN;
+        1:rgb = LIGHT_PURPPLE;
+        2:rgb = LIGHT_YELLOW;
+        3:rgb = LIGHT_RED;
+        4:rgb = LIGHT_GREEN;
+        5:rgb = LIGHT_ORANGE;
+        6:rgb = LIGHT_PINK;
+        default:rgb = 0;
+        endcase
+        end
+        else if(ghost_edge_r)begin
         case(type_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;
@@ -1107,7 +1162,19 @@ module frame(
         endcase
         end
     else if(ghost2_r)begin
-        if(ghost_edge_r)begin
+        if(ghost_tick || (gd2 != 2'd0 && ghost_dash))begin
+        case(type2_r)
+        0:rgb = LIGHT_CYAN;
+        1:rgb = LIGHT_PURPPLE;
+        2:rgb = LIGHT_YELLOW;
+        3:rgb = LIGHT_RED;
+        4:rgb = LIGHT_GREEN;
+        5:rgb = LIGHT_ORANGE;
+        6:rgb = LIGHT_PINK;
+        default:rgb = 0;
+        endcase
+        end
+        else if(ghost_edge_r)begin
         case(type2_r)
         0:rgb = LIGHT_CYAN;
         1:rgb = LIGHT_PURPPLE;

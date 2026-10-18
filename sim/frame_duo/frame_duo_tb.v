@@ -246,15 +246,25 @@ initial begin
   look(11'd349, 11'd108);  chk("幽灵右边带=浅青", rgb, 24'h99EEFF);
   look(11'd325, 11'd82);   chk("幽灵上边带=浅青", rgb, 24'h99EEFF);
   look(11'd348, 11'd109);  chk("幽灵下边带=浅青", rgb, 24'h99EEFF);
-  look(11'd325, 11'd85);   chk("幽灵内部=纯黑", rgb, `FLDBG);
-  look(11'd348, 11'd108);  chk("幽灵内部靠角=纯黑", rgb, `FLDBG);
+  look(11'd325, 11'd85);   chk("ghost inner tick TL", rgb, 24'h99EEFF);
+  look(11'd330, 11'd90);   chk("ghost interior black", rgb, `FLDBG);
+  look(11'd348, 11'd108);  chk("ghost inner tick BR", rgb, 24'h99EEFF);
   force dut.Playfield_inst.ghost = 1'b0;
   force dut.Playfield_inst.ghost2 = 1'b1; force dut.Playfield_inst.type2 = 3'd3;
   repeat(4) @(posedge Clk);
   look(11'd322, 11'd85);   chk("P2 幽灵左边带=浅红", rgb, 24'hFFB3B9);
   look(11'd348, 11'd109);  chk("P2 幽灵下边带=浅红", rgb, 24'hFFB3B9);
-  look(11'd325, 11'd85);   chk("P2 幽灵内部=纯黑", rgb, `FLDBG);
+  look(11'd325, 11'd85);   chk("P2 ghost inner tick", rgb, 24'hFFB3B9);
+  look(11'd330, 11'd90);   chk("P2 ghost interior black", rgb, `FLDBG);
   force dut.Playfield_inst.ghost2 = 1'b0;
+  //    ghost restart event -> 2-frame DASH RING
+  force dut.Playfield_inst.ghost = 1'b1; force dut.Playfield_inst.type = 3'd0;
+  l1 = 1'b1; @(posedge Clk); #1; l1 = 1'b0; @(posedge Clk); #1;
+  chk("ghost event arms dash", dut.gd1, 2);
+  look(11'd331, 11'd85); chk("ghost dash pixel", rgb, 24'h99EEFF);
+  force dut.gd1 = 2'd0; repeat(2) @(posedge Clk);
+  look(11'd331, 11'd85); chk("ghost dash off", rgb, `FLDBG);
+  release dut.gd1;
   force dut.Playfield_inst.Piece = 1'b1; force dut.Playfield_inst.type = 3'd0;
   repeat(4) @(posedge Clk);
   look(11'd325, 11'd85);   chk("下落方块内部=实色", rgb, 24'h00CCFF);
