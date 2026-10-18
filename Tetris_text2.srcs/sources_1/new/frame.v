@@ -803,7 +803,8 @@ module frame(
     owner_r <= 1'b0;
     end
     clear_t_r <= clear_t;
-    clear_shrink_r <= (clear_t) && (line_t[R_num]) && (clear_flash);
+    //    消行压缩: 1~4 行只要该行参与消行就持续收缩, 不受白闪相位影响
+    clear_shrink_r <= (clear_t) && (line_t[R_num]);
     flash_r <= (clear_t) && (line_t[R_num]) && (!clear_flash);
     chs_margin_r <= chs_margin;
     chs_inner_r <= chs_inner;
