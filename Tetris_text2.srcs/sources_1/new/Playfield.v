@@ -266,11 +266,12 @@ module Playfield(
     reg  ghost_done, ghost_done2;
     reg  ghost_blk_oth, ghost_blk_oth2;
     reg  [4:0]counter_r_d1, counter_r2_d1;
-    reg  [15:0]sig_p1_d, sig_p2_d;
+    reg  [10:0]sig_p1_d, sig_p2_d;
     integer jg1;
     integer jg2;
-    wire [15:0]sig_p1 = {duo, counter_c[4:0], counter_r[4:0], type[2:0], rot[1:0]};
-    wire [15:0]sig_p2 = {duo, counter_c2[4:0], counter_r2[4:0], type2[2:0], rot2[1:0]};
+    //    幽灵重扫只看水平/姿态变化; 任意一方下落不触发重扫
+    wire [10:0]sig_p1 = {duo, counter_c[4:0], type[2:0], rot[1:0]};
+    wire [10:0]sig_p2 = {duo, counter_c2[4:0], type2[2:0], rot2[1:0]};
     wire other_moved1 = (sig_p2 != sig_p2_d);
     wire other_moved2 = (sig_p1 != sig_p1_d);
     wire new_piece1 = (counter_r == 5'd0) && (counter_r_d1 != 5'd0);
@@ -1128,21 +1129,21 @@ module Playfield(
 
 //    音效事件(只读引出): 硬降/软降/左右被挡/换块
     assign snd_land1 = lock_t;
-    assign snd_land2 = lock_t2;
+    assign snd_land2 = duo && lock_t2;
     assign snd_hard1 = drop_hold;
-    assign snd_hard2 = drop_hold2;
+    assign snd_hard2 = duo && drop_hold2;
     assign snd_soft1 = drop_r;
-    assign snd_soft2 = drop_r2;
+    assign snd_soft2 = duo && drop_r2;
     assign blk_l1 = left_p_flag && boundary_collision_left;
     assign blk_r1 = right_p_flag && boundary_collision_right;
-    assign blk_l2 = left_p_flag2 && boundary_collision_left2;
-    assign blk_r2 = right_p_flag2 && boundary_collision_right2;
+    assign blk_l2 = duo && left_p_flag2 && boundary_collision_left2;
+    assign blk_r2 = duo && right_p_flag2 && boundary_collision_right2;
     assign snd_hold1 = hold_up;
-    assign snd_hold2 = hold_up2;
+    assign snd_hold2 = duo && hold_up2;
     assign blk_rot1 = Playing && rotate_p_flag && (rot_block || lock_we);
-    assign blk_rot2 = Playing && rotate_p_flag2 && (rot_block2 || lock_we2);
+    assign blk_rot2 = duo && Playing && rotate_p_flag2 && (rot_block2 || lock_we2);
     assign ghost_ev1 = ghost_restart1;
-    assign ghost_ev2 = ghost_restart2;
+    assign ghost_ev2 = duo && ghost_restart2;
     assign land_pulse2 = (lock_counter2 == 5940000) ? 1 : 0;
     assign lock_we2  = (lock_t2) || (lock_cnt2 != 2'd0);
     assign lock_idx2 = (lock_t2) ? 2'd0 : lock_cnt2;

@@ -28,6 +28,9 @@ wire [1:0] lock_idx, lock_idx2;
 wire lock_t, lock_we, land_we, en_hold, lock_we2, land_we2;
 wire [19:0] cc_d, rr_d, cc_d2, rr_d2, line_t;
 wire [2:0] hold_type;
+wire ghost_ev1;
+wire snd_land2, snd_hard2, snd_soft2, snd_hold2;
+wire blk_l2, blk_rot2;
 
 always #6.734 Clk_74M = ~Clk_74M;
 
@@ -47,7 +50,9 @@ Playfield dut(
   .type_d(type_d), .en_hold(en_hold), .hold_type(hold_type), .speed_level(speed_level),
   .land_we(land_we), .line_t(line_t), .Piece2(Piece2), .ghost2(ghost2),
   .type2_out(type2_out), .cc_d2(cc_d2), .rr_d2(rr_d2), .type_d2_out(type_d2_out),
-  .lock_we2(lock_we2), .lock_idx2(lock_idx2), .land_we2(land_we2), .type_t2_out(type_t2_out)
+  .lock_we2(lock_we2), .lock_idx2(lock_idx2), .land_we2(land_we2), .type_t2_out(type_t2_out),
+  .ghost_ev1(ghost_ev1), .snd_land2(snd_land2), .snd_hard2(snd_hard2),
+  .snd_soft2(snd_soft2), .snd_hold2(snd_hold2), .blk_l2(blk_l2), .blk_rot2(blk_rot2)
 );
 
 integer bad;
@@ -520,6 +525,50 @@ initial begin
     hc = 11'd0; vc = 11'd0; #1;
   end
 
+  $display("=== 23) ghost rescan excludes vertical down ===");
+  begin : ghost_down_chk
+    clr_state;
+    duo = 1'b1; Playing = 1'b1; Stop = 1'b0; Finalize = 1'b0;
+    force dut.counter_c = 5'd5;  force dut.counter_r = 5'd5;
+    force dut.counter_c2 = 5'd10; force dut.counter_r2 = 5'd5;
+    force dut.type2 = 3'd1; force dut.rot2 = 2'd0;
+    force dut.sig_p2_d = 11'b1_01010_001_00;
+    #1; chk("P2 down no ghost rescan", ghost_ev1, 0);
+    force dut.counter_c2 = 5'd11;
+    #1; chk("P2 horizontal still rescan", ghost_ev1, 1);
+    release dut.counter_c; release dut.counter_r;
+    release dut.counter_c2; release dut.counter_r2;
+    release dut.type2; release dut.rot2; release dut.sig_p2_d;
+  end
+
+  $display("=== 24) solo gates all P2 sound events ===");
+  begin : p2_sound_gate
+    duo = 1'b0;
+    force dut.lock_t2 = 1'b1;
+    #1; chk("solo land2 muted", snd_land2, 0);
+    duo = 1'b1; #1; chk("duo land2 active", snd_land2, 1);
+    duo = 1'b0;
+    force dut.drop_hold2 = 1'b1; #1; chk("solo hard2 muted", snd_hard2, 0);
+    duo = 1'b1; #1; chk("duo hard2 active", snd_hard2, 1);
+    duo = 1'b0;
+    force dut.drop_r2 = 1'b1; #1; chk("solo soft2 muted", snd_soft2, 0);
+    duo = 1'b1; #1; chk("duo soft2 active", snd_soft2, 1);
+    duo = 1'b0;
+    force dut.hold_up2 = 1'b1; #1; chk("solo hold2 muted", snd_hold2, 0);
+    duo = 1'b1; #1; chk("duo hold2 active", snd_hold2, 1);
+    duo = 1'b0;
+    force dut.left_p_flag2 = 1'b1; force dut.boundary_collision_left2 = 1'b1;
+    #1; chk("solo left block2 muted", blk_l2, 0);
+    duo = 1'b1; #1; chk("duo left block2 active", blk_l2, 1);
+    duo = 1'b0;
+    force dut.rotate_p_flag2 = 1'b1; force dut.rot_block2 = 1'b1; force dut.lock_we2 = 1'b0;
+    #1; chk("solo rot block2 muted", blk_rot2, 0);
+    duo = 1'b1; #1; chk("duo rot block2 active", blk_rot2, 1);
+    release dut.lock_t2; release dut.drop_hold2; release dut.drop_r2; release dut.hold_up2;
+    release dut.left_p_flag2; release dut.boundary_collision_left2;
+    release dut.rotate_p_flag2; release dut.rot_block2; release dut.lock_we2;
+    duo = 1'b1;
+  end
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;

@@ -110,17 +110,19 @@ module Tetris(
     .hold_p_flag(hold_p_flag)
     );
 
-wire left_p     = left_p_flag;
-wire right_p    = right_p_flag;
+wire p1_left, p1_right, p1_drop_r, p1_drop_en, p1_rotate, p1_hold;
+wire p2_left, p2_right, p2_drop_r, p2_drop_en, p2_rotate, p2_hold;
+
+wire left_p     = p1_left;
+wire right_p    = p1_right;
 wire left_p_menu  = left_p_flag | kb_left_p;
 wire right_p_menu = right_p_flag | kb_right_p;
-wire drop_r_f   = drop_r_flag;
-wire drop_e     = drop_en;
-wire rotate_p   = rotate_p_flag;
+wire drop_r_f   = p1_drop_r;
+wire drop_e     = p1_drop_en;
+wire rotate_p   = p1_rotate;
 wire switch_r_f = switch_r_flag | kb_switch_r;
 wire switch_e   = switch_en     | kb_switch_en;
-wire hold_p     = hold_p_flag;
-    
+wire hold_p     = p1_hold;
 //    游戏状态机
     wire Idle;  
     wire Playing;
@@ -130,6 +132,35 @@ wire hold_p     = hold_p_flag;
     wire choose;
     wire [3:0]choose_cnt;
     wire duo = (choose_cnt == 4'd1);
+//    单人: PC + 板载键都控制 P1; 双人: 板载 P1, PC P2
+control_route control_route_inst(
+.duo(duo),
+.btn_left(left_p_flag),
+.btn_right(right_p_flag),
+.btn_drop_r(drop_r_flag),
+.btn_drop_en(drop_en),
+.btn_rotate(rotate_p_flag),
+.btn_hold(hold_p_flag),
+.pc_left(kb_left_p),
+.pc_right(kb_right_p),
+.pc_drop_r(kb_drop_r),
+.pc_drop_en(kb_drop_en),
+.pc_rotate(kb_rotate_p),
+.pc_hold(kb_hold_p),
+.p1_left(p1_left),
+.p1_right(p1_right),
+.p1_drop_r(p1_drop_r),
+.p1_drop_en(p1_drop_en),
+.p1_rotate(p1_rotate),
+.p1_hold(p1_hold),
+.p2_left(p2_left),
+.p2_right(p2_right),
+.p2_drop_r(p2_drop_r),
+.p2_drop_en(p2_drop_en),
+.p2_rotate(p2_rotate),
+.p2_hold(p2_hold)
+);
+
     wire sw_short;
     wire sw_long;
     
@@ -206,12 +237,12 @@ wire hold_p     = hold_p_flag;
     .choose(choose),
     .choose_cnt(choose_cnt),
     .duo(duo),
-    .left_p_flag2(kb_left_p),
-    .right_p_flag2(kb_right_p),
-    .drop_r_flag2(kb_drop_r),
-    .drop_en2(kb_drop_en),
-    .rotate_p_flag2(kb_rotate_p),
-    .hold_p_flag2(kb_hold_p),
+    .left_p_flag2(p2_left),
+    .right_p_flag2(p2_right),
+    .drop_r_flag2(p2_drop_r),
+    .drop_en2(p2_drop_en),
+    .rotate_p_flag2(p2_rotate),
+    .hold_p_flag2(p2_hold),
     .Playing(Playing),
     .Stop(Stop),
     .Finalize(Finalize),
@@ -272,9 +303,9 @@ wire hold_p     = hold_p_flag;
     .soft1(snd_soft1),
     .hold1(snd_hold1),
     .blk1(blk_l1 || blk_r1),
-    .lft2(kb_left_p && !blk_l2),
-    .rgt2(kb_right_p && !blk_r2),
-    .rot2(kb_rotate_p && !blk_rot2),
+    .lft2(p2_left && !blk_l2),
+    .rgt2(p2_right && !blk_r2),
+    .rot2(p2_rotate && !blk_rot2),
     .hard2(snd_hard2),
     .soft2(snd_soft2),
     .hold2(snd_hold2),
