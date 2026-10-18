@@ -264,6 +264,7 @@ module Playfield(
     reg  ghost_blocked2, ghost_blk_state2, ghost_blk_other2;
     reg  [4:0]ghost_scan_r, ghost_scan_r2;
     reg  ghost_done, ghost_done2;
+    reg  ghost_valid, ghost_valid2;
     reg  ghost_blk_oth, ghost_blk_oth2;
     reg  [4:0]counter_r_d1, counter_r2_d1;
     reg  [10:0]sig_p1_d, sig_p2_d;
@@ -414,7 +415,7 @@ module Playfield(
             if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && row_w[rr][cc])//和已锁方块重叠=顶到
             touch_top = 1'b1;
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && ghost_done && (!clear_time) && (counter_ghost_r_t > (counter_r + 5'd4)))
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && ghost_valid && (!clear_time) && (counter_ghost_r_t > (counter_r + 5'd4)))
             ghost = 1'b1;
         end
     end
@@ -1009,6 +1010,7 @@ module Playfield(
         if(!Reset_n)begin
             ghost_scan_r <= 5'd0;
             ghost_done <= 1'b0;
+            ghost_valid <= 1'b0;
             ghost_blk_oth <= 1'b0;
             counter_ghost_r_t <= 5'd0;
         end
@@ -1020,13 +1022,16 @@ module Playfield(
         else if(!ghost_done)begin
             if(ghost_blocked1)begin
                 ghost_done <= 1'b1;
+                ghost_valid <= 1'b1;
                 ghost_blk_oth <= ghost_blk_other1;
                 counter_ghost_r_t <= (ghost_scan_r > counter_r) ? (ghost_scan_r - 5'd1) : counter_r;
             end
             else if(ghost_scan_r < 5'd21)//上限 21: 形状行偏移都 >= -1, 到 21 必被地板挡住, 落点自然是 20
             ghost_scan_r <= ghost_scan_r + 5'd1;
-            else
+            else begin
             ghost_done <= 1'b1;
+            ghost_valid <= 1'b1;
+            end
         end
     end
 
@@ -1212,6 +1217,7 @@ module Playfield(
         if(!Reset_n)begin
             ghost_scan_r2 <= 5'd0;
             ghost_done2 <= 1'b0;
+            ghost_valid2 <= 1'b0;
             ghost_blk_oth2 <= 1'b0;
             counter_ghost_r_t2 <= 5'd0;
         end
@@ -1223,13 +1229,16 @@ module Playfield(
         else if(!ghost_done2)begin
             if(ghost_blocked2)begin
                 ghost_done2 <= 1'b1;
+                ghost_valid2 <= 1'b1;
                 ghost_blk_oth2 <= ghost_blk_other2;
                 counter_ghost_r_t2 <= (ghost_scan_r2 > counter_r2) ? (ghost_scan_r2 - 5'd1) : counter_r2;
             end
             else if(ghost_scan_r2 < 5'd21)//同上: 上限 21, 落点自然到 20
             ghost_scan_r2 <= ghost_scan_r2 + 5'd1;
-            else
+            else begin
             ghost_done2 <= 1'b1;
+            ghost_valid2 <= 1'b1;
+            end
         end
     end
 
@@ -1307,7 +1316,7 @@ module Playfield(
             if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && row_w[rr2][cc2])//和已锁方块重叠=顶到
             touch_top2 = 1'b1;
             rr_g2 = counter_ghost_r_t2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && ghost_done2 && (!clear_time) && (counter_ghost_r_t2 > (counter_r2 + 5'd4)))
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && ghost_valid2 && (!clear_time) && (counter_ghost_r_t2 > (counter_r2 + 5'd4)))
             ghost2 = 1'b1;
         end
     end

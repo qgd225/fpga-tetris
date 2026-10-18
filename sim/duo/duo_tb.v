@@ -569,6 +569,33 @@ initial begin
     release dut.rotate_p_flag2; release dut.rot_block2; release dut.lock_we2;
     duo = 1'b1;
   end
+  $display("=== 25) ghost keeps old row during rescan ===");
+  begin : ghost_hold_chk
+    clr_state;
+    duo = 1'b0; repeat(4) @(posedge Clk_74M);
+    force dut.clear_t = 1'b0;
+    force dut.counter_land = 25'd0; force dut.lock_counter = 25'd0;
+    force dut.lock_t = 1'b0; force dut.lock_cnt = 2'd0;
+    force dut.drop_r_t = 1'b1;
+    force dut.counter_c = 5'd5; force dut.counter_r = 5'd5;
+    shape_val = 32'h30201000;
+    p_rot1; repeat(24) @(posedge Clk_74M);
+    chk("ghost valid after first scan", dut.ghost_valid, 1);
+    chk("ghost old row 19", dut.counter_ghost_r_t, 19);
+    hc = 11'd481; vc = 11'd689; repeat(2) @(posedge Clk_74M);
+    chk("ghost visible before restart", ghost, 1);
+    force dut.ghost_restart1 = 1'b1; @(posedge Clk_74M);
+    release dut.ghost_restart1; @(posedge Clk_74M);
+    chk("ghost valid survives restart", dut.ghost_valid, 1);
+    chk("ghost row held during scan", dut.counter_ghost_r_t, 19);
+    chk("ghost visible during scan", ghost, 1);
+    repeat(30) @(posedge Clk_74M);
+    chk("ghost valid after rescan", dut.ghost_valid, 1);
+    release dut.counter_c; release dut.counter_r;
+    release dut.counter_land; release dut.lock_counter;
+    release dut.lock_t; release dut.lock_cnt; release dut.drop_r_t; release dut.clear_t;
+    shape_val = 32'h0; hc = 11'd0; vc = 11'd0; clr_state;
+  end
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;
