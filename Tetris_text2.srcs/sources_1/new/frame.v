@@ -879,6 +879,30 @@ module frame(
                BLACK = 24'h000_000,//ºÚÉ«
                WHITE = 24'hFFF_FFF;//°×É«
     
+    // danger band and side rails
+    wire [23:0]col_mask = duo ? 24'hFFFFFF : 24'h0FFFFF;
+    wire row0_any = |(row_f[0] & col_mask);
+    wire row1_any = |(row_f[1] & col_mask);
+    wire row2_any = |(row_f[2] & col_mask);
+    wire row3_any = |(row_f[3] & col_mask);
+    wire danger_state = row0_any || row1_any;
+    wire caution_state = danger_state || row2_any || row3_any;
+    wire [1:0]danger_lvl = danger_state ? 2'd2 : (caution_state ? 2'd1 : 2'd0);
+    wire danger_active = (danger_lvl != 2'd0);
+    wire [23:0]danger_color = (danger_lvl == 2'd2) ? RED : ORANGE;
+    wire danger_line = danger_active && (hcounter >= 11'd321) && (hcounter < XR) &&
+                       (vcounter >= 11'd77) && (vcounter < 11'd81);
+    wire danger_dot = danger_active && in_field &&
+                      (((hcounter - 11'd321) & 11'd15) == 11'd0) &&
+                      (((vcounter - 11'd81) & 11'd15) == 11'd0) &&
+                      ((danger_lvl == 2'd2) ? (R_num <= 5'd1) : (R_num <= 5'd3));
+    wire rail_l_lit = (hcounter >= 11'd313) && (hcounter <= 11'd316) &&
+                      (vcounter >= 11'd81) && (vcounter < 11'd721);
+    wire rail_r_lit = (hcounter >= (XR + 11'd4)) && (hcounter <= (XR + 11'd7)) &&
+                      (vcounter >= 11'd81) && (vcounter < 11'd721);
+    wire rail_l_white = lflash1 || danger_active;
+    wire rail_r_white = (duo ? lflash2 : lflash1) || danger_active;
+
     always@(*)begin
     if(!Reset_n)
     rgb = BLACK;
@@ -993,8 +1017,16 @@ module frame(
     rgb = (scflash && (!fin_r)) ? 24'h00E5FF : WHITE;
     else if(time_lit_r)
     rgb = WHITE;
+    else if(rail_l_lit)
+    rgb = rail_l_white ? WHITE : 24'h00E5FF;
+    else if(rail_r_lit)
+    rgb = rail_r_white ? WHITE : (duo ? PINK : 24'h00E5FF);
+    else if(danger_line)
+    rgb = danger_color;
     else if(margin_r)
     rgb = WHITE;
+    else if(danger_dot && !cell_r && !Piece_r && !ghost_r && !Piece2_r && !ghost2_r)
+    rgb = danger_color;
     else if(Piece_r)begin
         if(!piece_round_r)
         rgb = field_bg;
