@@ -358,6 +358,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .vcounter(vcounter),
     .rgb(rgb),
     .Finalize(Finalize),
+    .duo(duo),
     .res_score(score),
     .res_level(speed_level),
     .res_lines(lines),

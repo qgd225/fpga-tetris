@@ -3,13 +3,13 @@ module net_screen_tx(
   input         Reset_n,
   input         por_n,
 
-  //-------- »­ÃæÊäÈë£¨À´×Ô hdmi / frame£©--------
-  input         de,             // 1 = µ±Ç°ÏñËØÔÚÓÐÐ§Çø(1280x720)
+  //-------- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë£¨ï¿½ï¿½ï¿½ï¿½ hdmi / frameï¿½ï¿½--------
+  input         de,             // 1 = ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½(1280x720)
   input  [10:0] hcounter,
   input  [10:0] vcounter,
   input  [23:0] rgb,
 
-  //-------- ÒÔÌ«ÍøÒý½Å --------
+  //-------- ï¿½ï¿½Ì«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ --------
   input         rgmii_rx_clk_i,
   input  [3:0]  rgmii_rxd,
   input         rgmii_rxdv,
@@ -20,7 +20,7 @@ module net_screen_tx(
   output        eth_mdc,
   output        eth_mdio,
 
-  //-------- ¼üÅÌ(ÍøÂç)°´¼ü£ºÐÎ×´ÓëÎïÀí°´¼üÒ»ÖÂ --------
+  //-------- ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ --------
   output        kb_left_p,
   output        kb_right_p,
   output        kb_drop_r,
@@ -33,28 +33,29 @@ module net_screen_tx(
   output        kb_reset_en,
   output        kb_activity,
 
-  //-------- ½á¹ûÊý¾Ý£¨À´×Ô frame£©--------
+  //-------- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ï¿½ï¿½ frameï¿½ï¿½--------
   input         Finalize,
+  input         duo,
   input  [19:0] res_score,
   input  [2:0]  res_level,
   input  [15:0] res_lines,
   input  [13:0] res_time
 );
-parameter DST_MAC    = 48'hFF_FF_FF_FF_FF_FF;   // Ä¬ÈÏ¹ã²¥£¬PC ¶Ë²»ÓÃÏÈÖªµÀÒ²ÐÐ
+parameter DST_MAC    = 48'hFF_FF_FF_FF_FF_FF;   // Ä¬ï¿½Ï¹ã²¥ï¿½ï¿½PC ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½Öªï¿½ï¿½Ò²ï¿½ï¿½
 parameter DST_IP     = 32'hFF_FF_FF_FF;
 parameter DST_PORT   = 16'd5000;
 parameter FPS_DIV    = 1;                        // 1=60fps  2=30fps  3=20fps
-parameter PAL_FRAMES = 60;                       // Ã¿ 60 Ö¡²åÒ»¸öµ÷É«°å°ü(=1s@60fps)
-parameter LINE_LEN   = 16'd1287;                 // 7 ×Ö½Ú°üÍ· + 1280 ¸ö±êºÅ
+parameter PAL_FRAMES = 60;                       // Ã¿ 60 Ö¡ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½(=1s@60fps)
+parameter LINE_LEN   = 16'd1287;                 // 7 ï¿½Ö½Ú°ï¿½Í· + 1280 ï¿½ï¿½ï¿½ï¿½ï¿½
 parameter PAL_LEN    = 16'd160;                  // 4 + 39*4
-parameter [7:0] PAL_LAST = 8'd159;              // = 4 + PAL_N*4 - 1 (°üÎ²ÐòºÅ)
+parameter [7:0] PAL_LAST = 8'd159;              // = 4 + PAL_N*4 - 1 (ï¿½ï¿½Î²ï¿½ï¿½ï¿½)
 parameter PAL_N      = 8'd39;
-parameter KB_TIMEOUT = 24'd14_850_000;              // 200ms @74.25MHz Ã»ÓÐ°´¼ü°ü¾ÍÈ«²¿ËÉ¿ª
-parameter KB_RST_CNT = 25'd1_485_000;               // Ð¡¼üÅÌ9¸´Î»°Ñ Reset_n À­µÍ 20ms
-parameter KB_ACT_CNT = 25'd22_275_000;              // ÊÕµ½°´¼ü°üºó kb_activity ÁÁ 0.3s
-parameter KB_GAP_MAX = 8'd255;                     // °üÄÚ×Ö½Ú¼ä¸ô³¬Ê±=°ü²»ÍêÕû£¬ÖØÐÂÍ¬²½
-parameter RES_LEN    = 16'd13;                     // ½á¹û°ü³¤¶È
-parameter RES_PERIOD = 26'd37_125_000;             // ½áÊø»­ÃæÀïÃ¿ 500ms ÖØ·¢Ò»´Î½á¹û°ü
+parameter KB_TIMEOUT = 24'd14_850_000;              // 200ms @74.25MHz Ã»ï¿½Ð°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½É¿ï¿½
+parameter KB_RST_CNT = 25'd1_485_000;               // Ð¡ï¿½ï¿½ï¿½ï¿½9ï¿½ï¿½Î»ï¿½ï¿½ Reset_n ï¿½ï¿½ï¿½ï¿½ 20ms
+parameter KB_ACT_CNT = 25'd22_275_000;              // ï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ kb_activity ï¿½ï¿½ 0.3s
+parameter KB_GAP_MAX = 8'd255;                     // ï¿½ï¿½ï¿½ï¿½ï¿½Ö½Ú¼ï¿½ï¿½ï¿½ï¿½Ê±=ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½
+parameter RES_LEN    = 16'd14;                     // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+parameter RES_PERIOD = 26'd37_125_000;             // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ 500ms ï¿½Ø·ï¿½Ò»ï¿½Î½ï¿½ï¿½ï¿½ï¿½
 
 assign eth_rstn = 1'b1;
 assign eth_mdc  = 1'b1;
@@ -64,7 +65,7 @@ wire       rx_empty;
 wire       kb_rd_en;
 
 //============================================================
-//    eth_udp_loopback_rgmii Àý»¯
+//    eth_udp_loopback_rgmii ï¿½ï¿½ï¿½ï¿½
 //============================================================
 reg         tog_line;
 reg         tog_pal;
@@ -75,7 +76,7 @@ wire        tx_start_125;
 wire [15:0] tx_len_125;
 wire        pll_locked;
 wire        clk125m;
-reg  [1:0]  len_sel;          // 0=ÐÐ°ü(1287)  1=µ÷É«°å°ü(112)  2=½á¹û°ü(13)
+reg  [1:0]  len_sel;          // 0=ï¿½Ð°ï¿½(1287)  1=ï¿½ï¿½É«ï¿½ï¿½ï¿½(112)  2=ï¿½ï¿½ï¿½ï¿½ï¿½(13)
 
 eth_udp_loopback_rgmii eth_udp_loopback_rgmii_inst(
   .reset_n        (Reset_n        ),
@@ -102,7 +103,7 @@ eth_udp_loopback_rgmii eth_udp_loopback_rgmii_inst(
 );
 
 //============================================================
-//    clk125m Óò£ºtx_start Âö³å + °ü³¤Ñ¡Ôñ£¨toggle ÎÕÊÖ£©
+//    clk125m ï¿½ï¿½tx_start ï¿½ï¿½ï¿½ï¿½ + ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½toggle ï¿½ï¿½ï¿½Ö£ï¿½
 //============================================================
 reg  gl1, gl2, gl3;
 reg  gp1, gp2, gp3;
@@ -153,7 +154,7 @@ assign tx_start_125 = p_line | p_pal | p_res;
 assign tx_len_125   = p_pal ? PAL_LEN : (p_res ? RES_LEN : LINE_LEN);
 
 //============================================================
-//    pll_locked Í¬²½µ½ 74.25 Óò
+//    pll_locked Í¬ï¿½ï¿½ï¿½ï¿½ 74.25 ï¿½ï¿½
 //============================================================
 reg pl_s1, pl_s2;
 
@@ -168,7 +169,7 @@ end
 wire link_up = pl_s2;
 
 //============================================================
-//    ÏñËØ´òÒ»ÅÄ + ÑÕÉ«²é±í
+//    ï¿½ï¿½ï¿½Ø´ï¿½Ò»ï¿½ï¿½ + ï¿½ï¿½É«ï¿½ï¿½ï¿½
 //============================================================
 reg        de_r, de_r2;
 reg [10:0] vc_r;
@@ -197,7 +198,7 @@ end
 
 always@(*)begin
   case(rgb_r)
-  24'h00_00_00: code_r = 8'd0;      // ¿Õ/ºÚ
+  24'h00_00_00: code_r = 8'd0;      // ï¿½ï¿½/ï¿½ï¿½
   24'h00_CC_FF: code_r = 8'd1;      // I
   24'h99_33_CC: code_r = 8'd2;      // T
   24'hFF_FF_00: code_r = 8'd3;      // O
@@ -205,15 +206,15 @@ always@(*)begin
   24'h55_A6_30: code_r = 8'd5;      // Z
   24'hF7_7F_24: code_r = 8'd6;      // L
   24'hFF_4D_A6: code_r = 8'd7;      // J
-  24'h99_EE_FF: code_r = 8'd8;      // ÓÄÁé I
-  24'hD9_B3_E6: code_r = 8'd9;      // ÓÄÁé T
-  24'hFF_FF_99: code_r = 8'd10;     // ÓÄÁé O
-  24'hFF_B3_B9: code_r = 8'd11;     // ÓÄÁé S
-  24'hBD_E0_AA: code_r = 8'd12;     // ÓÄÁé Z
-  24'hFF_D9_B3: code_r = 8'd13;     // ÓÄÁé L
-  24'hFF_B3_D9: code_r = 8'd14;     // ÓÄÁé J
-  24'hEE_EE_EE: code_r = 8'd15;     // ÉÁ°×
-  24'hFF_FF_FF: code_r = 8'd16;     // °×(±ß¿ò/·ÖÊý/Ê±¼ä/¿ò)
+  24'h99_EE_FF: code_r = 8'd8;      // ï¿½ï¿½ï¿½ï¿½ I
+  24'hD9_B3_E6: code_r = 8'd9;      // ï¿½ï¿½ï¿½ï¿½ T
+  24'hFF_FF_99: code_r = 8'd10;     // ï¿½ï¿½ï¿½ï¿½ O
+  24'hFF_B3_B9: code_r = 8'd11;     // ï¿½ï¿½ï¿½ï¿½ S
+  24'hBD_E0_AA: code_r = 8'd12;     // ï¿½ï¿½ï¿½ï¿½ Z
+  24'hFF_D9_B3: code_r = 8'd13;     // ï¿½ï¿½ï¿½ï¿½ L
+  24'hFF_B3_D9: code_r = 8'd14;     // ï¿½ï¿½ï¿½ï¿½ J
+  24'hEE_EE_EE: code_r = 8'd15;     // ï¿½ï¿½ï¿½ï¿½
+  24'hFF_FF_FF: code_r = 8'd16;     // ï¿½ï¿½(ï¿½ß¿ï¿½/ï¿½ï¿½ï¿½ï¿½/Ê±ï¿½ï¿½/ï¿½ï¿½)
   24'h10_10_10: code_r = 8'd17;
   24'h20_20_20: code_r = 8'd18;
   24'h40_40_40: code_r = 8'd19;
@@ -241,17 +242,17 @@ always@(*)begin
 end
 
 //============================================================
-//    ÐÐÄ©/³¡Ä© ´ò°üÐòÁÐÆ÷
+//    ï¿½ï¿½Ä©/ï¿½ï¿½Ä© ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //============================================================
 localparam SEQ_IDLE = 4'd0;
-localparam SEQ_HDR  = 4'd1;   // Ð´ÏÂÒ»ÐÐ°üÍ· 7 ×Ö½Ú
-localparam SEQ_TOG  = 4'd2;   // tx_start£¨ÐÐ°ü£©
-localparam SEQ_PAL  = 4'd3;   // Ð´µ÷É«°å°ü
-localparam SEQ_PTOG = 4'd4;   // tx_start£¨µ÷É«°å°ü£©
-localparam SEQ_H0   = 4'd5;   // Ð´ÏÂÒ»Ö¡µÚ 0 ÐÐ°üÍ·
-localparam SEQ_WAIT = 4'd6;   // µÈ MAC ·¢ÍêÉÏÒ»°ü£¨µ÷É«°å°ü/½á¹û°üÓÃ£©
-localparam SEQ_RES  = 4'd7;   // Ð´½á¹û°ü 13 ×Ö½Ú
-localparam SEQ_RTOG = 4'd8;   // tx_start£¨½á¹û°ü£©
+localparam SEQ_HDR  = 4'd1;   // Ð´ï¿½ï¿½Ò»ï¿½Ð°ï¿½Í· 7 ï¿½Ö½ï¿½
+localparam SEQ_TOG  = 4'd2;   // tx_startï¿½ï¿½ï¿½Ð°ï¿½ï¿½ï¿½
+localparam SEQ_PAL  = 4'd3;   // Ð´ï¿½ï¿½É«ï¿½ï¿½ï¿½
+localparam SEQ_PTOG = 4'd4;   // tx_startï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½
+localparam SEQ_H0   = 4'd5;   // Ð´ï¿½ï¿½Ò»Ö¡ï¿½ï¿½ 0 ï¿½Ð°ï¿½Í·
+localparam SEQ_WAIT = 4'd6;   // ï¿½ï¿½ MAC ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½
+localparam SEQ_RES  = 4'd7;   // Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ 14 å­—èŠ‚
+localparam SEQ_RTOG = 4'd8;   // tx_startï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 reg [3:0]  seq;
 reg [7:0]  seq_idx;
@@ -270,7 +271,7 @@ wire pal_due   = (pal_cnt == PAL_FRAMES - 1);
 wire send_pal  = line_719 && pal_due && frame_on;
 
 //============================================================
-//    ½á¹û°ü£º½ø½áÊø»­ÃæºóÃ¿ 500ms ·¢Ò»´Î£¬Ö±µ½Íæ¼ÒÖØ¿ª
+//    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ 500ms ï¿½ï¿½Ò»ï¿½Î£ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¿ï¿½
 //============================================================
 reg         h0_lat;
 reg         pal_lat;
@@ -316,33 +317,11 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else if(res_cnt != 26'd0) res_cnt <= res_cnt - 26'd1;
 end
 
-reg [7:0] xor_res;
-always@(*)begin
-  xor_res = res_no ^ {4'd0,res_score[19:16]} ^ res_score[15:8] ^ res_score[7:0]
-          ^ {5'd0,res_level} ^ res_lines[15:8] ^ res_lines[7:0]
-          ^ {2'd0,res_time[13:8]} ^ res_time[7:0];
-end
-
-reg [7:0] res_byte;
-always@(*)begin
-  case(seq_idx)
-  7'd0:  res_byte = 8'hA5;
-  7'd1:  res_byte = 8'h5A;
-  7'd2:  res_byte = 8'd4;
-  7'd3:  res_byte = res_no;
-  7'd4:  res_byte = {4'd0,res_score[19:16]};
-  7'd5:  res_byte = res_score[15:8];
-  7'd6:  res_byte = res_score[7:0];
-  7'd7:  res_byte = {5'd0,res_level};
-  7'd8:  res_byte = res_lines[15:8];
-  7'd9:  res_byte = res_lines[7:0];
-  7'd10: res_byte = {2'd0,res_time[13:8]};
-  7'd11: res_byte = res_time[7:0];
-  7'd12: res_byte = xor_res;
-  default: res_byte = 8'h00;
-  endcase
-end
-
+wire [7:0]res_byte;
+result_packet result_packet_inst(
+.res_no(res_no), .mode(duo), .score(res_score), .level(res_level),
+.lines(res_lines), .time_sec(res_time), .idx(seq_idx[3:0]), .dout(res_byte)
+);
 always@(posedge Clk_74M or negedge Reset_n)begin
   if(!Reset_n)
   seq <= SEQ_IDLE;
@@ -359,7 +338,7 @@ always@(posedge Clk_74M or negedge Reset_n)begin
                 else if(h0_lat)            seq <= SEQ_H0;
                 else                       seq <= SEQ_HDR;
             end
-  SEQ_RES:  if(seq_idx == 7'd12) seq <= SEQ_RTOG;
+  SEQ_RES:  if(seq_idx == 7'd13) seq <= SEQ_RTOG;
   SEQ_RTOG: if(pal_lat)          seq <= SEQ_WAIT;
             else if(h0_lat)      seq <= SEQ_H0;
             else                 seq <= SEQ_HDR;
@@ -379,7 +358,7 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else if(seq == SEQ_PAL)
   seq_idx <= (seq_idx == PAL_LAST) ? 7'd0 : (seq_idx + 7'd1);
   else if(seq == SEQ_RES)
-  seq_idx <= (seq_idx == 7'd12) ? 7'd0 : (seq_idx + 7'd1);
+  seq_idx <= (seq_idx == 7'd13) ? 7'd0 : (seq_idx + 7'd1);
   else
   seq_idx <= (seq_idx == 7'd6) ? 7'd0 : (seq_idx + 7'd1);
 end
@@ -455,7 +434,7 @@ always@(posedge Clk_74M or negedge Reset_n)begin
 end
 
 //============================================================
-//    °üÍ· / µ÷É«°å°ü ×Ö½Ú
+//    ï¿½ï¿½Í· / ï¿½ï¿½É«ï¿½ï¿½ï¿½ ï¿½Ö½ï¿½
 //============================================================
 wire [10:0] hdr_line  = (seq == SEQ_H0) ? 11'd0 : (line_num + 11'd1);
 wire [15:0] hdr_frame = frame_cnt;
@@ -540,7 +519,7 @@ always@(*)begin
 end
 
 //============================================================
-//    FIFO Ð´£ºÏñËØ / °üÍ· / µ÷É«°å / ½á¹û°ü
+//    FIFO Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ / ï¿½ï¿½Í· / ï¿½ï¿½É«ï¿½ï¿½ / ï¿½ï¿½ï¿½ï¿½ï¿½
 //============================================================
 always@(*)begin
   if(seq == SEQ_HDR || seq == SEQ_H0)
@@ -564,7 +543,7 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else wait_cnt <= 11'd0;
 end
 //============================================================
-//    ÍøÂç°´¼ü£º´Ó½ÓÊÕ FIFO ½âÎö A5 5A 03 | Î»Í¼
+//    ï¿½ï¿½ï¿½ç°´ï¿½ï¿½ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½ FIFO ï¿½ï¿½ï¿½ï¿½ A5 5A 03 | Î»Í¼
 //============================================================
 localparam KB_WA5 = 2'd0;
 localparam KB_W5A = 2'd1;
@@ -646,7 +625,7 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   kb_act_cnt <= kb_act_cnt - 25'd1;
 end
 
-//    Ð¡¼üÅÌ9¸´Î»£º°Ñ Reset_n À­µÍÒ»¶ÎÊ±¼ä£¬µÈÐ§°´°åÉÏ¸´Î»¼ü
+//    Ð¡ï¿½ï¿½ï¿½ï¿½9ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ Reset_n ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê±ï¿½ä£¬ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½Î»ï¿½ï¿½
 always@(posedge Clk_74M or negedge por_n)begin
   if(!por_n)
   kb_rst_cnt <= 25'd0;

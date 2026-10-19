@@ -116,7 +116,9 @@ module frame(
                      XLVLB = 11'd232,   //LV ��ǩ X
                      XLDIG = 11'd283,   //�ȼ����� X(��ȼ���ͬ��)
                      YLBLV = 11'd36,    //LV ��ǩ Y(�� 44px �ߵ����ֵײ�����)
-                     YDIGI = 11'd24;    //�ȼ����� Y
+                     YDIGI = 11'd24,    //�ȼ����� Y
+                     XRSCORE = 11'd365, XRLEVEL = 11'd568, XRLINES = 11'd748, XRTIME = 11'd900,
+                     YRMODE = 11'd468, YRLAB = 11'd526, YRNUM = 11'd562;
     wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
     wire [10:0]XPN2 = XPNL2;
 //    NEXT/HOLD ��ǩ����: 4 �� x 24 ���(ʵ�� 92) �� 128 ���������߾� 18
@@ -145,6 +147,44 @@ module frame(
     end
 
     assign lines = lines_total;
+
+    reg [19:0]lines_bcd;
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)
+    lines_bcd <= 20'd0;
+    else if(Finalize)begin
+        if(switch_r_flag)
+        lines_bcd <= 20'd0;
+    end
+    else if(Stop)
+    lines_bcd <= lines_bcd;
+    else if(Playing && clear_t_t)begin
+        if(lines_bcd[3:0] != 4'd9)
+        lines_bcd[3:0] <= lines_bcd[3:0] + 4'd1;
+        else begin
+        lines_bcd[3:0] <= 4'd0;
+        if(lines_bcd[7:4] != 4'd9)
+            lines_bcd[7:4] <= lines_bcd[7:4] + 4'd1;
+        else begin
+            lines_bcd[7:4] <= 4'd0;
+            if(lines_bcd[11:8] != 4'd9)
+                lines_bcd[11:8] <= lines_bcd[11:8] + 4'd1;
+            else begin
+                lines_bcd[11:8] <= 4'd0;
+                if(lines_bcd[15:12] != 4'd9)
+                    lines_bcd[15:12] <= lines_bcd[15:12] + 4'd1;
+                else begin
+                    lines_bcd[15:12] <= 4'd0;
+                    if(lines_bcd[19:16] != 4'd9)
+                        lines_bcd[19:16] <= lines_bcd[19:16] + 4'd1;
+                end
+            end
+        end
+        end
+    end
+    else if(!Playing)
+    lines_bcd <= 20'd0;
+    end
 
     wire [4:0]cc_t [0:3];
     wire [4:0]rr_t [0:3];
@@ -313,6 +353,7 @@ module frame(
     );
     
     wire time_lit;
+    wire [15:0]time_bcd;
     
     timer timer_inst(
     .Clk_74M(Clk_74M),
@@ -326,10 +367,12 @@ module frame(
     .Finalize(Finalize),
     
     .lit(time_lit),
+    .bcd(time_bcd),
     .seconds(time_sec)
     );
     
     wire score_lit;
+    wire [23:0]score_bcd;
     
     scoring scoring_inst(
     .Clk_74M(Clk_74M),
@@ -347,6 +390,7 @@ module frame(
     .duo(duo),
     
     .counter(score),
+    .bcd(score_bcd),
     .lit(score_lit)
     );
     
@@ -461,6 +505,8 @@ module frame(
     reg       lb_ena;
     reg       lb_ena_n;
     reg       lb_lv;
+    reg       lb_mode;
+    reg       lb_result_lbl;
     integer   li;
     wire [10:0]lb_hn = hcounter + 11'd1;
     always@(*)begin
@@ -470,6 +516,8 @@ module frame(
     lb_ena = 1'b0;
     lb_ena_n = 1'b0;
     lb_lv = 1'b0;
+    lb_mode = 1'b0;
+    lb_result_lbl = 1'b0;
     for(li = 0; li < 4; li = li + 1)begin
         if((hcounter >= (XLBN1 + li*24)) && (hcounter < (XLBN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
@@ -565,6 +613,60 @@ module frame(
             endcase
         end
     end
+    if(Finalize)begin
+        for(li = 0; li < 4; li = li + 1)begin
+            if((hcounter >= (11'd404 + li*24)) && (hcounter < (11'd404 + li*24 + 11'd20)) &&
+               (vcounter >= YRMODE) && (vcounter < (YRMODE + 11'd32)))begin
+                lb_ena = 1'b1; lb_X = 11'd404 + li*24; lb_Y = YRMODE; lb_mode = 1'b1;
+            end
+            if((lb_hn >= (11'd404 + li*24 - 11'd1)) && (lb_hn < (11'd404 + li*24 + 11'd20)) &&
+               (vcounter >= YRMODE) && (vcounter < (YRMODE + 11'd32)))begin
+                lb_ena_n = 1'b1; lb_Y = YRMODE;
+                if(duo) case(li) 0:lb_g=5'd3; 1:lb_g=5'd20; 2:lb_g=5'd14; default:lb_g=5'd26; endcase
+                else case(li) 0:lb_g=5'd18; 1:lb_g=5'd14; 2:lb_g=5'd11; default:lb_g=5'd14; endcase
+            end
+        end
+        for(li = 0; li < 5; li = li + 1)begin
+            if((hcounter >= (XRSCORE + li*24)) && (hcounter < (XRSCORE + li*24 + 11'd20)) &&
+               (vcounter >= YRLAB) && (vcounter < (YRLAB + 11'd32)))begin
+                lb_ena=1'b1; lb_X=XRSCORE+li*24; lb_Y=YRLAB; lb_result_lbl=1'b1;
+            end
+            if((lb_hn >= (XRSCORE + li*24 - 11'd1)) && (lb_hn < (XRSCORE + li*24 + 11'd20)) &&
+               (vcounter >= YRLAB) && (vcounter < (YRLAB + 11'd32)))begin
+                lb_ena_n=1'b1; lb_Y=YRLAB;
+                case(li) 0:lb_g=5'd18; 1:lb_g=5'd2; 2:lb_g=5'd14; 3:lb_g=5'd17; default:lb_g=5'd4; endcase
+            end
+            if((hcounter >= (XRLEVEL + li*24)) && (hcounter < (XRLEVEL + li*24 + 11'd20)) &&
+               (vcounter >= YRLAB) && (vcounter < (YRLAB + 11'd32)))begin
+                lb_ena=1'b1; lb_X=XRLEVEL+li*24; lb_Y=YRLAB; lb_result_lbl=1'b1;
+            end
+            if((lb_hn >= (XRLEVEL + li*24 - 11'd1)) && (lb_hn < (XRLEVEL + li*24 + 11'd20)) &&
+               (vcounter >= YRLAB) && (vcounter < (YRLAB + 11'd32)))begin
+                lb_ena_n=1'b1; lb_Y=YRLAB;
+                case(li) 0:lb_g=5'd11; 1:lb_g=5'd4; 2:lb_g=5'd21; 3:lb_g=5'd4; default:lb_g=5'd11; endcase
+            end
+            if((hcounter >= (XRLINES + li*24)) && (hcounter < (XRLINES + li*24 + 11'd20)) &&
+               (vcounter >= YRLAB) && (vcounter < (YRLAB + 11'd32)))begin
+                lb_ena=1'b1; lb_X=XRLINES+li*24; lb_Y=YRLAB; lb_result_lbl=1'b1;
+            end
+            if((lb_hn >= (XRLINES + li*24 - 11'd1)) && (lb_hn < (XRLINES + li*24 + 11'd20)) &&
+               (vcounter >= YRLAB) && (vcounter < (YRLAB + 11'd32)))begin
+                lb_ena_n=1'b1; lb_Y=YRLAB;
+                case(li) 0:lb_g=5'd11; 1:lb_g=5'd8; 2:lb_g=5'd13; 3:lb_g=5'd4; default:lb_g=5'd18; endcase
+            end
+        end
+        for(li = 0; li < 4; li = li + 1)begin
+            if((hcounter >= (XRTIME + li*24)) && (hcounter < (XRTIME + li*24 + 11'd20)) &&
+               (vcounter >= YRLAB) && (vcounter < (YRLAB + 11'd32)))begin
+                lb_ena=1'b1; lb_X=XRTIME+li*24; lb_Y=YRLAB; lb_result_lbl=1'b1;
+            end
+            if((lb_hn >= (XRTIME + li*24 - 11'd1)) && (lb_hn < (XRTIME + li*24 + 11'd20)) &&
+               (vcounter >= YRLAB) && (vcounter < (YRLAB + 11'd32)))begin
+                lb_ena_n=1'b1; lb_Y=YRLAB;
+                case(li) 0:lb_g=5'd19; 1:lb_g=5'd8; 2:lb_g=5'd12; default:lb_g=5'd4; endcase
+            end
+        end
+    end
     end
 
     wire [5:0]lb_vt = vcounter - lb_Y;
@@ -600,14 +702,85 @@ module frame(
 //    ȡ��ʹ����ǰ 1 ����(number Ҳ�� READ_LATENCY=1): ����ÿ�е� 1 �лᴮ��һ��
     wire lvd_ena_n = (lb_hn >= (XLDIG - 11'd1)) && (lb_hn < (XLDIG + 11'd20)) &&
                      (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
+    reg result_num_ena;
+    reg result_num_ena_n;
+    reg [10:0]result_num_X;
+    reg [10:0]result_num_Y;
+    reg [3:0]result_num_dig;
+    reg [1:0]result_num_sel;
+    integer rni;
+    always@(*)begin
+    result_num_ena = 1'b0;
+    result_num_ena_n = 1'b0;
+    result_num_X = 11'd0;
+    result_num_Y = YRNUM;
+    result_num_dig = 4'd0;
+    result_num_sel = 2'd0;
+    if(Finalize)begin
+        for(rni = 0; rni < 6; rni = rni + 1)begin
+            if((hcounter >= (XRSCORE + rni*24)) && (hcounter < (XRSCORE + rni*24 + 11'd20)) &&
+               (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+                result_num_ena = 1'b1; result_num_X = XRSCORE + rni*24; result_num_dig = score_bcd[(5-rni)*4 +: 4]; result_num_sel = 2'd0;
+            end
+            if((lb_hn >= (XRSCORE + rni*24 - 11'd1)) && (lb_hn < (XRSCORE + rni*24 + 11'd20)) &&
+               (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+                result_num_ena_n = 1'b1; result_num_dig = score_bcd[(5-rni)*4 +: 4]; result_num_sel = 2'd0;
+            end
+        end
+        if((hcounter >= XRLEVEL) && (hcounter < (XRLEVEL + 11'd20)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena = 1'b1; result_num_X = XRLEVEL; result_num_dig = {1'b0,speed_level}; result_num_sel = 2'd1;
+        end
+        if((lb_hn >= (XRLEVEL - 11'd1)) && (lb_hn < (XRLEVEL + 11'd20)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena_n = 1'b1; result_num_dig = {1'b0,speed_level}; result_num_sel = 2'd1;
+        end
+        for(rni = 0; rni < 5; rni = rni + 1)begin
+            if((hcounter >= (XRLINES + rni*24)) && (hcounter < (XRLINES + rni*24 + 11'd20)) &&
+               (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+                result_num_ena = 1'b1; result_num_X = XRLINES + rni*24; result_num_dig = lines_bcd[(4-rni)*4 +: 4]; result_num_sel = 2'd2;
+            end
+            if((lb_hn >= (XRLINES + rni*24 - 11'd1)) && (lb_hn < (XRLINES + rni*24 + 11'd20)) &&
+               (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+                result_num_ena_n = 1'b1; result_num_dig = lines_bcd[(4-rni)*4 +: 4]; result_num_sel = 2'd2;
+            end
+        end
+        if((hcounter >= XRTIME) && (hcounter < (XRTIME + 11'd20)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena=1'b1; result_num_X=XRTIME; result_num_dig=time_bcd[15:12]; result_num_sel=2'd3;
+        end
+        if((lb_hn >= (XRTIME - 11'd1)) && (lb_hn < (XRTIME + 11'd20)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena_n=1'b1; result_num_dig=time_bcd[15:12]; result_num_sel=2'd3;
+        end
+        if((hcounter >= (XRTIME + 11'd24)) && (hcounter < (XRTIME + 11'd44)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena=1'b1; result_num_X=XRTIME+11'd24; result_num_dig=time_bcd[11:8]; result_num_sel=2'd3;
+        end
+        if((lb_hn >= (XRTIME + 11'd23)) && (lb_hn < (XRTIME + 11'd44)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena_n=1'b1; result_num_dig=time_bcd[11:8]; result_num_sel=2'd3;
+        end
+        if((hcounter >= (XRTIME + 11'd68)) && (hcounter < (XRTIME + 11'd88)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena=1'b1; result_num_X=XRTIME+11'd68; result_num_dig=time_bcd[7:4]; result_num_sel=2'd3;
+        end
+        if((lb_hn >= (XRTIME + 11'd67)) && (lb_hn < (XRTIME + 11'd88)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena_n=1'b1; result_num_dig=time_bcd[7:4]; result_num_sel=2'd3;
+        end
+        if((hcounter >= (XRTIME + 11'd92)) && (hcounter < (XRTIME + 11'd112)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena=1'b1; result_num_X=XRTIME+11'd92; result_num_dig=time_bcd[3:0]; result_num_sel=2'd3;
+        end
+        if((lb_hn >= (XRTIME + 11'd91)) && (lb_hn < (XRTIME + 11'd112)) && (vcounter >= YRNUM) && (vcounter < (YRNUM + 11'd44)))begin
+            result_num_ena_n=1'b1; result_num_dig=time_bcd[3:0]; result_num_sel=2'd3;
+        end
+    end
+    end
+    wire [10:0]result_num_vt = vcounter - result_num_Y;
+    wire number_ena_n = result_num_ena_n || lvd_ena_n;
+    wire [9:0]number_addra = result_num_ena_n ? {result_num_dig,result_num_vt[5:0]} : {lv_dig,vdv[5:0]};
     wire [19:0]lvd_dout;
     number number_lv_inst(
     .clka(Clk_74M),
-    .ena(lvd_ena_n),
-    .addra({lv_dig, vdv[5:0]}),
+    .ena(number_ena_n),
+    .addra(number_addra),
     .douta(lvd_dout)
     );
     wire lvd_lit = lvd_ena ? lvd_dout[19 - (hcounter - XLDIG)] : 1'b0;
+    wire result_num_lit = result_num_ena ? lvd_dout[19 - (hcounter - result_num_X)] : 1'b0;
 //    �ȼ�ɫ: 8 ����������(��->��->��->��->��->��->��->��)
     reg [23:0]lv_color;
     always@(*)begin
@@ -628,7 +801,18 @@ module frame(
     wire lv_rule_lit = (hcounter >= 11'd232) && (hcounter < 11'd306) &&
                        (vcounter >= 11'd72) && (vcounter < 11'd74);
     wire lvd_all_lit = lvd_lit || lv_rule_lit;
-
+    wire result_score_rule = Finalize && (vcounter >= 11'd510) && (vcounter <= 11'd511) && (hcounter >= XRSCORE) && (hcounter < (XRSCORE + 11'd96));
+    wire result_level_rule = Finalize && (vcounter >= 11'd510) && (vcounter <= 11'd511) && (hcounter >= XRLEVEL) && (hcounter < (XRLEVEL + 11'd96));
+    wire result_lines_rule = Finalize && (vcounter >= 11'd510) && (vcounter <= 11'd511) && (hcounter >= XRLINES) && (hcounter < (XRLINES + 11'd96));
+    wire result_time_rule = Finalize && (vcounter >= 11'd510) && (vcounter <= 11'd511) && (hcounter >= XRTIME) && (hcounter < (XRTIME + 11'd96));
+    wire [1:0]result_rule_sel = result_level_rule ? 2'd1 : result_lines_rule ? 2'd2 : result_time_rule ? 2'd3 : 2'd0;
+    wire result_colon_lit = Finalize && (hcounter >= 11'd950) && (hcounter <= 11'd953) &&
+                            (((vcounter >= 11'd576) && (vcounter <= 11'd579)) ||
+                             ((vcounter >= 11'd590) && (vcounter <= 11'd593)));
+    wire result_dim = Finalize &&
+                      (((hcounter >= 11'd432) && (hcounter <= 11'd847) && (vcounter >= 11'd348) && (vcounter <= 11'd451)) ||
+                       ((hcounter >= 11'd352) && (hcounter <= 11'd1048) && (vcounter >= 11'd456) && (vcounter <= 11'd620))) &&
+                      (hcounter[0] ^ vcounter[0]);
 //    �����: 2px �ߴ� + �ĽǸ��� 1x1(�ڲ�����, ��ʵ�����䷽������)
 //    �ж������� ghost_r ͬ�ļĴ�: ghost_r �� hcounter �� 1 ��, ��������խ�ҿ�
     wire [10:0]glx = (hcounter - 11'd321) & 11'd31;
@@ -717,6 +901,13 @@ module frame(
     reg lvd_r;
     reg lb_lv_r;
     reg fin_r;
+    reg result_num_r;
+    reg [1:0]result_num_sel_r;
+    reg result_mode_r;
+    reg result_label_r;
+    reg result_rule_r;
+    reg [1:0]result_rule_sel_r;
+    reg result_colon_r;
     reg [23:0]hint_color;
     reg hint_hit_r;
     reg [2:0]hint_type_r;
@@ -786,6 +977,8 @@ module frame(
     lvd_r <= 1'b0;
     lb_lv_r <= 1'b0;
     fin_r <= 1'b0;
+    result_num_r <= 1'b0; result_num_sel_r <= 2'd0; result_mode_r <= 1'b0; result_label_r <= 1'b0;
+    result_rule_r <= 1'b0; result_rule_sel_r <= 2'd0; result_colon_r <= 1'b0;
     hint_hit_r <= 1'b0; hint_type_r <= 3'd0;
     end
     else begin
@@ -851,6 +1044,10 @@ module frame(
     lvd_r <= lvd_all_lit;
     lb_lv_r <= lb_lv;
     fin_r <= Finalize;
+    result_num_r <= result_num_lit; result_num_sel_r <= result_num_sel;
+    result_mode_r <= lb_mode; result_label_r <= lb_result_lbl;
+    result_rule_r <= result_score_rule || result_level_rule || result_lines_rule || result_time_rule;
+    result_rule_sel_r <= result_rule_sel; result_colon_r <= result_colon_lit;
     hint_type_r <= hint_type;
     hint_hit_r <= hint_show && !duo && Playing && hint_match && !hint_occupied_now;
     end
@@ -1178,9 +1375,28 @@ module frame(
           rgb_c = 24'h303030;
         default:rgb_c = 24'hFFF_FFF;
         endcase
-    else if(Finalize && (hcounter >= 11'd432) && (hcounter <= 11'd847) &&
-            (vcounter >= 11'd348) && (vcounter <= 11'd451) && (hcounter[0] ^ vcounter[0]))
-    rgb_c = 24'h101010;//��������������������ѹ��
+    else if(result_mode_r)
+    rgb_c = duo ? 24'hFF4DA6 : 24'h00E5FF;
+    else if(result_label_r)
+    rgb_c = 24'hB0B0B0;
+    else if(result_num_r)
+    case(result_num_sel_r)
+    0:rgb_c = WHITE;
+    1:rgb_c = lv_color;
+    2:rgb_c = 24'hFF4DA6;
+    default:rgb_c = 24'hFFFF00;
+    endcase
+    else if(result_rule_r)
+    case(result_rule_sel_r)
+    0:rgb_c = 24'h00E5FF;
+    1:rgb_c = lv_color;
+    2:rgb_c = 24'hFF4DA6;
+    default:rgb_c = 24'hFFFF00;
+    endcase
+    else if(result_colon_r)
+    rgb_c = 24'hFFFF00;
+    else if(result_dim)
+    rgb_c = 24'h101010;//GAME OVER 与结算数据区棋盘式局部压暗
     else if(level_frame_lit)
     rgb_c = 24'h606060;
     else if(lbl_r)

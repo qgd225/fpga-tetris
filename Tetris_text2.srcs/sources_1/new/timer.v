@@ -10,6 +10,7 @@ module timer(
     input switch_r_flag,
     
     output lit,
+    output [15:0] bcd,
     output [13:0] seconds
     );
     
@@ -110,6 +111,7 @@ module timer(
     end
     
     assign seconds = counter3*14'd600 + counter2*14'd60 + counter1*14'd10 + counter0;
+    assign bcd = {counter3,counter2,counter1,counter0};
 
     integer i;
     
