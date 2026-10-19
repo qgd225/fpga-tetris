@@ -702,8 +702,8 @@ initial begin
     force dut.Playfield_inst.type = k[2:0];
     force dut.hint_type = k[2:0];
     repeat(5) @(posedge Clk);
-    look(11'd388,11'd404); chk("hint top dash on", rgb, hintcol(k[2:0]));
-    look(11'd389,11'd404); chk("hint top dash gap", rgb, `FLDBG);
+    look(11'd393,11'd407); chk("hint top dash on", rgb, hintcol(k[2:0]));
+    look(11'd392,11'd407); chk("hint top dash gap", rgb, `FLDBG);
     look(11'd399,11'd415); chk("hint center dot", rgb, hintcol(k[2:0]));
   end
   dut.Playfield_inst.state[2*20+10] = 1'b1;

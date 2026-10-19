@@ -47,6 +47,7 @@ module solo_hint(
     reg best_valid;
     integer i;
     wire [6:0] col_s;
+    reg [479:0] board_snap;
     wire [23:0] board[0:19];
     genvar gi;
 
@@ -54,7 +55,7 @@ module solo_hint(
 
     generate
     for(gi=0; gi<20; gi=gi+1)begin : board_map
-        assign board[gi] = row_bits[gi*24 +: 24];
+        assign board[gi] = board_snap[gi*24 +: 24];
     end
     endgenerate
 
@@ -90,7 +91,7 @@ module solo_hint(
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
-    state<=S_IDLE; start_d<=1'b0; settle_cnt<=0; search_type<=3'd0;
+    state<=S_IDLE; start_d<=1'b0; settle_cnt<=0; search_type<=3'd0; board_snap<=480'd0;
     hint_valid<=1'b0; hint_type<=3'd0;
     hint_c0<=0;hint_c1<=0;hint_c2<=0;hint_c3<=0;
     hint_r0<=0;hint_r1<=0;hint_r2<=0;hint_r3<=0;
@@ -123,8 +124,11 @@ module solo_hint(
     else case(state)
     S_IDLE:;
     S_SETTLE:begin
-        if(settle_cnt == 0)
+        if(settle_cnt == 0)begin
+            board_snap <= row_bits;
+            search_type <= type;
             state <= S_INIT;
+        end
         else
             settle_cnt <= settle_cnt - 23'd1;
     end

@@ -137,6 +137,14 @@ chk("near clear valid",hint_valid,1); chk("near clear rotation",dut.best_rot,1);
 chk("near clear gap0",cell_at(8,19),1); chk("near clear gap1",cell_at(9,19),1);
 chk("near clear gap2",cell_at(10,19),1); chk("near clear gap3",cell_at(11,19),1);
 chk("near clear score",dut.best_score,-1248);
+// 搜索期间棋盘变化不影响已锁存快照
+reset_dut; set_row(19,20'hFF0FF); type=3'd0;
+start=1; @(posedge Clk); #1; start=0;
+cyc=0; while((dut.state==18)&&(cyc<200))begin @(posedge Clk);cyc=cyc+1;end
+chk("snapshot captured",dut.board_snap[19*24 +: 20],20'hFF0FF);
+rows=480'd0;
+cyc=0; while((dut.state!=0)&&(cyc<30000))begin @(posedge Clk);cyc=cyc+1;end
+chk("snapshot search valid",hint_valid,1); chk("snapshot search score",dut.best_score,-1248);
 // 贴左墙: 只有 0..3 空, 水平 I 必须贴墙补满
 reset_dut; set_row(19,20'hFFFF0); run_search(3'd0);
 chk("wall valid",hint_valid,1); chk("wall rotation",dut.best_rot,1);
