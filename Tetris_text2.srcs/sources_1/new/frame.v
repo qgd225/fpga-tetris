@@ -723,8 +723,8 @@ module frame(
     wire hint_match = hint_valid && (hint_type == type) &&
         ((C_num == hint_c0 && R_num == hint_r0) || (C_num == hint_c1 && R_num == hint_r1) ||
          (C_num == hint_c2 && R_num == hint_r2) || (C_num == hint_c3 && R_num == hint_r3));
-    wire hint_box = (((gly_r == 11'd6) || (gly_r == 11'd23)) && (glx_r > 11'd5) && (glx_r < 11'd24) && (glx_r[2:0] < 3'd4)) ||
-                    (((glx_r == 11'd6) || (glx_r == 11'd23)) && (gly_r > 11'd5) && (gly_r < 11'd24) && (gly_r[2:0] < 3'd4));
+    wire hint_box = (((gly_r == 11'd9) || (gly_r == 11'd20)) && (glx_r > 11'd8) && (glx_r < 11'd21) && (glx_r[1:0] < 2'd2)) ||
+                    (((glx_r == 11'd9) || (glx_r == 11'd20)) && (gly_r > 11'd8) && (gly_r < 11'd21) && (gly_r[1:0] < 2'd2));
     wire hint_dot = (glx_r >= 11'd14) && (glx_r <= 11'd15) && (gly_r >= 11'd14) && (gly_r <= 11'd15);
     wire [4:0]hint_r_safe = (R_num <= 5'd19) ? R_num : 5'd0;
     wire [4:0]hint_c_safe = (C_num <= 5'd23) ? C_num : 5'd0;

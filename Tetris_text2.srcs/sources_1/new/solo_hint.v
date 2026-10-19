@@ -134,7 +134,7 @@ module solo_hint(
     end
     S_INIT:begin
         top_c <= 0;
-        top_r <= 6'd19;
+        top_r <= 6'd0;
         holes_total <= 0;
         hole_c <= 0;
         hole_r <= 6'd19;
@@ -145,7 +145,7 @@ module solo_hint(
     S_TOP:begin
         if(board[top_r][top_c])begin
             tops[top_c] <= top_r[4:0];
-            top_r <= 6'd19;
+            top_r <= 6'd0;
             if(top_c == 19)begin
                 hole_c <= 0;
                 hole_r <= 6'd19;
@@ -154,9 +154,9 @@ module solo_hint(
             else
                 top_c <= top_c + 5'd1;
         end
-        else if(top_r == 0)begin
+        else if(top_r == 6'd19)begin
             tops[top_c] <= 5'd20;
-            top_r <= 6'd19;
+            top_r <= 6'd0;
             if(top_c == 19)begin
                 hole_c <= 0;
                 hole_r <= 6'd19;
@@ -166,7 +166,7 @@ module solo_hint(
                 top_c <= top_c + 5'd1;
         end
         else
-            top_r <= top_r - 6'd1;
+            top_r <= top_r + 6'd1;
     end
     S_HOLE:begin
         if((tops[hole_c] < 5'd20) && (hole_r > {1'b0,tops[hole_c]}) && !board[hole_r][hole_c])

@@ -34,7 +34,7 @@ reg [479:0] rows=0;
 wire hint_valid;
 wire [2:0] hint_type;
 wire [4:0] hint_c0,hint_c1,hint_c2,hint_c3,hint_r0,hint_r1,hint_r2,hint_r3;
-integer bad=0, cyc;
+integer bad=0, cyc, pidx, pcol, pheight, prow;
 
 always #5 Clk=~Clk;
 solo_hint #(.HINT_SETTLE_CYCLES(23'd20)) dut(.Clk_74M(Clk),.Reset_n(Rst),.start(start),.duo(duo),.Playing(Playing),.type(type),.row_bits(rows),
@@ -165,6 +165,17 @@ start=1;@(posedge Clk);#1;start=0;
 chk("new trigger hides old hint",hint_valid,0);
 cyc=0;while((dut.state!=0)&&(cyc<30000))begin @(posedge Clk);cyc=cyc+1;end
 chk("repeat search2",hint_valid,1); chk("repeat still rotated",dut.best_rot,1);
+// 逐列高度全面回归: 20 组阶梯地形, 智能落点不得覆盖任何锁存格
+for(pidx=0;pidx<20;pidx=pidx+1)begin
+  rows=480'd0;
+  for(pcol=0;pcol<20;pcol=pcol+1)begin
+    pheight=(pidx+pcol)%8;
+    for(prow=19;prow>=20-pheight;prow=prow-1)
+      rows[prow*24+pcol]=1'b1;
+  end
+  run_search(pidx%7);
+  chk("staggered terrain no overlap",no_overlap(0),1);
+end
 if(bad==0)$display("=== ALL PASS ==="); else $display("=== FAILED %0d ===",bad);
 $finish;
 end
