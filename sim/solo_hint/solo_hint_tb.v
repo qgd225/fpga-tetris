@@ -37,7 +37,7 @@ wire [4:0] hint_c0,hint_c1,hint_c2,hint_c3,hint_r0,hint_r1,hint_r2,hint_r3;
 integer bad=0, cyc;
 
 always #5 Clk=~Clk;
-solo_hint dut(.Clk_74M(Clk),.Reset_n(Rst),.start(start),.duo(duo),.Playing(Playing),.type(type),.row_bits(rows),
+solo_hint #(.HINT_SETTLE_CYCLES(23'd20)) dut(.Clk_74M(Clk),.Reset_n(Rst),.start(start),.duo(duo),.Playing(Playing),.type(type),.row_bits(rows),
 .hint_valid(hint_valid),.hint_type(hint_type),
 .hint_c0(hint_c0),.hint_c1(hint_c1),.hint_c2(hint_c2),.hint_c3(hint_c3),
 .hint_r0(hint_r0),.hint_r1(hint_r1),.hint_r2(hint_r2),.hint_r3(hint_r3));
@@ -60,7 +60,7 @@ endtask
 
 task reset_dut;
 begin
-Rst=0;start=0;duo=0;Playing=1;rows=0;type=0;repeat(4)@(posedge Clk);Rst=1;repeat(2)@(posedge Clk);
+Rst=0;start=0;duo=0;Playing=1;rows=0;type=0;repeat(4)@(posedge Clk);Rst=1;repeat(2)@(posedge Clk);#1;
 end
 endtask
 
@@ -153,7 +153,9 @@ chk("duo no search",dut.state,0); chk("duo keeps invalid",hint_valid,0);
 // 二次搜索: 触发后能从 IDLE 正常重算
 reset_dut; set_row(19,20'hFF0FF); run_search(3'd0);
 chk("repeat search1",hint_valid,1);
-start=1;@(posedge Clk);#1;start=0;cyc=0;while((dut.state!=0)&&(cyc<30000))begin @(posedge Clk);cyc=cyc+1;end
+start=1;@(posedge Clk);#1;start=0;
+chk("new trigger hides old hint",hint_valid,0);
+cyc=0;while((dut.state!=0)&&(cyc<30000))begin @(posedge Clk);cyc=cyc+1;end
 chk("repeat search2",hint_valid,1); chk("repeat still rotated",dut.best_rot,1);
 if(bad==0)$display("=== ALL PASS ==="); else $display("=== FAILED %0d ===",bad);
 $finish;

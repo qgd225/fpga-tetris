@@ -14,15 +14,17 @@ module solo_hint(
     output reg [4:0] hint_c0, hint_c1, hint_c2, hint_c3,
     output reg [4:0] hint_r0, hint_r1, hint_r2, hint_r3
     );
+    parameter [22:0] HINT_SETTLE_CYCLES = 23'd3_712_500;
     localparam S_IDLE=5'd0, S_INIT=5'd1, S_TOP=5'd2, S_HOLE=5'd3,
                S_CAND=5'd4, S_SHAPE=5'd5, S_ROM=5'd6, S_CELL=5'd7,
                S_FINAL=5'd8, S_OVER=5'd9, S_CLEAR_INIT=5'd10,
                S_CLEAR=5'd11, S_EVAL_INIT=5'd12, S_EVAL_PREP=5'd13,
-               S_EVAL=5'd14, S_SCORE=5'd15, S_NEXT=5'd16, S_DONE=5'd17;
+               S_EVAL=5'd14, S_SCORE=5'd15, S_NEXT=5'd16, S_DONE=5'd17,
+               S_SETTLE=5'd18;
     localparam [19:0] FULL20 = 20'hFFFFF;
     reg [4:0] state;
     reg start_d;
-    reg pending;
+    reg [22:0] settle_cnt;
     reg [2:0] search_type;
     reg [1:0] rot, best_rot;
     reg [5:0] col, top_r, hole_r, clear_row, eval_c, rom_addr;
@@ -88,7 +90,7 @@ module solo_hint(
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
-    state<=S_IDLE; start_d<=1'b0; pending<=1'b0; search_type<=3'd0;
+    state<=S_IDLE; start_d<=1'b0; settle_cnt<=0; search_type<=3'd0;
     hint_valid<=1'b0; hint_type<=3'd0;
     hint_c0<=0;hint_c1<=0;hint_c2<=0;hint_c3<=0;
     hint_r0<=0;hint_r1<=0;hint_r2<=0;hint_r3<=0;
@@ -103,15 +105,28 @@ module solo_hint(
     end
     else begin
     start_d <= start;
-    if((state != S_IDLE) && start && !start_d)
-        pending <= 1'b1;
-    case(state)
-    S_IDLE:if(!duo && Playing && start && !start_d)begin
-        state <= S_INIT;
-        search_type <= type;
-        best_score <= -17'sd32768;
+    if(duo || !Playing)begin
+        state <= S_IDLE;
+        hint_valid <= 1'b0;
+        settle_cnt <= 0;
         best_valid <= 1'b0;
-        pending <= 1'b0;
+    end
+    else if(start && ((state == S_IDLE) || !start_d))begin
+        // 棋盘/方块事件一到先隐藏, 等待稳定后再搜索
+        hint_valid <= 1'b0;
+        best_valid <= 1'b0;
+        best_score <= -17'sd32768;
+        search_type <= type;
+        settle_cnt <= HINT_SETTLE_CYCLES;
+        state <= S_SETTLE;
+    end
+    else case(state)
+    S_IDLE:;
+    S_SETTLE:begin
+        if(settle_cnt == 0)
+            state <= S_INIT;
+        else
+            settle_cnt <= settle_cnt - 23'd1;
     end
     S_INIT:begin
         top_c <= 0;
@@ -312,19 +327,11 @@ module solo_hint(
         end
     end
     S_DONE:begin
-        hint_valid <= best_valid;
         hint_type <= search_type;
         hint_c0 <= best_c[0]; hint_c1 <= best_c[1]; hint_c2 <= best_c[2]; hint_c3 <= best_c[3];
         hint_r0 <= best_r[0]; hint_r1 <= best_r[1]; hint_r2 <= best_r[2]; hint_r3 <= best_r[3];
-        if(pending)begin
-            pending <= 1'b0;
-            state <= S_INIT;
-            search_type <= type;
-            best_score <= -17'sd32768;
-            best_valid <= 1'b0;
-        end
-        else
-            state <= S_IDLE;
+        hint_valid <= best_valid;
+        state <= S_IDLE;
     end
     default:state <= S_IDLE;
     endcase
