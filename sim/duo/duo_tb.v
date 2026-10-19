@@ -624,6 +624,22 @@ initial begin
     release dut.new_piece1; release dut.field_chg;
     duo = 1'b1; repeat(4) @(posedge Clk_74M);
   end
+  $display("=== 28) hint row map and type refresh ===");
+  begin : hint_map_type_chk
+    duo = 1'b0; Playing = 1'b1; Idle = 1'b0; Stop = 1'b0; Finalize = 1'b0;
+    clr_state; repeat(20) @(posedge Clk_74M);
+    dut.state[3*20 + 19] = 1'b1; #1;
+    chk("hint map bottom row 19", dut.hint_row_bits[19*24 + 3], 1);
+    dut.state[3*20 + 19] = 1'b0;
+    dut.state[3*20 + 0] = 1'b1; #1;
+    chk("hint map top row 0", dut.hint_row_bits[3], 1);
+    dut.state[3*20 + 0] = 1'b0;
+    force dut.type = 3'd2; repeat(2) @(posedge Clk_74M); #1;
+    force dut.type = 3'd5; #1;
+    chk("hint type change restarts", dut.hint_start, 1);
+    @(posedge Clk_74M); #1; release dut.type;
+    duo = 1'b1; repeat(4) @(posedge Clk_74M);
+  end
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;

@@ -1598,23 +1598,27 @@ wire [479:0]hint_row_bits = {row_w[19],row_w[18],row_w[17],row_w[16],row_w[15],r
 reg playing_d;
 reg lock_we_d;
 reg hint_enable_d;
+reg [2:0]hint_type_d;
 always@(posedge Clk_74M or negedge Reset_n)begin
 if(!Reset_n)begin
 playing_d <= 1'b0;
 lock_we_d <= 1'b0;
 hint_enable_d <= 1'b0;
+hint_type_d <= 3'd0;
 end
 else begin
 playing_d <= Playing;
 lock_we_d <= lock_we;
 hint_enable_d <= hint_enable;
+hint_type_d <= type;
 end
 end
 // 四格锁存写完后再重算提示, 避免基于半写入棋盘得到错误落点
 wire hint_lock_done = lock_we_d && !lock_we;
 wire hint_enable_rise = hint_enable && !hint_enable_d;
+wire hint_type_changed = (type != hint_type_d);
 wire hint_start = !duo && Playing && hint_enable &&
-                   (hint_enable_rise || hold_up || clear_down || hint_lock_done || !playing_d);
+                   (hint_enable_rise || hint_type_changed || hold_up || clear_down || hint_lock_done || !playing_d);
 solo_hint solo_hint_inst(
 .Clk_74M(Clk_74M), .Reset_n(Reset_n), .start(hint_start), .duo(duo), .Playing(Playing),
 .type(type), .row_bits(hint_row_bits),

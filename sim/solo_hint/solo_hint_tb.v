@@ -126,17 +126,54 @@ end
 end
 endfunction
 
+function no_hint_overhang;
+input dummy;
+integer q,s,cc,rr,sc,sr;
+reg own;
+begin
+no_hint_overhang=1;
+for(q=0;q<4;q=q+1)begin
+case(q)
+0:begin cc=hint_c0;rr=hint_r0;end
+1:begin cc=hint_c1;rr=hint_r1;end
+2:begin cc=hint_c2;rr=hint_r2;end
+default:begin cc=hint_c3;rr=hint_r3;end
+endcase
+if(rr<19)begin
+own=0;
+for(s=0;s<4;s=s+1)begin
+case(s)
+0:begin sc=hint_c0;sr=hint_r0;end
+1:begin sc=hint_c1;sr=hint_r1;end
+2:begin sc=hint_c2;sr=hint_r2;end
+default:begin sc=hint_c3;sr=hint_r3;end
+endcase
+if((sc==cc)&&(sr==rr+1))own=1;
+end
+if(!own && !rows[(rr+1)*24+cc])no_hint_overhang=0;
+end
+end
+end
+endfunction
+
 initial begin
 $display("=== solo_hint 深度搜索 ===");
 // 平场
 reset_dut; run_search(3'd3);
 chk("flat valid",hint_valid,1); chk("flat type",hint_type,3); chk("flat cells in board",all_in_board(0),1); chk("flat no overlap",no_overlap(0),1);
+// 连续切换方块类型: 第一个候选不得沿用上一类型的 ROM 形状
+reset_dut; run_search(3'd0);
+chk("type0 shape left",cell_at(0,19),1); chk("type0 shape right",cell_at(3,19),1);
+run_search(3'd5);
+chk("type5 shape a",cell_at(0,18),1); chk("type5 shape b",cell_at(1,18),1);
+chk("type5 shape c",cell_at(1,19),1); chk("type5 shape d",cell_at(2,19),1);
+chk("type5 not stale I row",cell_at(3,19),0);
 // 近消行: 底行仅 8..11 空, I 旋转 1 必须补满并消行
 reset_dut; set_row(19,20'hFF0FF); run_search(3'd0);
 chk("near clear valid",hint_valid,1); chk("near clear rotation",dut.best_rot,1);
 chk("near clear gap0",cell_at(8,19),1); chk("near clear gap1",cell_at(9,19),1);
 chk("near clear gap2",cell_at(10,19),1); chk("near clear gap3",cell_at(11,19),1);
-chk("near clear score",dut.best_score,-1248);
+chk("near clear score",dut.best_score,480);
 // 搜索期间棋盘变化不影响已锁存快照
 reset_dut; set_row(19,20'hFF0FF); type=3'd0;
 start=1; @(posedge Clk); #1; start=0;
@@ -144,12 +181,18 @@ cyc=0; while((dut.state==18)&&(cyc<200))begin @(posedge Clk);cyc=cyc+1;end
 chk("snapshot captured",dut.board_snap[19*24 +: 20],20'hFF0FF);
 rows=480'd0;
 cyc=0; while((dut.state!=0)&&(cyc<30000))begin @(posedge Clk);cyc=cyc+1;end
-chk("snapshot search valid",hint_valid,1); chk("snapshot search score",dut.best_score,-1248);
+chk("snapshot search valid",hint_valid,1); chk("snapshot search score",dut.best_score,480);
 // 贴左墙: 只有 0..3 空, 水平 I 必须贴墙补满
 reset_dut; set_row(19,20'hFFFF0); run_search(3'd0);
 chk("wall valid",hint_valid,1); chk("wall rotation",dut.best_rot,1);
 chk("wall c0",cell_at(0,19),1); chk("wall c3",cell_at(3,19),1);
 // 已有空洞: 空洞总数必须被扫描到, 且候选不覆盖已有格
+reset_dut;
+for(pcol=8;pcol<=10;pcol=pcol+1)
+  for(prow=4;prow<=19;prow=prow+1) rows[prow*24+pcol]=1'b1;
+run_search(3'd0);
+chk("stack I valid",hint_valid,1); chk("stack I no overlap",no_overlap(0),1);
+chk("stack I supported",no_hint_overhang(0),1);
 reset_dut; set_row(18,20'h00001); run_search(3'd0);
 chk("hole valid",hint_valid,1); chk("hole counted",(dut.holes_total>0),1); chk("hole no overlap",no_overlap(0),1);
 // 贴顶无合法落点

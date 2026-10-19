@@ -20,7 +20,7 @@ module solo_hint(
                S_FINAL=5'd8, S_OVER=5'd9, S_CLEAR_INIT=5'd10,
                S_CLEAR=5'd11, S_EVAL_INIT=5'd12, S_EVAL_PREP=5'd13,
                S_EVAL=5'd14, S_SCORE=5'd15, S_NEXT=5'd16, S_DONE=5'd17,
-               S_SETTLE=5'd18;
+               S_SETTLE=5'd18, S_ROM2=5'd19;
     localparam [19:0] FULL20 = 20'hFFFFF;
     reg [4:0] state;
     reg start_d;
@@ -186,7 +186,8 @@ module solo_hint(
         state <= S_SHAPE;
     end
     S_SHAPE:state <= S_ROM;
-    S_ROM:begin
+    S_ROM:state <= S_ROM2;
+    S_ROM2:begin
         shp_r <= rom_dout;
         build_i <= 0;
         min_land <= 31;
@@ -291,10 +292,11 @@ module solo_hint(
     end
     S_EVAL:begin
         newtop_temp = (ptop < {1'b0,tops[eval_c[4:0]]}) ? ptop : {1'b0,tops[eval_c[4:0]]};
-        cand_total <= cand_total + {3'd0,newtop_temp};
+        // tops \u662f\u9876\u9762\u884c\u53f7, \u771f\u5b9e\u9ad8\u5ea6\u5fc5\u987b\u7528 20-top
+        cand_total <= cand_total + (6'd20 - {1'b0,newtop_temp});
         if(eval_c != 0)
             cand_bump <= cand_bump + ((newtop_temp > prev_top) ? (newtop_temp - prev_top) : (prev_top - newtop_temp));
-        if(newtop_temp > cand_max) cand_max <= newtop_temp;
+        if((6'd20 - {1'b0,newtop_temp}) > cand_max) cand_max <= 6'd20 - {1'b0,newtop_temp};
         prev_top <= newtop_temp;
         if(eval_c == 19)
             state <= S_SCORE;
