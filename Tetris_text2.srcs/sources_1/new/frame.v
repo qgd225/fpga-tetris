@@ -809,10 +809,10 @@ module frame(
     wire result_colon_lit = Finalize && (hcounter >= 11'd950) && (hcounter <= 11'd953) &&
                             (((vcounter >= 11'd576) && (vcounter <= 11'd579)) ||
                              ((vcounter >= 11'd590) && (vcounter <= 11'd593)));
-    wire result_dim = Finalize &&
+    wire result_region = Finalize &&
                       (((hcounter >= 11'd432) && (hcounter <= 11'd847) && (vcounter >= 11'd348) && (vcounter <= 11'd451)) ||
-                       ((hcounter >= 11'd352) && (hcounter <= 11'd1048) && (vcounter >= 11'd456) && (vcounter <= 11'd620))) &&
-                      (hcounter[0] ^ vcounter[0]);
+                       ((hcounter >= 11'd352) && (hcounter <= 11'd1048) && (vcounter >= 11'd456) && (vcounter <= 11'd620)));
+    wire result_dim = result_region && (hcounter[0] ^ vcounter[0]);
 //    �����: 2px �ߴ� + �ĽǸ��� 1x1(�ڲ�����, ��ʵ�����䷽������)
 //    �ж������� ghost_r ͬ�ļĴ�: ghost_r �� hcounter �� 1 ��, ��������խ�ҿ�
     wire [10:0]glx = (hcounter - 11'd321) & 11'd31;
@@ -1045,7 +1045,7 @@ module frame(
     lb_lv_r <= lb_lv;
     fin_r <= Finalize;
     result_num_r <= result_num_lit; result_num_sel_r <= result_num_sel;
-    result_mode_r <= lb_mode; result_label_r <= lb_result_lbl;
+    result_mode_r <= lb_mode && lbl_lit; result_label_r <= lb_result_lbl && lbl_lit;
     result_rule_r <= result_score_rule || result_level_rule || result_lines_rule || result_time_rule;
     result_rule_sel_r <= result_rule_sel; result_colon_r <= result_colon_lit;
     hint_type_r <= hint_type;
@@ -1395,8 +1395,8 @@ module frame(
     endcase
     else if(result_colon_r)
     rgb_c = 24'hFFFF00;
-    else if(result_dim)
-    rgb_c = 24'h101010;//GAME OVER 与结算数据区棋盘式局部压暗
+    else if(result_region)
+    rgb_c = result_dim ? 24'h101010 : (in_field ? field_bg : BLACK);//GAME OVER 与结算数据区棋盘式局部压暗
     else if(level_frame_lit)
     rgb_c = 24'h606060;
     else if(lbl_r)

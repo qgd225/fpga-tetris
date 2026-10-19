@@ -736,6 +736,12 @@ initial begin
   look(11'd404,11'd468); chk("result SOLO mode cyan", rgb, `CY_MENU);
   look(11'd370,11'd510); chk("result score rule cyan", rgb, `CY_MENU);
   look(11'd365,11'd526); chk("result label gray", rgb, `GRAY_LBL);
+  force dut.letter_hud_inst.douta = 20'h00000;
+  repeat(4) @(posedge Clk);
+  look(11'd404,11'd468); chk("result SOLO mode blank glyph", rgb, `FLDBG);
+  look(11'd365,11'd526); chk("result label blank glyph", rgb, 24'h101010);
+  release dut.letter_hud_inst.douta;
+  repeat(4) @(posedge Clk);
   look(11'd365,11'd562); chk("result score white", rgb, `WHITE);
   look(11'd568,11'd562); chk("result level color", rgb, 24'h9933CC);
   look(11'd748,11'd562); chk("result lines pink", rgb, `PINK2);
@@ -745,6 +751,12 @@ initial begin
   look(11'd796,11'd562); chk("result lines hundreds BCD", dut.result_num_dig, 1);
   look(11'd361,11'd470); chk("result dim checker on", rgb, 24'h101010);
   look(11'd360,11'd470); chk("result dim checker off", rgb, `FLDBG);
+  dut.Playfield_inst.state[4*20+10] = 1'b1;
+  dut.state_color[4*20+10] = 3'd3;
+  dut.state_owner[4*20+10] = 1'b0;
+  repeat(5) @(posedge Clk);
+  look(11'd450,11'd402); chk("result masks locked cell", rgb, `FLDBG);
+  dut.Playfield_inst.state[4*20+10] = 1'b0;
   duo=1; repeat(6) @(posedge Clk);
   look(11'd404,11'd468); chk("result DUO mode pink", rgb, `PINK2);
   Finalize=0; repeat(6) @(posedge Clk);
