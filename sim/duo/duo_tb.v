@@ -38,7 +38,7 @@ Playfield dut(
   .Clk_74M(Clk_74M), .Reset_n(Rst), .hcounter(hc), .vcounter(vc),
   .left_p_flag(left1), .right_p_flag(right1), .drop_r_flag(drop1), .drop_en(drop_en1),
   .rotate_p_flag(rot1), .switch_r_flag(sw1), .hold_p_flag(hold1),
-  .Idle(Idle), .Playing(Playing), .Stop(Stop), .Finalize(Finalize),
+  .Idle(Idle), .Playing(Playing), .hint_enable(1'b1), .Stop(Stop), .Finalize(Finalize),
   .score(score), .time_sec(time_sec), .duo(duo),
   .left_p_flag2(left2), .right_p_flag2(right2), .drop_r_flag2(drop2), .drop_en2(drop_en2),
   .rotate_p_flag2(rot2), .hold_p_flag2(hold2),
@@ -613,7 +613,18 @@ initial begin
     release dut.new_piece1; release dut.hold_up; release dut.clear_down;
     release dut.lock_we;
     duo = 1'b1; repeat(4) @(posedge Clk_74M);
-  end  if(bad == 0) $display("=== ALL PASS ===");
+  end
+  $display("=== 27) normal piece/field changes do not restart hint ===");
+  begin : hint_no_flash_chk
+    duo = 1'b0; Playing = 1'b1; Idle = 1'b0; Stop = 1'b0; Finalize = 1'b0;
+    repeat(20) @(posedge Clk_74M);
+    force dut.new_piece1 = 1'b1;
+    force dut.field_chg = 1'b1;
+    #1; chk("new piece alone no restart", dut.hint_start, 0);
+    release dut.new_piece1; release dut.field_chg;
+    duo = 1'b1; repeat(4) @(posedge Clk_74M);
+  end
+  if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;
 end

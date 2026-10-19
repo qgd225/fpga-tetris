@@ -223,6 +223,7 @@ module frame(
     .hold_p_flag(hold_p_flag),
     .Idle(Idle),
     .Playing(Playing),
+    .hint_enable(hint_show),
     .Stop(Stop),
     .Finalize(Finalize),
     .score(score),
