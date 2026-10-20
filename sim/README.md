@@ -1,40 +1,44 @@
 # 仿真台（可复现）
 
-八套自测，全部直接编译 `../Tetris.srcs/sources_1/new/` 下的**实时源码**（改完 RTL 直接重跑即可），
-产物写到各自的 `build/`（已在 .gitignore 中忽略）。
+八套自测直接编译 `../Tetris.srcs/sources_1/new/` 下的实时 RTL；仿真产物写入各自的 `build/`，日志写入 `logs/`，均不纳入 Git。
 
 ## 一键跑全部
 
-```
+```text
 sim\run_all.bat
 ```
 
-输出最后会给 SUMMARY：四套分别打印 `=== ALL PASS ===` 或 `=== FAILED n ===`。
-单套日志在 `sim/logs/<套名>.log`。
+最终输出逐套显示 `=== ALL PASS ===` 或 `=== FAILED n ===`。
 
-## 四套分别是什么
+## 八套测试说明
 
-| 套 | 顶层 | 覆盖内容 | 预期项数 |
-| --- | --- | --- | --- |
-| `sim/duo` | `duo_tb` | Playfield 级双人：出生列(8/16)、两片互撞与"顶住不锁存"、硬降停对方方块、被挡时不显示幽灵、22/23 列与顶部旋转无 X、共用 Hold、单流随机(同拍分配/每局搅动)、双人时间阈值、整行 24 格消行、2px 死区、幽灵落点扫到行上限也要更新 | 83 |
-| `sim/frame_duo` | `frame_duo_tb` | frame 级显示：P2 方块/落格取色、24 列右侧格子、新 HUD 布局(面板色线/槽位底色/8 段等级条/LV 数字/分数右对齐)、菜单屏(标题+两行选项+青色选中标记+两行提示)、幽灵空心框(边带浅色/内部纯黑)、P2 下一块预览、2px 死区取色、左边框不出头、单机 P1 显示回归 | 184 |
-| `sim/level` | `net_level_tb` | 单人回归：加分系数、分数/时间等级阈值、等级重置、每级自动下落速度 | 27 |
-| `sim/sound` | `sound_tb` | 音效模块：18 类事件编号、开关长短按、移动/旋转双音失败提示、同拍优先级、播放中不打断、1~4 行消行音阶长度、音高/时长查表、方波翻转次数、复位静音 | 85 |
+| 套 | 顶层 | 覆盖内容 | 项数 |
+| --- | --- | --- | ---: |
+| `sim/duo` | `duo_tb` | 双人出生/互撞/锁存、共用 Hold、单流随机、24 格消行、幽灵保持和音效门控 | 111 |
+| `sim/frame_duo` | `frame_duo_tb` | 画面/HUD/菜单/等级柱/特效、GAME OVER 结算页、智能提示和局部压暗 | 294 |
+| `sim/level` | `net_level_tb` | 消行加分、分数/时间等级阈值、等级重置和自动下落速度 | 38 |
+| `sim/sound` | `sound_tb` | 18 类音效、查表音高/时长、P1 优先、消行音阶和蜂鸣器翻转 | 99 |
+| `sim/input_route` | `input_route_tb` | 单人板载+PC 合并、双人板载 P1/PC P2 的输入路由 | 21 |
+| `sim/hold_gesture` | `hold_gesture_tb` | Hold 短按换块、长按提示切换和 PC/板载输入 | 27 |
+| `sim/solo_hint` | `solo_hint_tb` | 4 旋转 x 20 列搜索、评分、空洞/悬空约束和类型切换 | 59 |
+| `sim/result_packet` | `result_packet_tb` | Type4 14 字节成绩包、SOLO/DUO 模式和 XOR 校验 | 17 |
+
+总计 **666 项**。
 
 ## 单独跑一套
 
-```
+```text
 cd sim\duo
 run.bat
 ```
 
 ## 说明
 
-- ROM（Tetromino / weiyibiao / number / letter）在仿真里用**桩**（组合读、全 0 或合成形状），
-  因此这里验证的是逻辑通路；要按真实方块形状验证，可把工程 IP 的 `*_sim_netlist.v` 换进来。
-- `sim/level` 里 `frame` 的 `duo` 固定接 `1'b0`（单人回归）。
-- 场地存储是『单份 `state`(480 位 FF) + `row_w` 行字直读』（无分布式 RAM 副本），所有判定读点与渲染同源，不需要副本一致性核查。
+- ROM（Tetromino / weiyibiao / number / letter）在仿真中使用行为桩，重点验证逻辑通路。
+- 场地存储为单份 `state` + 行字直读，渲染和判定读取同一份状态。
+- 历史迭代记录保留在下方附录，不再混入当前测试使用说明。
 
+## 历史迭代附录
 
 ## 面积优化实测记录（Duo 之后）
 
