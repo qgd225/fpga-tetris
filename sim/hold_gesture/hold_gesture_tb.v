@@ -1,4 +1,9 @@
 `timescale 1ns/1ps
+//============================================================
+// 测试台：hold_gesture_tb
+// 测试目标：Hold 短按换块与长按智能提示手势回归。
+//============================================================
+
 module hold_gesture_tb;
 reg Clk=0, Rst=0;
 reg board_hold=0, pc_hold=0, legacy_hold=0, duo=0;

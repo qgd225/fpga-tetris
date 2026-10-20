@@ -1,3 +1,8 @@
+//============================================================
+// 模块：frame
+// 作用：像素合成：场地、HUD、菜单、结算页、特效和调色板输出。
+// 时钟/复位：Clk_74M；Reset_n 低有效
+//============================================================
 module frame(
     input Clk_74M,
     input Reset_n,
@@ -51,7 +56,7 @@ module frame(
     reg [23:0]rgb_c;
     
     
-//    ��Ϸ��
+//    游戏区
     wire [4:0]C_num;
     wire [4:0]R_num;
     wire [479:0]state;
@@ -78,7 +83,7 @@ module frame(
     wire [19:0]line_t;
     wire clear_flash;
     
-    //    P2(˫��)��ʾ��
+    //    P2(双人)显示用
     wire Piece2;
     wire ghost2;
     wire [2:0]type2;
@@ -102,26 +107,26 @@ module frame(
     wire [4:0]hint_r0, hint_r1, hint_r2, hint_r3;
 
 //============================================================
-//    HUD ����(Ψһ��Դ): ���ê�� / ��ǩ / �ָ��� / ��λ / �ȼ��� / �ȼ�����
+//    HUD 布局(唯一来源): 面板锚点 / 标签 / 分隔线 / 槽位 / 等级条 / 等级数字
 //============================================================
-    localparam [10:0] XPNL1 = 11'd94,    //˫�� P1 ���(����)ê��
-                     XPNL2 = 11'd1121,  //˫�� P2 ���(����)ê��
-                     XSOLO = 11'd1057,  //�������(����)ê��
-                     YNEXT = 11'd132,   //Ԥ����λ Y
-                     YHOLD = 11'd348,   //Hold ��λ Y
-                     YLBNX = 11'd84,    //NEXT ��ǩ Y
-                     YLBHD = 11'd300,   //HOLD ��ǩ Y
-                     YRLNX = 11'd122,   //NEXT �ָ��� Y
-                     YRLHD = 11'd338,   //HOLD �ָ��� Y
-                     XLVLB = 11'd232,   //LV ��ǩ X
-                     XLDIG = 11'd283,   //�ȼ����� X(��ȼ���ͬ��)
-                     YLBLV = 11'd36,    //LV ��ǩ Y(�� 44px �ߵ����ֵײ�����)
-                     YDIGI = 11'd24,    //�ȼ����� Y
+    localparam [10:0] XPNL1 = 11'd94, //双人 P1 面板(左栏)锚点
+                     XPNL2 = 11'd1121, //双人 P2 面板(右栏)锚点
+                     XSOLO = 11'd1057, //单人面板(右栏)锚点
+                     YNEXT = 11'd132, //预览槽位 Y
+                     YHOLD = 11'd348, //Hold 槽位 Y
+                     YLBNX = 11'd84, //NEXT 标签 Y
+                     YLBHD = 11'd300, //HOLD 标签 Y
+                     YRLNX = 11'd122, //NEXT 分隔线 Y
+                     YRLHD = 11'd338, //HOLD 分隔线 Y
+                     XLVLB = 11'd232, //LV 标签 X
+                     XLDIG = 11'd283, //等级数字 X(与等级条同轴)
+                     YLBLV = 11'd36, //LV 标签 Y(与 44px 高的数字底部对齐)
+                     YDIGI = 11'd24,
                      XRSCORE = 11'd365, XRLEVEL = 11'd568, XRLINES = 11'd748, XRTIME = 11'd900,
                      YRMODE = 11'd468, YRLAB = 11'd526, YRNUM = 11'd562;
     wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
     wire [10:0]XPN2 = XPNL2;
-//    NEXT/HOLD ��ǩ����: 4 �� x 24 ���(ʵ�� 92) �� 128 ���������߾� 18
+//    NEXT/HOLD 标签居中: 4 字 x 24 间距(实宽 92) 在 128 宽面板里左边距 18
     wire [10:0]XLBN1 = XPN1 + 11'd18;
     wire [10:0]XLBN2 = XPN2 + 11'd18;
 
@@ -211,7 +216,7 @@ module frame(
     reg [2:0]state_color[0:479];
     reg state_owner[0:479];
 
-//    ȡ������: 20 ��, ÿ�� 24 ��(state) / 24x3 λ(��ɫ��) / owner; ������, 0 LUT
+//    取格行字: 20 行, 每行 24 列(state) / 24x3 位(颜色号) / owner; 纯连线, 0 LUT
     wire [23:0]row_f[0:19];
     wire [71:0]scw[0:19];
     wire [23:0]row_ow[0:19];
@@ -239,7 +244,7 @@ module frame(
         state_owner[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= 1'b1;
         end
     end
-    else if(clear_time && !clear_t && !clear_pulse)begin 
+    else if(clear_time && !clear_t && !clear_pulse)begin
         for(c = 0; c < 24; c = c + 1)
             for(m = 1; m < 20; m = m + 1)
                 if(m <= clear_row)begin
@@ -497,8 +502,8 @@ module frame(
     );
     
 
-//    ���ֱ�ǩ NEXT/HOLD/LV: 1x �ֺ�(20x32), �־� 24
-//    ��ַ�� BRAM ʹ����ǰ 1 ����(ena_n �� lb_hn, ��߽��� 1): ����ÿ�ֵ� 1 �лᴮ��һ�ֵ� 1 ��
+//    文字标签 NEXT/HOLD/LV: 1x 字号(20x32), 字距 24
+//    地址与 BRAM 使能提前 1 像素(ena_n 用 lb_hn, 左边界多减 1): 否则每字第 1 列会串上一字第 1 列
     reg [10:0]lb_X;
     reg [10:0]lb_Y;
     reg [4:0] lb_g;
@@ -678,13 +683,13 @@ module frame(
     .douta(lb_dout)
     );
     wire lbl_lit = lb_ena ? lb_dout[19 - (hcounter - lb_X)] : 1'b0;
-//    ������˿��(ʱ��/��������) �� ���������»���: ���߱�ǩ��
+//    顶栏发丝线(时间/分数分组) 与 结束画面下划线: 都走标签灰
     wire top_rule_lit = (hcounter >= 11'd470) && (hcounter <= 11'd470) &&
                         (vcounter >= 11'd24) && (vcounter < 11'd68);
     wire over_line_lit = Finalize && (hcounter >= 11'd449) && (hcounter <= 11'd825) &&
                          (vcounter >= 11'd444) && (vcounter <= 11'd446);
 
-//    ���ָ���: 2px, λ�ڱ�ǩ�·�
+//    面板分隔线: 2px, 位于标签下方
     wire rule1_lit = ((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128)));
@@ -694,14 +699,15 @@ module frame(
                              ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
                              ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))));
 
-//    �ȼ�����: 1 λ, ��ȼ���ͬ��
+//    等级数字: 1 位, 与等级条同轴
     wire [3:0] lv_dig = {1'b0, speed_level};
     wire [10:0]vdv = vcounter - YDIGI;
     wire lvd_ena = (hcounter >= XLDIG) && (hcounter < (XLDIG + 11'd20)) &&
                    (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
-//    ȡ��ʹ����ǰ 1 ����(number Ҳ�� READ_LATENCY=1): ����ÿ�е� 1 �лᴮ��һ��
+//    取字使能提前 1 像素(number 也是 READ_LATENCY=1): 否则每行第 1 列会串上一行
     wire lvd_ena_n = (lb_hn >= (XLDIG - 11'd1)) && (lb_hn < (XLDIG + 11'd20)) &&
                      (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
+//    结算页数值复用 number ROM：SCORE(6 位)/LEVEL(1 位)/LINES(5 位)/TIME(MM:SS)
     reg result_num_ena;
     reg result_num_ena_n;
     reg [10:0]result_num_X;
@@ -781,7 +787,7 @@ module frame(
     );
     wire lvd_lit = lvd_ena ? lvd_dout[19 - (hcounter - XLDIG)] : 1'b0;
     wire result_num_lit = result_num_ena ? lvd_dout[19 - (hcounter - result_num_X)] : 1'b0;
-//    �ȼ�ɫ: 8 ����������(��->��->��->��->��->��->��->��)
+//    等级色: 8 级热力渐变(青->绿->黄->橙->红->粉->紫->白)
     reg [23:0]lv_color;
     always@(*)begin
     case(speed_level)
@@ -797,7 +803,7 @@ module frame(
     endcase
     end
 
-//    LV ���·� 2px �ȼ�ɫ����: ����ȼ����ַ�֧(ͬɫ)
+//    LV 组下方 2px 等级色横线: 并入等级数字分支(同色)
     wire lv_rule_lit = (hcounter >= 11'd232) && (hcounter < 11'd306) &&
                        (vcounter >= 11'd72) && (vcounter < 11'd74);
     wire lvd_all_lit = lvd_lit || lv_rule_lit;
@@ -809,12 +815,13 @@ module frame(
     wire result_colon_lit = Finalize && (hcounter >= 11'd950) && (hcounter <= 11'd953) &&
                             (((vcounter >= 11'd576) && (vcounter <= 11'd579)) ||
                              ((vcounter >= 11'd590) && (vcounter <= 11'd593)));
+//    结算区域先屏蔽底层游戏内容，再用棋盘纹压暗；标题、标签和数值在其上层绘制
     wire result_region = Finalize &&
                       (((hcounter >= 11'd432) && (hcounter <= 11'd847) && (vcounter >= 11'd348) && (vcounter <= 11'd451)) ||
                        ((hcounter >= 11'd352) && (hcounter <= 11'd1048) && (vcounter >= 11'd456) && (vcounter <= 11'd620)));
     wire result_dim = result_region && (hcounter[0] ^ vcounter[0]);
-//    �����: 2px �ߴ� + �ĽǸ��� 1x1(�ڲ�����, ��ʵ�����䷽������)
-//    �ж������� ghost_r ͬ�ļĴ�: ghost_r �� hcounter �� 1 ��, ��������խ�ҿ�
+//    幽灵框: 2px 边带 + 四角各切 1x1(内部纯黑, 与实心下落方块区分)
+//    判定必须与 ghost_r 同拍寄存: ghost_r 比 hcounter 晚 1 拍, 否则框会左窄右宽
     wire [10:0]glx = (hcounter - 11'd321) & 11'd31;
     wire [10:0]gly = (vcounter - 11'd81) & 11'd31;
     wire glx_bd = (glx < 11'd2) || (glx > 11'd27);
@@ -822,7 +829,7 @@ module frame(
     wire glx_cn = (glx < 11'd1) || (glx > 11'd28);
     wire gly_cn = (gly < 11'd1) || (gly > 11'd28);
     wire ghost_edge = (glx_bd || gly_bd) && !(glx_cn && gly_cn);
-//    ʵ�ķ��� 1px Բ��: �ĽǸ��� 1x1(�������н�ͬһ�ж�)
+//    实心方块 1px 圆角: 四角各切 1x1(与幽灵切角同一判定)
     wire piece_round = !(glx_cn && gly_cn);
 
     reg over_lit_r;
@@ -885,7 +892,7 @@ module frame(
     reg rule2_r;
     reg next_slot_r;
     reg hold_slot_r;
-//    Ԥ������ 1px Բ��: ��λ�����/��λ�ֱ�ȡ(�������崮��λ)
+//    预览方块 1px 圆角: 相位按面板/槽位分别取(避免跨面板串相位)
     wire [10:0]pvx1 = (hcounter - XPN1) & 11'd31;
     wire [10:0]pvx2 = (hcounter - XPN2) & 11'd31;
     wire [10:0]pvx = (duo && (hcounter >= XPN2)) ? pvx2 : pvx1;
@@ -893,7 +900,7 @@ module frame(
     wire [10:0]pvy_h = (vcounter - YHOLD) & 11'd31;
     wire [10:0]pvy = hold_slot_r ? pvy_h : pvy_n;
     wire pv_corner = ((pvx == 11'd0) || (pvx == 11'd29)) && ((pvy == 11'd0) || (pvy == 11'd29));
-//    ����ɫ: ���ص�ɫ vs �ⲿ / P1P2 ��λ��ɫ
+//    新配色: 场地底色 vs 外部 / P1P2 槽位底色
     wire [10:0]XR = duo ? 11'd1088 : 11'd960;
     wire in_field = (hcounter >= 11'd321) && (hcounter < XR) && (vcounter >= 11'd81);
     wire [23:0]field_bg = 24'h0A0F16;
@@ -1010,7 +1017,7 @@ module frame(
     type_r <= type;
     type_t_r <= type_t;
     hold_type_r <= hold_type;
-    //    ����ȡɫ: ��ű����ڳ�����(�ڱ� 24 �� 20 ��ʾ�����κθ�)
+    //    场地取色: 编号必须在场地内(哨兵 24 或 20 表示不在任何格)
     if((C_num <= 5'd23) && (R_num <= 5'd19))begin
     cell_r <= row_f[R_num][C_num];
     sc_r <= scw[R_num][C_num*3 +: 3];
@@ -1022,7 +1029,7 @@ module frame(
     owner_r <= 1'b0;
     end
     clear_t_r <= clear_t;
-    //    ����ѹ��: 1~4 ��ֻҪ���в������оͳ�������, ���ܰ�����λӰ��
+    //    消行压缩: 1~4 行只要该行参与消行就持续收缩, 不受白闪相位影响
     clear_shrink_r <= (clear_t) && (line_t[R_num]);
     flash_r <= (clear_t) && (line_t[R_num]) && (!clear_flash);
     chs_margin_r <= chs_margin;
@@ -1052,8 +1059,8 @@ module frame(
     hint_hit_r <= hint_show && !duo && Playing && hint_match && !hint_occupied_now;
     end
     end
-//    UI ��Ч: 60Hz ���� + ��������(E1) / ��������(E2)
-    parameter [20:0]EFF_TICK = 21'd1_237_499;//����ɸ���
+//    UI 特效: 60Hz 节拍 + 落锁脉冲(E1) / 升级闪白(E2)
+    parameter [20:0]EFF_TICK = 21'd1_237_499; //仿真可覆盖
     reg [20:0]eff_cnt;
     wire eff_tick = (eff_cnt == EFF_TICK);
     always@(posedge Clk_74M or negedge Reset_n)begin
@@ -1167,13 +1174,13 @@ module frame(
     wire nflash2 = (nf2 != 2'd0);
     wire hflash = (hf != 2'd0);
     wire scflash = (scf != 2'd0);
-//    Ԥ���� 32px ����(ֻ�ڲ�λ��, ���ȼ�����Ԥ������)
+//    预览槽 32px 点阵(只在槽位内, 优先级低于预览方块)
     wire dx1 = (((hcounter - XPN1) & 11'd31) == 11'd31);
     wire dx2 = (((hcounter - XPN2) & 11'd31) == 11'd31);
     wire dy1 = (((vcounter - YNEXT) & 11'd31) == 11'd31);
     wire dy2 = (((vcounter - YHOLD) & 11'd31) == 11'd31);
     wire slot_dot = (next_slot_r && dy1 && (dx1 || dx2)) || (hold_slot_r && dy2 && (dx1 || dx2));
-//    ˫�� P1/P2 ����ձ�: �ֻ� 7 ��(2x, �� number ����ͬ���), ������ ROM ʱ��
+//    双人 P1/P2 号码徽标: 手绘 7 段(2x, 与 number 字体同风格), 不依赖 ROM 时序
     wire bd1 = duo && (hcounter >= 11'd138) && (hcounter < 11'd178) && (vcounter >= 11'd621) && (vcounter < 11'd709);
     wire bd2 = duo && (hcounter >= 11'd1165) && (hcounter < 11'd1205) && (vcounter >= 11'd621) && (vcounter < 11'd709);
     wire [10:0]bx = bd2 ? (hcounter - 11'd1165) : (hcounter - 11'd138);
@@ -1186,22 +1193,22 @@ module frame(
     wire seg_e = (bx >= 11'd4) && (bx < 11'd8) && (by >= 11'd46) && (by < 11'd82);
     wire badge_lit = bd1 ? (seg_b || seg_c) : (bd2 ? (seg_a || seg_b || seg_g || seg_e || seg_d) : 1'b0);
 
-    parameter CYAN = 24'h00CCFF,//��ɫI
-               LIGHT_CYAN = 24'h99EEFF,//ǳ��ɫI
-               PURPPLE = 24'h9933CC,//��ɫT
-               LIGHT_PURPPLE = 24'hD9B3E6,//ǳ��ɫT
-               YELLOW = 24'hFFF_F00,//��ɫO
-               LIGHT_YELLOW = 24'hFFFF99,//ǳ��ɫO
-               RED = 24'hE63946,//��ɫS
-               LIGHT_RED = 24'hFFB3B9,//ǳ��ɫS
-               GREEN = 24'h55A630,//��ɫZ
-               LIGHT_GREEN = 24'hBDE0AA,//ǳ��ɫZ
-               ORANGE = 24'hF77F24,//��ɫL
-               LIGHT_ORANGE = 24'hFFD9B3,//ǳ��ɫL
-               PINK = 24'hFF4DA6,//����ɫJ
-               LIGHT_PINK = 24'hFFB3D9,//ǳ��ɫJ
-               BLACK = 24'h000_000,//��ɫ
-               WHITE = 24'hFFF_FFF,//��ɫ
+    parameter CYAN = 24'h00CCFF, //青色I
+               LIGHT_CYAN = 24'h99EEFF, //浅青色I
+               PURPPLE = 24'h9933CC, //紫色T
+               LIGHT_PURPPLE = 24'hD9B3E6, //浅紫色T
+               YELLOW = 24'hFFF_F00, //黄色O
+               LIGHT_YELLOW = 24'hFFFF99, //浅黄色O
+               RED = 24'hE63946, //红色S
+               LIGHT_RED = 24'hFFB3B9, //浅红色S
+               GREEN = 24'h55A630, //绿色Z
+               LIGHT_GREEN = 24'hBDE0AA, //浅绿色Z
+               ORANGE = 24'hF77F24, //橙色L
+               LIGHT_ORANGE = 24'hFFD9B3, //浅橙色L
+               PINK = 24'hFF4DA6, //亮粉色J
+               LIGHT_PINK = 24'hFFB3D9, //浅粉色J
+               BLACK = 24'h000_000, //黑色
+               WHITE = 24'hFFF_FFF, //白色
                DARK_I = 24'h04_63_7E,
                DARK_T = 24'h47_1F_67,
                DARK_O = 24'h74_79_0D,
@@ -1238,13 +1245,13 @@ module frame(
 
     //    Impact Glass edges and 8px SOFT white L glint
     wire block_light = (glx_r == 11'd1) || (gly_r == 11'd1);
-    wire block_soft = (glx_r >= 11'd6) && (glx_r <= 11'd11) && (gly_r == 11'd26);//����6x1���
+    wire block_soft = (glx_r >= 11'd6) && (glx_r <= 11'd11) && (gly_r == 11'd26); //左下6x1柔光
     wire block_dark = (glx_r == 11'd30) || (gly_r == 11'd30);
     wire block_glint = (((gly_r == 11'd2) || (gly_r == 11'd3)) && (glx_r >= 11'd2) && (glx_r <= 11'd9)) ||
                        (((glx_r == 11'd2) || (glx_r == 11'd3)) && (gly_r >= 11'd2) && (gly_r <= 11'd9)) ||
                        ((glx_r >= 11'd3) && (glx_r <= 11'd4) && (gly_r >= 11'd3) && (gly_r <= 11'd4));
     wire pv_light = (pvx_r == 11'd1) || (pvy_r == 11'd1);
-    wire pv_soft = (pvx_r >= 11'd6) && (pvx_r <= 11'd11) && (pvy_r == 11'd26);//Ԥ������6x1���
+    wire pv_soft = (pvx_r >= 11'd6) && (pvx_r <= 11'd11) && (pvy_r == 11'd26); //预览左下6x1柔光
     wire pv_dark = (pvx_r == 11'd30) || (pvy_r == 11'd30);
     wire pv_glint = (((pvy_r == 11'd2) || (pvy_r == 11'd3)) && (pvx_r >= 11'd2) && (pvx_r <= 11'd9)) ||
                     (((pvx_r == 11'd2) || (pvx_r == 11'd3)) && (pvy_r >= 11'd2) && (pvy_r <= 11'd9)) ||
@@ -1352,7 +1359,7 @@ module frame(
     rgb_c = BLACK;
     else if(choose)begin
         if(chs_margin_r)
-        rgb_c = chs_breath_r ? 24'h00697F : 24'h00E5FF;//ѡ�б��(������)
+        rgb_c = chs_breath_r ? 24'h00697F : 24'h00E5FF; //选中标记(带呼吸)
         else if(chs_text_r)
         rgb_c = chs_dim_r ? 24'h606060 : WHITE;
         else
@@ -1396,17 +1403,17 @@ module frame(
     else if(result_colon_r)
     rgb_c = 24'hFFFF00;
     else if(result_region)
-    rgb_c = result_dim ? 24'h101010 : (in_field ? field_bg : BLACK);//GAME OVER 与结算数据区棋盘式局部压暗
+    rgb_c = result_dim ? 24'h101010 : (in_field ? field_bg : BLACK); //GAME OVER 与结算数据区棋盘式局部压暗
     else if(level_frame_lit)
     rgb_c = 24'h606060;
     else if(lbl_r)
-    rgb_c = lb_lv_r ? lv_color : (fin_r ? 24'h202020 : 24'hB0B0B0);//NEXT/HOLD ��ǩ��, LV �õȼ�ɫ
+    rgb_c = lb_lv_r ? lv_color : (fin_r ? 24'h202020 : 24'hB0B0B0); //NEXT/HOLD 标签灰, LV 用等级色
     else if(rule1_r)
-    rgb_c = fin_r ? 24'h202020 : (lflash1 ? WHITE : (duo ? 24'h00E5FF : 24'h606060));//���ָ���(P1/����)
+    rgb_c = fin_r ? 24'h202020 : (lflash1 ? WHITE : (duo ? 24'h00E5FF : 24'h606060)); //面板分隔线(P1/单人)
     else if(rule2_r)
-    rgb_c = fin_r ? 24'h202020 : (lflash2 ? WHITE : 24'hFF4DA6);//P2 ���ָ���
+    rgb_c = fin_r ? 24'h202020 : (lflash2 ? WHITE : 24'hFF4DA6); //P2 面板分隔线
     else if(level_margin_r)begin
-        rgb_c = 24'h202020;//�����֮��ķ�
+        rgb_c = 24'h202020; //段与段之间的缝
         end
     else if(level_inner_r)begin
         if(lvflash)
@@ -1421,7 +1428,7 @@ module frame(
         rgb_c = 24'h303030;
         end
     else if(lvd_r)
-    rgb_c = lvflash ? WHITE : lv_color;//�ȼ�����(�� LV ͬɫ)
+    rgb_c = lvflash ? WHITE : lv_color; //等级数字(与 LV 同色)
     else if(hold_r)begin
         if(!pv_round_r)
         rgb_c = slot_bg;
@@ -1546,13 +1553,13 @@ module frame(
         endcase
         end
     else if(slot_dot)
-    rgb_c = 24'h404040;//Ԥ���۵���
+    rgb_c = 24'h404040; //预览槽点阵
     else if(hold_slot_r)
-    rgb_c = slot_bg;//Hold ��λ��ɫ
+    rgb_c = slot_bg; //Hold 槽位底色
     else if(next_slot_r)
-    rgb_c = slot_bg;//Next ��λ��ɫ
+    rgb_c = slot_bg; //Next 槽位底色
     else if(badge_lit)
-    rgb_c = bd2 ? 24'hFF4DA6 : 24'h00E5FF;//P1/P2 ����ձ�
+    rgb_c = bd2 ? 24'hFF4DA6 : 24'h00E5FF; //P1/P2 号码徽标
     else if(score_lit_r)
     rgb_c = (scflash && (!fin_r)) ? 24'h00E5FF : WHITE;
     else if(time_lit_r)
@@ -1790,7 +1797,7 @@ module frame(
     rgb_c = in_field ? field_bg : BLACK;
     end
     
-//    ������Ч���(ֻ��)
+//    消行音效编号(只读)
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     rgb <= BLACK;

@@ -1,11 +1,16 @@
 `timescale 1ns/1ps
+//============================================================
+// 测试台：duo_tb
+// 测试目标：Playfield 双人模式回归：出生、互撞、锁存、Hold、消行、幽灵和音效门控。
+//============================================================
 
-//===== Playfield Duo ר�����: ��ײ/��ס/����/����Hold/������/ʱ����ֵ/���� =====
+
+//===== Playfield Duo 专项测试: 互撞/顶住/幽灵/共用Hold/出生列/时间阈值/消行 =====
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
-  assign douta = duo_tb.shape_val;   // ׮: Ĭ�� 0 -> ����; ��ת����ʱ�� tb ���ϳ���״
+  assign douta = duo_tb.shape_val; // 桩: 默认 0 -> 单格; 旋转测试时由 tb 赋合成形状
 endmodule
 module weiyibiao(input clka, input [4:0] addra, output [7:0] douta);
-  assign douta = 8'h00;   // ׮: ��תƫ�� 0
+  assign douta = 8'h00; // 桩: 旋转偏移 0
 endmodule
 
 module duo_tb;
@@ -18,7 +23,7 @@ reg [19:0] score=0;
 reg [13:0] time_sec=0;
 reg duo=1;
 reg duu=1;
-reg [31:0] shape_val = 32'h0;   // �ϳ���״(Ĭ���˻�����)
+reg [31:0] shape_val = 32'h0; // 合成形状(默认退化单格)
 
 wire [479:0] state;
 wire Piece, ghost, Piece2, ghost2, over, clear, clear_time, clear_pulse, clear_t_t, clear_t;
@@ -67,12 +72,12 @@ endtask
 task chk_no_x;
 input [8*32-1:0] name; input [4:0] sig;
 begin
-  if((^sig) === 1'bx)begin $display("  FAIL %0s ���� X", name); bad = bad + 1; end
-  else $display("  ok   %0s �� X (=%0d)", name, sig);
+  if((^sig) === 1'bx)begin $display("  FAIL %0s 出现 X", name); bad = bad + 1; end
+  else $display("  ok   %0s 无 X (=%0d)", name, sig);
 end
 endtask
 
-// ��������(ʱ�ӵ͵�ƽ�ڶ���, ���⾺��)
+// 单拍脉冲(时钟低电平期动作, 避免竞争)
 task p_left1;  begin @(negedge Clk_74M); left1 =1'b1; @(posedge Clk_74M); @(negedge Clk_74M); left1 =1'b0; @(posedge Clk_74M); end endtask
 task p_right1; begin @(negedge Clk_74M); right1=1'b1; @(posedge Clk_74M); @(negedge Clk_74M); right1=1'b0; @(posedge Clk_74M); end endtask
 task p_drop1;  begin @(negedge Clk_74M); drop1 =1'b1; @(posedge Clk_74M); @(negedge Clk_74M); drop1 =1'b0; @(posedge Clk_74M); end endtask
@@ -86,7 +91,7 @@ task p_hold2;  begin @(negedge Clk_74M); hold2 =1'b1; @(posedge Clk_74M); @(nege
 
 task settle; begin repeat(40) @(posedge Clk_74M); end endtask
 
-// P1 Ӳ��(���� drop_en)
+// P1 硬降(长按 drop_en)
 task hard1;
 begin
   force dut.counter = 27'd74_250_000;
@@ -108,7 +113,7 @@ begin
 end
 endtask
 
-// ����һ������(��������ʱ��ֱ���Ƶ���ֵ)
+// 触发一次锁存(把两个计时器直接推到阈值)
 task lock1;
 begin
   force dut.counter_land = 25'd20_000_000;
@@ -140,153 +145,153 @@ initial begin
   bad = 0;
   Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk_74M);
 
-  $display("=== 1) ������(˫�� = 24 �����ȷֵ�) ===");
-  chk("duo=1 P1 ������", dut.counter_c, 8);
-  chk("duo=1 P2 ������", dut.counter_c2, 16);
+  $display("=== 1) 出生列(双人 = 24 列三等分点) ===");
+  chk("duo=1 P1 出生列", dut.counter_c, 8);
+  chk("duo=1 P2 出生列", dut.counter_c2, 16);
   duo = 1'b0; Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk_74M);
-  chk("duo=0 P1 ������", dut.counter_c, 9);
-  chk("duo=0 P2 ������", dut.counter_c2, 9);
+  chk("duo=0 P1 出生列", dut.counter_c, 9);
+  chk("duo=0 P2 出生列", dut.counter_c2, 9);
   duo = 1'b1; Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk_74M);
-  force dut.Drop = 30'd100_000_000;      // �ر��Զ�����, ���ھ�ȷ����
+  force dut.Drop = 30'd100_000_000; // 关闭自动下落, 便于精确测试
 
-  $display("=== 2) ѹ�ڶԷ��˶�������: ͣס������ʼ���� ===");
+  $display("=== 2) 压在对方运动方块上: 停住但不开始锁存 ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
   repeat(4) @(posedge Clk_74M);
-  chk("���б��Է���ס", dut.other_down_hold, 1);
-  chk("��סʱ���� land", dut.land, 0);
-  chk("��סʱ�������ʱ", dut.counter_land, 0);
+  chk("下行被对方顶住", dut.other_down_hold, 1);
+  chk("顶住时不置 land", dut.land, 0);
+  chk("顶住时不锁存计时", dut.counter_land, 0);
   p_drop1;
-  chk("��סʱ������Ч", dut.counter_r, 10);
+  chk("顶住时软降无效", dut.counter_r, 10);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   repeat(4) @(posedge Clk_74M);
 
-  $display("=== 3) �Է����� state ��: ����������ײ�������ʱ���� ===");
+  $display("=== 3) 对方锁进 state 后: 立刻满足落底并正常计时锁存 ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
-  lock2;                                  // P2 ���浽 (8,11)
-  chk("P2 ��������ͼ", dut.state[8*20 + 11], 1);
-  chk("�Ϸ����� land=1", dut.land, 1);
+  lock2; // P2 锁存到 (8,11)
+  chk("P2 已锁进地图", dut.state[8*20 + 11], 1);
+  chk("上方方块 land=1", dut.land, 1);
   repeat(6) @(posedge Clk_74M);
-  chk("�����ʱ����", (dut.counter_land > 0), 1);
-  lock1;                                  // ���� P1 ���浽 (8,10)
-  chk("P1 ���浽��ͼ", dut.state[8*20 + 10], 1);
+  chk("锁存计时在走", (dut.counter_land > 0), 1);
+  lock1; // 触发 P1 锁存到 (8,10)
+  chk("P1 锁存到地图", dut.state[8*20 + 10], 1);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 4) �Է����� -> �ָ����� ===");
+  $display("=== 4) 对方滑走 -> 恢复下落 ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
   repeat(4) @(posedge Clk_74M);
-  chk("����סʱ����", dut.other_down_hold, 1);
-  release dut.counter_c2; force dut.counter_c2 = 5'd12;   // �Է�����
+  chk("被顶住时不落", dut.other_down_hold, 1);
+  release dut.counter_c2; force dut.counter_c2 = 5'd12; // 对方滑走
   repeat(4) @(posedge Clk_74M);
-  chk("���ߺ��ٱ���ס", dut.other_down_hold, 0);
+  chk("滑走后不再被顶住", dut.other_down_hold, 0);
   release dut.counter_r;
   repeat(4) @(posedge Clk_74M);
-  chk("���ߺ��ѽ����ס(land ��Ϊ0)", dut.land, 0);
+  chk("滑走后已解除顶住(land 仍为0)", dut.land, 0);
   p_drop1;
-  chk("���ߺ�ָ�����", (dut.counter_r > 10), 1);
+  chk("滑走后恢复下落", (dut.counter_r > 10), 1);
   release dut.counter_c; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 5) ���ұ��Է���ס ===");
+  $display("=== 5) 左右被对方挡住 ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd9;  force dut.counter_r2 = 5'd10;
   repeat(4) @(posedge Clk_74M);
   p_right1;
-  chk("���Ʊ��Է���ס", dut.counter_c, 8);
+  chk("右移被对方挡住", dut.counter_c, 8);
   release dut.counter_c2; force dut.counter_c2 = 5'd12;
   repeat(4) @(posedge Clk_74M);
   release dut.counter_c;
   repeat(2) @(posedge Clk_74M);
   p_right1;
-  chk("�Է��ÿ����������", dut.counter_c, 9);
+  chk("对方让开后可以右移", dut.counter_c, 9);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 6) Ӳ��ͣ�ڶԷ������� + ���鲻��ʾ ===");
+  $display("=== 6) 硬降停在对方方块上 + 幽灵不显示 ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd0;
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
   settle;
-  chk("�������=�Է�������һ��", dut.counter_ghost_r_t, 10);
-  chk("���鱻�Է���ס��־", dut.ghost_blk_oth, 1);
-  hc = 11'd577; vc = 11'd337;            // ��8�� ��11��
+  chk("幽灵落点=对方方块上一行", dut.counter_ghost_r_t, 10);
+  chk("幽灵被对方挡住标志", dut.ghost_blk_oth, 1);
+  hc = 11'd577; vc = 11'd337; // 第8列 第11行
   repeat(2) @(posedge Clk_74M);
-  chk("���Է���סʱ��������", ghost, 0);
+  chk("被对方挡住时不画幽灵", ghost, 0);
   release dut.counter_r;
   repeat(2) @(posedge Clk_74M);
   hard1;
-  chk("Ӳ��ͣ�ڶԷ�������(��10)", dut.counter_r, 10);
-  chk("ͣ�ڶԷ�����ʱ�������ʱ", dut.counter_land, 0);
+  chk("硬降停在对方方块上(行10)", dut.counter_r, 10);
+  chk("停在对方身上时不锁存计时", dut.counter_land, 0);
   hc = 11'd0; vc = 11'd0; repeat(2) @(posedge Clk_74M);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 7) ����������ʾ(�ճ����䵽��) ===");
+  $display("=== 7) 幽灵正常显示(空场地落到底) ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd0;
   force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd0;
   settle;
-  chk("�������=�ذ�", dut.counter_ghost_r_t, 19);
-  chk("δ���Է���ס", dut.ghost_blk_oth, 0);
-  hc = 11'd577; vc = 11'd689;            // ��8�� ��19��
+  chk("幽灵落点=地板", dut.counter_ghost_r_t, 19);
+  chk("未被对方挡住", dut.ghost_blk_oth, 0);
+  hc = 11'd577; vc = 11'd689; // 第8列 第19行
   repeat(2) @(posedge Clk_74M);
-  chk("����������ʾ", ghost, 1);
+  chk("幽灵像素显示", ghost, 1);
   hc = 11'd0; vc = 11'd0; repeat(2) @(posedge Clk_74M);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
 
-  $display("=== 8) P2 ������(22/23)���鲻���� X ===");
+  $display("=== 8) P2 靠右列(22/23)幽灵不出现 X ===");
   force dut.counter_c2 = 5'd22; force dut.counter_r2 = 5'd0;
   force dut.counter_c  = 5'd1;  force dut.counter_r  = 5'd0;
   settle;
-  chk_no_x("P2 �������", dut.counter_ghost_r_t2);
-  chk("P2 �������=�ذ�", dut.counter_ghost_r_t2, 19);
+  chk_no_x("P2 幽灵落点", dut.counter_ghost_r_t2);
+  chk("P2 幽灵落点=地板", dut.counter_ghost_r_t2, 19);
   force dut.counter_c2 = 5'd23;
   settle;
-  chk_no_x("P2 ��23���������", dut.counter_ghost_r_t2);
+  chk_no_x("P2 第23列幽灵落点", dut.counter_ghost_r_t2);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
 
-  $display("=== 9) ������ת(����������ض���)��Խ���赲 ===");
+  $display("=== 9) 顶部旋转(格子伸出场地顶部)与越界阻挡 ===");
   force dut.counter_c = 5'd8; force dut.counter_r = 5'd0;
   force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd0;
   force dut.rot = 2'd0;
-  shape_val = 32'h0F0F0F0F;              // ÿ��: ��ƫ�� 0, ��ƫ�� -1(����֮��)
+  shape_val = 32'h0F0F0F0F; // 每格: 列偏移 0, 行偏移 -1(顶部之外)
   repeat(4) @(posedge Clk_74M);
   release dut.rot;
   repeat(2) @(posedge Clk_74M);
   p_rot1; repeat(2) @(posedge Clk_74M);
-  chk("����(�� -1)��ת������", dut.rot, 1);
-  chk_no_x("��ת���к�", dut.rr_r);
-  chk("��ת���к�Ϊ��(bit5=1)", dut.rr_r[5], 1);
-  shape_val = 32'h04040404;              // ��ƫ�� +4
-  force dut.counter_r = 5'd16;           // 16+4 = 20 �� = �ذ�����
+  chk("顶部(行 -1)旋转被允许", dut.rot, 1);
+  chk_no_x("旋转后行号", dut.rr_r);
+  chk("旋转后行号为负(bit5=1)", dut.rr_r[5], 1);
+  shape_val = 32'h04040404; // 行偏移 +4
+  force dut.counter_r = 5'd16; // 16+4 = 20 行 = 地板以下
   repeat(4) @(posedge Clk_74M);
   p_rot1; repeat(2) @(posedge Clk_74M);
-  chk("��ת���ذ����±��赲", dut.rot, 1);
-  shape_val = 32'h50505050;              // ��ƫ�� +5(�߰��ֽ�)
-  force dut.counter_r = 5'd0; force dut.counter_c = 5'd20;   // 20+5 = 25 > 23
+  chk("旋转到地板以下被阻挡", dut.rot, 1);
+  shape_val = 32'h50505050; // 列偏移 +5(高半字节)
+  force dut.counter_r = 5'd0; force dut.counter_c = 5'd20; // 20+5 = 25 > 23
   repeat(4) @(posedge Clk_74M);
   p_rot1; repeat(2) @(posedge Clk_74M);
-  chk("��ת�����ǽ���赲", dut.rot, 1);
+  chk("旋转伸出右墙被阻挡", dut.rot, 1);
   shape_val = 32'h0;
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 10) ���˹���һ�� Hold �� ===");
+  $display("=== 10) 两人共用一个 Hold 槽 ===");
   force dut.type  = 3'd3;  force dut.type2 = 3'd5;
   repeat(4) @(posedge Clk_74M);
   p_hold1; repeat(2) @(posedge Clk_74M);
-  chk("P1 �� -> ��=P1 �Ŀ�", dut.hold_type, 3);
+  chk("P1 存 -> 槽=P1 的块", dut.hold_type, 3);
   p_hold2; repeat(2) @(posedge Clk_74M);
-  chk("P2 �� -> ��=P2 �Ŀ�", dut.hold_type, 5);
+  chk("P2 存 -> 槽=P2 的块", dut.hold_type, 5);
   p_hold2; repeat(2) @(posedge Clk_74M);
-  chk("P2 ȡ -> �۽��� P2 ��һ��", dut.type_t2, 5);
+  chk("P2 取 -> 槽进入 P2 下一块", dut.type_t2, 5);
   p_hold1; repeat(2) @(posedge Clk_74M);
-  chk("P1 ȡ -> �۽��� P1 ��һ��", dut.type_t, 5);
+  chk("P1 取 -> 槽进入 P1 下一块", dut.type_t, 5);
   release dut.type; release dut.type2;
   repeat(4) @(posedge Clk_74M);
 
-  $display("=== 11) ����һ�������: ����ȡ�黥������ ===");
+  $display("=== 11) 共用一条随机流: 各自取块互不阻塞 ===");
   begin : rnd_loop
     integer t0, n_chg;
     n_chg = 0;
@@ -299,8 +304,8 @@ initial begin
       t0 = dut.type;
       if(dut.type > 6) bad = bad + 1;
     end
-    chk("P1 ����ȡ���б仯(�����ƽ�)", (n_chg > 0), 1);
-    chk("P1 ȡ�Ŀ�Ϸ�", (dut.type <= 6), 1);
+    chk("P1 连续取块有变化(流在推进)", (n_chg > 0), 1);
+    chk("P1 取的块合法", (dut.type <= 6), 1);
     release dut.counter_c; release dut.counter_r;
     clr_state;
     force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd2;
@@ -311,24 +316,24 @@ initial begin
       if(dut.type2 !== t0) n_chg = n_chg + 1;
       t0 = dut.type2;
     end
-    chk("P2 ����ȡ���б仯(�����ƽ�)", (n_chg > 0), 1);
-    chk("P2 ȡ�Ŀ�Ϸ�", (dut.type2 <= 6), 1);
+    chk("P2 连续取块有变化(流在推进)", (n_chg > 0), 1);
+    chk("P2 取的块合法", (dut.type2 <= 6), 1);
     release dut.counter_c2; release dut.counter_r2;
     clr_state;
   end
 
-  $display("=== 12) �������� P2 Ӱ��(��ײ�ر�) ===");
+  $display("=== 12) 单机不受 P2 影响(互撞关闭) ===");
   duo = 1'b0; repeat(4) @(posedge Clk_74M);
   force dut.counter_c  = 5'd8; force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd8; force dut.counter_r2 = 5'd11;
   repeat(4) @(posedge Clk_74M);
-  chk("�������ж�ס", dut.other_down_hold, 0);
-  chk("���� land ֻ����ͼ/�ذ�", dut.land, 0);
+  chk("单机不判顶住", dut.other_down_hold, 0);
+  chk("单机 land 只看地图/地板", dut.land, 0);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   duo = 1'b1; repeat(4) @(posedge Clk_74M);
   clr_state;
 
-  $display("=== 13) ˫��ʱ����ֵ(40/120/240/400/600/880/1200) ===");
+  $display("=== 13) 双人时间阈值(40/120/240/400/600/880/1200) ===");
   score = 20'd0;
   duo = 1'b1;
   time_sec = 14'd39;  repeat(4) @(posedge Clk_74M); chk("duo 39s",  speed_level, 0);
@@ -340,8 +345,8 @@ initial begin
   time_sec = 14'd880; repeat(4) @(posedge Clk_74M); chk("duo 880s", speed_level, 6);
   time_sec = 14'd1200;repeat(4) @(posedge Clk_74M); chk("duo 1200s", speed_level, 7);
   score = 20'd4; time_sec = 14'd0;
-  repeat(4) @(posedge Clk_74M); chk("duo �����ȼ�����Ч", speed_level, 1);
-  $display("=== 14) ����ʱ����ֵ�ع�(20/60/...) ===");
+  repeat(4) @(posedge Clk_74M); chk("duo 分数等级仍生效", speed_level, 1);
+  $display("=== 14) 单机时间阈值回归(20/60/...) ===");
   duo = 1'b0; score = 20'd0;
   time_sec = 14'd19;  repeat(4) @(posedge Clk_74M); chk("solo 19s", speed_level, 0);
   time_sec = 14'd20;  repeat(4) @(posedge Clk_74M); chk("solo 20s", speed_level, 1);
@@ -349,53 +354,53 @@ initial begin
   time_sec = 14'd600; repeat(4) @(posedge Clk_74M); chk("solo 600s", speed_level, 7);
   duo = 1'b1; time_sec = 14'd0; repeat(4) @(posedge Clk_74M);
 
-  $display("=== 17) ����: ���ر仯��Ҫ����, �Ҳ����ܵ������Ϸ� ===");
+  $display("=== 17) 幽灵: 场地变化后要重算, 且不能跑到方块上方 ===");
   begin : ghost_chk
     clr_state;
     duo = 1'b1; repeat(4) @(posedge Clk_74M);
-    // (a) �ճ���: ����Ӧ�ڵذ�(19)
+    // (a) 空场地: 幽灵应在地板(19)
     force dut.counter_c = 5'd8;  force dut.counter_r = 5'd0;
     force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd0;
     settle;
-    chk("�ճ�������=19", dut.counter_ghost_r_t, 19);
-    // (b) �Է�����ѹ���·�(�˶�����): ����ǯλ��"������һ��", �ұ�Ǳ��Է���ס
+    chk("空场地幽灵=19", dut.counter_ghost_r_t, 19);
+    // (b) 对方方块压在下方(运动方块): 幽灵钳位到"方块上一行", 且标记被对方挡住
     release dut.counter_c2; force dut.counter_c2 = 5'd8; force dut.counter_r2 = 5'd11;
     settle;
-    chk("���Է��˶����鵲סʱ����=10", dut.counter_ghost_r_t, 10);
-    chk("��ʱ�������ر��=1", dut.ghost_blk_oth, 1);
-    // (c) �Է���������: ���ر仯���봥������ -> ��������10, ����Ϊ"�����������"(Ҫ��ʾ)
+    chk("被对方运动方块挡住时幽灵=10", dut.counter_ghost_r_t, 10);
+    chk("此时幽灵隐藏标记=1", dut.ghost_blk_oth, 1);
+    // (c) 对方锁进场地: 场地变化必须触发重算 -> 幽灵仍在10, 但改为"落在已落格上"(要显示)
     lock2;
     repeat(6) @(posedge Clk_74M);
-    chk("�Է���������=10", dut.counter_ghost_r_t, 10);
-    chk("�Է�����������ʾ(�����ǶԷ�����)", dut.ghost_blk_oth, 0);
-    // (d) ���鱾�����ڱ�������(�ص�): ���鲻���ܵ������Ϸ�
+    chk("对方落格后幽灵=10", dut.counter_ghost_r_t, 10);
+    chk("对方落格后幽灵显示(不再是对方方块)", dut.ghost_blk_oth, 0);
+    // (d) 方块本身就在被挡的行(重叠): 幽灵不能跑到方块上方
     force dut.counter_r = 5'd11;
     settle;
-    chk("��㱻��ʱ����ǯλ>=������", (dut.counter_ghost_r_t >= dut.counter_r), 1);
+    chk("起点被挡时幽灵钳位>=方块行", (dut.counter_ghost_r_t >= dut.counter_r), 1);
     release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
     clr_state;
   end
 
-  $display("=== 15) ����: ���� 24 ����� ===");
+  $display("=== 15) 消行: 整行 24 格才消 ===");
   clr_state;
   for(integer c1 = 0; c1 < 12; c1 = c1 + 1) dut.state[c1*20 + 5] = 1'b1;
   repeat(2) @(posedge Clk_74M);
-  chk("ֻ�� 12 ������", clear, 0);
+  chk("只填 12 格不消行", clear, 0);
   clr_state;
   for(integer c2 = 0; c2 < 24; c2 = c2 + 1) dut.state[c2*20 + 5] = 1'b1;
   repeat(2) @(posedge Clk_74M);
-  chk("���� 24 ������", clear, 1);
+  chk("填满 24 格消行", clear, 1);
   clr_state;
   for(integer c3 = 0; c3 < 24; c3 = c3 + 1)begin
     dut.state[c3*20 + 5] = 1'b1;
     dut.state[c3*20 + 7] = 1'b1;
   end
   repeat(3) @(posedge Clk_74M);
-  chk("����ͬʱ�� clear=1", clear, 1);
+  chk("两行同时满 clear=1", clear, 1);
   chk("d_clear=2", dut.d_clear, 2);
   clr_state;
 
-  $display("=== 16) ���ȡ��: ʱ����� / ͬ�ķ��� / Idle ���� ===");
+  $display("=== 16) 随机取样: 时间采样 / 同拍分配 / Idle 搅动 ===");
   begin : rnd_chk
     reg [2:0] t_a;
     reg [31:0] exp_ns;
@@ -411,14 +416,14 @@ initial begin
       if(dut.rnd_type_t !== t_a) d3 = d3 + 1;
       t_a = dut.rnd_type_t;
     end
-    chk("Playing ��ȡ��ʱȡ��ֵ��ʱ��仯", (d3 > 0), 1);
+    chk("Playing 无取块时取样值随时间变化", (d3 > 0), 1);
     d2 = 0;
     for(q = 0; q < 8; q = q + 1)begin
       exp_ns = {dut.rnd[30:0], dut.rnd[31]^dut.rnd[21]^dut.rnd[1]^dut.rnd[0]};
       @(posedge Clk_74M);
       if(dut.rnd !== exp_ns) d2 = d2 + 1;
     end
-    chk("Playing ʱ���ӽ���", d2, 0);
+    chk("Playing 时不加搅动", d2, 0);
     Idle = 1'b1; Playing = 1'b0; repeat(4) @(posedge Clk_74M);
     d1 = 0;
     for(q = 0; q < 8; q = q + 1)begin
@@ -426,7 +431,7 @@ initial begin
       @(posedge Clk_74M);
       if(dut.rnd !== exp_ns) d1 = d1 + 1;
     end
-    chk("Idle ������Ч", (d1 > 0), 1);
+    chk("Idle 搅动生效", (d1 > 0), 1);
     Idle = 1'b0; Playing = 1'b1; repeat(2) @(posedge Clk_74M);
     force dut.rnd = 32'h000000F0; force dut.rnd_cnt = 16'h0000;
     repeat(2) @(posedge Clk_74M);
@@ -435,60 +440,60 @@ initial begin
     release dut.land_pulse; release dut.land_pulse2;
     repeat(2) @(posedge Clk_74M);
     t1 = dut.type_t; t2 = dut.type_t2;
-    $display("  [info] ͬ��ȡ��(��̬): P1 next=%0d, P2 next=%0d", t1, t2);
-    chk("ͬ�������õ���ͬ��", (t1 !== t2), 1);
+    $display("  [info] 同拍取块(定态): P1 next=%0d, P2 next=%0d", t1, t2);
+    chk("同拍两人拿到不同块", (t1 !== t2), 1);
     release dut.rnd; release dut.rnd_cnt;
     release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   end
 
-  $display("=== 20) �������: ɨ��������ҲҪ����(����ͣ��ֵ) ===");
+  $display("=== 20) 幽灵落点: 扫到行上限也要更新(不能停旧值) ===");
   begin : ghost_row_chk
     clr_state;
     duo = 1'b0; repeat(4) @(posedge Clk_74M);
-    force dut.clear_t = 1'b0;                  // ǰ��������µ����׻ᵲס������ʾ
+    force dut.clear_t = 1'b0; // 前面测试留下的闪白会挡住幽灵显示
     force dut.counter_land = 25'd0; force dut.lock_counter = 25'd0;
     force dut.lock_t = 1'b0; force dut.lock_cnt = 2'd0;
     force dut.drop_r_t = 1'b1;
     force dut.counter_c = 5'd5; force dut.counter_r = 5'd5;
-    shape_val = 32'h30201000;                    // 4 ��ͬ��(��ƫ��ȫ 0): ê����ൽ 19
+    shape_val = 32'h30201000; // 4 格同行(行偏移全 0): 锚点最多到 19
     p_rot1; repeat(20) @(posedge Clk_74M);
-    chk("��ƫ��ȫ 0: ���=19", dut.counter_ghost_r_t, 19);
-    shape_val = 32'h1F0FFFFE;                    // ��ƫ�� -1/-2(û�� 0): ê����뵽 20
+    chk("行偏移全 0: 落点=19", dut.counter_ghost_r_t, 19);
+    shape_val = 32'h1F0FFFFE; // 行偏移 -1/-2(没有 0): 锚点必须到 20
     p_rot1; repeat(30) @(posedge Clk_74M);
-    chk("��ƫ�� -1/-2: ���=20", dut.counter_ghost_r_t, 20);
-    hc = 11'd481; vc = 11'd689;                  // ��5�� ��19��, �ճ���: ����Ӧ������
+    chk("行偏移 -1/-2: 落点=20", dut.counter_ghost_r_t, 20);
+    hc = 11'd481; vc = 11'd689; // 第5列 第19行, 空场地: 幽灵应在这里
     repeat(2) @(posedge Clk_74M);
-    chk("���黭�ڵ�19��(������)", ghost, 1);
+    chk("幽灵画在第19行(不悬空)", ghost, 1);
     hc = 11'd0; vc = 11'd0; repeat(2) @(posedge Clk_74M);
     release dut.counter_c; release dut.counter_r;
-    hard1;                                       // Ӳ��Ҫͣ�����
-    chk("Ӳ��ͣ�����(20)", dut.counter_r, 20);
-    chk("ͣ�����ʱ���������", dut.land, 1);
+    hard1; // 硬降要停在落点
+    chk("硬降停在落点(20)", dut.counter_r, 20);
+    chk("停在落点时已满足落底", dut.land, 1);
     release dut.counter_land; release dut.lock_counter;
     release dut.lock_t; release dut.lock_cnt; release dut.drop_r_t; release dut.clear_t;
     shape_val = 32'h0;
     clr_state;
   end
 
-  $display("=== 21) ���鲻��ѹ�ڶԷ��˶������� ===");
+  $display("=== 21) 幽灵不能压在对方运动方块上 ===");
   begin : ghost_oth_chk
     clr_state;
     duo = 1'b1; repeat(4) @(posedge Clk_74M);
-    shape_val = 32'h000FFFFE;                    // J rot3: (-1,-2)(-1,-1)(0,-1)(0,0)
-    force dut.counter_c  = 5'd16; force dut.counter_r  = 5'd19;   // P1: (15,17)(15,18)(16,18)(16,19)
-    force dut.counter_c2 = 5'd16; force dut.counter_r2 = 5'd4;    // P2: (15,2)(15,3)(16,3)(16,4)
+    shape_val = 32'h000FFFFE; // J rot3: (-1,-2)(-1,-1)(0,-1)(0,0)
+    force dut.counter_c  = 5'd16; force dut.counter_r  = 5'd19; // P1: (15,17)(15,18)(16,18)(16,19)
+    force dut.counter_c2 = 5'd16; force dut.counter_r2 = 5'd4; // P2: (15,2)(15,3)(16,3)(16,4)
     p_rot1; p_rot2; repeat(40) @(posedge Clk_74M);
-    chk("P2 �������� P1 �����Ϸ�(=17)", dut.counter_ghost_r_t2, 17);
-    chk("���Է����鵲סҪ���", dut.ghost_blk_oth2, 1);
-    chk("P1 �������ڵװ�(=19)", dut.counter_ghost_r_t, 19);
+    chk("P2 幽灵落在 P1 方块上方(=17)", dut.counter_ghost_r_t2, 17);
+    chk("被对方方块挡住要标记", dut.ghost_blk_oth2, 1);
+    chk("P1 幽灵落在底板(=19)", dut.counter_ghost_r_t, 19);
     release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
-    hard2;                                       // Ӳ��Ҫͣ�ڶԷ�������
-    chk("P2 Ӳ��ͣ�ڶԷ�������(17)", dut.counter_r2, 17);
+    hard2; // 硬降要停在对方方块上
+    chk("P2 硬降停在对方方块上(17)", dut.counter_r2, 17);
     shape_val = 32'h0;
     clr_state;
   end
 
-  $display("=== 22) C_num/R_num ���: ��ԭ�����Ƚ���λ�ȼ� ===");
+  $display("=== 22) C_num/R_num 编号: 与原来逐格比较逐位等价 ===");
   begin : num_chk
     integer hc2, vc2, bad_c, bad_r, c_exp, r_exp, o2, p2, col_now;
     bad_c = 0; bad_r = 0;
@@ -501,7 +506,7 @@ initial begin
       if((o2 < col_now) && (hc2 >= (321 + 32*o2)) && (hc2 < (351 + 32*o2))) c_exp = o2;
       if(C_num !== c_exp[4:0]) bad_c = bad_c + 1;
     end
-    chk("duo=1 �б�����һ��(801 ��)", bad_c, 0);
+    chk("duo=1 列编号逐点一致(801 点)", bad_c, 0);
     for(vc2 = 60; vc2 <= 740; vc2 = vc2 + 1)begin
       hc = 11'd577; vc = vc2[10:0];
       #1;
@@ -510,7 +515,7 @@ initial begin
       if((vc2 >= (81 + 32*p2)) && (vc2 < (111 + 32*p2))) r_exp = p2;
       if(R_num !== r_exp[4:0]) bad_r = bad_r + 1;
     end
-    chk("duo=1 �б�����һ��(681 ��)", bad_r, 0);
+    chk("duo=1 行编号逐点一致(681 点)", bad_r, 0);
     duo = 1'b0; col_now = 20; bad_c = 0; bad_r = 0;
     for(hc2 = 300; hc2 <= 1100; hc2 = hc2 + 1)begin
       hc = hc2[10:0]; vc = 11'd400;
@@ -520,7 +525,7 @@ initial begin
       if((o2 < col_now) && (hc2 >= (321 + 32*o2)) && (hc2 < (351 + 32*o2))) c_exp = o2;
       if(C_num !== c_exp[4:0]) bad_c = bad_c + 1;
     end
-    chk("duo=0 �б�����һ��(801 ��)", bad_c, 0);
+    chk("duo=0 列编号逐点一致(801 点)", bad_c, 0);
     duo = 1'b1;
     hc = 11'd0; vc = 11'd0; #1;
   end
