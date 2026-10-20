@@ -3,10 +3,10 @@
 <!--                                                         -->
 <!-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="39" Path="D:/vivado_project/Tetris_text2/Tetris_text2.xpr">
+<Project Version="7" Minor="39" Path="D:/vivado_project/Tetris/Tetris.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="b11df39315fd4daaa7a2593e0572ad66"/>
+    <Option Name="Id" Val="eb1f6f3e5646442f9cfa42df46708f6b"/>
     <Option Name="Part" Val="xc7a35tfgg484-2"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>
@@ -57,6 +57,8 @@
       <Filter Type="Srcs"/>
       <File Path="$PSRCDIR/sources_1/new/Game_state_machine.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/Game_state_machine.v"/>
+          <Attr Name="ImportTime" Val="1792252558"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -64,6 +66,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/Key.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/Key.v"/>
+          <Attr Name="ImportTime" Val="1792328864"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -71,6 +75,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/Next_piece.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/Next_piece.v"/>
+          <Attr Name="ImportTime" Val="1792166933"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -78,6 +84,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/Playfield.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/Playfield.v"/>
+          <Attr Name="ImportTime" Val="1792423851"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -85,6 +93,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/Playfield_edge.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/Playfield_edge.v"/>
+          <Attr Name="ImportTime" Val="1792043188"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -101,6 +111,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/choose_menu.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/choose_menu.v"/>
+          <Attr Name="ImportTime" Val="1792235766"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -108,6 +120,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/control_route.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/control_route.v"/>
+          <Attr Name="ImportTime" Val="1792306678"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -169,6 +183,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/frame.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/frame.v"/>
+          <Attr Name="ImportTime" Val="1792421309"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -176,6 +192,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/game_over.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/game_over.v"/>
+          <Attr Name="ImportTime" Val="1792306949"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -201,6 +219,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/hold_gesture.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/hold_gesture.v"/>
+          <Attr Name="ImportTime" Val="1792336473"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -208,6 +228,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/hold_piece.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/hold_piece.v"/>
+          <Attr Name="ImportTime" Val="1792166933"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -224,6 +246,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/key_filter.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/key_filter.v"/>
+          <Attr Name="ImportTime" Val="1792329165"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -231,6 +255,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/level.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/level.v"/>
+          <Attr Name="ImportTime" Val="1792325567"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -238,6 +264,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/music.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/music.v"/>
+          <Attr Name="ImportTime" Val="1791547759"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -245,6 +273,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/net_screen_tx.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/net_screen_tx.v"/>
+          <Attr Name="ImportTime" Val="1792419704"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -252,6 +282,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/result_packet.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/result_packet.v"/>
+          <Attr Name="ImportTime" Val="1792418352"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -268,6 +300,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/scoring.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/scoring.v"/>
+          <Attr Name="ImportTime" Val="1792418713"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -284,6 +318,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/solo_hint.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/solo_hint.v"/>
+          <Attr Name="ImportTime" Val="1792424002"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -291,6 +327,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/sound.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/sound.v"/>
+          <Attr Name="ImportTime" Val="1792325415"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -298,6 +336,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/timer.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/timer.v"/>
+          <Attr Name="ImportTime" Val="1792418250"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -305,6 +345,8 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/Tetris.v">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/Tetris.v"/>
+          <Attr Name="ImportTime" Val="1792418421"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -313,6 +355,8 @@
       <File Path="$PSRCDIR/sources_1/new/Ghost_piece.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/new/Ghost_piece.v"/>
+          <Attr Name="ImportTime" Val="1791459073"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -320,30 +364,40 @@
       </File>
       <File Path="$PSRCDIR/sources_1/ip/shape_rom.coe">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/shape_rom.coe"/>
+          <Attr Name="ImportTime" Val="1790407926"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/ip/offset_rom.coe">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/offset_rom.coe"/>
+          <Attr Name="ImportTime" Val="1790431446"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/ip/music_rom.coe">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/music_rom.coe"/>
+          <Attr Name="ImportTime" Val="1790927376"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/ip/font_20x44.coe">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/font_20x44.coe"/>
+          <Attr Name="ImportTime" Val="1791523418"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/ip/letters_20x32.coe">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/letters_20x32.coe"/>
+          <Attr Name="ImportTime" Val="1791543767"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -357,6 +411,8 @@
       <Filter Type="Constrs"/>
       <File Path="$PSRCDIR/constrs_1/new/Tetris.xdc">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/constrs_1/new/Tetris.xdc"/>
+          <Attr Name="ImportTime" Val="1791903235"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
@@ -386,6 +442,8 @@
     <FileSet Name="hdmi_pll" Type="BlockSrcs" RelSrcDir="$PSRCDIR/hdmi_pll">
       <File Path="$PSRCDIR/sources_1/ip/hdmi_pll/hdmi_pll.xci">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/hdmi_pll/hdmi_pll.xci"/>
+          <Attr Name="ImportTime" Val="1790352839"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -399,6 +457,8 @@
     <FileSet Name="Tetromino" Type="BlockSrcs" RelSrcDir="$PSRCDIR/Tetromino">
       <File Path="$PSRCDIR/sources_1/ip/Tetromino/Tetromino.xci">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/Tetromino/Tetromino.xci"/>
+          <Attr Name="ImportTime" Val="1790407972"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -412,6 +472,8 @@
     <FileSet Name="weiyibiao" Type="BlockSrcs" RelSrcDir="$PSRCDIR/weiyibiao">
       <File Path="$PSRCDIR/sources_1/ip/weiyibiao/weiyibiao.xci">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/weiyibiao/weiyibiao.xci"/>
+          <Attr Name="ImportTime" Val="1790431476"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -425,6 +487,8 @@
     <FileSet Name="note" Type="BlockSrcs" RelSrcDir="$PSRCDIR/note">
       <File Path="$PSRCDIR/sources_1/ip/note/note.xci">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/note/note.xci"/>
+          <Attr Name="ImportTime" Val="1790927393"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -438,6 +502,8 @@
     <FileSet Name="number" Type="BlockSrcs" RelSrcDir="$PSRCDIR/number">
       <File Path="$PSRCDIR/sources_1/ip/number_1/number.xci">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/number_1/number.xci"/>
+          <Attr Name="ImportTime" Val="1791524613"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -451,6 +517,8 @@
     <FileSet Name="letter" Type="BlockSrcs" RelSrcDir="$PSRCDIR/letter">
       <File Path="$PSRCDIR/sources_1/ip/letter/letter.xci">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/letter/letter.xci"/>
+          <Attr Name="ImportTime" Val="1791544066"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -464,6 +532,8 @@
     <FileSet Name="clk_wiz_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/clk_wiz_0">
       <File Path="$PSRCDIR/sources_1/ip/clk_wiz_0/clk_wiz_0.xci">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/clk_wiz_0/clk_wiz_0.xci"/>
+          <Attr Name="ImportTime" Val="1791900484"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -477,6 +547,8 @@
     <FileSet Name="eth_data_buf" Type="BlockSrcs" RelSrcDir="$PSRCDIR/eth_data_buf">
       <File Path="$PSRCDIR/sources_1/ip/eth_data_buf/eth_data_buf.xci">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/eth_data_buf/eth_data_buf.xci"/>
+          <Attr Name="ImportTime" Val="1791900486"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -490,6 +562,8 @@
     <FileSet Name="eth_msg_buf" Type="BlockSrcs" RelSrcDir="$PSRCDIR/eth_msg_buf">
       <File Path="$PSRCDIR/sources_1/ip/eth_msg_buf/eth_msg_buf.xci">
         <FileInfo>
+          <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/ip/eth_msg_buf/eth_msg_buf.xci"/>
+          <Attr Name="ImportTime" Val="1791900487"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>

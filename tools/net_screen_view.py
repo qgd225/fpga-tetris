@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Tetris_text2 以太网：PC 端画面显示 + 键盘按键发送
+Tetris 以太网：PC 端画面显示 + 键盘按键发送
 双击 tools\启动-画面和按键.bat 即可运行（无需命令行参数）
 
 FPGA 发来的包：
@@ -386,7 +386,7 @@ def main():
     start_listener()
     threading.Thread(target=tx_loop, daemon=True).start()
 
-    root.title("Tetris_text2  (画面 udp:%d  ->  按键 %s:%d)" % (LISTEN_PORT, FPGA_IP, FPGA_PORT))
+    root.title("Tetris  (画面 udp:%d  ->  按键 %s:%d)" % (LISTEN_PORT, FPGA_IP, FPGA_PORT))
     label = tk.Label(root, text="等待画面...", fg="white", bg="black", font=("Consolas", 12), anchor="w")
     label.pack(fill="x")
     cur_lab = None

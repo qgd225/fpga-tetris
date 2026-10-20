@@ -1,6 +1,6 @@
 # 仿真台（可复现）
 
-四套自测，全部直接编译 `../Tetris_text2.srcs/sources_1/new/` 下的**实时源码**（改完 RTL 直接重跑即可），
+八套自测，全部直接编译 `../Tetris.srcs/sources_1/new/` 下的**实时源码**（改完 RTL 直接重跑即可），
 产物写到各自的 `build/`（已在 .gitignore 中忽略）。
 
 ## 一键跑全部
@@ -414,7 +414,7 @@ LUT as Memory 5（只剩 SRL，**无分布式 RAM**）、FF 4681、F7 1933、F8 
 - **综合/实现**（关闭旧 Vivado 进程后新开进程，从零重跑）：0 error、0 时序违例；
   LUT **16290（78.32%）**、FF **4625**、BRAM **14.5/50**、LUTRAM **0**、DSP **4**、IOB **34**；
   WNS **+0.515ns**、WHS **+0.103ns**；`sound` 自身 146 LUT / 56 FF。
-- 比特流：`D:\vivado_project\Tetris_text2\Tetris_sound.bit`（2,192,114 字节，2026-10-17 23:36:37）。
+- 旧工程比特流：`D:\vivado_project\Tetris_text2\Tetris_sound.bit`（2,192,114 字节，2026-10-17 23:36:37）。
 
 ## 音效柔和化与状态细分
 
@@ -425,4 +425,4 @@ LUT as Memory 5（只剩 SRL，**无分布式 RAM**）、FF 4681、F7 1933、F8 
 - 消行/结束类保留 C6 上限：4 行消行为 `C5-D5-E5-G5-C6`，结束为 `G5-E5-C5-G4`，降低连续操作时的刺耳感。
 - 仿真：`sim/sound` 47 → **85**，新增 18 类事件、开关长短按映射、移动/旋转被挡双音、静音间隔、控制类音高与时长断言；四套合计 **83 / 184 / 27 / 85**。
 - 综合/实现（关闭旧 Vivado 进程后新开进程，从零重跑）：**0 error、0 时序违例**；LUT **16299（78.36%）**、FF **4633**、BRAM **14.5/50**、LUTRAM **0**、DSP **4**、IOB **34**；WNS **+0.340ns**、WHS **+0.035ns**；`sound` 自身 160 LUT / 56 FF。
-- 比特流：`D:\vivado_project\Tetris_text2\Tetris_sound_soft.bit`（2,192,114 字节，2026-10-18 00:11:05）。
+- 旧工程比特流：`D:\vivado_project\Tetris_text2\Tetris_sound_soft.bit`（2,192,114 字节，2026-10-18 00:11:05）。

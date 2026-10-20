@@ -37,8 +37,8 @@
 ## 目录结构
 
 ```
-Tetris_text2.xpr                      # Vivado 工程文件
-Tetris_text2.srcs/
+Tetris.xpr                      # Vivado 工程文件
+Tetris.srcs/
 ├── constrs_1/new/Tetris.xdc          # 引脚与时钟约束
 └── sources_1/
     ├── new/                          # 游戏逻辑(手写 Verilog)
@@ -65,7 +65,7 @@ Tetris_text2.srcs/
 ## 使用方法
 
 1. 克隆本仓库。
-2. 用 **Vivado 2018.3** 打开 `Tetris_text2.xpr`。
+2. 用 **Vivado 2018.3** 打开 `Tetris.xpr`。
 3. 直接 Run Synthesis / Implementation。首次综合时 Vivado 会依据 IP 目录下的 `.xci` 配置文件**自动重新生成** IP 输出产物(仓库中未提交任何生成物,属正常现象)。
 4. 生成比特流后下载到器件。
 

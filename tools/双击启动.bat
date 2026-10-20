@@ -1,6 +1,6 @@
 @echo off
 chcp 936 >nul
-title Tetris_text2 一键启动（自动设置静态ARP + 画面和按键）
+title Tetris 一键启动（自动设置静态ARP + 画面和按键）
 cd /d "%~dp0"
 setlocal
 
@@ -9,7 +9,7 @@ for /f "delims=" %%p in ('where python 2^>nul') do if not defined PY set "PY=%%p
 set "TETRIS_ARP_PS1=%CD%\set_static_arp.py"
 
 echo ============================================================
-echo    Tetris_text2   PC 端一键启动
+echo    Tetris   PC 端一键启动
 echo    FPGA: 192.168.0.2    本脚本会自动: 选网卡 -^> 设静态ARP -^> 开画面和按键
 echo ============================================================
 echo.
