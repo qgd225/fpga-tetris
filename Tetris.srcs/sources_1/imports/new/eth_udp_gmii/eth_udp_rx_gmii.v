@@ -124,7 +124,7 @@ module eth_udp_rx_gmii(
     .I(gmii_rx_clk    )  // 1-bit input: Clock input
   ); 
 
-  //½«±¾µØMAC¡¢IP¡¢PORT¼Ä´æ
+  //å°†æœ¬åœ°MACã€IPã€PORTå¯„å­˜
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -139,7 +139,7 @@ module eth_udp_rx_gmii(
     local_port_reg <= local_port;
   end
 
-  //½«ÒÔÌ«ÍøÊäÈëµÄ½ÓÊÕĞÅºÅ¼Ä´æ
+  //å°†ä»¥å¤ªç½‘è¾“å…¥çš„æ¥æ”¶ä¿¡å·å¯„å­˜
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -152,7 +152,7 @@ module eth_udp_rx_gmii(
     reg_gmii_rxdv <= gmii_rxdv;
   end
 
-  //½«ÒÔÌ«ÍøÊäÈëµÄ½ÓÊÕĞÅºÅ¼Ä´æºó´òÅÄ
+  //å°†ä»¥å¤ªç½‘è¾“å…¥çš„æ¥æ”¶ä¿¡å·å¯„å­˜åæ‰“æ‹
   always@(posedge clk125m)
   begin
     rx_data_dly1  <= reg_gmii_rxd;

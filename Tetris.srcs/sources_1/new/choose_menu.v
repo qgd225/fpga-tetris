@@ -13,28 +13,28 @@ module choose_menu(
     output reg breath
     );
     
-//    ²Ëµ¥ÆÁ: ±êÌâ TETRIS + Á½ÐÐÑ¡Ïî(SOLO PVE / DUO PVE) + ÇàÉ«Ñ¡ÖÐ±ê¼Ç + Á½ÐÐ²Ù×÷ÌáÊ¾
-//    È«²¿ÎÞ¿ò; Ñ¡ÖÐµÄÄÇÒ»ÐÐ×ó²àÒ»Ìõ 4px ÊúÌõ, ÏÂ·½Ò»Ìõ 2px ºáÏß
-    parameter [10:0]TX  = 11'd496,   //±êÌâ X(2x ×ÖºÅ)
-                     TY  = 11'd96,    //±êÌâ Y
-                     OX  = 11'd452,   //Ñ¡Ïî X(2x ×ÖºÅ)
-                     OY1 = 11'd260,   //Ñ¡Ïî 1 Y
-                     OY2 = 11'd420,   //Ñ¡Ïî 2 Y
-                     MX  = 11'd424,   //Ñ¡ÖÐÊúÌõ X
-                     MW  = 11'd4,     //Ñ¡ÖÐÊúÌõ¿í
-                     UY1 = 11'd336,   //Ñ¡ÖÐºáÏß Y(Ñ¡Ïî 1)
-                     UY2 = 11'd496,   //Ñ¡ÖÐºáÏß Y(Ñ¡Ïî 2)
-                     UH  = 11'd2,     //ºáÏß¸ß
-                     LU  = 11'd376,   //ºáÏß³¤
-                     HX1 = 11'd438,   //ÌáÊ¾ 1 X(1x ×ÖºÅ)
+//    èœå•å±: æ ‡é¢˜ TETRIS + ä¸¤è¡Œé€‰é¡¹(SOLO PVE / DUO PVE) + é’è‰²é€‰ä¸­æ ‡è®° + ä¸¤è¡Œæ“ä½œæç¤º
+//    å…¨éƒ¨æ— æ¡†; é€‰ä¸­çš„é‚£ä¸€è¡Œå·¦ä¾§ä¸€æ¡ 4px ç«–æ¡, ä¸‹æ–¹ä¸€æ¡ 2px æ¨ªçº¿
+    parameter [10:0]TX  = 11'd496,   //æ ‡é¢˜ X(2x å­—å·)
+                     TY  = 11'd96,    //æ ‡é¢˜ Y
+                     OX  = 11'd452,   //é€‰é¡¹ X(2x å­—å·)
+                     OY1 = 11'd260,   //é€‰é¡¹ 1 Y
+                     OY2 = 11'd420,   //é€‰é¡¹ 2 Y
+                     MX  = 11'd424,   //é€‰ä¸­ç«–æ¡ X
+                     MW  = 11'd4,     //é€‰ä¸­ç«–æ¡å®½
+                     UY1 = 11'd336,   //é€‰ä¸­æ¨ªçº¿ Y(é€‰é¡¹ 1)
+                     UY2 = 11'd496,   //é€‰ä¸­æ¨ªçº¿ Y(é€‰é¡¹ 2)
+                     UH  = 11'd2,     //æ¨ªçº¿é«˜
+                     LU  = 11'd376,   //æ¨ªçº¿é•¿
+                     HX1 = 11'd438,   //æç¤º 1 X(1x å­—å·)
                      HY1 = 11'd560,
-                     HX2 = 11'd498,   //ÌáÊ¾ 2 X
+                     HX2 = 11'd498,   //æç¤º 2 X
                      HY2 = 11'd604;
 
     wire sel1 = (choose_cnt == 4'd0);
     wire sel2 = (choose_cnt == 4'd1);
 
-//    Ñ¡ÖÐ±ê¼Ç(½öÑ¡ÖÐµÄÄÇÒ»ÐÐ)
+//    é€‰ä¸­æ ‡è®°(ä»…é€‰ä¸­çš„é‚£ä¸€è¡Œ)
     wire bar1 = choose && sel1 && (hcounter >= MX) && (hcounter < (MX + MW)) &&
                 (vcounter >= OY1) && (vcounter < (OY1 + 11'd64));
     wire lin1 = choose && sel1 && (hcounter >= OX) && (hcounter < (OX + LU)) &&
@@ -62,7 +62,7 @@ module choose_menu(
 
     wire [10:0]hn = hcounter + 11'd1;
 
-//    E6: Ñ¡ÖÐ±ê¼ÇºôÎü(Ô¼ 1.2s Ò»ÂÖ)
+//    E6: é€‰ä¸­æ ‡è®°å‘¼å¸(çº¦ 1.2s ä¸€è½®)
     reg [26:0]br_cnt;
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -87,7 +87,7 @@ module choose_menu(
     in1 = 1'b0;
     in2 = 1'b0;
         if(choose)begin
-            //  ±êÌâ TETRIS (2x)
+            //  æ ‡é¢˜ TETRIS (2x)
             for(i = 0; i < 6; i = i + 1)begin
                 if( (hcounter >= (TX + i*48)) && (hcounter < (TX + i*48 + 40)) &&
                     (vcounter >= TY) && (vcounter < (TY + 64)) )begin
@@ -110,7 +110,7 @@ module choose_menu(
                     endcase
                 end
             end
-            //  Ñ¡Ïî SOLO PVE / DUO PVE (2x)
+            //  é€‰é¡¹ SOLO PVE / DUO PVE (2x)
             for(i = 0; i < 8; i = i + 1)begin
                 if( (hcounter >= (OX + i*48)) && (hcounter < (OX + i*48 + 40)) &&
                     (vcounter >= OY1) && (vcounter < (OY1 + 64)) )begin
@@ -159,7 +159,7 @@ module choose_menu(
                     endcase
                 end
             end
-            //  ÌáÊ¾ 1: LEFT RIGHT SELECT (1x)
+            //  æç¤º 1: LEFT RIGHT SELECT (1x)
             for(i = 0; i < 17; i = i + 1)begin
                 if( (hcounter >= (HX1 + i*24)) && (hcounter < (HX1 + i*24 + 20)) &&
                     (vcounter >= HY1) && (vcounter < (HY1 + 32)) )begin
@@ -195,7 +195,7 @@ module choose_menu(
                     endcase
                 end
             end
-            //  ÌáÊ¾ 2: SWITCH START (1x)
+            //  æç¤º 2: SWITCH START (1x)
             for(i = 0; i < 12; i = i + 1)begin
                 if( (hcounter >= (HX2 + i*24)) && (hcounter < (HX2 + i*24 + 20)) &&
                     (vcounter >= HY2) && (vcounter < (HY2 + 32)) )begin

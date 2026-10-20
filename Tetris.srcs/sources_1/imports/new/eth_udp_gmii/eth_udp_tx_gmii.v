@@ -141,7 +141,7 @@ module eth_udp_tx_gmii(
     .checksum       (IP_check_sum   )
   );
   
-  //½«ÒÔÌ«Íø±¨ÎÄÔ´/Ä¿µÄ²ÎÊı¼Ä´æ
+  //å°†ä»¥å¤ªç½‘æŠ¥æ–‡æº/ç›®çš„å‚æ•°å¯„å­˜
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -162,7 +162,7 @@ module eth_udp_tx_gmii(
     src_ip_reg   <= src_ip;
   end
 
-  //½«ÒÔÌ«Íø±¨ÎÄÊı¾İ²¿·Ö³¤¶È²ÎÊı¼Ä´æ
+  //å°†ä»¥å¤ªç½‘æŠ¥æ–‡æ•°æ®éƒ¨åˆ†é•¿åº¦å‚æ•°å¯„å­˜
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin

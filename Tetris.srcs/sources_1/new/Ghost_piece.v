@@ -232,7 +232,7 @@ module Ghost_piece(
     restart_d <= ghost_restart;
     end
     
-    wire restart_hold = ghost_restart || restart_d;//ÖØÆô±£³ÖÁ½ÅÄ£¬±Ü¿ªland_tµÄ¾ÉÖµ
+    wire restart_hold = ghost_restart || restart_d;//é‡å¯ä¿æŒä¸¤æ‹ï¼Œé¿å¼€land_tçš„æ—§å€¼
     
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
@@ -281,7 +281,7 @@ module Ghost_piece(
     lock_d <= 1'd0;
     end
     
-    always@(posedge Clk_74M or negedge Reset_n)begin//land_t´òÒ»ÅÄËùÒÔcounter_ghost_r_tÒ²´òÒ»ÅÄ
+    always@(posedge Clk_74M or negedge Reset_n)begin//land_tæ‰“ä¸€æ‹æ‰€ä»¥counter_ghost_r_tä¹Ÿæ‰“ä¸€æ‹
     if(!Reset_n)
     counter_ghost_r_d <= 0;
     else

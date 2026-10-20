@@ -90,7 +90,7 @@ module music(
   );
     
     
-    //Ö÷ÐýÂÉ
+    //ä¸»æ—‹å¾‹
     
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)

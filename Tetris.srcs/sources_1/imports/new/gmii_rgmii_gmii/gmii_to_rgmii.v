@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 武汉芯路恒科技有限公司
+// Company: 姝︽眽鑺矾鎭掔鎶�鏈夐檺鍏徃
 // Engineer: www.corecourse.cn
 // 
 // Create Date: 2021/09/20 00:00:00
@@ -8,7 +8,7 @@
 // Project Name: 
 // Target Devices: xc7z020clg400-2
 // Tool Versions: Vivado 2018.3
-// Description: gmii转rgmii
+// Description: gmii杞瑀gmii
 // 
 // Dependencies: 
 // 

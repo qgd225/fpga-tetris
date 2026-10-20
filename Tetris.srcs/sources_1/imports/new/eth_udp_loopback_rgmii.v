@@ -1,6 +1,6 @@
 module eth_udp_loopback_rgmii(
   input         reset_n,
-  input         clk_74m,       // 74.25MHz ÏñËØÊ±ÖÓ£¨¸ø¿çÊ±ÖÓ FIFO ÓÃ£©
+  input         clk_74m,       // 74.25MHz åƒç´ æ—¶é’Ÿï¼ˆç»™è·¨æ—¶é’Ÿ FIFO ç”¨ï¼‰
   //eth_rx
   input         rgmii_rx_clk_i,
   input  [3:0]  rgmii_rxd,
@@ -10,33 +10,33 @@ module eth_udp_loopback_rgmii(
   output  [3:0] rgmii_txd,
   output        rgmii_txen,
 
-  //-------- ½ÓÊÕ·½Ïò£º°ÑÊÕµ½µÄÊı¾İ¶Á³öÈ¥ --------
-  output [7:0]  rx,             // ÊÕµ½µÄ payload ×Ö½Ú
-  input         rx_rd_en,       // 1 ÅÄÂö³å = È¡×ßÒ»¸ö×Ö½Ú£¨ÇëÔÚ !rx_empty Ê±¸ø£©
-  output        rx_empty,       // 1 = Ã»ÓĞÊı¾İ¿É¶Á
-  output        rx_full,        // 1 = ½ÓÊÕ FIFO Âú£¨Í¬Ê±Ò²ËÍ¸øÁË rx Ä£¿é×öÁ÷¿Ø£©
-  output [15:0] rx_data_length, // ÕâÒ»°ü payload ÓĞ¶àÉÙ×Ö½Ú
+  //-------- æ¥æ”¶æ–¹å‘ï¼šæŠŠæ”¶åˆ°çš„æ•°æ®è¯»å‡ºå» --------
+  output [7:0]  rx,             // æ”¶åˆ°çš„ payload å­—èŠ‚
+  input         rx_rd_en,       // 1 æ‹è„‰å†² = å–èµ°ä¸€ä¸ªå­—èŠ‚ï¼ˆè¯·åœ¨ !rx_empty æ—¶ç»™ï¼‰
+  output        rx_empty,       // 1 = æ²¡æœ‰æ•°æ®å¯è¯»
+  output        rx_full,        // 1 = æ¥æ”¶ FIFO æ»¡ï¼ˆåŒæ—¶ä¹Ÿé€ç»™äº† rx æ¨¡å—åšæµæ§ï¼‰
+  output [15:0] rx_data_length, // è¿™ä¸€åŒ… payload æœ‰å¤šå°‘å­—èŠ‚
 
-  //-------- ·¢ËÍ·½Ïò£º°ÑÒª·¢µÄÊı¾İĞ´½øÀ´ --------
-  input  [7:0]  tx,             // Òª·¢µÄ payload ×Ö½Ú
-  input         tx_wr_en,       // 1 ÅÄÂö³å = Ğ´ÈëÒ»¸ö×Ö½Ú£¨ÇëÔÚ !tx_full Ê±¸ø£©
-  output        tx_full,        // 1 = ·¢ËÍ FIFO Âú
-  input         tx_start,       // 1 ÅÄÂö³å = Æô¶¯·¢ËÍ£¨mac Ö»ÔÚ IDLE ×´Ì¬ÈÏËü£©
+  //-------- å‘é€æ–¹å‘ï¼šæŠŠè¦å‘çš„æ•°æ®å†™è¿›æ¥ --------
+  input  [7:0]  tx,             // è¦å‘çš„ payload å­—èŠ‚
+  input         tx_wr_en,       // 1 æ‹è„‰å†² = å†™å…¥ä¸€ä¸ªå­—èŠ‚ï¼ˆè¯·åœ¨ !tx_full æ—¶ç»™ï¼‰
+  output        tx_full,        // 1 = å‘é€ FIFO æ»¡
+  input         tx_start,       // 1 æ‹è„‰å†² = å¯åŠ¨å‘é€ï¼ˆmac åªåœ¨ IDLE çŠ¶æ€è®¤å®ƒï¼‰
   input  [47:0] tx_dst_mac,
   input  [31:0] tx_dst_ip,
   input  [15:0] tx_dst_port,
-  input  [15:0] tx_data_length, // ÕâÒ»°ü·¢ÕâÃ´¶à×Ö½Ú
-  output        tx_done,        // Ò»°ü·¢Íê£¬1 ÅÄ
+  input  [15:0] tx_data_length, // è¿™ä¸€åŒ…å‘è¿™ä¹ˆå¤šå­—èŠ‚
+  output        tx_done,        // ä¸€åŒ…å‘å®Œï¼Œ1 æ‹
 
-  //-------- ±¨ÎÄĞÅÏ¢Óë×´Ì¬ --------
-  output [111:0]msg_dout,       // {·¢¼şÈËMAC, ·¢¼şÈËIP, ·¢¼şÈËPORT, ¸Ã°ü³¤¶È}
-  input         msg_rd_en,      // 1 ÅÄÂö³å = ¶Á×ßÒ»Ìõ£¨±ê×¼FIFO£¬dout ÏÂÒ»ÅÄ²ÅÓĞĞ§£©
-  output [4:0]  msg_count,      // ÀïÃæ´æÁË¼¸Ìõ±¨ÎÄĞÅÏ¢
-  output        msg_empty,      // 1 = Ã»ÓĞ±¨ÎÄĞÅÏ¢
-  output        rx_pkt_done,    // ÊÕÍêÒ»°ü£¬1 ÅÄ
-  output        rx_pkt_err,     // ÕâÒ»°üÓĞ´í
-  output        pll_locked,     // clk_wiz_0 Ëø¶¨
-  output        clk125m         // 125MHz£¨À´×Ô PHY RXC£©£¬¸øÉÏ²ã×ö¿çÊ±ÖÓÍ¬²½ÓÃ
+  //-------- æŠ¥æ–‡ä¿¡æ¯ä¸çŠ¶æ€ --------
+  output [111:0]msg_dout,       // {å‘ä»¶äººMAC, å‘ä»¶äººIP, å‘ä»¶äººPORT, è¯¥åŒ…é•¿åº¦}
+  input         msg_rd_en,      // 1 æ‹è„‰å†² = è¯»èµ°ä¸€æ¡ï¼ˆæ ‡å‡†FIFOï¼Œdout ä¸‹ä¸€æ‹æ‰æœ‰æ•ˆï¼‰
+  output [4:0]  msg_count,      // é‡Œé¢å­˜äº†å‡ æ¡æŠ¥æ–‡ä¿¡æ¯
+  output        msg_empty,      // 1 = æ²¡æœ‰æŠ¥æ–‡ä¿¡æ¯
+  output        rx_pkt_done,    // æ”¶å®Œä¸€åŒ…ï¼Œ1 æ‹
+  output        rx_pkt_err,     // è¿™ä¸€åŒ…æœ‰é”™
+  output        pll_locked,     // clk_wiz_0 é”å®š
+  output        clk125m         // 125MHzï¼ˆæ¥è‡ª PHY RXCï¼‰ï¼Œç»™ä¸Šå±‚åšè·¨æ—¶é’ŸåŒæ­¥ç”¨
 );
 parameter LOCAL_MAC  = 48'h00_0a_35_01_fe_c0;
 parameter LOCAL_IP   = 32'hc0_a8_00_02;
@@ -63,7 +63,7 @@ wire        gmii_txen;
 
 wire        rgmii_rx_clk;
 
-clk_wiz_0 clk_wiz_0   //¼ÓËøÏà»·µ÷ÕûÏàÎ»£¬Í¬Ê±¼ÓÇ¿Ê±ÖÓÉÈ³öÄÜÁ¦
+clk_wiz_0 clk_wiz_0   //åŠ é”ç›¸ç¯è°ƒæ•´ç›¸ä½ï¼ŒåŒæ—¶åŠ å¼ºæ—¶é’Ÿæ‰‡å‡ºèƒ½åŠ›
 (
   // Clock out ports
   .clk_out1(rgmii_rx_clk),     // output clk_out1
@@ -86,7 +86,7 @@ rgmii_to_gmii rgmii_to_gmii(
   .gmii_rxer( )
 );
 
-//ÒÔÌ«Íø½ÓÊÕ
+//ä»¥å¤ªç½‘æ¥æ”¶
 eth_udp_rx_gmii eth_udp_rx_gmii(
   .reset_p         (reset_p               ),
 
@@ -112,11 +112,11 @@ eth_udp_rx_gmii eth_udp_rx_gmii(
   .gmii_rxd        (gmii_rxd              )
 );
 
-//¶ÔÒÔÌ«Íø½ÓÊÕÊı¾İ»º´æ£¨ÄãÔÚÕâÀï¶Á³öÈ¥£©
+//å¯¹ä»¥å¤ªç½‘æ¥æ”¶æ•°æ®ç¼“å­˜ï¼ˆä½ åœ¨è¿™é‡Œè¯»å‡ºå»ï¼‰
 eth_data_buf eth_rx_data_buf (
   .rst   (reset_p          ), // input wire rst
-  .wr_clk(clk125m          ), // input wire wr_clk  (rx Ä£¿éĞ´)
-  .rd_clk(clk_74m          ), // input wire rd_clk  (Äã¶Á)
+  .wr_clk(clk125m          ), // input wire wr_clk  (rx æ¨¡å—å†™)
+  .rd_clk(clk_74m          ), // input wire rd_clk  (ä½ è¯»)
   .din   (rx_payload_dat   ), // input wire [7 : 0] din
   .wr_en (rx_payload_valid ), // input wire wr_en
   .rd_en (rx_rd_en         ), // input wire rd_en
@@ -125,7 +125,7 @@ eth_data_buf eth_rx_data_buf (
   .empty (rx_empty         )  // output wire empty
 );
 
-//Í¬Ê±¶Ô±¨ÎÄÖĞMAC¡¢IPµÈÏûÏ¢Êı¾İ»º´æ
+//åŒæ—¶å¯¹æŠ¥æ–‡ä¸­MACã€IPç­‰æ¶ˆæ¯æ•°æ®ç¼“å­˜
 eth_msg_buf eth_msg_buf (
   .rst        (reset_p                                     ), // input wire rst
   .clk        (clk125m                                     ), // input wire clk
@@ -138,11 +138,11 @@ eth_msg_buf eth_msg_buf (
   .data_count (msg_count                                   )  // output wire [4 : 0] data_count
 );
 
-//¶ÔÒÔÌ«Íø·¢³öÊı¾İ»º´æ£¨Äã°ÑÒª·¢µÄ¶«Î÷Ğ´½øÀ´£©
+//å¯¹ä»¥å¤ªç½‘å‘å‡ºæ•°æ®ç¼“å­˜ï¼ˆä½ æŠŠè¦å‘çš„ä¸œè¥¿å†™è¿›æ¥ï¼‰
 eth_data_buf eth_tx_data_buf (
   .rst   (reset_p          ), // input wire rst
-  .wr_clk(clk_74m          ), // input wire wr_clk  (´ò°üÂß¼­Ğ´)
-  .rd_clk(clk125m          ), // input wire rd_clk  (mac ¶Á)
+  .wr_clk(clk_74m          ), // input wire wr_clk  (æ‰“åŒ…é€»è¾‘å†™)
+  .rd_clk(clk125m          ), // input wire rd_clk  (mac è¯»)
   .din   (tx               ), // input wire [7 : 0] din
   .wr_en (tx_wr_en         ), // input wire wr_en
   .rd_en (tx_payload_req   ), // input wire rd_en

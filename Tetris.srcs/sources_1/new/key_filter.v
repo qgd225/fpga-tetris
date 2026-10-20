@@ -29,7 +29,7 @@ module key_filter(
     
     parameter MCNT_CNT = 1_000_000 - 1;
     
-//    20ms¼ÆÊ±
+//    20msè®¡æ—¶
     always@(posedge Clk or negedge Reset_n)begin
     if(!Reset_n)
     counter_cnt <= 0;
@@ -39,7 +39,7 @@ module key_filter(
     counter_cnt <= counter_cnt + 1;
     end
     
-//    È¥ÑÇÎÈÌ¬ºÍ¼ÇÂ¼ÏÂ½µÑØºÍÉÏÉýÑØ
+//    åŽ»äºšç¨³æ€å’Œè®°å½•ä¸‹é™æ²¿å’Œä¸Šå‡æ²¿
     always@(posedge Clk or negedge Reset_n)
     if(!Reset_n)
     sync_d0_key <= 1'b1;
@@ -61,7 +61,7 @@ module key_filter(
     assign key_down = (!sync_d1_key) && (r_key);
     assign key_up = (sync_d1_key) && (!r_key);
     
-//    ¼ÆÊýÊ¹ÄÜ¿ª¹ØÓëÊÇ·ñ°´ÏÂ¿ª¹Ø
+//    è®¡æ•°ä½¿èƒ½å¼€å…³ä¸Žæ˜¯å¦æŒ‰ä¸‹å¼€å…³
     always@(posedge Clk or negedge Reset_n)begin
     if(!Reset_n)begin
     en_cnt <= 0;
@@ -89,7 +89,7 @@ module key_filter(
     end
     end
     
-//    Êä³ö°´ÏÂÓëËÉ¿ªÐÅºÅ
+//    è¾“å‡ºæŒ‰ä¸‹ä¸Žæ¾å¼€ä¿¡å·
     always@(posedge Clk or negedge Reset_n)
     if(!Reset_n)
     key_en_tx <= 1'b0;

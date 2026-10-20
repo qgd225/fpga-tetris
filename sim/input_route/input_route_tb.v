@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-//===== 输入路由回归: 单人 P1 合并, 双人 P1/P2 分离 =====
+//===== 杈撳叆璺敱鍥炲綊: 鍗曚汉 P1 鍚堝苟, 鍙屼汉 P1/P2 鍒嗙 =====
 module input_route_tb;
 reg duo = 0;
 reg btn_left=0, btn_right=0, btn_drop_r=0, btn_drop_en=0, btn_rotate=0, btn_hold=0;
@@ -48,7 +48,7 @@ end
 endtask
 
 initial begin
-  $display("=== input_route 输入路由 ===");
+  $display("=== input_route 杈撳叆璺敱 ===");
   clear_all; duo=0; btn_left=1; #1;
   chk("solo btn left -> P1", p1_left, 1);
   chk("solo btn left -> no P2", p2_left, 0);

@@ -18,8 +18,8 @@ module Next_piece(
     output reg next_slot
     );
 
-//    ÎŞ¿òÃæ°å: Ô¤ÀÀÇøÊÇ 4x4 ¸ö 32px ¸ñ×Ó×é³ÉµÄ²ÛÎ»(µ×É«ÓÉ frame »­)
-//    ¸ñ×Ó±àºÅ´Ó²ÛÎ»×óÉÏ½ÇËãÆğ, ·½¿éµÚ 0 ¸ñ»­ÔÚ (1,3) µÄÎ»ÖÃ, ÓëÔ­À´Ò»ÖÂ
+//    æ— æ¡†é¢æ¿: é¢„è§ˆåŒºæ˜¯ 4x4 ä¸ª 32px æ ¼å­ç»„æˆçš„æ§½ä½(åº•è‰²ç”± frame ç”»)
+//    æ ¼å­ç¼–å·ä»æ§½ä½å·¦ä¸Šè§’ç®—èµ·, æ–¹å—ç¬¬ 0 æ ¼ç”»åœ¨ (1,3) çš„ä½ç½®, ä¸åŸæ¥ä¸€è‡´
     reg [1:0]C_num;
     reg [1:0]R_num;
     reg [1:0]C_num2;
@@ -27,7 +27,7 @@ module Next_piece(
     reg [3:0]cc;
     reg [3:0]rr;
 
-//    P1 Ô¤ÀÀ²ÛÎ»µÄĞĞÁĞºÅ
+//    P1 é¢„è§ˆæ§½ä½çš„è¡Œåˆ—å·
     always@(*)begin : blk1
         integer o1, p1;
     C_num = 2'd0;
@@ -41,7 +41,7 @@ module Next_piece(
     end
     end
 
-//    P2 Ô¤ÀÀ²ÛÎ»µÄĞĞÁĞºÅ(½öË«ÈË)
+//    P2 é¢„è§ˆæ§½ä½çš„è¡Œåˆ—å·(ä»…åŒäºº)
     always@(*)begin : blk2
         integer o2, p2;
     C_num2 = 2'd0;
@@ -55,7 +55,7 @@ module Next_piece(
     end
     end
 
-//    ²ÛÎ»µ×É«ÇøÓò: Ë«ÈËÁ½¿é, µ¥ÈËÒ»¿é
+//    æ§½ä½åº•è‰²åŒºåŸŸ: åŒäººä¸¤å—, å•äººä¸€å—
     always@(*)begin
     next_slot = 1'b0;
     if((hcounter >= X1) && (hcounter < (X1 + 11'd128)) && (vcounter >= Y1) && (vcounter < (Y1 + 11'd128)))
@@ -81,7 +81,7 @@ module Next_piece(
         .douta(Tetromino_dout2)
     );
 
-//    P1 ÏÂÒ»¿éÔ¤ÀÀ
+//    P1 ä¸‹ä¸€å—é¢„è§ˆ
     always@(*)begin : blk3
         integer i1;
     if(Idle)
@@ -98,7 +98,7 @@ module Next_piece(
     end
     end
 
-//    P2 ÏÂÒ»¿éÔ¤ÀÀ(½öË«ÈË)
+//    P2 ä¸‹ä¸€å—é¢„è§ˆ(ä»…åŒäºº)
     always@(*)begin : blk4
         integer i2;
     if(Idle || !duo)
@@ -115,6 +115,6 @@ module Next_piece(
     end
     end
 
-    assign next_margin = 1'b0;//Íâ¿òÓëĞéÏßÒÑÉ¾, ¸ÄÎª frame ÀïµÄÎÄ×Ö±êÇ© + 2px ·Ö¸ôÏß
+    assign next_margin = 1'b0;//å¤–æ¡†ä¸è™šçº¿å·²åˆ , æ”¹ä¸º frame é‡Œçš„æ–‡å­—æ ‡ç­¾ + 2px åˆ†éš”çº¿
 
 endmodule

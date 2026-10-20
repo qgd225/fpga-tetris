@@ -32,7 +32,7 @@ module serdes_4b_10to1(
   wire dataout_2_n;
   wire dataout_3_n;
 
-  reg [2:0] TMDS_mod5 = 0;  // Ä£5¼ÆÊıÆ÷
+  reg [2:0] TMDS_mod5 = 0;  // æ¨¡5è®¡æ•°å™¨
 
   reg [4:0] TMDS_shift_0h = 0, TMDS_shift_0l = 0;
   reg [4:0] TMDS_shift_1h = 0, TMDS_shift_1l = 0;
@@ -51,7 +51,7 @@ module serdes_4b_10to1(
   wire [4:0] TMDS_3_l = {datain_3[9],datain_3[7],datain_3[5],datain_3[3],datain_3[1]};
   wire [4:0] TMDS_3_h = {datain_3[8],datain_3[6],datain_3[4],datain_3[2],datain_3[0]};
 
-  // 5±¶ËÙ¶ÈÒÆÎ»·¢ËÍÊı¾İ
+  // 5å€é€Ÿåº¦ç§»ä½å‘é€æ•°æ®
   always @(posedge clkx5)
   begin
     TMDS_mod5 <= (TMDS_mod5[2]) ? 3'd0 : TMDS_mod5 + 3'd1;

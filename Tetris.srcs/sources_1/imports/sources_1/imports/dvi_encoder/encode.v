@@ -74,7 +74,7 @@ module encode(
       dout <= 10'h0;
       cnt <= 5'd0;
     end else begin
-      if (de_reg[1]) begin// Êý¾ÝÖÜÆÚ£º·¢ËÍ¶ÔÓ¦±àÂëµÄÊý¾Ý
+      if (de_reg[1]) begin// æ•°æ®å‘¨æœŸï¼šå‘é€å¯¹åº”ç¼–ç çš„æ•°æ®
         if (decision2) begin
           dout[9]   <= `D ~q_m_reg[8]; 
           dout[8]   <= `D q_m_reg[8]; 
@@ -92,7 +92,7 @@ module encode(
             cnt <= `D cnt - {~q_m_reg[8], 1'b0} + (n1q_m - n0q_m);
           end
         end
-      end else begin  // ¿ØÖÆÖÜÆÚ:·¢ËÍ¿ØÖÆÐÅºÅ
+      end else begin  // æŽ§åˆ¶å‘¨æœŸ:å‘é€æŽ§åˆ¶ä¿¡å·
         cnt <=  `D 5'd0;
         case ({c1_reg[1], c0_reg[1]})
           2'b00:   dout <= `D CTL0;

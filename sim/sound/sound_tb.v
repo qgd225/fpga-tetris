@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-//===== sound Ä£¿é¼¶»Ø¹é: ÊÂ¼şÓÅÏÈ¼¶ / Ë«Òô·´À¡ / ¿ª¹Ø³¤¶Ì°´ =====
+//===== sound æ¨¡å—çº§å›å½’: äº‹ä»¶ä¼˜å…ˆçº§ / åŒéŸ³åé¦ˆ / å¼€å…³é•¿çŸ­æŒ‰ =====
 module sound_tb;
 reg Clk_74M = 0;
 reg Reset_n = 0;
@@ -204,7 +204,7 @@ begin
         #1;
         cycles = cycles + 1;
     end
-    chk("µ½´ïÒô·û×´Ì¬", dut.st, target);
+    chk("åˆ°è¾¾éŸ³ç¬¦çŠ¶æ€", dut.st, target);
 end
 endtask
 
@@ -234,10 +234,10 @@ end
 endtask
 
 initial begin
-    $display("=== sound Ä£¿é¼¶²âÊÔ ===");
+    $display("=== sound æ¨¡å—çº§æµ‹è¯• ===");
     do_reset;
 
-    $display("=== 1) ÊÂ¼ş±àºÅ ===");
+    $display("=== 1) äº‹ä»¶ç¼–å· ===");
     menu_l = 1; one_pulse; check_event("menu_l -> 2", 2);
     soft1 = 1; one_pulse; check_event("soft1 -> 3", 3);
     soft2 = 1; one_pulse; check_event("soft2 -> 3", 3);
@@ -264,7 +264,7 @@ initial begin
     blk_rot2 = 1; one_pulse; check_event("blk_rot2 -> 18", 18);
     over = 1; one_pulse; check_event("over -> 16", 16);
 
-    $display("=== 2) Í¬ÅÄÓÅÏÈ¼¶ ===");
+    $display("=== 2) åŒæ‹ä¼˜å…ˆçº§ ===");
     do_reset;
     over = 1; sw_long = 1; sw_short = 1; one_pulse;
     check_event("over > switch", 16);
@@ -284,7 +284,7 @@ initial begin
     rot1 = 1; rot2 = 1; one_pulse;
     check_event("P1/P2 same rotate", 6);
 
-    $display("=== 3) ²¥·ÅÖĞºöÂÔĞÂÊÂ¼ş ===");
+    $display("=== 3) æ’­æ”¾ä¸­å¿½ç•¥æ–°äº‹ä»¶ ===");
     do_reset;
     rot1 = 1; one_pulse;
     chk("rotate starts en=6", dut.en, 6);
@@ -294,13 +294,13 @@ initial begin
     chk("playing keeps en=6", dut.en, 6);
     clear_all;
 
-    $display("=== 4) ÏûĞĞĞòÁĞ³¤¶È ===");
+    $display("=== 4) æ¶ˆè¡Œåºåˆ—é•¿åº¦ ===");
     run_clear_sequence(1, 5, "clear1 note count");
     run_clear_sequence(2, 5, "clear2 note count");
     run_clear_sequence(3, 5, "clear3 note count");
     run_clear_sequence(4, 5, "clear4 note count");
 
-    $display("=== 5) ÏûĞĞ¸ßµçÆ½Ö»ÏìÒ»´Î ===");
+    $display("=== 5) æ¶ˆè¡Œé«˜ç”µå¹³åªå“ä¸€æ¬¡ ===");
     do_reset;
     clear = 1; clr_n = 1;
     @(posedge Clk_74M);
@@ -317,7 +317,7 @@ initial begin
     chk("clear release then high retrigger", dut.en, 11);
     clear = 0;
 
-    $display("=== 6) ¿ØÖÆÒô¸ßÓëÊ±Ğò ===");
+    $display("=== 6) æ§åˆ¶éŸ³é«˜ä¸æ—¶åº ===");
     do_reset;
     over = 1; one_pulse;
     chk("over st0 note=G5", dut.note, 47360);
@@ -357,7 +357,7 @@ initial begin
     chk("clear4 st0 cnt=30ms", dut.cnt, 30); chk("clear4 st_last=4", dut.st_last, 4);
     clear_all; wait_done;
 
-    $display("=== 7) ±»µ²Ë«ÒôÓë¿ª¹ØË«Òô ===");
+    $display("=== 7) è¢«æŒ¡åŒéŸ³ä¸å¼€å…³åŒéŸ³ ===");
     do_reset;
     blk1 = 1; one_pulse;
     chk("move blocked st0 note=E5", dut.note, 56335);
@@ -404,7 +404,7 @@ initial begin
     clear_all;
     wait_done;
 
-    $display("=== 8) Òô·ûÇĞ»»Ê±³¤ ===");
+    $display("=== 8) éŸ³ç¬¦åˆ‡æ¢æ—¶é•¿ ===");
     do_reset;
     hold1 = 1; one_pulse;
     cycles = 0;
@@ -417,7 +417,7 @@ initial begin
     clear_all;
     wait_done;
 
-    $display("=== 9) ·½²¨·­×ª´ÎÊı ===");
+    $display("=== 9) æ–¹æ³¢ç¿»è½¬æ¬¡æ•° ===");
     do_reset;
     menu_l = 1; one_pulse;
     edges = 0;
@@ -432,7 +432,7 @@ initial begin
     end
     chk("menu F5 18ms toggle count", edges, 11);
 
-    $display("=== 10) ¸´Î»¾²Òô ===");
+    $display("=== 10) å¤ä½é™éŸ³ ===");
     do_reset;
     chk("reset en=0", dut.en, 0);
     chk("reset buzz=0", buzz_else, 0);
@@ -440,7 +440,7 @@ initial begin
     #1;
     chk("idle buzz=0", buzz_else, 0);
 
-    $display("=== 11) switch ×´Ì¬»ú³¤¶Ì°´Ó³Éä ===");
+    $display("=== 11) switch çŠ¶æ€æœºé•¿çŸ­æŒ‰æ˜ å°„ ===");
     do_reset;
     sm_switch_en = 1;
     repeat(8) @(posedge Clk_74M);
@@ -490,7 +490,7 @@ initial begin
     chk("over plays once", dut.en, 0);
     repeat(100) @(posedge Clk_74M);
     chk("over does not retrigger", dut.en, 0);
-    $display("²âÊÔ: %0d", checks);
+    $display("æµ‹è¯•: %0d", checks);
     if(bad == 0)
         $display("=== ALL PASS ===");
     else

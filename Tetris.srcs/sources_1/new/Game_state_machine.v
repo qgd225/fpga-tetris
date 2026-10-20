@@ -22,7 +22,7 @@ module Game_state_machine(
     parameter MCNT = 74_250_000;
     parameter [3:0]CHOOSE_MAX = 4'd1;
     
-//    °´¼üĞÅºÅ´¦Àí
+//    æŒ‰é”®ä¿¡å·å¤„ç†
     reg [26:0]counter;
     reg short_press_ok;
     
@@ -49,7 +49,7 @@ module Game_state_machine(
     short_press_ok <= 1'b1;
     end
     
-//    Ä£Ê½Ñ¡Ôñ¼ÆÊıÆ÷
+//    æ¨¡å¼é€‰æ‹©è®¡æ•°å™¨
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     choose_cnt <= 4'd0;
@@ -63,7 +63,7 @@ module Game_state_machine(
     choose_cnt <= 4'd0;
     end
     
-//    ×´Ì¬×ª»»
+//    çŠ¶æ€è½¬æ¢
     localparam Choose_en   = 5'b00001;
     localparam Idle_en     = 5'b00010;
     localparam Playing_en  = 5'b00100;

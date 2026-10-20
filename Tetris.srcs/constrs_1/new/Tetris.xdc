@@ -55,7 +55,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports buzz_else]
 set_property PACKAGE_PIN A13 [get_ports buzz_else]
 
 
-# ===== ÒÔÌ«Íø RGMII + PHY ¿ØÖÆ£¨¹Ü½ÅÓë BX72 io.xdc Ò»ÖÂ£©=====
+# ===== ä»¥å¤ªç½‘ RGMII + PHY æ§åˆ¶ï¼ˆç®¡è„šä¸ BX72 io.xdc ä¸€è‡´ï¼‰=====
 set_property PACKAGE_PIN V18 [get_ports rgmii_tx_clk]
 set_property PACKAGE_PIN P17 [get_ports rgmii_txen]
 set_property PACKAGE_PIN R17 [get_ports {rgmii_txd[0]}]
@@ -83,6 +83,6 @@ set_property IOSTANDARD LVCMOS33 [get_ports eth_mdio]
 set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets rgmii_rx_clk_i]
 create_generated_clock -name rgmii_tx_clk -source [get_pins net_screen_tx_inst/eth_udp_loopback_rgmii_inst/gmii_to_rgmii/ODDR_rgmii_clk/C] -divide_by 1 [get_ports rgmii_tx_clk]
 
-# ===== Á½¸öÒì²½Ê±ÖÓÓò£ºÏñËØ/ÓÎÏ·Ê±ÖÓ(74.219M) Óë PHY RXC »Ö¸´µÄ 125M =====
-# ¿çÓòÈ«²¿×ß FIFO(BRAM) »ò 2~3 ¼¶Í¬²½Æ÷£¨tog_line/tog_pal/pll_locked£©£¬°´Òì²½´¦Àí
+# ===== ä¸¤ä¸ªå¼‚æ­¥æ—¶é’ŸåŸŸï¼šåƒç´ /æ¸¸æˆæ—¶é’Ÿ(74.219M) ä¸ PHY RXC æ¢å¤çš„ 125M =====
+# è·¨åŸŸå…¨éƒ¨èµ° FIFO(BRAM) æˆ– 2~3 çº§åŒæ­¥å™¨ï¼ˆtog_line/tog_pal/pll_lockedï¼‰ï¼ŒæŒ‰å¼‚æ­¥å¤„ç†
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks hdmi_inst/hdmi_pll_inst/inst/clk_in1] -group [get_clocks -include_generated_clocks rgmii_rx_clk_i]
