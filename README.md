@@ -73,6 +73,7 @@ Tetris.srcs/
     │   ├── Next_piece.v              # 下一个方块预览
     │   ├── hold_piece.v              # Hold 暂存区
     │   ├── scoring.v / level.v / timer.v / frame.v
+    │   ├── rgb_to_palette.v      # PC 画面 RGB→39 色索引
     │   ├── music.v / sound.v         # 音乐与音效
     │   ├── key_filter.v / Key.v      # 按键消抖
     │   └── game_over.v / Playfield_edge.v
@@ -97,11 +98,12 @@ Tetris.srcs/
 
 ## 验证与资源
 
-- 八套仿真共 666 项：`duo / frame_duo / level / sound / input_route / hold_gesture / solo_hint / result_packet`。
+- 九套仿真共 705 项：`duo / frame_duo / level / sound / input_route / hold_gesture / solo_hint / result_packet / rgb_palette`。
 - Python 接收端测试 5 项：新旧成绩包兼容、坏校验、分模式去重、CSV 迁移和 Top5 排序。
 - Vivado 2018.3 从零综合/实现：0 error、0 时序违例、0 未布通网络。
-- 当前资源：LUT 19437/20800（93.45%）、FF 6197、BRAM 15、DSP 4、IOB 34。
-- 当前时序：WNS +0.266ns、WHS +0.090ns。
+- 当前资源：LUT 19239/20800（92.50%）、FF 6197、BRAM 15.5、DSP 4、IOB 34。
+- 当前时序：WNS +0.109ns、WHS +0.079ns。
+- 本轮 LUT 较基线 19437 减少 198；PC 调色板反查由 24 位全色比较改为 7 位无碰撞索引，代价为增加 0.5 个 BRAM Tile。
 
 ## 备注
 

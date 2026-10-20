@@ -179,7 +179,12 @@ wire link_up = pl_s2;
 reg        de_r, de_r2;
 reg [10:0] vc_r;
 reg [23:0] rgb_r;
-reg  [7:0] code_r;
+wire [7:0] code_r;
+
+rgb_to_palette rgb_to_palette_inst(
+  .rgb(rgb_r),
+  .code(code_r)
+);
 reg [10:0] line_num;
 
 always@(posedge Clk_74M or negedge Reset_n)begin
@@ -201,50 +206,8 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else if(de_r) line_num <= vc_r;
 end
 
-always@(*)begin
-  case(rgb_r)
-  24'h00_00_00: code_r = 8'd0; // 空/黑
-  24'h00_CC_FF: code_r = 8'd1; // I
-  24'h99_33_CC: code_r = 8'd2; // T
-  24'hFF_FF_00: code_r = 8'd3; // O
-  24'hE6_39_46: code_r = 8'd4; // S
-  24'h55_A6_30: code_r = 8'd5; // Z
-  24'hF7_7F_24: code_r = 8'd6; // L
-  24'hFF_4D_A6: code_r = 8'd7; // J
-  24'h99_EE_FF: code_r = 8'd8; // 幽灵 I
-  24'hD9_B3_E6: code_r = 8'd9; // 幽灵 T
-  24'hFF_FF_99: code_r = 8'd10; // 幽灵 O
-  24'hFF_B3_B9: code_r = 8'd11; // 幽灵 S
-  24'hBD_E0_AA: code_r = 8'd12; // 幽灵 Z
-  24'hFF_D9_B3: code_r = 8'd13; // 幽灵 L
-  24'hFF_B3_D9: code_r = 8'd14; // 幽灵 J
-  24'hEE_EE_EE: code_r = 8'd15; // 闪白
-  24'hFF_FF_FF: code_r = 8'd16; // 白(边框/分数/时间/框)
-  24'h10_10_10: code_r = 8'd17;
-  24'h20_20_20: code_r = 8'd18;
-  24'h40_40_40: code_r = 8'd19;
-  24'h60_60_60: code_r = 8'd20;
-  24'h90_90_90: code_r = 8'd21;
-  24'hB0_B0_B0: code_r = 8'd22;
-  24'hD8_D8_D8: code_r = 8'd23;
-  24'h30_30_30: code_r = 8'd24;
-  24'h00_E5_FF: code_r = 8'd25;
-  24'h00_69_7F: code_r = 8'd26;
-  24'h0A_0F_16: code_r = 8'd27;
-  24'h08_1A_1E: code_r = 8'd28;
-  24'h1E_08_12: code_r = 8'd29;
-  24'h04_63_7E: code_r = 8'd30;
-  24'h47_1F_67: code_r = 8'd31;
-  24'h74_79_0D: code_r = 8'd32;
-  24'h69_22_2C: code_r = 8'd33;
-  24'h29_52_23: code_r = 8'd34;
-  24'h71_41_1D: code_r = 8'd35;
-  24'h74_2B_56: code_r = 8'd36;
-  24'h6B_F0_FF: code_r = 8'd37;
-  24'hFF_98_CB: code_r = 8'd38;
-  default:      code_r = 8'd0;
-  endcase
-end
+// RGB→调色板索引：7 位无碰撞哈希后查小表，避免 24 位全色比较。
+// 映射定义见 rgb_to_palette.v；纯组合输出直接进入 TX FIFO。
 
 //============================================================
 //    行末/场末 打包序列器
