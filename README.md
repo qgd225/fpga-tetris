@@ -1,6 +1,6 @@
 # FPGA 俄罗斯方块 (Tetris)
 
-基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏,画面通过 HDMI (TMDS) 输出,支持音效。
+基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效、PC 画面镜像与排行榜。
 
 ## 工程信息
 
@@ -33,9 +33,11 @@
 - 横向连发：首移立即发生，DAS 132ms、ARR 33ms；松开方向、换向、暂停或结束时复位。
 - 单人智能落点：长按 Hold 显示方块本色虚线靶框和中心点；按消行、空洞、高度、凹凸和悬空评分搜索 4 旋转 x 20 列。
 - 双人输入分流：板载键控制 P1，PC 键盘控制 P2；单人时板载键和 PC 键共同控制 P1。
-- 完整 UI：Impact Glass 方块、1px 圆角、幽灵空心框、危险带、阵营光条、8 级热力等级柱、菜单呼吸色和落锁/升级/加分/换块特效。
-- GAME OVER 结算页：SCORE、LEVEL、LINES、TIME、SOLO/DUO 标识、局部棋盘压暗和模式化排行榜数据。
-- 音频：背景音乐 + 18 类操作/状态音效，音高与时长查表，P1/P2 共用蜂鸣器且同拍 P1 优先。
+- CORE-07 故事板画面：“轨道核心：最后的收容”双层反应堆舱室、游戏区收容槽、双人单核心缝、观察窗与冷却管线。
+- 完整 UI：Impact Glass 方块、1px 圆角、幽灵空心框、34px 八级热力压力柱、警戒齿、分段危险灯带、阵营光条和菜单呼吸色。
+- 反应堆反馈：落锁/升级/换块/加分特效、消行坍缩环与中心热点、GAME OVER `CORE BREACH` 副标题和局部压暗结算面板。
+- GAME OVER 结算页：SCORE、LEVEL、LINES、TIME、SOLO/DUO 标识、模式化数据区和 PC 端分模式排行榜。
+- 音频：背景音乐 + 20 类操作/状态音效，音高与时长查表，危险等级上升沿触发反应堆警报，P1/P2 共用蜂鸣器且同拍 P1 优先。
 - PC 端：UDP 逐行画面、调色板同步、键盘遥控、静态 ARP 助手、SOLO/DUO Top5 排行榜。
 
 ## 系统架构
@@ -74,7 +76,7 @@ Tetris.srcs/
     │   ├── Next_piece.v              # 下一个方块预览
     │   ├── hold_piece.v              # Hold 暂存区
     │   ├── scoring.v / level.v / timer.v / frame.v
-    │   ├── rgb_to_palette.v      # PC 画面 RGB→39 色索引
+    │   ├── rgb_to_palette.v      # PC 画面 RGB→44 色索引
     │   ├── music.v / sound.v         # 音乐与音效
     │   ├── key_filter.v / Key.v      # 按键消抖
     │   ├── horizontal_repeat.v       # 横向 DAS/ARR 连发
@@ -100,12 +102,21 @@ Tetris.srcs/
 
 ## 验证与资源
 
-- 十套仿真共 741 项：`duo / frame_duo / level / sound / input_route / horizontal_repeat / hold_gesture / solo_hint / result_packet / rgb_palette`。
-- Python 接收端测试 5 项：新旧成绩包兼容、坏校验、分模式去重、CSV 迁移和 Top5 排序。
-- Vivado 2018.3 从零综合/实现：0 error、0 时序违例、0 未布通网络。
-- 当前资源：LUT 19333/20800（92.95%）、FF 6258、BRAM 15.5、DSP 4、IOB 34。
-- 当前时序：WNS +0.024ns、WHS +0.076ns。
-- 横向连发采用 24 位单计时器；综合阶段 2 个实例共增加约 106 LUT、60 FF。
+- 十套仿真共 **759 项**：`duo 111 / frame_duo 302 / level 39 / sound 103 / input_route 29 / horizontal_repeat 28 / hold_gesture 27 / solo_hint 59 / result_packet 17 / rgb_palette 44`，全部通过。
+- Python 接收端测试 5 项：新旧成绩包兼容、坏校验、分模式去重、CSV 迁移和 Top5 排序，全部通过。
+- Vivado 2018.3 最终从零综合/实现：0 error、0 时序违例、0 未布通网络。
+- 最终资源：LUT **20148/20800（96.87%）**、FF 6302、Block RAM 15.5/50、DSP 4、IOB 34。
+- 最终时序：**WNS +0.330ns、WHS +0.067ns**。
+- 渲染取色采用 7 位命中码寄存一级并统一右移 1 像素，把原 20 余级 24 位优先链拆成“判层 + 取色”两级；背景颜色与命中码同拍寄存，整套画面保持统一相位。
+
+### 本版构建产物
+
+| 项目 | 值 |
+| --- | --- |
+| 比特流 | `Tetris.runs/impl_1/Tetris.bit` |
+| 生成时间 | 2026-10-21 16:38:05 |
+| 大小 | 2,192,114 字节 |
+| SHA256 | `8EA84FC1E6CBB287EDF9639A40987D59509E404B04B4ADCB53F92C922D30F85C` |
 
 ## 备注
 
