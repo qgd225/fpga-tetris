@@ -15,17 +15,17 @@ sim\run_all.bat
 | 套 | 顶层 | 覆盖内容 | 项数 |
 | --- | --- | --- | ---: |
 | `sim/duo` | `duo_tb` | 双人出生/互撞/锁存、共用 Hold、单流随机、24 格消行、幽灵保持和音效门控 | 111 |
-| `sim/frame_duo` | `frame_duo_tb` | CORE-07 双层背景/压力柱/危险带、HUD/菜单/特效、GAME OVER 结算页、智能提示和局部压暗 | 302 |
+| `sim/frame_duo` | `frame_duo_tb` | CORE-07 双层背景/压力柱/危险带、HUD/菜单/特效、GAME OVER 结算页、智能提示和局部压暗 | 318 |
 | `sim/level` | `net_level_tb` | 34px 压力柱、八级 `seg`、顶帽/热力色、消行加分、等级阈值和自动下落速度 | 39 |
 | `sim/sound` | `sound_tb` | 20 类音效、查表音高/时长、危险警报、P1 优先、消行音阶和蜂鸣器翻转 | 103 |
 | `sim/input_route` | `input_route_tb` | 单人板载+PC 合并、双人板载 P1/PC P2 的输入路由与按住电平 | 29 |
-| `sim/horizontal_repeat` | `horizontal_repeat_tb` | 首移直通、DAS/ARR、方向切换及暂停/结束复位 | 28 |
+| `sim/horizontal_repeat` | `horizontal_repeat_tb` | 首移直通、DAS/ARR、方向切换及暂停/结束复位 | 30 |
 | `sim/hold_gesture` | `hold_gesture_tb` | Hold 短按换块、长按提示切换和 PC/板载输入 | 27 |
 | `sim/solo_hint` | `solo_hint_tb` | 4 旋转 x 20 列搜索、评分、空洞/悬空约束和类型切换 | 59 |
 | `sim/result_packet` | `result_packet_tb` | Type4 14 字节成绩包、SOLO/DUO 模式和 XOR 校验 | 17 |
-| `sim/rgb_palette` | `rgb_palette_tb` | 44 色调色板与 7 位无碰撞 RGB 索引映射 | 44 |
+| `sim/rgb_palette` | `rgb_palette_tb` | 56 色调色板与 8 位无碰撞 RGB 索引映射 | 56 |
 
-总计 **759 项**。
+总计 **789 项**。
 
 ## 单独跑一套
 
@@ -38,7 +38,7 @@ run.bat
 
 - ROM（Tetromino / weiyibiao / number / letter）在仿真中使用行为桩，重点验证逻辑通路。
 - 场地存储为单份 `state` + 行字直读，渲染和判定读取同一份状态。
-- CORE-07 回归覆盖外层舱壁/内层反应堆槽、双人单核心缝、压力柱警戒齿、分段危险带、`CORE BREACH`、坍缩环/白热点和 44 色协议。
+- CORE-07 回归覆盖外层舱壁/内层反应堆槽、双人单核心缝、压力柱警戒齿、分段危险带、`CORE BREACH`、坍缩环/白热点和 56 色协议。
 - 历史迭代记录保留在下方附录，不再混入当前测试使用说明。
 
 ## 历史迭代附录
