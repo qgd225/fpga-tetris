@@ -13,6 +13,8 @@ reg over = 0;
 reg clear = 0;
 reg [2:0]clr_n = 0;
 reg lvl_up = 0;
+reg danger1 = 0;
+reg danger2 = 0;
 reg sw_short = 0;
 reg sw_long = 0;
 reg menu_l = 0;
@@ -58,6 +60,8 @@ sound #(
     .clear(clear),
     .clr_n(clr_n),
     .lvl_up(lvl_up),
+    .danger1(danger1),
+    .danger2(danger2),
     .sw_short(sw_short),
     .sw_long(sw_long),
     .menu_l(menu_l),
@@ -134,6 +138,8 @@ begin
     clear = 0;
     clr_n = 0;
     lvl_up = 0;
+    danger1 = 0;
+    danger2 = 0;
     sw_short = 0;
     sw_long = 0;
     menu_l = 0;
@@ -259,6 +265,8 @@ initial begin
     hard1 = 1; one_pulse; check_event("hard1 -> 9", 9);
     hard2 = 1; one_pulse; check_event("hard2 -> 9", 9);
     lvl_up = 1; one_pulse; check_event("lvl_up -> 10", 10);
+    danger1 = 1; one_pulse; check_event("danger1 -> 19", 19);
+    danger2 = 1; one_pulse; check_event("danger2 -> 20", 20);
     clear = 1; clr_n = 1; one_pulse; check_event("clear1 -> 11", 11);
     clear = 1; clr_n = 2; one_pulse; check_event("clear2 -> 12", 12);
     clear = 1; clr_n = 3; one_pulse; check_event("clear3 -> 13", 13);
@@ -288,6 +296,12 @@ initial begin
     do_reset;
     rot1 = 1; rot2 = 1; one_pulse;
     check_event("P1/P2 same rotate", 6);
+    do_reset;
+    lvl_up = 1; danger2 = 1; one_pulse;
+    check_event("level_up > danger", 10);
+    do_reset;
+    danger2 = 1; hard1 = 1; one_pulse;
+    check_event("danger > hard", 20);
 
     $display("=== 3) 播放中忽略新事件 ===");
     do_reset;

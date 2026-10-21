@@ -267,6 +267,10 @@ control_route control_route_inst(
     wire blk_rot1;
     wire blk_rot2;
     wire [2:0]snd_clr_n;
+    wire [1:0] danger_lvl;
+    reg [1:0] danger_d;
+    reg danger1_pulse;
+    reg danger2_pulse;
     reg [2:0]lvl_d;
     reg lvl_up;
 
@@ -279,6 +283,20 @@ control_route control_route_inst(
     else begin
     lvl_d <= speed_level;
     lvl_up <= Playing && (speed_level > lvl_d);
+    end
+    end
+
+//    危险等级上升沿：0->1 警报，0/1->2 紧急警报
+    always@(posedge Clk_74M or negedge Reset_n)begin
+    if(!Reset_n)begin
+    danger_d <= 2'd0;
+    danger1_pulse <= 1'b0;
+    danger2_pulse <= 1'b0;
+    end
+    else begin
+    danger_d <= danger_lvl;
+    danger1_pulse <= (danger_lvl == 2'd1) && (danger_d == 2'd0);
+    danger2_pulse <= (danger_lvl == 2'd2) && (danger_d != 2'd2);
     end
     end
    
@@ -348,7 +366,8 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .snd_hold2(snd_hold2),
     .blk_rot1(blk_rot1),
     .blk_rot2(blk_rot2),
-    .snd_clr_n(snd_clr_n)
+    .snd_clr_n(snd_clr_n),
+    .danger_lvl(danger_lvl)
     );
     
     
@@ -391,6 +410,8 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .blk2(blk_l2 || blk_r2),
     .blk_rot1(blk_rot1),
     .blk_rot2(blk_rot2),
+    .danger1(danger1_pulse),
+    .danger2(danger2_pulse),
     
     .buzz_else(buzz_else)
     );

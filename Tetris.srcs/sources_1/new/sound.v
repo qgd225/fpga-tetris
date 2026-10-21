@@ -10,6 +10,8 @@ module sound(
     input clear,
     input [2:0]clr_n,
     input lvl_up,
+    input danger1,
+    input danger2,
     input sw_short,
     input sw_long,
     input menu_l,
@@ -137,6 +139,10 @@ module sound(
         end
         else if(lvl_up)
         en <= 5'd10;
+        else if(danger2)
+        en <= 5'd20;
+        else if(danger1)
+        en <= 5'd19;
         else if(hard1 || hard2)
         en <= 5'd9;
         else if(land1 || land2)
@@ -168,6 +174,8 @@ module sound(
     5'd16: st_last = 4'd3;
     5'd15: st_last = 4'd1;
     5'd18: st_last = 4'd2;
+    5'd20: st_last = 4'd2;
+    5'd19: st_last = 4'd2;
     5'd14: st_last = 4'd4;
     5'd13: st_last = 4'd4;
     5'd12: st_last = 4'd4;
@@ -207,6 +215,18 @@ module sound(
         default: note = 18'd0;
         endcase
     5'd18: case(st)
+        4'd0: note = N_D5;
+        4'd1: note = 18'd0;
+        4'd2: note = N_B4;
+        default: note = 18'd0;
+        endcase
+    5'd20: case(st)
+        4'd0: note = N_A5;
+        4'd1: note = 18'd0;
+        4'd2: note = N_E5;
+        default: note = 18'd0;
+        endcase
+    5'd19: case(st)
         4'd0: note = N_D5;
         4'd1: note = 18'd0;
         4'd2: note = N_B4;
@@ -296,6 +316,18 @@ module sound(
         default: cnt = 9'd0;
         endcase
     5'd18: case(st)
+        4'd0: cnt = 9'd30;
+        4'd1: cnt = 9'd8;
+        4'd2: cnt = 9'd45;
+        default: cnt = 9'd0;
+        endcase
+    5'd20: case(st)
+        4'd0: cnt = 9'd35;
+        4'd1: cnt = 9'd8;
+        4'd2: cnt = 9'd55;
+        default: cnt = 9'd0;
+        endcase
+    5'd19: case(st)
         4'd0: cnt = 9'd30;
         4'd1: cnt = 9'd8;
         4'd2: cnt = 9'd45;
