@@ -65,6 +65,11 @@ module rgb_palette_tb;
     check(24'h742B56, 6'd36);
     check(24'h6BF0FF, 6'd37);
     check(24'hFF98CB, 6'd38);
+    check(24'h38D996, 6'd39);
+    check(24'h9BD64D, 6'd40);
+    check(24'hFFD23F, 6'd41);
+    check(24'hFF9F1C, 6'd42);
+    check(24'hFF6B35, 6'd43);
     if(errors != 0)begin
       $display("=== FAILED: %0d / %0d ===", errors, checks);
       $fatal;

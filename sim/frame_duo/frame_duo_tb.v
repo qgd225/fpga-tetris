@@ -66,12 +66,12 @@ input [2:0] v;
 begin
 case(v)
 3'd0: lvcol = 24'h00E5FF;
-3'd1: lvcol = 24'h55A630;
-3'd2: lvcol = 24'hFFF_F00;
-3'd3: lvcol = 24'hF77F24;
-3'd4: lvcol = 24'hE63946;
-3'd5: lvcol = 24'hFF4DA6;
-3'd6: lvcol = 24'h9933CC;
+3'd1: lvcol = 24'h38D996;
+3'd2: lvcol = 24'h9BD64D;
+3'd3: lvcol = 24'hFFD23F;
+3'd4: lvcol = 24'hFF9F1C;
+3'd5: lvcol = 24'hFF6B35;
+3'd6: lvcol = 24'hE63946;
 default: lvcol = 24'hFFF_FFF;
 endcase
 end
@@ -100,7 +100,7 @@ end
 endtask
 task look;
 input [10:0] x; input [10:0] y;
-begin hc = x; vc = y; repeat(4) @(posedge Clk); end
+begin hc = x; vc = y; repeat(6) @(posedge Clk); end
 endtask
 task lock2;
 begin
@@ -148,7 +148,7 @@ initial begin
   chk("duo=1 P2 方块=青色", rgb, `CYAN);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd971, 11'd91);
-  chk("duo=0 同位置无 P2 方块", rgb, `BLACK);
+  chk("duo=0 同位置为外层背景", rgb, 24'h101010);
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
   clr_state;
 
@@ -178,7 +178,7 @@ initial begin
   chk("duo=1 第23列格=红色", rgb, `RED);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1067, 11'd630);
-  chk("duo=0 第23列不在场地", rgb, `BLACK);
+  chk("duo=0 第23列不在场地", rgb, 24'h101010);
   clr_state;
   dut.state_color[23*20 + 17] = 3'd0; dut.Playfield_inst.state[23*20 + 17] = 1'b0;
 
@@ -194,18 +194,18 @@ initial begin
   look(11'd1230, 11'd339);  chk("duo=1 P2 Hold 色线", rgb, `PINK2);
   look(11'd1059, 11'd140);  chk("duo=1 单人槽位位置=黑", rgb, `FLDBG);
   look(11'd1059, 11'd123);  chk("duo=1 单人色线位置=黑", rgb, `FLDBG);
-  look(11'd1104, 11'd100);  chk("旧 Next 外框位置=黑", rgb, `BLACK);
-  look(11'd1120, 11'd203);  chk("旧中间虚线位置=黑", rgb, `BLACK);
+  look(11'd1104, 11'd100);  chk("旧 Next 外框位置=外层背景", rgb, 24'h101010);
+  look(11'd1120, 11'd203);  chk("旧中间虚线位置=外层背景", rgb, 24'h101010);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1059, 11'd140);  chk("duo=0 单人 Next 槽位", rgb, `SLOT_P1);
   look(11'd1059, 11'd123);  chk("duo=0 单人 Next 色线", rgb, `GRAY_MID);
   look(11'd1059, 11'd356);  chk("duo=0 单人 Hold 槽位", rgb, `SLOT_P1);
-  look(11'd100, 11'd140);   chk("duo=0 双人槽位位置=黑", rgb, `BLACK);
-  look(11'd100, 11'd123);   chk("duo=0 双人色线位置=黑", rgb, `BLACK);
+  look(11'd100, 11'd140);   chk("duo=0 双人槽位位置=外层背景", rgb, 24'h101010);
+  look(11'd100, 11'd123);   chk("duo=0 双人色线位置=外层背景", rgb, 24'h101010);
   look(11'd1230, 11'd140);  chk("duo=0 无 P2 槽位", rgb, `BLACK);
   look(11'd1230, 11'd123);  chk("duo=0 无 P2 色线", rgb, `BLACK);
-  look(11'd1104, 11'd500);  chk("duo=0 旧 Next 外框位置=黑", rgb, `BLACK);
-  look(11'd1040, 11'd100);  chk("duo=0 旧单人外框位置=黑", rgb, `BLACK);
+  look(11'd1104, 11'd500);  chk("duo=0 旧 Next 外框位置=外层背景", rgb, 24'h101010);
+  look(11'd1040, 11'd100);  chk("duo=0 旧单人外框位置=外层背景", rgb, 24'h101010);
 
   $display("=== 5) 下一块预览(锚点随布局迁移) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
@@ -218,7 +218,7 @@ initial begin
   chk("duo=1 P1 下一块=黄", rgb, `YELLOW);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd140, 11'd240);
-  chk("duo=0 左栏位置无预览", rgb, `BLACK);
+  chk("duo=0 左栏位置为外层背景", rgb, 24'h101010);
   look(11'd1101, 11'd240); // 单人预览 (列1,行3)
   chk("duo=0 单人下一块=黄", rgb, `YELLOW);
   look(11'd1161, 11'd240);
@@ -227,10 +227,10 @@ initial begin
 
   $display("=== 6) Hold 位置 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd1104, 11'd400);  chk("duo=1 旧 Hold 外框位置=黑", rgb, `BLACK);
+  look(11'd1104, 11'd400);  chk("duo=1 旧 Hold 外框位置=外层背景", rgb, 24'h101010);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1040, 11'd300);  chk("duo=0 旧 Hold 外框位置=黑", rgb, `BLACK);
-  look(11'd1230, 11'd356);  chk("duo=0 双人 Hold 位置=黑", rgb, `BLACK);
+  look(11'd1040, 11'd300);  chk("duo=0 旧 Hold 外框位置=外层背景", rgb, 24'h101010);
+  look(11'd1230, 11'd356);  chk("duo=0 双人 Hold 位置=外层背景", rgb, 24'h101010);
 
   $display("=== 7) 单人 P1 显示回归 ===");
   duo = 1'b0; repeat(4) @(posedge Clk);
@@ -249,11 +249,11 @@ initial begin
   dut.state_color[20*20 + 3] = 3'd0;
   dut.Playfield_inst.state[20*20 + 3] = 1'b0;
   look(11'd318, 11'd40); // 边框上方: 左边框不应出头
-  chk("左边框不出头(上方=黑)", rgb, `BLACK);
+  chk("左边框不出头(上方=外层背景)", rgb, 24'h202020);
   look(11'd318, 11'd200); // 边框旁: 左边框正常
   chk("左边框正常(旁边=白)", rgb, `WHITE);
   look(11'd321, 11'd81);
-  chk("有效格(第0行第0列)", rgb, `FLDBG);
+  chk("有效格(第0行第0列)=背景网格", rgb, 24'h081A1E);
 
   $display("=== 9) 幽灵空心框: 边带浅色 / 内部纯黑 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
@@ -345,7 +345,7 @@ initial begin
     look(11'd293, (ybar-37));  chk("current cap white", rgb, `WHITE);
     if(k > 0)begin
       ybar = 88 + (7 - (k-1)) * 78 + 40;
-      look(11'd293, ybar[10:0]); chk("achieved body color", rgb, lvcol(k[2:0]));
+      look(11'd293, ybar[10:0]); chk("achieved body color", rgb, lvcol(k[2:0] - 1'b1));
     end
     if(k < 7)begin
       ybar = 88 + (7 - (k+1)) * 78 + 40;
@@ -353,18 +353,24 @@ initial begin
     end
   end
   force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
-  look(11'd277, 11'd440);   chk("level frame left", rgb, 24'h606060);
-  look(11'd279, 11'd440);   chk("outside bar black", rgb, `BLACK);
-  look(11'd280, 11'd440);   chk("bar left inner", rgb, 24'h303030);
-  look(11'd306, 11'd440);   chk("bar inner right", rgb, 24'h303030);
-  look(11'd307, 11'd440);   chk("bar right inner", rgb, 24'h303030);
-  look(11'd310, 11'd440);   chk("level frame right", rgb, 24'h606060);
+  look(11'd271, 11'd440);   chk("level frame left", rgb, 24'h606060);
+  look(11'd274, 11'd440);   chk("outside bar background", rgb, 24'h101010);
+  look(11'd276, 11'd440);   chk("bar left inner", rgb, 24'h303030);
+  look(11'd309, 11'd440);   chk("bar inner right", rgb, 24'h303030);
+  look(11'd311, 11'd440);   chk("level frame right", rgb, 24'h606060);
   look(11'd293, 11'd88);    chk("segment gap dark", rgb, `SLOT_BG);
   look(11'd292, 11'd40);    chk("level digit color", rgb, 24'h00E5FF);
   look(11'd234, 11'd50);    chk("LV label color", rgb, 24'h00E5FF);
   look(11'd240, 11'd72);    chk("LV rule color", rgb, 24'h00E5FF);
-  look(11'd240, 11'd74);    chk("LV rule below black", rgb, `BLACK);
+  look(11'd240, 11'd74);    chk("LV rule below background", rgb, 24'h202020);
   look(11'd340, 11'd40);    chk("time still white", rgb, `WHITE);
+  release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
+  force dut.Playfield_inst.speed_level = 3'd5; repeat(40) @(posedge Clk);
+  look(11'd267, 11'd90);    chk("hot pressure tooth", rgb, 24'hF77F24);
+  look(11'd315, 11'd90);    chk("hot pressure tooth right", rgb, 24'hF77F24);
+  force dut.Playfield_inst.speed_level = 3'd7; repeat(40) @(posedge Clk);
+  look(11'd267, 11'd90);    chk("critical pressure tooth", rgb, 24'hE63946);
+  look(11'd271, 11'd440);   chk("critical pressure frame", rgb, 24'hE63946);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
   $display("=== 11) 菜单屏: 无框选项 + 青色选中标记 ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
@@ -379,14 +385,14 @@ initial begin
   chk("提示 vt 正确(1x)", dut.choose_menu_inst.vt, 6'd10);
   look(11'd426, 11'd290);   chk("选中项竖条=青", rgb, `CY_MENU);
   look(11'd600, 11'd337);   chk("选中项下划线=青", rgb, `CY_MENU);
-  look(11'd426, 11'd450);   chk("未选中行无竖条", rgb, `BLACK);
+  look(11'd426, 11'd450);   chk("未选中行无竖条=菜单背景", rgb, 24'h0A0F16);
   look(11'd500, 11'd110);   chk("标题文字=白", rgb, `WHITE);
   look(11'd500, 11'd280);   chk("选中项文字=白", rgb, `WHITE);
   look(11'd500, 11'd440);   chk("未选中项文字=灰", rgb, `GRAY_MID);
   choose_cnt = 4'd1; repeat(4) @(posedge Clk);
   look(11'd426, 11'd450);   chk("切换后竖条=青", rgb, `CY_MENU);
   look(11'd600, 11'd497);   chk("切换后下划线=青", rgb, `CY_MENU);
-  look(11'd426, 11'd290);   chk("原选中行无竖条", rgb, `BLACK);
+  look(11'd426, 11'd290);   chk("原选中行无竖条=菜单背景", rgb, 24'h0A0F16);
   look(11'd500, 11'd440);   chk("切换后该项文字=白", rgb, `WHITE);
   look(11'd500, 11'd280);   chk("切换后原项文字=灰", rgb, `GRAY_MID);
   choose = 1'b0; choose_cnt = 4'd0; Playing = 1'b1; repeat(4) @(posedge Clk);
@@ -395,11 +401,11 @@ initial begin
   duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("duo=1 分数贴场地右边界", rgb, `WHITE);
   look(11'd113,  11'd90);   chk("duo=1 NEXT 标签=标签灰", rgb, `GRAY_LBL);
-  look(11'd95,   11'd90);   chk("duo=1 标签旧位置=黑(已居中)", rgb, `BLACK);
+  look(11'd95,   11'd90);   chk("duo=1 标签旧位置=外层背景", rgb, 24'h101010);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1070, 11'd40);   chk("duo=0 该处无分数", rgb, `BLACK);
+  look(11'd1070, 11'd40);   chk("duo=0 该处为顶部背景", rgb, 24'h202020);
   look(11'd935,  11'd40);   chk("duo=0 分数贴场地右边界", rgb, `WHITE);
-  look(11'd95,   11'd90);   chk("duo=0 双人标签位置=黑", rgb, `BLACK);
+  look(11'd95,   11'd90);   chk("duo=0 双人标签位置=外层背景", rgb, 24'h101010);
   look(11'd1077, 11'd90);   chk("duo=0 单人 NEXT 标签", rgb, `GRAY_LBL);
   look(11'd340,  11'd40);   chk("时间数字=白", rgb, `WHITE);
   force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
@@ -411,7 +417,7 @@ initial begin
   look(11'd292,   11'd40);   chk("Finalize LV digit kept", rgb, 24'h00E5FF);
   look(11'd234,   11'd50);   chk("Finalize LV label kept", rgb, 24'h00E5FF);
   look(11'd293,   11'd674);  chk("Finalize level bar kept", rgb, 24'h00E5FF);
-  look(11'd277,   11'd440);  chk("Finalize level frame kept", rgb, 24'h606060);  Finalize = 1'b0; repeat(4) @(posedge Clk);
+  look(11'd271,   11'd440);  chk("Finalize level frame kept", rgb, 24'h606060);  Finalize = 1'b0; repeat(4) @(posedge Clk);
 
   $display("=== 13) 标签字模 1 像素预取(修第 1 列串字) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
@@ -457,21 +463,21 @@ initial begin
   look(11'd1130, 11'd718);  chk("P2 面板底条=粉", rgb, `PINK2);
   look(11'd125, 11'd163);   chk("预览槽点阵=404040", rgb, 24'h404040);
   look(11'd400, 11'd300);   chk("场地内底色=0A0F16", rgb, `FLDBG);
-  look(11'd250, 11'd600);   chk("场地外底色=黑", rgb, `BLACK);
+  look(11'd250, 11'd600);   chk("场地外为外层背景", rgb, 24'h101010);
   look(11'd126, 11'd163);   chk("点阵旁=槽底", rgb, `SLOT_P1);
   look(11'd171, 11'd640);   chk("P1 号码徽标=青", rgb, `CY_MENU);
   look(11'd1185, 11'd624);  chk("P2 号码徽标=粉", rgb, `PINK2);
   look(11'd470, 11'd40);    chk("顶栏发丝线=标签灰", rgb, `GRAY_LBL);
-  look(11'd469, 11'd40);    chk("发丝线左侧=黑", rgb, `BLACK);
+  look(11'd469, 11'd40);    chk("发丝线左侧=顶部背景", rgb, 24'h202020);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1060, 11'd718);  chk("单人面板底条=灰", rgb, `GRAY_MID);
-  look(11'd171, 11'd640);   chk("单人无号码徽标", rgb, `BLACK);
+  look(11'd171, 11'd640);   chk("单人无号码徽标=外层背景", rgb, 24'h101010);
   duo = 1'b1; repeat(4) @(posedge Clk);
 
   $display("=== 16) 菜单标题线 ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
   look(11'd600, 11'd181);   chk("菜单标题线=青", rgb, `CY_MENU);
-  look(11'd600, 11'd179);   chk("标题线上方=黑", rgb, `BLACK);
+  look(11'd600, 11'd179);   chk("标题线上方=菜单背景", rgb, 24'h0A0F16);
   force dut.choose_menu_inst.breath = 1'b1; repeat(4) @(posedge Clk);
   look(11'd426, 11'd290);   chk("菜单选中标记呼吸=暗青", rgb, 24'h00697F);
   release dut.choose_menu_inst.breath; repeat(4) @(posedge Clk);
@@ -487,10 +493,10 @@ initial begin
   force dut.Playfield_inst.speed_level = 3'd5; repeat(2) @(posedge Clk);
   look(11'd293, 11'd280);   chk("升级瞬间当前段=白", rgb, `WHITE);
   repeat(40) @(posedge Clk);
-  look(11'd293, 11'd280);   chk("升级后当前段回青", rgb, 24'hFF4DA6);
+  look(11'd293, 11'd280);   chk("升级后当前段=热力橙红", rgb, 24'hFF6B35);
   release dut.Playfield_inst.speed_level; repeat(40) @(posedge Clk);
   force dut.Playfield_inst.score = 20'd777; repeat(2) @(posedge Clk);
-  look(11'd1070, 11'd40);   chk("加分瞬间分数=青", rgb, `CY_MENU);
+  look(11'd1070, 11'd40);   chk("加分瞬间分数=热力橙", rgb, 24'hFF6B35);
   repeat(40) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("加分后分数=白", rgb, `WHITE);
   release dut.Playfield_inst.score; repeat(40) @(posedge Clk);
@@ -616,7 +622,9 @@ initial begin
   force dut.clear_t_r = 1'b1; force dut.clear_shrink_r = 1'b1; force dut.flash_r = 1'b0;
   repeat(4) @(posedge Clk);
   look(11'd321, 11'd81);  chk("collapse edge black", rgb, `FLDBG);
-  look(11'd337, 11'd97);  chk("collapse center color", rgb, `RED);
+  look(11'd337, 11'd97);  chk("collapse center color", rgb, `WHITE);
+  look(11'd331, 11'd95);  chk("collapse ring orange", rgb, 24'hFF6B35);
+  look(11'd337, 11'd97);  chk("collapse spark white", rgb, 24'hFFFFFF);
   force dut.flash_r = 1'b1;
   repeat(4) @(posedge Clk);
   look(11'd321, 11'd81);  chk("collapse flash edge black", rgb, `FLDBG);
@@ -652,6 +660,10 @@ initial begin
   look(11'd692, 11'd368); chk("GO V visible", rgb, `WHITE);
   look(11'd740, 11'd368); chk("GO E2 visible", rgb, `WHITE);
   look(11'd788, 11'd368); chk("GO R visible", rgb, `WHITE);
+  hc = 11'd509; vc = 11'd320; repeat(3) @(posedge Clk);
+  chk("CORE BREACH label window", dut.lb_breach, 1'b1);
+  chk("CORE BREACH C glyph", dut.lb_g, 5'd2);
+  chk("CORE BREACH prefetch", dut.letter_hud_inst.ena, 1'b1);
   look(11'd432, 11'd349); chk("GO dim inside", rgb, 24'h101010);
   look(11'd431, 11'd349); chk("GO dim outside left", rgb, `FLDBG);
   look(11'd432, 11'd348); chk("GO dim checker other", rgb, `FLDBG);
@@ -748,7 +760,7 @@ initial begin
   release dut.letter_hud_inst.douta;
   repeat(4) @(posedge Clk);
   look(11'd365,11'd562); chk("result score white", rgb, `WHITE);
-  look(11'd568,11'd562); chk("result level color", rgb, 24'h9933CC);
+  look(11'd568,11'd562); chk("result level color", rgb, 24'hE63946);
   look(11'd748,11'd562); chk("result lines pink", rgb, `PINK2);
   look(11'd900,11'd562); chk("result time yellow", rgb, `YELLOW);
   look(11'd950,11'd576); chk("result time colon", rgb, `YELLOW);

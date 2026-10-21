@@ -51,9 +51,12 @@ module frame(
     output snd_hold2,
     output blk_rot1,
     output blk_rot2,
-    output [2:0]snd_clr_n
+    output [2:0]snd_clr_n,
+    output [1:0] danger_lvl
     );
     reg [23:0]rgb_c;
+    reg [6:0]psel;               // 当前像素的组合命中码
+    reg [6:0]psel_r;             // 命中码寄存一级，整屏统一右移 1 像素
     
     
 //    游戏区
@@ -123,7 +126,8 @@ module frame(
                      YLBLV = 11'd36, //LV 标签 Y(与 44px 高的数字底部对齐)
                      YDIGI = 11'd24,
                      XRSCORE = 11'd365, XRLEVEL = 11'd568, XRLINES = 11'd748, XRTIME = 11'd900,
-                     YRMODE = 11'd468, YRLAB = 11'd526, YRNUM = 11'd562;
+                     YRMODE = 11'd468, YRLAB = 11'd526, YRNUM = 11'd562,
+                     XBREACH = 11'd508, YBREACH = 11'd314;
     wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
     wire [10:0]XPN2 = XPNL2;
 //    NEXT/HOLD 标签居中: 4 字 x 24 间距(实宽 92) 在 128 宽面板里左边距 18
@@ -447,6 +451,7 @@ module frame(
     wire level_margin;
     wire level_inner;
     wire level_cap;
+    wire [2:0] level_seg;
     wire on;
     wire cur;
     
@@ -461,7 +466,8 @@ module frame(
     .inner(level_inner),
     .on(on),
     .cur(cur),
-    .cap(level_cap)
+    .cap(level_cap),
+    .seg(level_seg)
     );
     
     wire over_lit;
@@ -512,6 +518,7 @@ module frame(
     reg       lb_lv;
     reg       lb_mode;
     reg       lb_result_lbl;
+    reg       lb_breach;
     integer   li;
     wire [10:0]lb_hn = hcounter + 11'd1;
     always@(*)begin
@@ -523,6 +530,7 @@ module frame(
     lb_lv = 1'b0;
     lb_mode = 1'b0;
     lb_result_lbl = 1'b0;
+    lb_breach = 1'b0;
     for(li = 0; li < 4; li = li + 1)begin
         if((hcounter >= (XLBN1 + li*24)) && (hcounter < (XLBN1 + li*24 + 11'd20)) &&
            (vcounter >= YLBNX) && (vcounter < (YLBNX + 11'd32)))begin
@@ -619,6 +627,21 @@ module frame(
         end
     end
     if(Finalize)begin
+        for(li = 0; li < 11; li = li + 1)begin
+            if((hcounter >= (XBREACH + li*24)) && (hcounter < (XBREACH + li*24 + 11'd20)) &&
+               (vcounter >= YBREACH) && (vcounter < (YBREACH + 11'd32)))begin
+                lb_ena = 1'b1; lb_X = XBREACH + li*24; lb_Y = YBREACH; lb_breach = 1'b1;
+            end
+            if((lb_hn >= (XBREACH + li*24 - 11'd1)) && (lb_hn < (XBREACH + li*24 + 11'd20)) &&
+               (vcounter >= YBREACH) && (vcounter < (YBREACH + 11'd32)))begin
+                lb_ena_n = 1'b1; lb_Y = YBREACH;
+                case(li)
+                0:lb_g=5'd2; 1:lb_g=5'd14; 2:lb_g=5'd17; 3:lb_g=5'd4;
+                4:lb_g=5'd26; 5:lb_g=5'd1; 6:lb_g=5'd17; 7:lb_g=5'd4;
+                8:lb_g=5'd0; 9:lb_g=5'd2; default:lb_g=5'd7;
+                endcase
+            end
+        end
         for(li = 0; li < 4; li = li + 1)begin
             if((hcounter >= (11'd404 + li*24)) && (hcounter < (11'd404 + li*24 + 11'd20)) &&
                (vcounter >= YRMODE) && (vcounter < (YRMODE + 11'd32)))begin
@@ -693,8 +716,13 @@ module frame(
     wire rule1_lit = ((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128)));
-    wire level_frame_lit = (((hcounter == 11'd277) || (hcounter == 11'd310)) && (vcounter >= 11'd86) && (vcounter <= 11'd713)) ||
-                           (((vcounter == 11'd86) || (vcounter == 11'd713)) && (hcounter >= 11'd277) && (hcounter <= 11'd310));
+    wire level_frame_lit =
+        (((hcounter >= 11'd271) && (hcounter <= 11'd272)) ||
+         ((hcounter >= 11'd311) && (hcounter <= 11'd312))) &&
+        (vcounter >= 11'd86) && (vcounter <= 11'd713) ||
+        (((vcounter >= 11'd86) && (vcounter <= 11'd87)) ||
+         ((vcounter >= 11'd712) && (vcounter <= 11'd713))) &&
+        (hcounter >= 11'd271) && (hcounter <= 11'd312);
     wire rule2_lit = duo && (((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
                              ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
                              ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))));
@@ -787,19 +815,42 @@ module frame(
     );
     wire lvd_lit = lvd_ena ? lvd_dout[19 - (hcounter - XLDIG)] : 1'b0;
     wire result_num_lit = result_num_ena ? lvd_dout[19 - (hcounter - result_num_X)] : 1'b0;
-//    等级色: 8 级热力渐变(青->绿->黄->橙->红->粉->紫->白)
+//    等级色: CORE-07 压力柱 8 级热力渐变
+    localparam [23:0] LV_H0 = 24'h00E5FF,
+                      LV_H1 = 24'h38D996,
+                      LV_H2 = 24'h9BD64D,
+                      LV_H3 = 24'hFFD23F,
+                      LV_H4 = 24'hFF9F1C,
+                      LV_H5 = 24'hFF6B35,
+                      LV_H6 = 24'hE63946,
+                      LV_H7 = 24'hFFFFFF;
     reg [23:0]lv_color;
     always@(*)begin
     case(speed_level)
-    0:lv_color = 24'h00E5FF;
-    1:lv_color = 24'h55A630;
-    2:lv_color = 24'hFFF_F00;
-    3:lv_color = 24'hF77F24;
-    4:lv_color = 24'hE63946;
-    5:lv_color = 24'hFF4DA6;
-    6:lv_color = 24'h9933CC;
-    7:lv_color = 24'hFFF_FFF;
-    default:lv_color = 24'h00E5FF;
+    0:lv_color = LV_H0;
+    1:lv_color = LV_H1;
+    2:lv_color = LV_H2;
+    3:lv_color = LV_H3;
+    4:lv_color = LV_H4;
+    5:lv_color = LV_H5;
+    6:lv_color = LV_H6;
+    7:lv_color = LV_H7;
+    default:lv_color = LV_H0;
+    endcase
+    end
+
+    reg [2:0] level_seg_r;
+    reg [23:0]level_seg_color;
+    always@(*)begin
+    case(level_seg_r)
+    3'd0:level_seg_color = LV_H0;
+    3'd1:level_seg_color = LV_H1;
+    3'd2:level_seg_color = LV_H2;
+    3'd3:level_seg_color = LV_H3;
+    3'd4:level_seg_color = LV_H4;
+    3'd5:level_seg_color = LV_H5;
+    3'd6:level_seg_color = LV_H6;
+    default:level_seg_color = LV_H7;
     endcase
     end
 
@@ -817,7 +868,7 @@ module frame(
                              ((vcounter >= 11'd590) && (vcounter <= 11'd593)));
 //    结算区域先屏蔽底层游戏内容，再用棋盘纹压暗；标题、标签和数值在其上层绘制
     wire result_region = Finalize &&
-                      (((hcounter >= 11'd432) && (hcounter <= 11'd847) && (vcounter >= 11'd348) && (vcounter <= 11'd451)) ||
+                      (((hcounter >= 11'd432) && (hcounter <= 11'd847) && (vcounter >= 11'd310) && (vcounter <= 11'd451)) ||
                        ((hcounter >= 11'd352) && (hcounter <= 11'd1048) && (vcounter >= 11'd456) && (vcounter <= 11'd620)));
     wire result_dim = result_region && (hcounter[0] ^ vcounter[0]);
 //    幽灵框: 2px 边带 + 四角各切 1x1(内部纯黑, 与实心下落方块区分)
@@ -875,6 +926,14 @@ module frame(
     reg owner_r;
     reg clear_t_r;
     reg clear_shrink_r;
+    wire collapse_ring_r = clear_shrink_r &&
+        (((glx_r == 11'd10) || (glx_r == 11'd21)) &&
+         (gly_r >= 11'd10) && (gly_r <= 11'd21) ||
+         ((gly_r == 11'd10) || (gly_r == 11'd21)) &&
+         (glx_r >= 11'd10) && (glx_r <= 11'd21));
+    wire collapse_spark_r = clear_shrink_r &&
+        (glx_r >= 11'd14) && (glx_r <= 11'd17) &&
+        (gly_r >= 11'd14) && (gly_r <= 11'd17);
     reg flash_r;
     reg chs_margin_r;
     reg chs_inner_r;
@@ -905,6 +964,71 @@ module frame(
     wire in_field = (hcounter >= 11'd321) && (hcounter < XR) && (vcounter >= 11'd81);
     wire [23:0]field_bg = 24'h0A0F16;
     wire [23:0]slot_bg = (duo && (hcounter >= XPN2)) ? 24'h1E0812 : 24'h081A1E;
+    wire [10:0]field_mid = (11'd321 + XR) >> 1;
+    reg [23:0]story_outer_color;
+    reg [23:0]story_inner_color;
+    reg [23:0]story_menu_color;
+    reg [23:0]story_outer_color_r;
+    reg [23:0]story_inner_color_r;
+    reg [23:0]story_menu_color_r;
+
+//    CORE-07 双层背景：外层舱室 + 内层反应堆收容槽。
+//    背景只作为最低优先级填充，所有方块、HUD、菜单和结算内容仍在上层。
+    always@(*)begin
+    story_outer_color = 24'h101010;
+    if(vcounter < 11'd75)
+        story_outer_color = 24'h202020;
+    if((vcounter == 11'd82) || (vcounter == 11'd306) ||
+       (vcounter == 11'd520) || (vcounter == 11'd710))
+        story_outer_color = 24'h303030;
+    if((hcounter == 11'd12) || (hcounter == 11'd286) ||
+       (hcounter == 11'd301) || (hcounter == 11'd1015) ||
+       (hcounter == 11'd1206) || (hcounter == 11'd1260))
+        story_outer_color = 24'h202020;
+
+    // 观察窗：左侧两个、右侧两个窄窗。
+    if(((hcounter >= 11'd22) && (hcounter <= 11'd76) &&
+        (((vcounter >= 11'd112) && (vcounter <= 11'd162)) ||
+         ((vcounter >= 11'd214) && (vcounter <= 11'd264)))) ||
+       ((hcounter >= 11'd1230) && (hcounter <= 11'd1266) &&
+        (((vcounter >= 11'd112) && (vcounter <= 11'd162)) ||
+         ((vcounter >= 11'd214) && (vcounter <= 11'd264)))))
+        story_outer_color = 24'h000000;
+
+    // 冷却管线：从外层舱壁接入内层场地两侧。
+    if(((vcounter == 11'd164) || (vcounter == 11'd318) ||
+        (vcounter == 11'd472) || (vcounter == 11'd626)) &&
+       (((hcounter >= 11'd292) && (hcounter < 11'd321)) ||
+        ((hcounter >= XR) && (hcounter <= (XR + 11'd21)))))
+        story_outer_color = 24'h04637E;
+
+    story_inner_color = field_bg;
+    if(in_field)begin
+        if((((hcounter - 11'd321) & 11'd31) == 11'd0) ||
+           (((vcounter - 11'd81) & 11'd31) == 11'd0))
+            story_inner_color = 24'h081A1E;
+        if((hcounter == (11'd321 + 11'd22)) ||
+           (hcounter == (XR - 11'd23)))
+            story_inner_color = 24'h00697F;
+        if((hcounter == (11'd321 + 11'd22)) ||
+           (hcounter == (XR - 11'd23)))begin
+            if((vcounter == 11'd164) || (vcounter == 11'd318) ||
+               (vcounter == 11'd472) || (vcounter == 11'd626))
+                story_inner_color = (hcounter == (11'd321 + 11'd22)) ?
+                                     24'h00E5FF : 24'hFF4DA6;
+        end
+        // 中央只保留一条断续核心缝，双人模式不增加次级竖线。
+        if((hcounter == field_mid) && ((vcounter & 11'd63) < 11'd24))
+            story_inner_color = 24'h00697F;
+        if((vcounter >= 11'd700) && ((vcounter & 11'd3) == 11'd0))
+            story_inner_color = 24'h202020;
+        if((vcounter >= 11'd714) && ((hcounter & 11'd31) < 11'd12))
+            story_inner_color = 24'h71411D;
+    end
+
+    // 菜单不显示游戏区网格，只保留低亮度外层舱室和中央暗面板。
+    story_menu_color = in_field ? 24'h0A0F16 : story_outer_color;
+    end
     reg lvd_r;
     reg lb_lv_r;
     reg fin_r;
@@ -937,6 +1061,7 @@ module frame(
     level_margin_r <= 1'b0;
     level_inner_r <= 1'b0;
     level_cap_r <= 1'b0;
+    level_seg_r <= 3'd0;
     on_r <= 1'b0;
     cur_r <= 1'b0;
     hold_r <= 1'b0;
@@ -986,7 +1111,8 @@ module frame(
     fin_r <= 1'b0;
     result_num_r <= 1'b0; result_num_sel_r <= 2'd0; result_mode_r <= 1'b0; result_label_r <= 1'b0;
     result_rule_r <= 1'b0; result_rule_sel_r <= 2'd0; result_colon_r <= 1'b0;
-    hint_hit_r <= 1'b0; hint_type_r <= 3'd0;
+    hint_hit_r <= 1'b0; hint_type_r <= 3'd0; psel_r <= 7'd0;
+    story_outer_color_r <= 24'h0; story_inner_color_r <= 24'h0; story_menu_color_r <= 24'h0;
     end
     else begin
     over_lit_r <= over_lit;
@@ -995,6 +1121,7 @@ module frame(
     level_margin_r <= level_margin;
     level_inner_r <= level_inner;
     level_cap_r <= level_cap;
+    level_seg_r <= level_seg;
     on_r <= on;
     cur_r <= cur;
     hold_r <= hold;
@@ -1055,7 +1182,10 @@ module frame(
     result_mode_r <= lb_mode && lbl_lit; result_label_r <= lb_result_lbl && lbl_lit;
     result_rule_r <= result_score_rule || result_level_rule || result_lines_rule || result_time_rule;
     result_rule_sel_r <= result_rule_sel; result_colon_r <= result_colon_lit;
-    hint_type_r <= hint_type;
+    hint_type_r <= hint_type; psel_r <= psel;
+    story_outer_color_r <= story_outer_color;
+    story_inner_color_r <= story_inner_color;
+    story_menu_color_r <= story_menu_color;
     hint_hit_r <= hint_show && !duo && Playing && hint_match && !hint_occupied_now;
     end
     end
@@ -1227,11 +1357,14 @@ module frame(
     wire row3_any = |(row_f[3] & col_mask);
     wire danger_state = row0_any || row1_any;
     wire caution_state = danger_state || row2_any || row3_any;
-    wire [1:0]danger_lvl = danger_state ? 2'd2 : (caution_state ? 2'd1 : 2'd0);
+    assign danger_lvl = danger_state ? 2'd2 : (caution_state ? 2'd1 : 2'd0);
     wire danger_active = (danger_lvl != 2'd0);
     wire [23:0]danger_color = (danger_lvl == 2'd2) ? RED : ORANGE;
+    wire [10:0]danger_dx = hcounter - 11'd321;
+    wire [10:0]danger_phase = danger_dx % 11'd24;
     wire danger_line = danger_active && (hcounter >= 11'd321) && (hcounter < XR) &&
-                       (vcounter >= 11'd77) && (vcounter < 11'd81);
+                       (vcounter >= 11'd77) && (vcounter < 11'd81) &&
+                       (danger_phase < 11'd16);
     wire danger_dot = danger_active && in_field &&
                       (((hcounter - 11'd321) & 11'd15) == 11'd0) &&
                       (((vcounter - 11'd81) & 11'd15) == 11'd0) &&
@@ -1242,6 +1375,14 @@ module frame(
                       (vcounter >= 11'd81) && (vcounter < 11'd721);
     wire rail_l_white = lflash1 || danger_active || (mbl1 != 2'd0) || (mbl2 != 2'd0);
     wire rail_r_white = (duo ? lflash2 : lflash1) || danger_active || (mbr1 != 2'd0) || (mbr2 != 2'd0);
+    wire level_hot = (speed_level >= 3'd5);
+    wire level_critical = (speed_level == 3'd7) || danger_active;
+    wire [23:0]level_frame_color = level_critical ? RED : (level_hot ? ORANGE : 24'h606060);
+    wire level_alert_lit = level_hot &&
+        (((hcounter >= 11'd267) && (hcounter <= 11'd270)) ||
+         ((hcounter >= 11'd315) && (hcounter <= 11'd318))) &&
+        (((vcounter - 11'd88) & 11'd31) < 11'd8);
+    wire [23:0]level_alert_color = level_critical ? RED : ORANGE;
 
     //    Impact Glass edges and 8px SOFT white L glint
     wire block_light = (glx_r == 11'd1) || (gly_r == 11'd1);
@@ -1354,447 +1495,539 @@ module frame(
     endcase
     end
 
+//    像素命中码：只保留优先级判定，颜色在下一级一次性展开。
+//    这样避免把 24 位颜色常量复制进整条优先链，降低 LUT 与关键路径级数。
+    localparam [6:0]
+        PS_BLACK            = 7'd0,
+        PS_MENU_DARK        = 7'd1,
+        PS_MENU_CYAN        = 7'd2,
+        PS_MENU_TEXT_DIM    = 7'd3,
+        PS_MENU_TEXT        = 7'd4,
+        PS_MENU_BG          = 7'd5,
+        PS_OVER_0           = 7'd6,
+        PS_OVER_1           = 7'd7,
+        PS_OVER_2           = 7'd8,
+        PS_OVER_3           = 7'd9,
+        PS_OVER_4           = 7'd10,
+        PS_OVER_5           = 7'd11,
+        PS_OVER_6           = 7'd12,
+        PS_OVER_7           = 7'd13,
+        PS_OVER_8           = 7'd14,
+        PS_OVER_9_ON        = 7'd15,
+        PS_OVER_9_OFF       = 7'd16,
+        PS_OVER_DEFAULT     = 7'd17,
+        PS_RES_MODE_SOLO    = 7'd18,
+        PS_RES_MODE_DUO     = 7'd19,
+        PS_RES_LABEL        = 7'd20,
+        PS_RES_NUM_SCORE    = 7'd21,
+        PS_RES_NUM_LEVEL    = 7'd22,
+        PS_RES_NUM_LINES    = 7'd23,
+        PS_RES_NUM_TIME     = 7'd24,
+        PS_RES_RULE_SCORE   = 7'd25,
+        PS_RES_RULE_LEVEL   = 7'd26,
+        PS_RES_RULE_LINES   = 7'd27,
+        PS_RES_RULE_TIME    = 7'd28,
+        PS_RES_COLON        = 7'd29,
+        PS_RES_DIM          = 7'd30,
+        PS_RES_BG_FIELD     = 7'd31,
+        PS_RES_BG_BLACK     = 7'd32,
+        PS_BREACH           = 7'd33,
+        PS_LVFRAME_GRAY     = 7'd34,
+        PS_LVFRAME_ORANGE   = 7'd35,
+        PS_LVFRAME_RED      = 7'd36,
+        PS_LVALERT_ORANGE   = 7'd37,
+        PS_LVALERT_RED      = 7'd38,
+        PS_LBL_LV           = 7'd39,
+        PS_LBL_GRAY         = 7'd40,
+        PS_LBL_DIM          = 7'd41,
+        PS_RULE1_CYAN       = 7'd42,
+        PS_RULE1_SOLO_GRAY  = 7'd43,
+        PS_RULE1_WHITE      = 7'd44,
+        PS_RULE1_DIM        = 7'd45,
+        PS_RULE2_PINK       = 7'd46,
+        PS_RULE2_WHITE      = 7'd47,
+        PS_RULE2_DIM        = 7'd48,
+        PS_LV_MARGIN        = 7'd49,
+        PS_LV_WHITE         = 7'd50,
+        PS_LV_SEG           = 7'd51,
+        PS_LV_UNLIT         = 7'd52,
+        PS_LVD_COLOR        = 7'd53,
+        PS_LVD_WHITE        = 7'd54,
+        PS_SLOT_BG          = 7'd55,
+        PS_PREVIEW_WHITE    = 7'd56,
+        PS_PREVIEW_LIGHT_H  = 7'd57,
+        PS_PREVIEW_DARK_H   = 7'd58,
+        PS_PREVIEW_BASE_H   = 7'd59,
+        PS_PREVIEW_LIGHT_N1 = 7'd60,
+        PS_PREVIEW_DARK_N1  = 7'd61,
+        PS_PREVIEW_BASE_N1  = 7'd62,
+        PS_PREVIEW_LIGHT_N2 = 7'd63,
+        PS_PREVIEW_DARK_N2  = 7'd64,
+        PS_PREVIEW_BASE_N2  = 7'd65,
+        PS_SLOT_DOT         = 7'd66,
+        PS_HOLD_SLOT        = 7'd67,
+        PS_NEXT_SLOT        = 7'd68,
+        PS_BADGE_P1         = 7'd69,
+        PS_BADGE_P2         = 7'd70,
+        PS_SCORE_FLASH      = 7'd71,
+        PS_SCORE_WHITE      = 7'd72,
+        PS_TIME_WHITE       = 7'd73,
+        PS_RAIL_L_CYAN      = 7'd74,
+        PS_RAIL_L_WHITE     = 7'd75,
+        PS_RAIL_R_PINK      = 7'd76,
+        PS_RAIL_R_CYAN      = 7'd77,
+        PS_RAIL_R_WHITE     = 7'd78,
+        PS_DANGER           = 7'd79,
+        PS_MARGIN_WHITE     = 7'd80,
+        PS_ROT1             = 7'd81,
+        PS_ROT2             = 7'd82,
+        PS_BRACKET1         = 7'd83,
+        PS_BRACKET2         = 7'd84,
+        PS_PIECE_CORNER     = 7'd85,
+        PS_PIECE_LAND       = 7'd86,
+        PS_PIECE_GLINT      = 7'd87,
+        PS_PIECE_LIGHT_DUO  = 7'd88,
+        PS_PIECE_LIGHT      = 7'd89,
+        PS_PIECE_DARK       = 7'd90,
+        PS_PIECE_BASE       = 7'd91,
+        PS_GHOST_LIGHT      = 7'd92,
+        PS_GHOST_BG         = 7'd93,
+        PS_HINT             = 7'd94,
+        PS_RIM_WHITE        = 7'd95,
+        PS_CELL_CORNER      = 7'd96,
+        PS_CELL_CLEAR_BASE  = 7'd97,
+        PS_CELL_SPARK       = 7'd98,
+        PS_CELL_RING        = 7'd99,
+        PS_CELL_FLASH       = 7'd100,
+        PS_CELL_SHRINK      = 7'd101,
+        PS_CELL_GLINT       = 7'd102,
+        PS_CELL_LIGHT_DUO   = 7'd103,
+        PS_CELL_LIGHT       = 7'd104,
+        PS_CELL_DARK        = 7'd105,
+        PS_CELL_BASE        = 7'd106,
+        PS_PIECE2_CORNER    = 7'd107,
+        PS_PIECE2_LAND      = 7'd108,
+        PS_PIECE2_GLINT     = 7'd109,
+        PS_PIECE2_LIGHT_DUO = 7'd110,
+        PS_PIECE2_LIGHT     = 7'd111,
+        PS_PIECE2_DARK      = 7'd112,
+        PS_PIECE2_BASE      = 7'd113,
+        PS_GHOST2_LIGHT     = 7'd114,
+        PS_GHOST2_BG        = 7'd115,
+        PS_STORY_INNER      = 7'd116,
+        PS_STORY_OUTER      = 7'd117;
+
+    function [23:0] tet_light;
+    input [2:0] t;
+    begin
+        case(t)
+        0:tet_light = LIGHT_CYAN;
+        1:tet_light = LIGHT_PURPPLE;
+        2:tet_light = LIGHT_YELLOW;
+        3:tet_light = LIGHT_RED;
+        4:tet_light = LIGHT_GREEN;
+        5:tet_light = LIGHT_ORANGE;
+        6:tet_light = LIGHT_PINK;
+        default:tet_light = 24'h0;
+        endcase
+    end
+    endfunction
+
+    function [23:0] tet_dark;
+    input [2:0] t;
+    begin
+        case(t)
+        0:tet_dark = DARK_I;
+        1:tet_dark = DARK_T;
+        2:tet_dark = DARK_O;
+        3:tet_dark = DARK_S;
+        4:tet_dark = DARK_Z;
+        5:tet_dark = DARK_L;
+        6:tet_dark = DARK_J;
+        default:tet_dark = 24'h0;
+        endcase
+    end
+    endfunction
+
+    function [23:0] tet_base;
+    input [2:0] t;
+    begin
+        case(t)
+        0:tet_base = CYAN;
+        1:tet_base = PURPPLE;
+        2:tet_base = YELLOW;
+        3:tet_base = RED;
+        4:tet_base = GREEN;
+        5:tet_base = ORANGE;
+        6:tet_base = PINK;
+        default:tet_base = 24'h0;
+        endcase
+    end
+    endfunction
+
     always@(*)begin
+    psel = PS_BLACK;
     if(!Reset_n)
-    rgb_c = BLACK;
+    psel = PS_BLACK;
     else if(choose)begin
         if(chs_margin_r)
-        rgb_c = chs_breath_r ? 24'h00697F : 24'h00E5FF; //选中标记(带呼吸)
+        psel = chs_breath_r ? PS_MENU_DARK : PS_MENU_CYAN;
         else if(chs_text_r)
-        rgb_c = chs_dim_r ? 24'h606060 : WHITE;
+        psel = chs_dim_r ? PS_MENU_TEXT_DIM : PS_MENU_TEXT;
         else
-        rgb_c = BLACK;
+        psel = PS_MENU_BG;
         end
-    else if(over_lit_r || over_line_lit)
+    else if(over_lit_r || over_line_lit)begin
         case(cn_r)
-        0:rgb_c = 24'h101010;
-        1:rgb_c = 24'h202020;
-        2:rgb_c = 24'h404040;
-        3:rgb_c = 24'h606060;
-        4:rgb_c = 24'h909090;
-        5:rgb_c = 24'hB0B0B0;
-        6:rgb_c = 24'hD8D8D8;
-        7:rgb_c = 24'hFFF_FFF;
-        8:rgb_c = 24'hFFF_FFF;
-        9:if(tick_r)
-          rgb_c = 24'hFFF_FFF;
-          else
-          rgb_c = 24'h303030;
-        default:rgb_c = 24'hFFF_FFF;
+        0:psel = PS_OVER_0;
+        1:psel = PS_OVER_1;
+        2:psel = PS_OVER_2;
+        3:psel = PS_OVER_3;
+        4:psel = PS_OVER_4;
+        5:psel = PS_OVER_5;
+        6:psel = PS_OVER_6;
+        7:psel = PS_OVER_7;
+        8:psel = PS_OVER_8;
+        9:psel = tick_r ? PS_OVER_9_ON : PS_OVER_9_OFF;
+        default:psel = PS_OVER_DEFAULT;
         endcase
-    else if(result_mode_r)
-    rgb_c = duo ? 24'hFF4DA6 : 24'h00E5FF;
-    else if(result_label_r)
-    rgb_c = 24'hB0B0B0;
-    else if(result_num_r)
-    case(result_num_sel_r)
-    0:rgb_c = WHITE;
-    1:rgb_c = lv_color;
-    2:rgb_c = 24'hFF4DA6;
-    default:rgb_c = 24'hFFFF00;
-    endcase
-    else if(result_rule_r)
-    case(result_rule_sel_r)
-    0:rgb_c = 24'h00E5FF;
-    1:rgb_c = lv_color;
-    2:rgb_c = 24'hFF4DA6;
-    default:rgb_c = 24'hFFFF00;
-    endcase
-    else if(result_colon_r)
-    rgb_c = 24'hFFFF00;
-    else if(result_region)
-    rgb_c = result_dim ? 24'h101010 : (in_field ? field_bg : BLACK); //GAME OVER 与结算数据区棋盘式局部压暗
-    else if(level_frame_lit)
-    rgb_c = 24'h606060;
-    else if(lbl_r)
-    rgb_c = lb_lv_r ? lv_color : (fin_r ? 24'h202020 : 24'hB0B0B0); //NEXT/HOLD 标签灰, LV 用等级色
-    else if(rule1_r)
-    rgb_c = fin_r ? 24'h202020 : (lflash1 ? WHITE : (duo ? 24'h00E5FF : 24'h606060)); //面板分隔线(P1/单人)
-    else if(rule2_r)
-    rgb_c = fin_r ? 24'h202020 : (lflash2 ? WHITE : 24'hFF4DA6); //P2 面板分隔线
-    else if(level_margin_r)begin
-        rgb_c = 24'h202020; //段与段之间的缝
         end
-    else if(level_inner_r)begin
-        if(lvflash)
-        rgb_c = WHITE;
-        else if(level_cap_r)
-        rgb_c = WHITE;
-        else if(cur_r)
-        rgb_c = lv_color;
-        else if(on_r)
-        rgb_c = lv_color;
+    else if(result_mode_r)
+    psel = duo ? PS_RES_MODE_DUO : PS_RES_MODE_SOLO;
+    else if(result_label_r)
+    psel = PS_RES_LABEL;
+    else if(result_num_r)begin
+        case(result_num_sel_r)
+        0:psel = PS_RES_NUM_SCORE;
+        1:psel = PS_RES_NUM_LEVEL;
+        2:psel = PS_RES_NUM_LINES;
+        default:psel = PS_RES_NUM_TIME;
+        endcase
+        end
+    else if(result_rule_r)begin
+        case(result_rule_sel_r)
+        0:psel = PS_RES_RULE_SCORE;
+        1:psel = PS_RES_RULE_LEVEL;
+        2:psel = PS_RES_RULE_LINES;
+        default:psel = PS_RES_RULE_TIME;
+        endcase
+        end
+    else if(result_colon_r)
+    psel = PS_RES_COLON;
+    else if(result_region)begin
+        if(result_dim)
+        psel = PS_RES_DIM;
         else
-        rgb_c = 24'h303030;
+        psel = in_field ? PS_RES_BG_FIELD : PS_RES_BG_BLACK;
+        end
+    else if(lb_breach)
+    psel = PS_BREACH;
+    else if(level_frame_lit)
+    psel = level_critical ? PS_LVFRAME_RED :
+           (level_hot ? PS_LVFRAME_ORANGE : PS_LVFRAME_GRAY);
+    else if(level_alert_lit)
+    psel = level_critical ? PS_LVALERT_RED : PS_LVALERT_ORANGE;
+    else if(lbl_r)begin
+        if(lb_lv_r)
+        psel = PS_LBL_LV;
+        else if(fin_r)
+        psel = PS_LBL_DIM;
+        else
+        psel = PS_LBL_GRAY;
+        end
+    else if(rule1_r)begin
+        if(fin_r)
+        psel = PS_RULE1_DIM;
+        else if(lflash1)
+        psel = PS_RULE1_WHITE;
+        else
+        psel = duo ? PS_RULE1_CYAN : PS_RULE1_SOLO_GRAY;
+        end
+    else if(rule2_r)begin
+        if(fin_r)
+        psel = PS_RULE2_DIM;
+        else if(lflash2)
+        psel = PS_RULE2_WHITE;
+        else
+        psel = PS_RULE2_PINK;
+        end
+    else if(level_margin_r)
+    psel = PS_LV_MARGIN;
+    else if(level_inner_r)begin
+        if(lvflash || level_cap_r)
+        psel = PS_LV_WHITE;
+        else if(cur_r || on_r)
+        psel = PS_LV_SEG;
+        else
+        psel = PS_LV_UNLIT;
         end
     else if(lvd_r)
-    rgb_c = lvflash ? WHITE : lv_color; //等级数字(与 LV 同色)
+    psel = lvflash ? PS_LVD_WHITE : PS_LVD_COLOR;
     else if(hold_r)begin
         if(!pv_round_r)
-        rgb_c = slot_bg;
-        else if(hflash)
-        rgb_c = WHITE;
-        else if(pv_glint)
-        rgb_c = WHITE;
+        psel = PS_SLOT_BG;
+        else if(hflash || pv_glint)
+        psel = PS_PREVIEW_WHITE;
         else if(pv_light || pv_soft)
-        case(hold_type_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PREVIEW_LIGHT_H;
         else if(pv_dark)
-        case(hold_type_r)
-        0:rgb_c = DARK_I;
-        1:rgb_c = DARK_T;
-        2:rgb_c = DARK_O;
-        3:rgb_c = DARK_S;
-        4:rgb_c = DARK_Z;
-        5:rgb_c = DARK_L;
-        6:rgb_c = DARK_J;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PREVIEW_DARK_H;
         else
-        case(hold_type_r)
-        0:rgb_c = CYAN;
-        1:rgb_c = PURPPLE;
-        2:rgb_c = YELLOW;
-        3:rgb_c = RED;
-        4:rgb_c = GREEN;
-        5:rgb_c = ORANGE;
-        6:rgb_c = PINK;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PREVIEW_BASE_H;
         end
     else if(next_r)begin
         if(!pv_round_r)
-        rgb_c = slot_bg;
-        else if(nflash1)
-        rgb_c = WHITE;
-        else if(pv_glint)
-        rgb_c = WHITE;
+        psel = PS_SLOT_BG;
+        else if(nflash1 || pv_glint)
+        psel = PS_PREVIEW_WHITE;
         else if(pv_light || pv_soft)
-        case(type_t_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PREVIEW_LIGHT_N1;
         else if(pv_dark)
-        case(type_t_r)
-        0:rgb_c = DARK_I;
-        1:rgb_c = DARK_T;
-        2:rgb_c = DARK_O;
-        3:rgb_c = DARK_S;
-        4:rgb_c = DARK_Z;
-        5:rgb_c = DARK_L;
-        6:rgb_c = DARK_J;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PREVIEW_DARK_N1;
         else
-        case(type_t_r)
-        0:rgb_c = CYAN;
-        1:rgb_c = PURPPLE;
-        2:rgb_c = YELLOW;
-        3:rgb_c = RED;
-        4:rgb_c = GREEN;
-        5:rgb_c = ORANGE;
-        6:rgb_c = PINK;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PREVIEW_BASE_N1;
         end
     else if(next2_r)begin
         if(!pv_round_r)
-        rgb_c = slot_bg;
-        else if(nflash2)
-        rgb_c = WHITE;
-        else if(pv_glint)
-        rgb_c = WHITE;
+        psel = PS_SLOT_BG;
+        else if(nflash2 || pv_glint)
+        psel = PS_PREVIEW_WHITE;
         else if(pv_light || pv_soft)
-        case(type_t2_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PREVIEW_LIGHT_N2;
         else if(pv_dark)
-        case(type_t2_r)
-        0:rgb_c = DARK_I;
-        1:rgb_c = DARK_T;
-        2:rgb_c = DARK_O;
-        3:rgb_c = DARK_S;
-        4:rgb_c = DARK_Z;
-        5:rgb_c = DARK_L;
-        6:rgb_c = DARK_J;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PREVIEW_DARK_N2;
         else
-        case(type_t2_r)
-        0:rgb_c = CYAN;
-        1:rgb_c = PURPPLE;
-        2:rgb_c = YELLOW;
-        3:rgb_c = RED;
-        4:rgb_c = GREEN;
-        5:rgb_c = ORANGE;
-        6:rgb_c = PINK;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PREVIEW_BASE_N2;
         end
     else if(slot_dot)
-    rgb_c = 24'h404040; //预览槽点阵
+    psel = PS_SLOT_DOT;
     else if(hold_slot_r)
-    rgb_c = slot_bg; //Hold 槽位底色
+    psel = PS_HOLD_SLOT;
     else if(next_slot_r)
-    rgb_c = slot_bg; //Next 槽位底色
+    psel = PS_NEXT_SLOT;
     else if(badge_lit)
-    rgb_c = bd2 ? 24'hFF4DA6 : 24'h00E5FF; //P1/P2 号码徽标
+    psel = bd2 ? PS_BADGE_P2 : PS_BADGE_P1;
     else if(score_lit_r)
-    rgb_c = (scflash && (!fin_r)) ? 24'h00E5FF : WHITE;
+    psel = (scflash && !fin_r) ? PS_SCORE_FLASH : PS_SCORE_WHITE;
     else if(time_lit_r)
-    rgb_c = WHITE;
+    psel = PS_TIME_WHITE;
     else if(rail_l_lit)
-    rgb_c = rail_l_white ? WHITE : 24'h00E5FF;
-    else if(rail_r_lit)
-    rgb_c = rail_r_white ? WHITE : (duo ? PINK : 24'h00E5FF);
+    psel = rail_l_white ? PS_RAIL_L_WHITE : PS_RAIL_L_CYAN;
+    else if(rail_r_lit)begin
+        if(rail_r_white)
+        psel = PS_RAIL_R_WHITE;
+        else
+        psel = duo ? PS_RAIL_R_PINK : PS_RAIL_R_CYAN;
+        end
     else if(danger_line)
-    rgb_c = danger_color;
+    psel = PS_DANGER;
     else if(margin_r)
-    rgb_c = WHITE;
-    else if(danger_dot && !cell_r && !Piece_r && !ghost_r && !Piece2_r && !ghost2_r)
-    rgb_c = danger_color;
+    psel = PS_MARGIN_WHITE;
     else if(rot_corner1 || hard_fx1)
-    rgb_c = 24'h00E5FF;
+    psel = PS_ROT1;
     else if(rot_corner2 || hard_fx2)
-    rgb_c = PINK;
+    psel = PS_ROT2;
     else if(bracket1)
-    rgb_c = 24'h00E5FF;
+    psel = PS_BRACKET1;
     else if(bracket2)
-    rgb_c = PINK;
+    psel = PS_BRACKET2;
     else if(Piece_r)begin
         if(!piece_round_r)
-        rgb_c = field_bg;
+        psel = PS_PIECE_CORNER;
         else if(land_we_r)
-        rgb_c = 24'hEEEEEE;
+        psel = PS_PIECE_LAND;
         else if(block_glint)
-        rgb_c = WHITE;
-        else if(block_light || block_soft)begin
-        if(duo)
-        rgb_c = P1_SOFT;
-        else
-        case(type_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
-        end
+        psel = PS_PIECE_GLINT;
+        else if(block_light || block_soft)
+        psel = duo ? PS_PIECE_LIGHT_DUO : PS_PIECE_LIGHT;
         else if(block_dark)
-        case(type_r)
-        0:rgb_c = DARK_I;
-        1:rgb_c = DARK_T;
-        2:rgb_c = DARK_O;
-        3:rgb_c = DARK_S;
-        4:rgb_c = DARK_Z;
-        5:rgb_c = DARK_L;
-        6:rgb_c = DARK_J;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PIECE_DARK;
         else
-        case(type_r)
-        0:rgb_c = CYAN;
-        1:rgb_c = PURPPLE;
-        2:rgb_c = YELLOW;
-        3:rgb_c = RED;
-        4:rgb_c = GREEN;
-        5:rgb_c = ORANGE;
-        6:rgb_c = PINK;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PIECE_BASE;
         end
     else if(ghost_r)begin
-        if(ghost_tick || ghost_edge_r)begin
-        case(type_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
-        end
-        else if(ghost_edge_r)begin
-        case(type_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
-        end
+        if(ghost_tick || ghost_edge_r)
+        psel = PS_GHOST_LIGHT;
         else
-        rgb_c = field_bg;
+        psel = PS_GHOST_BG;
         end
     else if(hint_cell_lit)
-    rgb_c = hint_color;
-    else if(lock_rim1)
-    rgb_c = WHITE;
-    else if(lock_rim2)
-    rgb_c = WHITE;
+    psel = PS_HINT;
+    else if(lock_rim1 || lock_rim2)
+    psel = PS_RIM_WHITE;
     else if(cell_r)begin
         if(!piece_round_r)
-        rgb_c = field_bg;
+        psel = PS_CELL_CORNER;
         else if(clear_t_r)begin
-            case(sc_r)
-            0:rgb_c = CYAN;
-            1:rgb_c = PURPPLE;
-            2:rgb_c = YELLOW;
-            3:rgb_c = RED;
-            4:rgb_c = GREEN;
-            5:rgb_c = ORANGE;
-            6:rgb_c = PINK;
-            default:rgb_c = 0;
-            endcase
-            if(flash_r)
-            rgb_c = 24'hEEEEEE;
-            if(clear_shrink_r && !((glx_r >= 11'd11) && (glx_r <= 11'd20) && (gly_r >= 11'd11) && (gly_r <= 11'd20)))
-            rgb_c = field_bg;
-        end
+            if(clear_shrink_r && !collapse_ring_r &&
+               !((glx_r >= 11'd11) && (glx_r <= 11'd20) &&
+                 (gly_r >= 11'd11) && (gly_r <= 11'd20)))
+            psel = PS_CELL_SHRINK;
+            else if(flash_r)
+            psel = PS_CELL_FLASH;
+            else if(collapse_spark_r)
+            psel = PS_CELL_SPARK;
+            else if(collapse_ring_r)
+            psel = PS_CELL_RING;
+            else
+            psel = PS_CELL_CLEAR_BASE;
+            end
         else if(block_glint)
-        rgb_c = WHITE;
-        else if(block_light || block_soft)begin
-        if(duo)
-        rgb_c = owner_r ? P2_SOFT : P1_SOFT;
-        else
-        case(sc_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
-        end
+        psel = PS_CELL_GLINT;
+        else if(block_light || block_soft)
+        psel = duo ? PS_CELL_LIGHT_DUO : PS_CELL_LIGHT;
         else if(block_dark)
-        case(sc_r)
-        0:rgb_c = DARK_I;
-        1:rgb_c = DARK_T;
-        2:rgb_c = DARK_O;
-        3:rgb_c = DARK_S;
-        4:rgb_c = DARK_Z;
-        5:rgb_c = DARK_L;
-        6:rgb_c = DARK_J;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_CELL_DARK;
         else
-        case(sc_r)
-        0:rgb_c = CYAN;
-        1:rgb_c = PURPPLE;
-        2:rgb_c = YELLOW;
-        3:rgb_c = RED;
-        4:rgb_c = GREEN;
-        5:rgb_c = ORANGE;
-        6:rgb_c = PINK;
-        default:rgb_c = 0;
-        endcase
-    end
+        psel = PS_CELL_BASE;
+        end
     else if(Piece2_r)begin
         if(!piece_round_r)
-        rgb_c = field_bg;
+        psel = PS_PIECE2_CORNER;
         else if(land_we2_r)
-        rgb_c = 24'hEEEEEE;
+        psel = PS_PIECE2_LAND;
         else if(block_glint)
-        rgb_c = WHITE;
-        else if(block_light || block_soft)begin
-        if(duo)
-        rgb_c = P2_SOFT;
-        else
-        case(type2_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
-        end
+        psel = PS_PIECE2_GLINT;
+        else if(block_light || block_soft)
+        psel = duo ? PS_PIECE2_LIGHT_DUO : PS_PIECE2_LIGHT;
         else if(block_dark)
-        case(type2_r)
-        0:rgb_c = DARK_I;
-        1:rgb_c = DARK_T;
-        2:rgb_c = DARK_O;
-        3:rgb_c = DARK_S;
-        4:rgb_c = DARK_Z;
-        5:rgb_c = DARK_L;
-        6:rgb_c = DARK_J;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PIECE2_DARK;
         else
-        case(type2_r)
-        0:rgb_c = CYAN;
-        1:rgb_c = PURPPLE;
-        2:rgb_c = YELLOW;
-        3:rgb_c = RED;
-        4:rgb_c = GREEN;
-        5:rgb_c = ORANGE;
-        6:rgb_c = PINK;
-        default:rgb_c = 0;
-        endcase
+        psel = PS_PIECE2_BASE;
         end
     else if(ghost2_r)begin
-        if(ghost_tick || ghost_edge_r)begin
-        case(type2_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
-        end
-        else if(ghost_edge_r)begin
-        case(type2_r)
-        0:rgb_c = LIGHT_CYAN;
-        1:rgb_c = LIGHT_PURPPLE;
-        2:rgb_c = LIGHT_YELLOW;
-        3:rgb_c = LIGHT_RED;
-        4:rgb_c = LIGHT_GREEN;
-        5:rgb_c = LIGHT_ORANGE;
-        6:rgb_c = LIGHT_PINK;
-        default:rgb_c = 0;
-        endcase
-        end
+        if(ghost_tick || ghost_edge_r)
+        psel = PS_GHOST2_LIGHT;
         else
-        rgb_c = field_bg;
+        psel = PS_GHOST2_BG;
         end
+    else if(in_field)
+    psel = PS_STORY_INNER;
     else
-    rgb_c = in_field ? field_bg : BLACK;
+    psel = PS_STORY_OUTER;
+    end
+
+    always@(*)begin
+    case(psel_r)
+    PS_MENU_DARK:       rgb_c = 24'h00697F;
+    PS_MENU_CYAN:       rgb_c = 24'h00E5FF;
+    PS_MENU_TEXT_DIM:   rgb_c = 24'h606060;
+    PS_MENU_TEXT:       rgb_c = WHITE;
+    PS_MENU_BG:         rgb_c = story_menu_color_r;
+    PS_OVER_0:          rgb_c = 24'h101010;
+    PS_OVER_1:          rgb_c = 24'h202020;
+    PS_OVER_2:          rgb_c = 24'h404040;
+    PS_OVER_3:          rgb_c = 24'h606060;
+    PS_OVER_4:          rgb_c = 24'h909090;
+    PS_OVER_5:          rgb_c = 24'hB0B0B0;
+    PS_OVER_6:          rgb_c = 24'hD8D8D8;
+    PS_OVER_7:          rgb_c = 24'hFFFFFF;
+    PS_OVER_8:          rgb_c = 24'hFFFFFF;
+    PS_OVER_9_ON:       rgb_c = 24'hFFFFFF;
+    PS_OVER_9_OFF:      rgb_c = 24'h303030;
+    PS_OVER_DEFAULT:    rgb_c = 24'hFFFFFF;
+    PS_RES_MODE_SOLO:   rgb_c = 24'h00E5FF;
+    PS_RES_MODE_DUO:    rgb_c = 24'hFF4DA6;
+    PS_RES_LABEL:       rgb_c = 24'hB0B0B0;
+    PS_RES_NUM_SCORE:   rgb_c = WHITE;
+    PS_RES_NUM_LEVEL:   rgb_c = lv_color;
+    PS_RES_NUM_LINES:   rgb_c = 24'hFF4DA6;
+    PS_RES_NUM_TIME:    rgb_c = 24'hFFFF00;
+    PS_RES_RULE_SCORE:  rgb_c = 24'h00E5FF;
+    PS_RES_RULE_LEVEL:  rgb_c = lv_color;
+    PS_RES_RULE_LINES:  rgb_c = 24'hFF4DA6;
+    PS_RES_RULE_TIME:   rgb_c = 24'hFFFF00;
+    PS_RES_COLON:       rgb_c = 24'hFFFF00;
+    PS_RES_DIM:         rgb_c = 24'h101010;
+    PS_RES_BG_FIELD:    rgb_c = field_bg;
+    PS_RES_BG_BLACK:    rgb_c = BLACK;
+    PS_BREACH:          rgb_c = 24'hE63946;
+    PS_LVFRAME_GRAY:    rgb_c = 24'h606060;
+    PS_LVFRAME_ORANGE:  rgb_c = ORANGE;
+    PS_LVFRAME_RED:     rgb_c = RED;
+    PS_LVALERT_ORANGE:  rgb_c = ORANGE;
+    PS_LVALERT_RED:     rgb_c = RED;
+    PS_LBL_LV:          rgb_c = lv_color;
+    PS_LBL_GRAY:        rgb_c = 24'hB0B0B0;
+    PS_LBL_DIM:         rgb_c = 24'h202020;
+    PS_RULE1_CYAN:      rgb_c = 24'h00E5FF;
+    PS_RULE1_SOLO_GRAY: rgb_c = 24'h606060;
+    PS_RULE1_WHITE:     rgb_c = WHITE;
+    PS_RULE1_DIM:       rgb_c = 24'h202020;
+    PS_RULE2_PINK:      rgb_c = 24'hFF4DA6;
+    PS_RULE2_WHITE:     rgb_c = WHITE;
+    PS_RULE2_DIM:       rgb_c = 24'h202020;
+    PS_LV_MARGIN:       rgb_c = 24'h202020;
+    PS_LV_WHITE:        rgb_c = WHITE;
+    PS_LV_SEG:          rgb_c = level_seg_color;
+    PS_LV_UNLIT:        rgb_c = 24'h303030;
+    PS_LVD_COLOR:       rgb_c = lv_color;
+    PS_LVD_WHITE:       rgb_c = WHITE;
+    PS_SLOT_BG:         rgb_c = slot_bg;
+    PS_PREVIEW_WHITE:   rgb_c = WHITE;
+    PS_PREVIEW_LIGHT_H: rgb_c = tet_light(hold_type_r);
+    PS_PREVIEW_DARK_H:  rgb_c = tet_dark(hold_type_r);
+    PS_PREVIEW_BASE_H:  rgb_c = tet_base(hold_type_r);
+    PS_PREVIEW_LIGHT_N1:rgb_c = tet_light(type_t_r);
+    PS_PREVIEW_DARK_N1: rgb_c = tet_dark(type_t_r);
+    PS_PREVIEW_BASE_N1: rgb_c = tet_base(type_t_r);
+    PS_PREVIEW_LIGHT_N2:rgb_c = tet_light(type_t2_r);
+    PS_PREVIEW_DARK_N2: rgb_c = tet_dark(type_t2_r);
+    PS_PREVIEW_BASE_N2: rgb_c = tet_base(type_t2_r);
+    PS_SLOT_DOT:        rgb_c = 24'h404040;
+    PS_HOLD_SLOT:       rgb_c = slot_bg;
+    PS_NEXT_SLOT:       rgb_c = slot_bg;
+    PS_BADGE_P1:        rgb_c = 24'h00E5FF;
+    PS_BADGE_P2:        rgb_c = 24'hFF4DA6;
+    PS_SCORE_FLASH:     rgb_c = LV_H5;
+    PS_SCORE_WHITE:     rgb_c = WHITE;
+    PS_TIME_WHITE:      rgb_c = WHITE;
+    PS_RAIL_L_CYAN:     rgb_c = 24'h00E5FF;
+    PS_RAIL_L_WHITE:    rgb_c = WHITE;
+    PS_RAIL_R_PINK:     rgb_c = PINK;
+    PS_RAIL_R_CYAN:     rgb_c = 24'h00E5FF;
+    PS_RAIL_R_WHITE:    rgb_c = WHITE;
+    PS_DANGER:          rgb_c = danger_color;
+    PS_MARGIN_WHITE:    rgb_c = WHITE;
+    PS_ROT1:            rgb_c = 24'h00E5FF;
+    PS_ROT2:            rgb_c = PINK;
+    PS_BRACKET1:        rgb_c = 24'h00E5FF;
+    PS_BRACKET2:        rgb_c = PINK;
+    PS_PIECE_CORNER:    rgb_c = field_bg;
+    PS_PIECE_LAND:      rgb_c = 24'hEEEEEE;
+    PS_PIECE_GLINT:     rgb_c = WHITE;
+    PS_PIECE_LIGHT_DUO: rgb_c = P1_SOFT;
+    PS_PIECE_LIGHT:     rgb_c = tet_light(type_r);
+    PS_PIECE_DARK:      rgb_c = tet_dark(type_r);
+    PS_PIECE_BASE:      rgb_c = tet_base(type_r);
+    PS_GHOST_LIGHT:     rgb_c = tet_light(type_r);
+    PS_GHOST_BG:        rgb_c = field_bg;
+    PS_HINT:            rgb_c = hint_color;
+    PS_RIM_WHITE:       rgb_c = WHITE;
+    PS_CELL_CORNER:     rgb_c = field_bg;
+    PS_CELL_CLEAR_BASE: rgb_c = tet_base(sc_r);
+    PS_CELL_SPARK:      rgb_c = WHITE;
+    PS_CELL_RING:       rgb_c = LV_H5;
+    PS_CELL_FLASH:      rgb_c = 24'hEEEEEE;
+    PS_CELL_SHRINK:     rgb_c = field_bg;
+    PS_CELL_GLINT:      rgb_c = WHITE;
+    PS_CELL_LIGHT_DUO:  rgb_c = owner_r ? P2_SOFT : P1_SOFT;
+    PS_CELL_LIGHT:      rgb_c = tet_light(sc_r);
+    PS_CELL_DARK:       rgb_c = tet_dark(sc_r);
+    PS_CELL_BASE:       rgb_c = tet_base(sc_r);
+    PS_PIECE2_CORNER:   rgb_c = field_bg;
+    PS_PIECE2_LAND:     rgb_c = 24'hEEEEEE;
+    PS_PIECE2_GLINT:    rgb_c = WHITE;
+    PS_PIECE2_LIGHT_DUO:rgb_c = P2_SOFT;
+    PS_PIECE2_LIGHT:    rgb_c = tet_light(type2_r);
+    PS_PIECE2_DARK:     rgb_c = tet_dark(type2_r);
+    PS_PIECE2_BASE:     rgb_c = tet_base(type2_r);
+    PS_GHOST2_LIGHT:    rgb_c = tet_light(type2_r);
+    PS_GHOST2_BG:       rgb_c = field_bg;
+    PS_STORY_INNER:     rgb_c = story_inner_color_r;
+    PS_STORY_OUTER:     rgb_c = story_outer_color_r;
+    default:            rgb_c = BLACK;
+    endcase
     end
     
 //    消行音效编号(只读)

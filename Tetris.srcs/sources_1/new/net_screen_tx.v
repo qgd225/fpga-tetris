@@ -54,9 +54,9 @@ parameter DST_PORT   = 16'd5000;
 parameter FPS_DIV    = 1; // 1=60fps  2=30fps  3=20fps
 parameter PAL_FRAMES = 60; // 每 60 帧插一个调色板包(=1s@60fps)
 parameter LINE_LEN   = 16'd1287; // 7 字节包头 + 1280 个标号
-parameter PAL_LEN    = 16'd160; // 4 + 39*4
-parameter [7:0] PAL_LAST = 8'd159; // = 4 + PAL_N*4 - 1 (包尾序号)
-parameter PAL_N      = 8'd39;
+parameter PAL_LEN    = 16'd180; // 4 + 44*4
+parameter [7:0] PAL_LAST = 8'd179; // = 4 + PAL_N*4 - 1 (包尾序号)
+parameter PAL_N      = 8'd44;
 parameter KB_TIMEOUT = 24'd14_850_000; // 200ms @74.25MHz 没有按键包就全部松开
 parameter KB_RST_CNT = 25'd1_485_000; // 小键盘9复位把 Reset_n 拉低 20ms
 parameter KB_ACT_CNT = 25'd22_275_000; // 收到按键包后 kb_activity 亮 0.3s
@@ -469,6 +469,11 @@ always@(*)begin
   6'd36:  pal_rgb = 24'h74_2B_56;
   6'd37:  pal_rgb = 24'h6B_F0_FF;
   6'd38:  pal_rgb = 24'hFF_98_CB;
+  6'd39:  pal_rgb = 24'h38_D9_96;
+  6'd40:  pal_rgb = 24'h9B_D6_4D;
+  6'd41:  pal_rgb = 24'hFF_D2_3F;
+  6'd42:  pal_rgb = 24'hFF_9F_1C;
+  6'd43:  pal_rgb = 24'hFF_6B_35;
   default: pal_rgb = 24'h00_00_00;
   endcase
 end

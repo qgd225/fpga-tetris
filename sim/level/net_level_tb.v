@@ -204,6 +204,7 @@ initial begin
     hc = 11'd293; vc = 11'd402; #1;
     chk("current inner", dut.level_inst.inner, 1);
     chk("current segment", dut.level_inst.cur, 1);
+    chk("current segment index", dut.level_inst.seg, 3);
     chk("current cap", dut.level_inst.cap, 1);
     vc = 11'd408; #1;
     chk("cap ends at 6px", dut.level_inst.cap, 0);
@@ -211,13 +212,13 @@ initial begin
     chk("current body lit", dut.level_inst.on, 1);
     vc = 11'd360; #1;
     chk("above segment unlit", dut.level_inst.on, 0);
-    hc = 11'd279; vc = 11'd440; #1;
+    hc = 11'd275; vc = 11'd440; #1;
     chk("outside left", dut.level_inst.inner, 0);
-    hc = 11'd280; #1;
-    chk("width starts 280", dut.level_inst.inner, 1);
-    hc = 11'd307; #1;
-    chk("width ends 307", dut.level_inst.inner, 1);
-    hc = 11'd308; #1;
+    hc = 11'd276; #1;
+    chk("width starts 276", dut.level_inst.inner, 1);
+    hc = 11'd309; #1;
+    chk("width ends 309", dut.level_inst.inner, 1);
+    hc = 11'd310; #1;
     chk("outside right", dut.level_inst.inner, 0);
     release dut.Playfield_inst.speed_level;
     hc = 11'd0; vc = 11'd0;

@@ -14,14 +14,15 @@ module level(
     output inner,
     output on,
     output cur,
-    output cap
+    output cap,
+    output [2:0] seg
     );
 
-//    等级: 场地左侧 8 段竖条(x 284..302, y 88..712), 每段 78px, 段顶部 2px 是缝
+//    等级: 场地左侧 8 段压力柱(x 276..309, y 88..712), 每段 78px, 段顶部 2px 是缝
 //    margin=缝(画暗色)  inner=段体  on=已达段  cur=当前段
-    parameter [10:0]BX = 11'd280,
+    parameter [10:0]BX = 11'd276,
                      BY = 11'd88,
-                     BW = 11'd28,
+                     BW = 11'd34,
                      SH = 11'd78;
 
     wire [10:0]Yr = vcounter - BY;
@@ -42,5 +43,6 @@ module level(
     assign on     = (sib <= {1'b0, speed_level});
     assign cur    = (sib == {1'b0, speed_level});
     assign cap    = in_bar && cur && (Rr >= 11'd2) && (Rr < 11'd8);
+    assign seg    = sib[2:0];
 
 endmodule
