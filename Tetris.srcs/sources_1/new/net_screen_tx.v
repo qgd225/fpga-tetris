@@ -54,9 +54,9 @@ parameter DST_PORT   = 16'd5000;
 parameter FPS_DIV    = 1;
 parameter PAL_FRAMES = 60;
 parameter LINE_LEN   = 16'd1287;
-parameter PAL_LEN    = 16'd180;
-parameter [7:0] PAL_LAST = 8'd179;
-parameter PAL_N      = 8'd44;
+parameter PAL_LEN    = 16'd228;
+parameter [7:0] PAL_LAST = 8'd227;
+parameter PAL_N      = 8'd56;
 parameter KB_TIMEOUT = 24'd14_850_000;
 parameter KB_RST_CNT = 25'd1_485_000;
 parameter KB_ACT_CNT = 25'd22_275_000;
@@ -181,9 +181,10 @@ wire link_up = pl_s2;
 reg        de_r, de_r2;
 reg [10:0] vc_r;
 reg [23:0] rgb_r;
-wire [7:0] code_r;
+wire [5:0] code_r;
 
 rgb_to_palette rgb_to_palette_inst(
+  .Clk(Clk_74M),
   .rgb(rgb_r),
   .code(code_r)
 );
@@ -474,6 +475,18 @@ always@(*)begin
   6'd41:  pal_rgb = 24'hFF_D2_3F;
   6'd42:  pal_rgb = 24'hFF_9F_1C;
   6'd43:  pal_rgb = 24'hFF_6B_35;
+  6'd44:  pal_rgb = 24'h08_10_18;
+  6'd45:  pal_rgb = 24'h06_10_17;
+  6'd46:  pal_rgb = 24'h0D_20_29;
+  6'd47:  pal_rgb = 24'h29_40_4D;
+  6'd48:  pal_rgb = 24'h08_79_8A;
+  6'd49:  pal_rgb = 24'h7B_2B_54;
+  6'd50:  pal_rgb = 24'h17_41_4B;
+  6'd51:  pal_rgb = 24'h09_17_1C;
+  6'd52:  pal_rgb = 24'h10_25_2B;
+  6'd53:  pal_rgb = 24'h53_6A_76;
+  6'd54:  pal_rgb = 24'h80_55_1F;
+  6'd55:  pal_rgb = 24'h07_10_18;
   default: pal_rgb = 24'h00_00_00;
   endcase
 end
@@ -504,13 +517,13 @@ always@(*)begin
   tx_fifo_din = pal_byte;
   else if(seq == SEQ_RES)
   tx_fifo_din = res_byte;
-  else if(de_r)
+  else if(de_r2)
   tx_fifo_din = code_r;
   else
   tx_fifo_din = 8'h00;
 end
 
-assign tx_fifo_we = ((de_r && frame_on && link_up && armed)
+assign tx_fifo_we = ((de_r2 && frame_on && link_up && armed)
                   || (seq == SEQ_HDR) || (seq == SEQ_PAL) || (seq == SEQ_H0) || (seq == SEQ_RES));
 
 always@(posedge Clk_74M or negedge Reset_n)begin

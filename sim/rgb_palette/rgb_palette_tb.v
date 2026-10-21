@@ -1,17 +1,22 @@
 `timescale 1ns/1ps
 module rgb_palette_tb;
+  reg Clk;
   reg  [23:0] rgb;
   wire [5:0]  code;
   integer errors;
   integer checks;
 
-  rgb_to_palette dut(.rgb(rgb), .code(code));
+  rgb_to_palette dut(.Clk(Clk), .rgb(rgb), .code(code));
+
+  initial Clk = 1'b0;
+  always #5 Clk = ~Clk;
 
   task check;
     input [23:0] c;
     input [5:0]  k;
     begin
       rgb = c;
+      @(posedge Clk);
       #1;
       checks = checks + 1;
       if(code !== k)begin
@@ -70,6 +75,18 @@ module rgb_palette_tb;
     check(24'hFFD23F, 6'd41);
     check(24'hFF9F1C, 6'd42);
     check(24'hFF6B35, 6'd43);
+    check(24'h081018, 6'd44);
+    check(24'h061017, 6'd45);
+    check(24'h0D2029, 6'd46);
+    check(24'h29404D, 6'd47);
+    check(24'h08798A, 6'd48);
+    check(24'h7B2B54, 6'd49);
+    check(24'h17414B, 6'd50);
+    check(24'h09171C, 6'd51);
+    check(24'h10252B, 6'd52);
+    check(24'h536A76, 6'd53);
+    check(24'h80551F, 6'd54);
+    check(24'h071018, 6'd55);
     if(errors != 0)begin
       $display("=== FAILED: %0d / %0d ===", errors, checks);
       $fatal;

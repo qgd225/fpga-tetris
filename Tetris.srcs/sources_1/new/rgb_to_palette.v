@@ -1,66 +1,75 @@
-
-
-
-
-
-
-
 module rgb_to_palette(
+  input         Clk,
   input  [23:0] rgb,
   output reg [5:0] code
 );
 
+wire [7:0] hash = {rgb[20], rgb[18], rgb[14], rgb[12], rgb[8], rgb[7], rgb[5], rgb[2]};
+(* rom_style = "block" *) reg [5:0] rom[0:255];
+integer i;
 
-wire [6:0] hash = {rgb[12], rgb[9], rgb[8], rgb[7], rgb[6], rgb[5], rgb[4]};
-
-always@(*)begin
-  case(hash)
-  7'h00: code = 6'd0;
-  7'h01: code = 6'd29;
-  7'h02: code = 6'd18;
-  7'h04: code = 6'd19;
-  7'h06: code = 6'd20;
-  7'h0A: code = 6'd12;
-  7'h0F: code = 6'd1;
-  7'h11: code = 6'd35;
-  7'h17: code = 6'd26;
-  7'h1A: code = 6'd7;
-  7'h1F: code = 6'd25;
-  7'h22: code = 6'd33;
-  7'h23: code = 6'd5;
-  7'h2E: code = 6'd15;
-  7'h2F: code = 6'd8;
-  7'h31: code = 6'd27;
-  7'h33: code = 6'd43;
-  7'h35: code = 6'd36;
-  7'h37: code = 6'd30;
-  7'h41: code = 6'd17;
-  7'h43: code = 6'd24;
-  7'h49: code = 6'd21;
-  7'h4B: code = 6'd22;
-  7'h4C: code = 6'd38;
-  7'h4D: code = 6'd23;
-  7'h4F: code = 6'd37;
-  7'h50: code = 6'd32;
-  7'h54: code = 6'd4;
-  7'h59: code = 6'd39;
-  7'h5B: code = 6'd13;
-  7'h61: code = 6'd28;
-  7'h62: code = 6'd34;
-  7'h63: code = 6'd41;
-  7'h64: code = 6'd40;
-  7'h70: code = 6'd3;
-  7'h71: code = 6'd42;
-  7'h72: code = 6'd6;
-  7'h76: code = 6'd31;
-  7'h79: code = 6'd10;
-  7'h7B: code = 6'd11;
-  7'h7C: code = 6'd2;
-  7'h7D: code = 6'd14;
-  7'h7E: code = 6'd9;
-  7'h7F: code = 6'd16;
-  default: code = 6'd0;
-  endcase
+initial begin
+  for(i=0; i<256; i=i+1)
+    rom[i] = 6'd0;
+  rom[8'h00] = 6'd0;
+  rom[8'h27] = 6'd1;
+  rom[8'h9D] = 6'd2;
+  rom[8'hF8] = 6'd3;
+  rom[8'h59] = 6'd4;
+  rom[8'hC2] = 6'd5;
+  rom[8'hFB] = 6'd6;
+  rom[8'hEF] = 6'd7;
+  rom[8'hA7] = 6'd8;
+  rom[8'h9F] = 6'd9;
+  rom[8'hFC] = 6'd10;
+  rom[8'hDE] = 6'd11;
+  rom[8'hE6] = 6'd12;
+  rom[8'hFE] = 6'd13;
+  rom[8'hDC] = 6'd14;
+  rom[8'h67] = 6'd15;
+  rom[8'hFF] = 6'd16;
+  rom[8'h90] = 6'd17;
+  rom[8'h02] = 6'd18;
+  rom[8'h20] = 6'd19;
+  rom[8'h22] = 6'd20;
+  rom[8'h94] = 6'd21;
+  rom[8'h96] = 6'd22;
+  rom[8'hB4] = 6'd23;
+  rom[8'h92] = 6'd24;
+  rom[8'h2F] = 6'd25;
+  rom[8'h2B] = 6'd26;
+  rom[8'h09] = 6'd27;
+  rom[8'h11] = 6'd28;
+  rom[8'hC0] = 6'd29;
+  rom[8'h6B] = 6'd30;
+  rom[8'h5B] = 6'd31;
+  rom[8'hF9] = 6'd32;
+  rom[8'h03] = 6'd33;
+  rom[8'h32] = 6'd34;
+  rom[8'hA9] = 6'd35;
+  rom[8'hC9] = 6'd36;
+  rom[8'h37] = 6'd37;
+  rom[8'hD4] = 6'd38;
+  rom[8'hBD] = 6'd39;
+  rom[8'hB1] = 6'd40;
+  rom[8'hF3] = 6'd41;
+  rom[8'hD9] = 6'd42;
+  rom[8'hEB] = 6'd43;
+  rom[8'h10] = 6'd44;
+  rom[8'h51] = 6'd45;
+  rom[8'h42] = 6'd46;
+  rom[8'h21] = 6'd47;
+  rom[8'h3C] = 6'd48;
+  rom[8'h89] = 6'd49;
+  rom[8'hE8] = 6'd50;
+  rom[8'h19] = 6'd51;
+  rom[8'h8A] = 6'd52;
+  rom[8'hA3] = 6'd53;
+  rom[8'h39] = 6'd54;
+  rom[8'h50] = 6'd55;
 end
+
+always@(posedge Clk)
+  code <= rom[hash];
 
 endmodule
