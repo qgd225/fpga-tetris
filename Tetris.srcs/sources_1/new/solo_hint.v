@@ -37,6 +37,7 @@ module solo_hint(
     reg [4:0] best_c[0:3], best_r[0:3];
     reg [4:0] min_land, ptop, ptop_calc, newtop_temp;
     reg bad_cand;
+    reg [1:0] cell_i, inner_i;
     reg [31:0] shp_r;
     wire [31:0] rom_dout;
     reg [8:0] holes_total, cand_total, cand_bump;
@@ -100,6 +101,7 @@ module solo_hint(
     rot<=0;best_rot<=0;col<=0;top_c<=0;top_r<=0;hole_c<=0;hole_r<=0;
     clear_row<=0;eval_c<=0;rom_addr<=0;build_i<=0;over_i<=0;
     min_land<=31;ptop<=31;ptop_calc<=31;newtop_temp<=0;bad_cand<=1'b1;shp_r<=0;
+    cell_i<=2'd0;inner_i<=2'd0;
     holes_total<=0;cand_total<=0;cand_bump<=0;cand_max<=0;prev_top<=0;
     cand_clears<=0;cand_overhang<=0;clear_pop<=0;piece_mask<=0;clear_now<=0;own_below<=0;
     best_score<=-17'sd32768;best_valid<=1'b0;
@@ -185,6 +187,8 @@ module solo_hint(
     end
     S_CAND:begin
         rom_addr <= {search_type,rot};
+        bad_cand <= 1'b0;
+        cell_i <= 2'd0;
         state <= S_SHAPE;
     end
     S_SHAPE:state <= S_ROM;
@@ -210,7 +214,10 @@ module solo_hint(
                 min_land <= rr_s[5:0];
         end
         if(build_i == 3)
+            begin
+            cell_i <= 2'd0;
             state <= S_FINAL;
+            end
         else
             build_i <= build_i + 5'd1;
     end
@@ -219,65 +226,84 @@ module solo_hint(
             state <= S_NEXT;
         end
         else begin
-            bad_cand = 1'b0;
-            for(i=0;i<4;i=i+1)begin
-                rr_s = {1'b0,min_land} + s4(tmp_dy[i]);
-                if((cell_c[i] > 5'd19) || (rr_s < 0) || (rr_s > 7'sd19))begin
-                    cell_r[i] <= 5'd20;
-                    bad_cand = 1'b1;
-                end
-                else
-                    cell_r[i] <= rr_s[4:0];
+            rr_s = {1'b0,min_land} + s4(tmp_dy[cell_i]);
+            if((cell_c[cell_i] > 5'd19) || (rr_s < 0) || (rr_s > 7'sd19))begin
+                cell_r[cell_i] <= 5'd20;
+                bad_cand <= 1'b1;
             end
-            if(bad_cand)
+            else
+                cell_r[cell_i] <= rr_s[4:0];
+            if(cell_i == 2'd3)begin
+            if((cell_c[3] > 5'd19) || (rr_s < 0) || (rr_s > 7'sd19) || bad_cand)
                 state <= S_NEXT;
             else begin
                 cand_overhang <= 0;
                 over_i <= 0;
+                inner_i <= 0;
                 state <= S_OVER;
             end
+            end
+            else
+                cell_i <= cell_i + 2'd1;
         end
     end
     S_OVER:begin
-        own_below = 1'b0;
-        for(i=0;i<4;i=i+1)
-            if((i != over_i[1:0]) && (cell_c[i] == cell_c[over_i[1:0]]) &&
-               (cell_r[i] == (cell_r[over_i[1:0]] + 5'd1)))
-                own_below = 1'b1;
-        if((cell_r[over_i[1:0]] < 5'd19) && !own_below &&
-           !board[cell_r[over_i[1:0]] + 5'd1][cell_c[over_i[1:0]]])
-            cand_overhang <= cand_overhang + 3'd1;
-        if(over_i == 3)begin
-            clear_row <= 0;
-            clear_pop <= 0;
-            state <= S_CLEAR_INIT;
+        if(inner_i == 2'd0)
+            own_below = 1'b0;
+        if((inner_i != over_i[1:0]) && (cell_c[inner_i] == cell_c[over_i[1:0]]) &&
+           (cell_r[inner_i] == (cell_r[over_i[1:0]] + 5'd1)))
+            own_below = 1'b1;
+        if(inner_i == 2'd3)begin
+            if((cell_r[over_i[1:0]] < 5'd19) && !own_below &&
+               !board[cell_r[over_i[1:0]] + 5'd1][cell_c[over_i[1:0]]])
+                cand_overhang <= cand_overhang + 3'd1;
+            if(over_i == 3)begin
+                clear_row <= 0;
+                clear_pop <= 0;
+                cell_i <= 2'd0;
+                state <= S_CLEAR_INIT;
+            end
+            else begin
+                over_i <= over_i + 5'd1;
+                inner_i <= 2'd0;
+            end
         end
         else
-            over_i <= over_i + 5'd1;
+            inner_i <= inner_i + 2'd1;
     end
     S_CLEAR_INIT:begin
         clear_row <= 0;
         clear_pop <= 0;
+        piece_mask <= 0;
+        cell_i <= 2'd0;
         cand_clears <= 0;
         state <= S_CLEAR;
     end
     S_CLEAR:begin
-        clear_pop = 0;
-        piece_mask = 0;
-        for(i=0;i<4;i=i+1)
-            if(cell_r[i] == clear_row[4:0])begin
-                clear_pop = clear_pop + 3'd1;
-                piece_mask = piece_mask | (20'd1 << cell_c[i]);
+        if(cell_i == 2'd0)begin
+            clear_pop = 0;
+            piece_mask = 0;
+        end
+        if(cell_r[cell_i] == clear_row[4:0])begin
+            clear_pop = clear_pop + 3'd1;
+            piece_mask = piece_mask | (20'd1 << cell_c[cell_i]);
+        end
+        if(cell_i == 2'd3)begin
+            clear_now = (clear_pop != 0) && ((board[clear_row[4:0]][19:0] | piece_mask) == FULL20);
+            cand_clears <= cand_clears + {2'd0,clear_now};
+            if(clear_row == 19)
+                state <= S_EVAL_INIT;
+            else begin
+                clear_row <= clear_row + 6'd1;
+                cell_i <= 2'd0;
             end
-        clear_now = (clear_pop != 0) && ((board[clear_row[4:0]][19:0] | piece_mask) == FULL20);
-        cand_clears <= cand_clears + {2'd0,clear_now};
-        if(clear_row == 19)
-            state <= S_EVAL_INIT;
+        end
         else
-            clear_row <= clear_row + 6'd1;
+            cell_i <= cell_i + 2'd1;
     end
     S_EVAL_INIT:begin
         eval_c <= 0;
+        cell_i <= 2'd0;
         cand_total <= 0;
         cand_bump <= 0;
         cand_max <= 0;
@@ -285,12 +311,16 @@ module solo_hint(
         state <= S_EVAL_PREP;
     end
     S_EVAL_PREP:begin
-        ptop_calc = 31;
-        for(i=0;i<4;i=i+1)
-            if((cell_c[i] == eval_c[4:0]) && (cell_r[i] < ptop_calc))
-                ptop_calc = cell_r[i];
-        ptop <= ptop_calc;
-        state <= S_EVAL;
+        if(cell_i == 2'd0)
+            ptop_calc = 31;
+        if((cell_c[cell_i] == eval_c[4:0]) && (cell_r[cell_i] < ptop_calc))
+            ptop_calc = cell_r[cell_i];
+        if(cell_i == 2'd3)begin
+            ptop <= ptop_calc;
+            state <= S_EVAL;
+        end
+        else
+            cell_i <= cell_i + 2'd1;
     end
     S_EVAL:begin
         newtop_temp = (ptop < {1'b0,tops[eval_c[4:0]]}) ? ptop : {1'b0,tops[eval_c[4:0]]};
@@ -304,6 +334,7 @@ module solo_hint(
             state <= S_SCORE;
         else begin
             eval_c <= eval_c + 6'd1;
+            cell_i <= 2'd0;
             state <= S_EVAL_PREP;
         end
     end
