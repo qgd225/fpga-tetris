@@ -1,8 +1,8 @@
-//============================================================
-// 模块：Ghost_piece
-// 作用：幽灵方块落点扫描：计算落地行并保持旧落点直到新扫描完成。
-// 时钟/复位：Clk_74M；Reset_n 低有效
-//============================================================
+
+
+
+
+
 module Ghost_piece(
     Clk_74M,
     Reset_n,
@@ -22,7 +22,7 @@ module Ghost_piece(
     clear_down,
     Finalize
     );
-    
+
     input Clk_74M;
     input Reset_n;
     input [399:0] state;
@@ -41,12 +41,12 @@ module Ghost_piece(
     input clear_down;
 
     output reg[4:0]counter_ghost_r_t;
-    
+
     reg [4:0]counter_ghost_r;
     reg[4:0]counter_ghost_r_d;
-    
+
     reg land_t;
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     land_t <= 1'b0;
@@ -221,7 +221,7 @@ module Ghost_piece(
         endcase
     end
     end
-    
+
     reg land_t_d;
     reg lock_d;
     reg scan_done;
@@ -229,25 +229,25 @@ module Ghost_piece(
     wire new_piece = (counter_r == 0) && (counter_r_d != 0);
     wire ghost_restart = rotate_p || left_p || right_p || new_piece || (Finalize&&switch_r_flag) || clear_down;
     reg restart_d;
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     restart_d <= 1'd0;
     else
     restart_d <= ghost_restart;
     end
-    
-    wire restart_hold = ghost_restart || restart_d;//重启保持两拍，避开land_t的旧值
-    
+
+    wire restart_hold = ghost_restart || restart_d;
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
         land_t_d <= 1'b0;
     else
         land_t_d <= land_t;
     end
-    
+
     wire land_t_pulse = (land_t) && (!land_t_d);
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter_ghost_r <= 1'd0;
@@ -260,7 +260,7 @@ module Ghost_piece(
     counter_ghost_r <= counter_ghost_r + 1'd1;
     end
     end
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     scan_done <= 1'b0;
@@ -269,14 +269,14 @@ module Ghost_piece(
     else if(!scan_done && land_t)
     scan_done <= 1'b1;
     end
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter_r_d <= 1'd0;
     else
     counter_r_d <= counter_r;
     end
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     lock_d <= 1'd0;
@@ -285,20 +285,20 @@ module Ghost_piece(
     else
     lock_d <= 1'd0;
     end
-    
-    always@(posedge Clk_74M or negedge Reset_n)begin//land_t打一拍所以counter_ghost_r_t也打一拍
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter_ghost_r_d <= 0;
     else
     counter_ghost_r_d <= counter_ghost_r;
     end
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter_ghost_r_t <= 0;
     else if(land_t_pulse && !scan_done && !restart_hold)
     counter_ghost_r_t <= counter_ghost_r_d;
     end
-    
-    
+
+
 endmodule

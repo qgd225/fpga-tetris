@@ -1,11 +1,11 @@
 `timescale 1ns/1ps
-//============================================================
-// 测试台：solo_hint_tb
-// 测试目标：智能落点搜索、评分、空洞支持和类型切换回归。
-//============================================================
 
 
-// 1 拍读延迟的形状 ROM 仿真桩, 数据与 Tetromino.mif 完全一致
+
+
+
+
+
 module Tetromino(input clka, input [4:0] addra, output reg [31:0] douta);
 function [31:0] shape_of;
 input [4:0] a;
@@ -163,23 +163,23 @@ endfunction
 
 initial begin
 $display("=== solo_hint 深度搜索 ===");
-// 平场
+
 reset_dut; run_search(3'd3);
 chk("flat valid",hint_valid,1); chk("flat type",hint_type,3); chk("flat cells in board",all_in_board(0),1); chk("flat no overlap",no_overlap(0),1);
-// 连续切换方块类型: 第一个候选不得沿用上一类型的 ROM 形状
+
 reset_dut; run_search(3'd0);
 chk("type0 shape left",cell_at(0,19),1); chk("type0 shape right",cell_at(3,19),1);
 run_search(3'd5);
 chk("type5 shape a",cell_at(0,18),1); chk("type5 shape b",cell_at(1,18),1);
 chk("type5 shape c",cell_at(1,19),1); chk("type5 shape d",cell_at(2,19),1);
 chk("type5 not stale I row",cell_at(3,19),0);
-// 近消行: 底行仅 8..11 空, I 旋转 1 必须补满并消行
+
 reset_dut; set_row(19,20'hFF0FF); run_search(3'd0);
 chk("near clear valid",hint_valid,1); chk("near clear rotation",dut.best_rot,1);
 chk("near clear gap0",cell_at(8,19),1); chk("near clear gap1",cell_at(9,19),1);
 chk("near clear gap2",cell_at(10,19),1); chk("near clear gap3",cell_at(11,19),1);
 chk("near clear score",dut.best_score,480);
-// 搜索期间棋盘变化不影响已锁存快照
+
 reset_dut; set_row(19,20'hFF0FF); type=3'd0;
 start=1; @(posedge Clk); #1; start=0;
 cyc=0; while((dut.state==18)&&(cyc<200))begin @(posedge Clk);cyc=cyc+1;end
@@ -187,11 +187,11 @@ chk("snapshot captured",dut.board_snap[19*24 +: 20],20'hFF0FF);
 rows=480'd0;
 cyc=0; while((dut.state!=0)&&(cyc<30000))begin @(posedge Clk);cyc=cyc+1;end
 chk("snapshot search valid",hint_valid,1); chk("snapshot search score",dut.best_score,480);
-// 贴左墙: 只有 0..3 空, 水平 I 必须贴墙补满
+
 reset_dut; set_row(19,20'hFFFF0); run_search(3'd0);
 chk("wall valid",hint_valid,1); chk("wall rotation",dut.best_rot,1);
 chk("wall c0",cell_at(0,19),1); chk("wall c3",cell_at(3,19),1);
-// 已有空洞: 空洞总数必须被扫描到, 且候选不覆盖已有格
+
 reset_dut;
 for(pcol=8;pcol<=10;pcol=pcol+1)
   for(prow=4;prow<=19;prow=prow+1) rows[prow*24+pcol]=1'b1;
@@ -200,20 +200,20 @@ chk("stack I valid",hint_valid,1); chk("stack I no overlap",no_overlap(0),1);
 chk("stack I supported",no_hint_overhang(0),1);
 reset_dut; set_row(18,20'h00001); run_search(3'd0);
 chk("hole valid",hint_valid,1); chk("hole counted",(dut.holes_total>0),1); chk("hole no overlap",no_overlap(0),1);
-// 贴顶无合法落点
+
 reset_dut; set_row(0,20'hFFFFF); run_search(3'd3);
 chk("top full invalid",hint_valid,0); chk("top no best",dut.best_valid,0);
-// 双人强制不启动
+
 reset_dut; duo=1; start=1; repeat(20)@(posedge Clk); start=0; repeat(4)@(posedge Clk);
 chk("duo no search",dut.state,0); chk("duo keeps invalid",hint_valid,0);
-// 二次搜索: 触发后能从 IDLE 正常重算
+
 reset_dut; set_row(19,20'hFF0FF); run_search(3'd0);
 chk("repeat search1",hint_valid,1);
 start=1;@(posedge Clk);#1;start=0;
 chk("new trigger hides old hint",hint_valid,0);
 cyc=0;while((dut.state!=0)&&(cyc<30000))begin @(posedge Clk);cyc=cyc+1;end
 chk("repeat search2",hint_valid,1); chk("repeat still rotated",dut.best_rot,1);
-// 逐列高度全面回归: 20 组阶梯地形, 智能落点不得覆盖任何锁存格
+
 for(pidx=0;pidx<20;pidx=pidx+1)begin
   rows=480'd0;
   for(pcol=0;pcol<20;pcol=pcol+1)begin

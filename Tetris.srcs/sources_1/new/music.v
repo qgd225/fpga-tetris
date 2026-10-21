@@ -1,20 +1,20 @@
-//============================================================
-// 模块：music
-// 作用：背景音乐序列器：按等级选择音符并输出 PWM 方波。
-// 时钟/复位：Clk_74M；Reset_n 低有效
-//============================================================
+
+
+
+
+
 module music(
     input Clk_74M,
     input Reset_n,
     input Idle,
     input [2:0]speed_level,
-    
+
     output reg buzz_main
     );
-    
+
     reg [16:0]ms_cnt;
     reg ms_tick;
-    
+
     always @(posedge Clk_74M or negedge Reset_n) begin
     if (!Reset_n) begin
     ms_cnt  <= 17'd0;
@@ -35,11 +35,11 @@ module music(
     ms_tick <= 1'b0;
     end
     end
-    
+
     reg [16:0]ms8_cnt;
     reg ms8_tick;
     reg [16:0]level;
-    
+
     always @(posedge Clk_74M or negedge Reset_n) begin
         if (!Reset_n)
         level <= 200 - 1;
@@ -56,7 +56,7 @@ module music(
             default:level <= 200 - 1;
             endcase
     end
-    
+
     always @(posedge Clk_74M or negedge Reset_n) begin
     if (!Reset_n) begin
     ms8_cnt  <= 17'd0;
@@ -73,7 +73,7 @@ module music(
             ms8_tick <= 1'b0;
             end
         end
-        else 
+        else
         ms8_tick <= 1'b0;
         end
     else begin
@@ -81,22 +81,22 @@ module music(
         ms8_tick <= 1'b0;
     end
     end
-    
 
-    
+
+
     reg [29:0]cnt_main;
     reg [5:0]note_addr;
     wire [21:0]note_data;
-    
+
     note note_inst(
     .clka(Clk_74M),
     .addra(note_addr),
     .douta(note_data)
   );
-    
-    
-    //主旋律
-    
+
+
+
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     buzz_main <= 0;
@@ -109,7 +109,7 @@ module music(
     else
     buzz_main <= 0;
     end
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     cnt_main <= 0;
@@ -124,11 +124,11 @@ module music(
     else
     cnt_main <= 0;
     end
-    
-    
+
+
     reg [16:0]cnt;
     reg tick;
-    
+
     always @(posedge Clk_74M or negedge Reset_n) begin
     if (!Reset_n) begin
     cnt  <= 17'd0;
@@ -153,8 +153,8 @@ module music(
     tick <= 1'b0;
     end
     end
-    
-    
+
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     note_addr <= 0;
@@ -169,5 +169,5 @@ module music(
     else
     note_addr <= 0;
     end
-        
+
 endmodule

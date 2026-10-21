@@ -1,7 +1,7 @@
-//============================================================
-// 导入模块：dvi_encoder
-// 本工程用途：DVI 编码顶层，将 24 位 RGB 转为 TMDS 通道数据。
-//============================================================
+
+
+
+
 module dvi_encoder(
   pixelclk,
   pixelclk5x,
@@ -17,19 +17,19 @@ module dvi_encoder(
   tmds_data_p,
   tmds_data_n
 );
-  input        pixelclk;       
-  input        pixelclk5x;     
-  input        rst_p;          
-  input  [7:0] blue_din;       
-  input  [7:0] green_din;      
-  input  [7:0] red_din;        
-  input        hsync;          
-  input        vsync;          
-  input        de;             
-  output       tmds_clk_p;     
-  output       tmds_clk_n;     
-  output [2:0] tmds_data_p;    
-  output [2:0] tmds_data_n;    
+  input        pixelclk;
+  input        pixelclk5x;
+  input        rst_p;
+  input  [7:0] blue_din;
+  input  [7:0] green_din;
+  input  [7:0] red_din;
+  input        hsync;
+  input        vsync;
+  input        de;
+  output       tmds_clk_p;
+  output       tmds_clk_n;
+  output [2:0] tmds_data_p;
+  output [2:0] tmds_data_n;
 
   wire [9:0] red;
   wire [9:0] green;
@@ -78,7 +78,7 @@ module dvi_encoder(
     .dataout_2_p   (tmds_data_p[2]  ),
     .dataout_2_n   (tmds_data_n[2]  ),
     .dataout_3_p   (tmds_clk_p      ),
-    .dataout_3_n   (tmds_clk_n      ) 
-  ); 
+    .dataout_3_n   (tmds_clk_n      )
+  );
 
 endmodule

@@ -1,7 +1,7 @@
-//============================================================
-// 导入模块：serdes_4b_10to1
-// 本工程用途：TMDS 4:1 串行化与 DDR 输出。
-//============================================================
+
+
+
+
 module serdes_4b_10to1(
   clkx5,
   datain_0,
@@ -15,28 +15,28 @@ module serdes_4b_10to1(
   dataout_2_p,
   dataout_2_n,
   dataout_3_p,
-  dataout_3_n 
+  dataout_3_n
 );
-  input        clkx5;        
-  input  [9:0] datain_0;     
-  input  [9:0] datain_1;     
-  input  [9:0] datain_2;     
-  input  [9:0] datain_3;     
-  output       dataout_0_p;  
-  output       dataout_0_n;  
-  output       dataout_1_p;  
-  output       dataout_1_n;  
-  output       dataout_2_p;  
-  output       dataout_2_n;  
-  output       dataout_3_p;  
-  output       dataout_3_n;  
+  input        clkx5;
+  input  [9:0] datain_0;
+  input  [9:0] datain_1;
+  input  [9:0] datain_2;
+  input  [9:0] datain_3;
+  output       dataout_0_p;
+  output       dataout_0_n;
+  output       dataout_1_p;
+  output       dataout_1_n;
+  output       dataout_2_p;
+  output       dataout_2_n;
+  output       dataout_3_p;
+  output       dataout_3_n;
 
   wire dataout_0_n;
   wire dataout_1_n;
   wire dataout_2_n;
   wire dataout_3_n;
 
-  reg [2:0] TMDS_mod5 = 0;  // 模5计数器
+  reg [2:0] TMDS_mod5 = 0;
 
   reg [4:0] TMDS_shift_0h = 0, TMDS_shift_0l = 0;
   reg [4:0] TMDS_shift_1h = 0, TMDS_shift_1l = 0;
@@ -55,7 +55,7 @@ module serdes_4b_10to1(
   wire [4:0] TMDS_3_l = {datain_3[9],datain_3[7],datain_3[5],datain_3[3],datain_3[1]};
   wire [4:0] TMDS_3_h = {datain_3[8],datain_3[6],datain_3[4],datain_3[2],datain_3[0]};
 
-  // 5倍速度移位发送数据
+
   always @(posedge clkx5)
   begin
     TMDS_mod5 <= (TMDS_mod5[2]) ? 3'd0 : TMDS_mod5 + 3'd1;
@@ -70,9 +70,9 @@ module serdes_4b_10to1(
   end
 
 ODDR #(
-    .DDR_CLK_EDGE("SAME_EDGE"), 
-    .INIT(1'b0),    
-    .SRTYPE("SYNC") 
+    .DDR_CLK_EDGE("SAME_EDGE"),
+    .INIT(1'b0),
+    .SRTYPE("SYNC")
   ) ODDR_0 (
     .Q (dataout_0        ),
     .C (clkx5            ),
@@ -80,22 +80,22 @@ ODDR #(
     .D1(TMDS_shift_0h[0] ),
     .D2(TMDS_shift_0l[0] ),
     .R (1'b0             ),
-    .S (1'b0             ) 
+    .S (1'b0             )
   );
 
   OBUFDS #(
-    .IOSTANDARD("DEFAULT"), 
-    .SLEW("SLOW")           
+    .IOSTANDARD("DEFAULT"),
+    .SLEW("SLOW")
   ) OBUFDS_0 (
     .O  (dataout_0_p ),
     .OB (dataout_0_n ),
-    .I  (dataout_0   ) 
+    .I  (dataout_0   )
   );
 
   ODDR #(
-    .DDR_CLK_EDGE("SAME_EDGE"), 
-    .INIT(1'b0),    
-    .SRTYPE("SYNC") 
+    .DDR_CLK_EDGE("SAME_EDGE"),
+    .INIT(1'b0),
+    .SRTYPE("SYNC")
   ) ODDR_1 (
     .Q (dataout_1        ),
     .C (clkx5            ),
@@ -103,22 +103,22 @@ ODDR #(
     .D1(TMDS_shift_1h[0] ),
     .D2(TMDS_shift_1l[0] ),
     .R (1'b0             ),
-    .S (1'b0             ) 
+    .S (1'b0             )
   );
 
   OBUFDS #(
-    .IOSTANDARD("DEFAULT"), 
-    .SLEW("SLOW")           
+    .IOSTANDARD("DEFAULT"),
+    .SLEW("SLOW")
   ) OBUFDS_1 (
     .O  (dataout_1_p ),
     .OB (dataout_1_n ),
-    .I  (dataout_1   ) 
+    .I  (dataout_1   )
   );
 
   ODDR #(
-    .DDR_CLK_EDGE("SAME_EDGE"), 
-    .INIT(1'b0),    
-    .SRTYPE("SYNC") 
+    .DDR_CLK_EDGE("SAME_EDGE"),
+    .INIT(1'b0),
+    .SRTYPE("SYNC")
   ) ODDR_2 (
     .Q (dataout_2        ),
     .C (clkx5            ),
@@ -126,22 +126,22 @@ ODDR #(
     .D1(TMDS_shift_2h[0] ),
     .D2(TMDS_shift_2l[0] ),
     .R (1'b0             ),
-    .S (1'b0             ) 
+    .S (1'b0             )
   );
 
   OBUFDS #(
-    .IOSTANDARD("DEFAULT"), 
-    .SLEW("SLOW")           
+    .IOSTANDARD("DEFAULT"),
+    .SLEW("SLOW")
   ) OBUFDS_2 (
     .O  (dataout_2_p ),
     .OB (dataout_2_n ),
-    .I  (dataout_2   ) 
+    .I  (dataout_2   )
   );
 
   ODDR #(
-    .DDR_CLK_EDGE("SAME_EDGE"), 
-    .INIT(1'b0),    
-    .SRTYPE("SYNC") 
+    .DDR_CLK_EDGE("SAME_EDGE"),
+    .INIT(1'b0),
+    .SRTYPE("SYNC")
   ) ODDR_3 (
     .Q (dataout_3        ),
     .C (clkx5            ),
@@ -149,16 +149,16 @@ ODDR #(
     .D1(TMDS_shift_3h[0] ),
     .D2(TMDS_shift_3l[0] ),
     .R (1'b0             ),
-    .S (1'b0             ) 
+    .S (1'b0             )
   );
 
   OBUFDS #(
-    .IOSTANDARD("DEFAULT"), 
-    .SLEW("SLOW")           
+    .IOSTANDARD("DEFAULT"),
+    .SLEW("SLOW")
   ) OBUFDS_3 (
     .O  (dataout_3_p ),
     .OB (dataout_3_n ),
-    .I  (dataout_3   ) 
+    .I  (dataout_3   )
   );
 
 

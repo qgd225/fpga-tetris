@@ -1,16 +1,16 @@
 `timescale 1ns/1ps
-//============================================================
-// 测试台：duo_tb
-// 测试目标：Playfield 双人模式回归：出生、互撞、锁存、Hold、消行、幽灵和音效门控。
-//============================================================
 
 
-//===== Playfield Duo 专项测试: 互撞/顶住/幽灵/共用Hold/出生列/时间阈值/消行 =====
+
+
+
+
+
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
-  assign douta = duo_tb.shape_val; // 桩: 默认 0 -> 单格; 旋转测试时由 tb 赋合成形状
+  assign douta = duo_tb.shape_val;
 endmodule
 module weiyibiao(input clka, input [4:0] addra, output [7:0] douta);
-  assign douta = 8'h00; // 桩: 旋转偏移 0
+  assign douta = 8'h00;
 endmodule
 
 module duo_tb;
@@ -23,7 +23,7 @@ reg [19:0] score=0;
 reg [13:0] time_sec=0;
 reg duo=1;
 reg duu=1;
-reg [31:0] shape_val = 32'h0; // 合成形状(默认退化单格)
+reg [31:0] shape_val = 32'h0;
 
 wire [479:0] state;
 wire Piece, ghost, Piece2, ghost2, over, clear, clear_time, clear_pulse, clear_t_t, clear_t;
@@ -77,7 +77,7 @@ begin
 end
 endtask
 
-// 单拍脉冲(时钟低电平期动作, 避免竞争)
+
 task p_left1;  begin @(negedge Clk_74M); left1 =1'b1; @(posedge Clk_74M); @(negedge Clk_74M); left1 =1'b0; @(posedge Clk_74M); end endtask
 task p_right1; begin @(negedge Clk_74M); right1=1'b1; @(posedge Clk_74M); @(negedge Clk_74M); right1=1'b0; @(posedge Clk_74M); end endtask
 task p_drop1;  begin @(negedge Clk_74M); drop1 =1'b1; @(posedge Clk_74M); @(negedge Clk_74M); drop1 =1'b0; @(posedge Clk_74M); end endtask
@@ -91,7 +91,7 @@ task p_hold2;  begin @(negedge Clk_74M); hold2 =1'b1; @(posedge Clk_74M); @(nege
 
 task settle; begin repeat(40) @(posedge Clk_74M); end endtask
 
-// P1 硬降(长按 drop_en)
+
 task hard1;
 begin
   force dut.counter = 27'd74_250_000;
@@ -113,7 +113,7 @@ begin
 end
 endtask
 
-// 触发一次锁存(把两个计时器直接推到阈值)
+
 task lock1;
 begin
   force dut.counter_land = 25'd20_000_000;
@@ -152,7 +152,7 @@ initial begin
   chk("duo=0 P1 出生列", dut.counter_c, 9);
   chk("duo=0 P2 出生列", dut.counter_c2, 9);
   duo = 1'b1; Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk_74M);
-  force dut.Drop = 30'd100_000_000; // 关闭自动下落, 便于精确测试
+  force dut.Drop = 30'd100_000_000;
 
   $display("=== 2) 压在对方运动方块上: 停住但不开始锁存 ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
@@ -169,12 +169,12 @@ initial begin
   $display("=== 3) 对方锁进 state 后: 立刻满足落底并正常计时锁存 ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
-  lock2; // P2 锁存到 (8,11)
+  lock2;
   chk("P2 已锁进地图", dut.state[8*20 + 11], 1);
   chk("上方方块 land=1", dut.land, 1);
   repeat(6) @(posedge Clk_74M);
   chk("锁存计时在走", (dut.counter_land > 0), 1);
-  lock1; // 触发 P1 锁存到 (8,10)
+  lock1;
   chk("P1 锁存到地图", dut.state[8*20 + 10], 1);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   clr_state;
@@ -184,7 +184,7 @@ initial begin
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
   repeat(4) @(posedge Clk_74M);
   chk("被顶住时不落", dut.other_down_hold, 1);
-  release dut.counter_c2; force dut.counter_c2 = 5'd12; // 对方滑走
+  release dut.counter_c2; force dut.counter_c2 = 5'd12;
   repeat(4) @(posedge Clk_74M);
   chk("滑走后不再被顶住", dut.other_down_hold, 0);
   release dut.counter_r;
@@ -216,7 +216,7 @@ initial begin
   settle;
   chk("幽灵落点=对方方块上一行", dut.counter_ghost_r_t, 10);
   chk("幽灵被对方挡住标志", dut.ghost_blk_oth, 1);
-  hc = 11'd577; vc = 11'd337; // 第8列 第11行
+  hc = 11'd577; vc = 11'd337;
   repeat(2) @(posedge Clk_74M);
   chk("被对方挡住时不画幽灵", ghost, 0);
   release dut.counter_r;
@@ -234,7 +234,7 @@ initial begin
   settle;
   chk("幽灵落点=地板", dut.counter_ghost_r_t, 19);
   chk("未被对方挡住", dut.ghost_blk_oth, 0);
-  hc = 11'd577; vc = 11'd689; // 第8列 第19行
+  hc = 11'd577; vc = 11'd689;
   repeat(2) @(posedge Clk_74M);
   chk("幽灵像素显示", ghost, 1);
   hc = 11'd0; vc = 11'd0; repeat(2) @(posedge Clk_74M);
@@ -255,7 +255,7 @@ initial begin
   force dut.counter_c = 5'd8; force dut.counter_r = 5'd0;
   force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd0;
   force dut.rot = 2'd0;
-  shape_val = 32'h0F0F0F0F; // 每格: 列偏移 0, 行偏移 -1(顶部之外)
+  shape_val = 32'h0F0F0F0F;
   repeat(4) @(posedge Clk_74M);
   release dut.rot;
   repeat(2) @(posedge Clk_74M);
@@ -263,13 +263,13 @@ initial begin
   chk("顶部(行 -1)旋转被允许", dut.rot, 1);
   chk_no_x("旋转后行号", dut.rr_r);
   chk("旋转后行号为负(bit5=1)", dut.rr_r[5], 1);
-  shape_val = 32'h04040404; // 行偏移 +4
-  force dut.counter_r = 5'd16; // 16+4 = 20 行 = 地板以下
+  shape_val = 32'h04040404;
+  force dut.counter_r = 5'd16;
   repeat(4) @(posedge Clk_74M);
   p_rot1; repeat(2) @(posedge Clk_74M);
   chk("旋转到地板以下被阻挡", dut.rot, 1);
-  shape_val = 32'h50505050; // 列偏移 +5(高半字节)
-  force dut.counter_r = 5'd0; force dut.counter_c = 5'd20; // 20+5 = 25 > 23
+  shape_val = 32'h50505050;
+  force dut.counter_r = 5'd0; force dut.counter_c = 5'd20;
   repeat(4) @(posedge Clk_74M);
   p_rot1; repeat(2) @(posedge Clk_74M);
   chk("旋转伸出右墙被阻挡", dut.rot, 1);
@@ -358,22 +358,22 @@ initial begin
   begin : ghost_chk
     clr_state;
     duo = 1'b1; repeat(4) @(posedge Clk_74M);
-    // (a) 空场地: 幽灵应在地板(19)
+
     force dut.counter_c = 5'd8;  force dut.counter_r = 5'd0;
     force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd0;
     settle;
     chk("空场地幽灵=19", dut.counter_ghost_r_t, 19);
-    // (b) 对方方块压在下方(运动方块): 幽灵钳位到"方块上一行", 且标记被对方挡住
+
     release dut.counter_c2; force dut.counter_c2 = 5'd8; force dut.counter_r2 = 5'd11;
     settle;
     chk("被对方运动方块挡住时幽灵=10", dut.counter_ghost_r_t, 10);
     chk("此时幽灵隐藏标记=1", dut.ghost_blk_oth, 1);
-    // (c) 对方锁进场地: 场地变化必须触发重算 -> 幽灵仍在10, 但改为"落在已落格上"(要显示)
+
     lock2;
     repeat(6) @(posedge Clk_74M);
     chk("对方落格后幽灵=10", dut.counter_ghost_r_t, 10);
     chk("对方落格后幽灵显示(不再是对方方块)", dut.ghost_blk_oth, 0);
-    // (d) 方块本身就在被挡的行(重叠): 幽灵不能跑到方块上方
+
     force dut.counter_r = 5'd11;
     settle;
     chk("起点被挡时幽灵钳位>=方块行", (dut.counter_ghost_r_t >= dut.counter_r), 1);
@@ -450,23 +450,23 @@ initial begin
   begin : ghost_row_chk
     clr_state;
     duo = 1'b0; repeat(4) @(posedge Clk_74M);
-    force dut.clear_t = 1'b0; // 前面测试留下的闪白会挡住幽灵显示
+    force dut.clear_t = 1'b0;
     force dut.counter_land = 25'd0; force dut.lock_counter = 25'd0;
     force dut.lock_t = 1'b0; force dut.lock_cnt = 2'd0;
     force dut.drop_r_t = 1'b1;
     force dut.counter_c = 5'd5; force dut.counter_r = 5'd5;
-    shape_val = 32'h30201000; // 4 格同行(行偏移全 0): 锚点最多到 19
+    shape_val = 32'h30201000;
     p_rot1; repeat(20) @(posedge Clk_74M);
     chk("行偏移全 0: 落点=19", dut.counter_ghost_r_t, 19);
-    shape_val = 32'h1F0FFFFE; // 行偏移 -1/-2(没有 0): 锚点必须到 20
+    shape_val = 32'h1F0FFFFE;
     p_rot1; repeat(30) @(posedge Clk_74M);
     chk("行偏移 -1/-2: 落点=20", dut.counter_ghost_r_t, 20);
-    hc = 11'd481; vc = 11'd689; // 第5列 第19行, 空场地: 幽灵应在这里
+    hc = 11'd481; vc = 11'd689;
     repeat(2) @(posedge Clk_74M);
     chk("幽灵画在第19行(不悬空)", ghost, 1);
     hc = 11'd0; vc = 11'd0; repeat(2) @(posedge Clk_74M);
     release dut.counter_c; release dut.counter_r;
-    hard1; // 硬降要停在落点
+    hard1;
     chk("硬降停在落点(20)", dut.counter_r, 20);
     chk("停在落点时已满足落底", dut.land, 1);
     release dut.counter_land; release dut.lock_counter;
@@ -479,15 +479,15 @@ initial begin
   begin : ghost_oth_chk
     clr_state;
     duo = 1'b1; repeat(4) @(posedge Clk_74M);
-    shape_val = 32'h000FFFFE; // J rot3: (-1,-2)(-1,-1)(0,-1)(0,0)
-    force dut.counter_c  = 5'd16; force dut.counter_r  = 5'd19; // P1: (15,17)(15,18)(16,18)(16,19)
-    force dut.counter_c2 = 5'd16; force dut.counter_r2 = 5'd4; // P2: (15,2)(15,3)(16,3)(16,4)
+    shape_val = 32'h000FFFFE;
+    force dut.counter_c  = 5'd16; force dut.counter_r  = 5'd19;
+    force dut.counter_c2 = 5'd16; force dut.counter_r2 = 5'd4;
     p_rot1; p_rot2; repeat(40) @(posedge Clk_74M);
     chk("P2 幽灵落在 P1 方块上方(=17)", dut.counter_ghost_r_t2, 17);
     chk("被对方方块挡住要标记", dut.ghost_blk_oth2, 1);
     chk("P1 幽灵落在底板(=19)", dut.counter_ghost_r_t, 19);
     release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
-    hard2; // 硬降要停在对方方块上
+    hard2;
     chk("P2 硬降停在对方方块上(17)", dut.counter_r2, 17);
     shape_val = 32'h0;
     clr_state;

@@ -1,7 +1,7 @@
-//============================================================
-// 导入模块：ip_checksum
-// 本工程用途：IPv4 校验和计算。
-//============================================================
+
+
+
+
 module ip_checksum(
   input           clk            ,
   input           reset_p        ,
@@ -22,7 +22,7 @@ module ip_checksum(
   input   [31:0]  src_ip         ,
   input   [31:0]  dst_ip         ,
 
-  output  [15:0]  checksum       
+  output  [15:0]  checksum
 );
 
   reg  [31:0]suma;

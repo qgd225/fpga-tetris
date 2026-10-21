@@ -1,7 +1,7 @@
-//============================================================
-// 导入模块：eth_udp_tx_gmii
-// 本工程用途：UDP 发送、以太网帧封装和 CRC 追加。
-//============================================================
+
+
+
+
 module eth_udp_tx_gmii(
   clk125m,
   reset_p,
@@ -17,7 +17,7 @@ module eth_udp_tx_gmii(
   src_port,
 
   data_length,
-  
+
   payload_req_o,
   payload_dat_i,
 
@@ -40,13 +40,13 @@ module eth_udp_tx_gmii(
   input [15:0]   src_port;
 
   input [15:0]   data_length;
-  
+
   output         payload_req_o;
   input     [7:0]payload_dat_i;
 
   output         gmii_tx_clk;
-//  (*IOB = "TRUE"*) output  reg[7:0] gmii_txd;
-//  (*IOB = "TRUE"*) output  reg      gmii_txen;
+
+
   output  reg[7:0] gmii_txd;
   output  reg      gmii_txen;
 
@@ -84,7 +84,7 @@ module eth_udp_tx_gmii(
   reg  [15:0] src_port_reg;
   reg  [31:0] dst_ip_reg;
   reg  [31:0] src_ip_reg;
-  reg  [15:0] data_length_reg; 
+  reg  [15:0] data_length_reg;
   reg  [15:0] IP_total_len_reg;
   reg  [15:0] udp_length_reg;
 
@@ -115,12 +115,12 @@ module eth_udp_tx_gmii(
   wire [31:0] crc_result;
 
   reg  [7:0]  gmii_txd_renewcrc;
-  reg         gmii_txen_renewcrc; 
+  reg         gmii_txen_renewcrc;
 
   assign gmii_tx_clk = clk125m;
 
-  assign udp_length = data_length + 8'd8;   //udp_header: 8byte
-  assign IP_total_len = udp_length + 8'd20; //ip_header: 20byte
+  assign udp_length = data_length + 8'd8;
+  assign IP_total_len = udp_length + 8'd20;
 
   ip_checksum ip_checksum(
     .clk            (clk125m        ),
@@ -144,8 +144,8 @@ module eth_udp_tx_gmii(
 
     .checksum       (IP_check_sum   )
   );
-  
-  //将以太网报文源/目的参数寄存
+
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -166,7 +166,7 @@ module eth_udp_tx_gmii(
     src_ip_reg   <= src_ip;
   end
 
-  //将以太网报文数据部分长度参数寄存
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -178,7 +178,7 @@ module eth_udp_tx_gmii(
   begin
     data_length_reg  <= data_length;
     IP_total_len_reg <= IP_total_len;
-    udp_length_reg   <= udp_length; 
+    udp_length_reg   <= udp_length;
   end
 
   always@(posedge clk125m or posedge reset_p)
@@ -233,13 +233,13 @@ module eth_udp_tx_gmii(
           next_state = TX_CRC;
         else
           next_state = TX_FILL_DATA;
-        
+
       TX_CRC:
         if(cnt_crc == 2'd3)
           next_state = TX_DELAY;
         else
           next_state = TX_CRC;
-		  
+
       TX_DELAY:
         if(cnt_delay == 8'd64)
           next_state = IDLE;
@@ -251,7 +251,7 @@ module eth_udp_tx_gmii(
     endcase
   end
 
-  //cnt_preamble
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_preamble <= 4'd0;
@@ -260,7 +260,7 @@ module eth_udp_tx_gmii(
   else
     cnt_preamble <= 4'd0;
 
-  //cnt_eth_header
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_eth_header <= 4'd0;
@@ -269,7 +269,7 @@ module eth_udp_tx_gmii(
   else
     cnt_eth_header <= 4'd0;
 
-  //cnt_ip_header
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_ip_header <= 5'd0;
@@ -278,7 +278,7 @@ module eth_udp_tx_gmii(
   else
     cnt_ip_header <= 5'd0;
 
-  //cnt_udp_header
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_udp_header <= 4'd0;
@@ -287,7 +287,7 @@ module eth_udp_tx_gmii(
   else
     cnt_udp_header <= 4'd0;
 
-  //cnt_data
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_data <= 16'd0;
@@ -296,7 +296,7 @@ module eth_udp_tx_gmii(
   else
     cnt_data <= 16'd0;
 
-  //cnt_fill_data
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_fill_data <= 5'd0;
@@ -305,7 +305,7 @@ module eth_udp_tx_gmii(
   else
     cnt_fill_data <= 5'd0;
 
-  //cnt_crc
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_crc <= 5'd0;
@@ -313,8 +313,8 @@ module eth_udp_tx_gmii(
     cnt_crc <= cnt_crc + 1'b1;
   else
     cnt_crc <= 5'd0;
-	
-  //cnt_crc
+
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_delay <= 8'd0;
@@ -323,7 +323,7 @@ module eth_udp_tx_gmii(
   else
     cnt_delay <= 8'd0;
 
-  //tx_data,tx_en
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -394,7 +394,7 @@ module eth_udp_tx_gmii(
           5'd17:  tx_data <= dst_ip_reg[23:16];
           5'd18:  tx_data <= dst_ip_reg[15:8];
           5'd19:  tx_data <= dst_ip_reg[7:0];
-          default:tx_data <= 8'h00; 
+          default:tx_data <= 8'h00;
         endcase
       end
 
@@ -410,7 +410,7 @@ module eth_udp_tx_gmii(
           4'd5:   tx_data <= udp_length_reg[7:0];
           4'd6:   tx_data <= udp_check_sum[15:8];
           4'd7:   tx_data <= udp_check_sum[7:0];
-          default:tx_data <= 8'h00; 
+          default:tx_data <= 8'h00;
         endcase
       end
 
@@ -440,7 +440,7 @@ module eth_udp_tx_gmii(
     endcase
   end
 
-  //payload_req_o
+
   assign payload_req_o = (curr_state == TX_DATA) ? 1'b1 : 1'b0;
 
   always@(posedge clk125m or posedge reset_p)
@@ -448,16 +448,16 @@ module eth_udp_tx_gmii(
     crc_init <= 1'b0;
   else if (tx_en_pulse && (curr_state == IDLE))
     crc_init <= 1'b1;
-  else 
+  else
     crc_init <= 1'b0;
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     crc_en_temp <= 1'b0;
-  else if (curr_state == TX_ETH_HEADER || curr_state == TX_IP_HEADER || 
+  else if (curr_state == TX_ETH_HEADER || curr_state == TX_IP_HEADER ||
            curr_state == TX_UDP_HEADER || curr_state == TX_FILL_DATA || curr_state == TX_DATA)
     crc_en_temp <= 1'b1;
-  else 
+  else
     crc_en_temp <= 1'b0;
 
   always@(posedge clk125m or posedge reset_p)
@@ -465,7 +465,7 @@ module eth_udp_tx_gmii(
     crc_en <= 1'b0;
   else if (crc_en_temp)
     crc_en <= 1'b1;
-  else 
+  else
     crc_en <= 1'b0;
 
   always@(posedge clk125m or posedge reset_p)
@@ -484,7 +484,7 @@ module eth_udp_tx_gmii(
     .data        (crc_in     ),
     .crc_init    (crc_init   ),
     .crc_en      (crc_en     ),
-    .crc_result  (crc_result )//latency=1
+    .crc_result  (crc_result )
   );
 
   assign crc_state = curr_state == TX_CRC;
@@ -552,7 +552,7 @@ module eth_udp_tx_gmii(
     gmii_txd  <= gmii_txd_renewcrc;
   end
 
-  //tx_done
+
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     tx_done <= 1'b0;

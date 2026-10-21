@@ -1,8 +1,8 @@
-//============================================================
-// 模块：solo_hint
-// 作用：智能落点搜索：4 旋转 x 20 列，按消行、空洞、高度和悬空评分。
-// 时钟/复位：Clk_74M；Reset_n 低有效
-//============================================================
+
+
+
+
+
 module solo_hint(
     input Clk_74M,
     input Reset_n,
@@ -68,14 +68,14 @@ module solo_hint(
     end
     endfunction
 
-//    额外仅一个形状 ROM 实例, 与场地共用同一份 28 项形状数据
+
     Tetromino Tetromino_hint_inst(
         .clka(Clk_74M),
         .addra(rom_addr[4:0]),
         .douta(rom_dout)
     );
 
-//    候选评分: 消行奖励 - 空洞/高度/凹凸/最高/悬空惩罚
+
     always@(*)begin
     case(cand_clears)
     0:score_calc = 17'sd0;
@@ -115,7 +115,7 @@ module solo_hint(
         best_valid <= 1'b0;
     end
     else if(start && ((state == S_IDLE) || !start_d))begin
-        // 棋盘/方块事件一到先隐藏, 等待稳定后再搜索
+
         hint_valid <= 1'b0;
         best_valid <= 1'b0;
         best_score <= -17'sd32768;
@@ -294,7 +294,7 @@ module solo_hint(
     end
     S_EVAL:begin
         newtop_temp = (ptop < {1'b0,tops[eval_c[4:0]]}) ? ptop : {1'b0,tops[eval_c[4:0]]};
-        // tops \u662f\u9876\u9762\u884c\u53f7, \u771f\u5b9e\u9ad8\u5ea6\u5fc5\u987b\u7528 20-top
+
         cand_total <= cand_total + (6'd20 - {1'b0,newtop_temp});
         if(eval_c != 0)
             cand_bump <= cand_bump + ((newtop_temp > prev_top) ? (newtop_temp - prev_top) : (prev_top - newtop_temp));

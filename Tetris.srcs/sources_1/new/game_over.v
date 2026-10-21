@@ -1,27 +1,27 @@
-//============================================================
-// 模块：game_over
-// 作用：GAME OVER 标题字模绘制、渐亮和闪烁动画。
-// 时钟/复位：Clk_74M；Reset_n 低有效
-//============================================================
+
+
+
+
+
 module game_over(
     input Clk_74M,
     input Reset_n,
     input [10:0]hcounter,
     input [10:0]vcounter,
     input Finalize,
-    
+
     output lit,
     output reg tick,
     output reg [3:0]cn
     );
-    
+
     integer i;
-    
+
     reg [10:0]X;
     reg [10:0]Y;
     reg ena;
     reg ena_n;
-    reg [4:0]cnt; 
+    reg [4:0]cnt;
 
     wire [10:0]hn = hcounter + 11'd1;
 
@@ -74,17 +74,17 @@ module game_over(
     wire [10:0]addra = {cnt,vt};
     wire [10:0]ht = (hcounter-X)/2;
     assign lit = ena ? douta[19 - ht]:1'b0;
-    
+
     letter letter_inst0(
     .clka(Clk_74M),
     .ena(ena_n),
     .addra(addra),
     .douta(douta)
     );
-    
+
     reg [16:0]ms_cnt;
     reg ms_tick;
-    
+
     always @(posedge Clk_74M or negedge Reset_n) begin
     if (!Reset_n) begin
     ms_cnt  <= 17'd0;
@@ -105,9 +105,9 @@ module game_over(
     ms_tick <= 1'b0;
     end
     end
-    
+
     reg [19:0]counter;
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     counter <= 20'd0;
@@ -148,5 +148,5 @@ module game_over(
     tick <= 0;
     end
     end
-    
+
 endmodule

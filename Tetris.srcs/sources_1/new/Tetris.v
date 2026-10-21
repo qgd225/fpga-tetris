@@ -1,8 +1,8 @@
-//============================================================
-// 模块：Tetris
-// 作用：顶层集成：按键、游戏状态、场地、画面、音频与以太网接口。
-// 时钟/复位：Clk；Reset_key
-//============================================================
+
+
+
+
+
 module Tetris(
     input Clk,
     input Reset_key,
@@ -12,7 +12,7 @@ module Tetris(
     input rotate,
     input switch,
     input hold,
-    
+
     output hdmi_clk_p,
     output hdmi_clk_n,
     output [2:0]hdmi_data_p,
@@ -20,7 +20,7 @@ module Tetris(
     output hdmi_oe,
     output buzz_main,
     output buzz_else,
-    
+
     input         rgmii_rx_clk_i,
     input  [3:0]  rgmii_rxd,
     input         rgmii_rxdv,
@@ -31,18 +31,18 @@ module Tetris(
     output        eth_mdc,
     output        eth_mdio
     );
-    
-    //上电复位
+
+
     reg [19:0]por_cnt = 20'd0;
-    
+
     always@(posedge Clk)begin
     if(!por_cnt[19])
     por_cnt <= por_cnt + 1'b1;
     end
-    
+
     wire por_n = por_cnt[19];
     wire rst_key_en;
-    
+
     wire kb_left_p;
     wire kb_right_p;
     wire kb_left_held;
@@ -58,16 +58,16 @@ module Tetris(
     wire kb_activity;
 
     wire Reset_n = (por_n) && (!rst_key_en) && (!kb_reset_en);
-    
- 
-    
-//    VGA转HDMI及输出分频
+
+
+
+
     wire [10:0]hcounter;
     wire [10:0]vcounter;
     wire [23:0]rgb;
     wire hdmi_de;
     wire Clk_74M;
-    
+
     hdmi hdmi_inst(
     .Clk(Clk),
     .Clk_74M(Clk_74M),
@@ -78,13 +78,13 @@ module Tetris(
     .hdmi_data_n(hdmi_data_n),
     .hdmi_oe(hdmi_oe),
     .rgb(rgb),
-    
+
     .hcounter(hcounter),
     .vcounter(vcounter),
     .de(hdmi_de)
     );
-    
-//    按键输入及消抖
+
+
     wire switch_r_flag;
     wire switch_en;
     wire left_p_flag;
@@ -96,7 +96,7 @@ module Tetris(
     wire rotate_p_flag;
     wire hold_p_flag;
     wire hold_held;
-    
+
     Key Key_inst(
     .Clk(Clk_74M),
     .Clk_50M(Clk),
@@ -109,7 +109,7 @@ module Tetris(
     .rotate(rotate),
     .reset_key(Reset_key),
     .hold(hold),
-    
+
     .switch_r_flag(switch_r_flag),
     .switch_en(switch_en),
     .left_p_flag(left_p_flag),
@@ -143,7 +143,7 @@ wire switch_e   = switch_en     | kb_switch_en;
 wire hold_route = p1_hold;
 wire solo_hold_short;
 wire solo_hold_long;
-//    游戏状态机
+
     wire Idle;
     wire Playing;
     wire Stop;
@@ -160,7 +160,7 @@ hold_gesture hold_gesture_inst(
 .long_level(solo_hold_long)
 );
 wire hold_p = duo ? hold_route : solo_hold_short;
-//    单人: PC + 板载键都控制 P1; 双人: 板载 P1, PC P2
+
 control_route control_route_inst(
 .duo(duo),
 .btn_left(left_p_flag),
@@ -199,7 +199,7 @@ control_route control_route_inst(
 
     wire sw_short;
     wire sw_long;
-    
+
     Game_state_machine Game_state_machine_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -208,7 +208,7 @@ control_route control_route_inst(
     .switch_r_flag(switch_r_f),
     .switch_en(switch_e),
     .over(over),
-    
+
     .sw_short(sw_short),
     .sw_long(sw_long),
 
@@ -220,7 +220,7 @@ control_route control_route_inst(
     .choose_cnt(choose_cnt)
     );
 
-//    横向连发：首移直通，DAS 132ms，ARR 33ms
+
     horizontal_repeat p1_horizontal_repeat(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -245,8 +245,8 @@ control_route control_route_inst(
     .right_out(p2_right_move)
     );
 
-    
-//    画面输出
+
+
     wire clear;
     wire [2:0]speed_level;
     wire [19:0]score;
@@ -274,7 +274,7 @@ control_route control_route_inst(
     reg [2:0]lvl_d;
     reg lvl_up;
 
-//    升级检测: speed_level 变化产生 1 拍脉冲(给音效)
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     lvl_d <= 3'd0;
@@ -286,7 +286,7 @@ control_route control_route_inst(
     end
     end
 
-//    危险等级上升沿：0->1 警报，0/1->2 紧急警报
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     danger_d <= 2'd0;
@@ -299,8 +299,8 @@ control_route control_route_inst(
     danger2_pulse <= (danger_lvl == 2'd2) && (danger_d != 2'd2);
     end
     end
-   
-//    长按开关提示: 第一次长按常亮, 再次长按收起
+
+
 reg solo_hint_latched;
 reg solo_hold_long_d;
 always@(posedge Clk_74M or negedge Reset_n)begin
@@ -317,7 +317,7 @@ solo_hint_latched <= ~solo_hint_latched;
 end
 end
 wire solo_hint_show = !duo && solo_hint_latched;
-//    像素合成：场地/HUD/菜单/结算页/UI 特效与调色板
+
    frame frame_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -344,7 +344,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .Playing(Playing),
     .Stop(Stop),
     .Finalize(Finalize),
-    
+
     .over(over),
     .rgb(rgb),
     .clear(clear),
@@ -369,18 +369,18 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .snd_clr_n(snd_clr_n),
     .danger_lvl(danger_lvl)
     );
-    
-    
-    
+
+
+
     music music_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
     .Idle(Idle | choose),
     .speed_level(speed_level),
-    
+
     .buzz_main(buzz_main)
     );
-    
+
     sound sound_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -412,12 +412,12 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .blk_rot2(blk_rot2),
     .danger1(danger1_pulse),
     .danger2(danger2_pulse),
-    
+
     .buzz_else(buzz_else)
     );
-    
 
-//    以太网：UDP 画面/调色板、PC 键盘输入与 Type4 结算成绩包
+
+
     net_screen_tx net_screen_tx_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -432,7 +432,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .res_level(speed_level),
     .res_lines(lines),
     .res_time(time_sec),
-    
+
     .rgmii_rx_clk_i(rgmii_rx_clk_i),
     .rgmii_rxd(rgmii_rxd),
     .rgmii_rxdv(rgmii_rxdv),

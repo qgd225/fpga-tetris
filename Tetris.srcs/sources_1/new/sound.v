@@ -1,8 +1,8 @@
-//============================================================
-// 模块：sound
-// 作用：音效序列器：事件优先级、音高/时长查表和双蜂鸣器输出。
-// 时钟/复位：Clk_74M；Reset_n 低有效
-//============================================================
+
+
+
+
+
 module sound(
     input Clk_74M,
     input Reset_n,
@@ -38,11 +38,11 @@ module sound(
     output reg buzz_else
     );
 
-//    仿真可覆盖: 1ms 节拍与音高右移量
+
     parameter [16:0]MS_MAX = 17'd74249;
     parameter [3:0]NOTE_SH = 4'd0;
 
-//    音高表: 半周期(74.25MHz / (2*f))
+
     parameter [17:0]N_G4 = 18'd94707;
     parameter [17:0]N_B4 = 18'd75188;
     parameter [17:0]N_C5 = 18'd70985;
@@ -74,7 +74,7 @@ module sound(
     reg [3:0]st;
     reg [3:0]st_last;
 
-//    1ms 节拍: 只在播放时计数
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     ms_cnt <= 17'd0;
@@ -96,7 +96,7 @@ module sound(
     end
     end
 
-//    事件优先链: 播放中不接收新事件; 同动作 P1 先于 P2
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     en <= 5'd0;
@@ -167,7 +167,7 @@ module sound(
     end
     end
 
-//    每条音效的末音符编号
+
     always@(*)begin
     case(en)
     5'd17: st_last = 4'd1;
@@ -193,7 +193,7 @@ module sound(
     endcase
     end
 
-//    音符查表: (en, st) -> 半周期
+
     always@(*)begin
     note = 18'd0;
     case(en)
@@ -294,7 +294,7 @@ module sound(
     endcase
     end
 
-//    时长查表: (en, st) -> ms
+
     always@(*)begin
     cnt = 9'd0;
     case(en)
@@ -395,7 +395,7 @@ module sound(
     endcase
     end
 
-//    仿真缩放: 只缩短半周期, 不改音符/时长表
+
     always@(*)begin
     if(note == 18'd0)
     note_q = 18'd0;
@@ -403,7 +403,7 @@ module sound(
     note_q = note >> NOTE_SH;
     end
 
-//    方波翻转: 每 note_q 拍翻转一次
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     buzz_else <= 1'b0;
@@ -423,7 +423,7 @@ module sound(
     end
     end
 
-//    音符序列推进: 按 ms_tick 切到下一音, 末音结束给 tick
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     st <= 4'd0;

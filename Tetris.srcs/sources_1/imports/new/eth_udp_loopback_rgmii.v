@@ -1,46 +1,46 @@
-//============================================================
-// 导入模块：eth_udp_loopback_rgmii
-// 本工程用途：RGMII 以太网 UDP 收发集成。
-//============================================================
+
+
+
+
 module eth_udp_loopback_rgmii(
   input         reset_n,
-  input         clk_74m,       // 74.25MHz 像素时钟（给跨时钟 FIFO 用）
-  //eth_rx
+  input         clk_74m,
+
   input         rgmii_rx_clk_i,
   input  [3:0]  rgmii_rxd,
   input         rgmii_rxdv,
-  //eth_tx
+
   output        rgmii_tx_clk,
   output  [3:0] rgmii_txd,
   output        rgmii_txen,
 
-  //-------- 接收方向：把收到的数据读出去 --------
-  output [7:0]  rx,             // 收到的 payload 字节
-  input         rx_rd_en,       // 1 拍脉冲 = 取走一个字节（请在 !rx_empty 时给）
-  output        rx_empty,       // 1 = 没有数据可读
-  output        rx_full,        // 1 = 接收 FIFO 满（同时也送给了 rx 模块做流控）
-  output [15:0] rx_data_length, // 这一包 payload 有多少字节
 
-  //-------- 发送方向：把要发的数据写进来 --------
-  input  [7:0]  tx,             // 要发的 payload 字节
-  input         tx_wr_en,       // 1 拍脉冲 = 写入一个字节（请在 !tx_full 时给）
-  output        tx_full,        // 1 = 发送 FIFO 满
-  input         tx_start,       // 1 拍脉冲 = 启动发送（mac 只在 IDLE 状态认它）
+  output [7:0]  rx,
+  input         rx_rd_en,
+  output        rx_empty,
+  output        rx_full,
+  output [15:0] rx_data_length,
+
+
+  input  [7:0]  tx,
+  input         tx_wr_en,
+  output        tx_full,
+  input         tx_start,
   input  [47:0] tx_dst_mac,
   input  [31:0] tx_dst_ip,
   input  [15:0] tx_dst_port,
-  input  [15:0] tx_data_length, // 这一包发这么多字节
-  output        tx_done,        // 一包发完，1 拍
+  input  [15:0] tx_data_length,
+  output        tx_done,
 
-  //-------- 报文信息与状态 --------
-  output [111:0]msg_dout,       // {发件人MAC, 发件人IP, 发件人PORT, 该包长度}
-  input         msg_rd_en,      // 1 拍脉冲 = 读走一条（标准FIFO，dout 下一拍才有效）
-  output [4:0]  msg_count,      // 里面存了几条报文信息
-  output        msg_empty,      // 1 = 没有报文信息
-  output        rx_pkt_done,    // 收完一包，1 拍
-  output        rx_pkt_err,     // 这一包有错
-  output        pll_locked,     // clk_wiz_0 锁定
-  output        clk125m         // 125MHz（来自 PHY RXC），给上层做跨时钟同步用
+
+  output [111:0]msg_dout,
+  input         msg_rd_en,
+  output [4:0]  msg_count,
+  output        msg_empty,
+  output        rx_pkt_done,
+  output        rx_pkt_err,
+  output        pll_locked,
+  output        clk125m
 );
 parameter LOCAL_MAC  = 48'h00_0a_35_01_fe_c0;
 parameter LOCAL_IP   = 32'hc0_a8_00_02;
@@ -56,7 +56,7 @@ wire        rx_payload_valid;
 wire [7:0]  tx_payload_dat;
 wire        tx_payload_req;
 
-// gmii interface
+
 wire        gmii_rx_clk;
 wire [7:0]  gmii_rxd;
 wire        gmii_rxdv;
@@ -67,11 +67,11 @@ wire        gmii_txen;
 
 wire        rgmii_rx_clk;
 
-clk_wiz_0 clk_wiz_0   //加锁相环调整相位，同时加强时钟扇出能力
+clk_wiz_0 clk_wiz_0
 (
-  // Clock out ports
-  .clk_out1(rgmii_rx_clk),     // output clk_out1
-  .clk_in1(rgmii_rx_clk_i),    // input clk_in1
+
+  .clk_out1(rgmii_rx_clk),
+  .clk_in1(rgmii_rx_clk_i),
   .locked (pll_locked)
 );
 
@@ -90,7 +90,7 @@ rgmii_to_gmii rgmii_to_gmii(
   .gmii_rxer( )
 );
 
-//以太网接收
+
 eth_udp_rx_gmii eth_udp_rx_gmii(
   .reset_p         (reset_p               ),
 
@@ -116,43 +116,43 @@ eth_udp_rx_gmii eth_udp_rx_gmii(
   .gmii_rxd        (gmii_rxd              )
 );
 
-//对以太网接收数据缓存（你在这里读出去）
+
 eth_data_buf eth_rx_data_buf (
-  .rst   (reset_p          ), // input wire rst
-  .wr_clk(clk125m          ), // input wire wr_clk  (rx 模块写)
-  .rd_clk(clk_74m          ), // input wire rd_clk  (你读)
-  .din   (rx_payload_dat   ), // input wire [7 : 0] din
-  .wr_en (rx_payload_valid ), // input wire wr_en
-  .rd_en (rx_rd_en         ), // input wire rd_en
-  .dout  (rx               ), // output wire [7 : 0] dout
-  .full  (rx_full          ), // output wire full
-  .empty (rx_empty         )  // output wire empty
+  .rst   (reset_p          ),
+  .wr_clk(clk125m          ),
+  .rd_clk(clk_74m          ),
+  .din   (rx_payload_dat   ),
+  .wr_en (rx_payload_valid ),
+  .rd_en (rx_rd_en         ),
+  .dout  (rx               ),
+  .full  (rx_full          ),
+  .empty (rx_empty         )
 );
 
-//同时对报文中MAC、IP等消息数据缓存
+
 eth_msg_buf eth_msg_buf (
-  .rst        (reset_p                                     ), // input wire rst
-  .clk        (clk125m                                     ), // input wire clk
-  .din        ({exter_mac,exter_ip,exter_port,rx_data_length}),// input wire [111 : 0] din
-  .wr_en      (rx_pkt_done                                 ), // input wire wr_en
-  .rd_en      (msg_rd_en                                   ), // input wire rd_en
-  .dout       (msg_dout                                    ), // output wire [111 : 0] dout
-  .full       (                                            ), // output wire full
-  .empty      (msg_empty                                   ), // output wire empty
-  .data_count (msg_count                                   )  // output wire [4 : 0] data_count
+  .rst        (reset_p                                     ),
+  .clk        (clk125m                                     ),
+  .din        ({exter_mac,exter_ip,exter_port,rx_data_length}),
+  .wr_en      (rx_pkt_done                                 ),
+  .rd_en      (msg_rd_en                                   ),
+  .dout       (msg_dout                                    ),
+  .full       (                                            ),
+  .empty      (msg_empty                                   ),
+  .data_count (msg_count                                   )
 );
 
-//对以太网发出数据缓存（你把要发的东西写进来）
+
 eth_data_buf eth_tx_data_buf (
-  .rst   (reset_p          ), // input wire rst
-  .wr_clk(clk_74m          ), // input wire wr_clk  (打包逻辑写)
-  .rd_clk(clk125m          ), // input wire rd_clk  (mac 读)
-  .din   (tx               ), // input wire [7 : 0] din
-  .wr_en (tx_wr_en         ), // input wire wr_en
-  .rd_en (tx_payload_req   ), // input wire rd_en
-  .dout  (tx_payload_dat   ), // output wire [7 : 0] dout
-  .full  (tx_full          ), // output wire full
-  .empty (                 )  // output wire empty
+  .rst   (reset_p          ),
+  .wr_clk(clk_74m          ),
+  .rd_clk(clk125m          ),
+  .din   (tx               ),
+  .wr_en (tx_wr_en         ),
+  .rd_en (tx_payload_req   ),
+  .dout  (tx_payload_dat   ),
+  .full  (tx_full          ),
+  .empty (                 )
 );
 
 eth_udp_tx_gmii eth_udp_tx_gmii

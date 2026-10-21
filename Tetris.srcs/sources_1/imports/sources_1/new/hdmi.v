@@ -1,7 +1,7 @@
-//============================================================
-// 导入模块：hdmi
-// 本工程用途：HDMI/TMDS 顶层：时钟、并串转换和差分输出。
-//============================================================
+
+
+
+
 module hdmi(
     Clk,
     Clk_74M,
@@ -16,23 +16,23 @@ module hdmi(
     rgb,
     de
     );
-    
+
     input Clk;
     input Reset_n;
-    
+
     input wire [23:0]rgb;
-    
+
     output hdmi_clk_p;
     output hdmi_clk_n;
     output [2:0]hdmi_data_p;
     output [2:0]hdmi_data_n;
     output hdmi_oe;
-    
+
     output wire [10:0]hcounter;
     output wire [10:0]vcounter;
     output wire Clk_74M;
     output wire de;
-    
+
     wire Clk_371M;
     wire Clk_50M;
     wire hdmi_hs;
@@ -54,20 +54,20 @@ module hdmi(
     hdmi_vs_r <= hdmi_vs;
     end
     end
-    
+
    assign hdmi_oe = 1;
-    
+
     hdmi_pll hdmi_pll_inst
  (
-  // Clock out ports
+
   .clk_out1(Clk_74M),
   .clk_out2(Clk_371M),
-  // Status and control signals
+
   .reset(!Reset_n),
- // Clock in ports
+
   .clk_in1(Clk)
  );
-    
+
     VGA_1280_720 VGA_1280_720_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -80,7 +80,7 @@ module hdmi(
     .VGA_CLK(),
     .VGA_DATA()
     );
-    
+
     dvi_encoder dvi_encoder_inst(
     .pixelclk(Clk_74M),
     .pixelclk5x(Clk_371M),
@@ -96,5 +96,5 @@ module hdmi(
     .tmds_data_p(hdmi_data_p),
     .tmds_data_n(hdmi_data_n)
 );
-    
+
     endmodule

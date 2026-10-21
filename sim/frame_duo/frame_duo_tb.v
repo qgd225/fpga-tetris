@@ -1,22 +1,22 @@
 `timescale 1ns/1ps
-//============================================================
-// 测试台：frame_duo_tb
-// 测试目标：frame 显示回归：方块/HUD/菜单/特效/结算页/智能提示和局部压暗。
-//============================================================
 
 
-//===== frame 级双人显示回归: P2 运动块/落格/下一块/Hold/新 HUD 布局/菜单屏 =====
+
+
+
+
+
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
-  assign douta = 32'h0000_0000; // 桩: 偏移全 0 -> 预览块占 (列1,行3)
+  assign douta = 32'h0000_0000;
 endmodule
 module weiyibiao(input clka, input [4:0] addra, output [7:0] douta);
   assign douta = 8'h00;
 endmodule
 module number(input clka, input ena, input [9:0] addra, output [19:0] douta);
-  assign douta = 20'hF_FFFF; // 桩: 全亮, 便于断言数字区域颜色
+  assign douta = 20'hF_FFFF;
 endmodule
 module letter(input clka, input ena, input [10:0] addra, output [19:0] douta);
-  assign douta = 20'hF_FFFF; // 桩: 全亮, 便于断言标签/菜单文字颜色
+  assign douta = 20'hF_FFFF;
 endmodule
 
 module frame_duo_tb;
@@ -120,7 +120,7 @@ begin
 end
 endtask
 
-//    颜色(与 frame 一致)
+
 `define CYAN     24'h00CCFF
 `define YELLOW   24'hFFF_F00
 `define RED      24'hE63946
@@ -138,13 +138,13 @@ endtask
 initial begin
   bad = 0;
   Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk);
-  force dut.Playfield_inst.Drop = 30'd100_000_000; // 抑制自动下落
+  force dut.Playfield_inst.Drop = 30'd100_000_000;
 
   $display("=== 1) 双人: P2 运动块像素(同色表) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c2 = 5'd20; force dut.Playfield_inst.counter_r2 = 5'd0;
   force dut.Playfield_inst.type2 = 3'd0;
-  look(11'd971, 11'd91); // 第20列 第0行
+  look(11'd971, 11'd91);
   chk("duo=1 P2 方块=青色", rgb, `CYAN);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd971, 11'd91);
@@ -157,15 +157,15 @@ initial begin
   force dut.Playfield_inst.counter_c2 = 5'd10; force dut.Playfield_inst.counter_r2 = 5'd19;
   force dut.Playfield_inst.type2 = 3'd3;
   repeat(4) @(posedge Clk);
-  lock2; // P2 落锁 (10,19)
+  lock2;
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
-  look(11'd656, 11'd704); // 第10列 第19行
+  look(11'd656, 11'd704);
   chk("duo=1 P2 落格=红色", rgb, `RED);
   clr_state;
   duo = 1'b0; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c2 = 5'd10; force dut.Playfield_inst.counter_r2 = 5'd19;
   repeat(4) @(posedge Clk);
-  lock2; // 单人: 不应写入
+  lock2;
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
   look(11'd643, 11'd691);
   chk("duo=0 P2 落格不显示", rgb, `FLDBG);
@@ -174,7 +174,7 @@ initial begin
   $display("=== 3) 24 列场地最右两列也能显示 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   dut.state_color[23*20 + 17] = 3'd3; dut.Playfield_inst.state[23*20 + 17] = 1'b1;
-  look(11'd1067, 11'd630); // 第23列 第17行
+  look(11'd1067, 11'd630);
   chk("duo=1 第23列格=红色", rgb, `RED);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1067, 11'd630);
@@ -212,14 +212,14 @@ initial begin
   force dut.Playfield_inst.type_t2 = 3'd3;
   force dut.Playfield_inst.type_t  = 3'd2;
   repeat(4) @(posedge Clk);
-  look(11'd1161, 11'd240); // P2 预览 (列1,行3)
+  look(11'd1161, 11'd240);
   chk("duo=1 P2 下一块=红", rgb, `RED);
-  look(11'd140, 11'd240); // P1 预览 (列1,行3)
+  look(11'd140, 11'd240);
   chk("duo=1 P1 下一块=黄", rgb, `YELLOW);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd140, 11'd240);
   chk("duo=0 左栏位置为外层背景", rgb, 24'h101010);
-  look(11'd1101, 11'd240); // 单人预览 (列1,行3)
+  look(11'd1101, 11'd240);
   chk("duo=0 单人下一块=黄", rgb, `YELLOW);
   look(11'd1161, 11'd240);
   chk("duo=0 无 P2 预览", rgb, `SLOT_P1);
@@ -236,7 +236,7 @@ initial begin
   duo = 1'b0; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c = 5'd9; force dut.Playfield_inst.counter_r = 5'd0;
   force dut.Playfield_inst.type = 3'd2;
-  look(11'd619, 11'd91); // 第9列 第0行
+  look(11'd619, 11'd91);
   chk("duo=0 P1 方块=黄", rgb, `YELLOW);
   release dut.Playfield_inst.counter_c; release dut.Playfield_inst.counter_r; release dut.Playfield_inst.type;
 
@@ -244,13 +244,13 @@ initial begin
   duo = 1'b1; repeat(4) @(posedge Clk);
   dut.state_color[20*20 + 3] = 3'd3;
   dut.Playfield_inst.state[20*20 + 3] = 1'b1;
-  look(11'd351, 11'd200); // 列间 2px 死区
+  look(11'd351, 11'd200);
   chk("死区像素=黑", rgb, `FLDBG);
   dut.state_color[20*20 + 3] = 3'd0;
   dut.Playfield_inst.state[20*20 + 3] = 1'b0;
-  look(11'd318, 11'd40); // 边框上方: 左边框不应出头
+  look(11'd318, 11'd40);
   chk("左边框不出头(上方=外层背景)", rgb, 24'h202020);
-  look(11'd318, 11'd200); // 边框旁: 左边框正常
+  look(11'd318, 11'd200);
   chk("左边框正常(旁边=白)", rgb, `WHITE);
   look(11'd321, 11'd81);
   chk("有效格(第0行第0列)=背景网格", rgb, 24'h081A1E);
@@ -277,7 +277,7 @@ initial begin
   look(11'd325, 11'd85);   chk("P2 ghost inner tick", rgb, 24'hFFB3B9);
   look(11'd330, 11'd90);   chk("P2 ghost interior black", rgb, `FLDBG);
   force dut.Playfield_inst.ghost2 = 1'b0;
-  //    ghost restart must not trigger dynamic dash ring
+
   force dut.Playfield_inst.ghost = 1'b1; force dut.Playfield_inst.type = 3'd0;
   l1 = 1'b1; @(posedge Clk); #1; l1 = 1'b0; repeat(4) @(posedge Clk);
   look(11'd331, 11'd85); chk("ghost no rescan flash", rgb, `FLDBG);
@@ -291,7 +291,7 @@ initial begin
   release dut.Playfield_inst.type;  release dut.Playfield_inst.type2;
   repeat(4) @(posedge Clk);
 
-  //    动态扫描: 用真实幽灵(不 force ghost), hcounter 每拍 +1, 抓 1 拍错位导致的左窄右宽
+
   force dut.Playfield_inst.counter_c = 5'd8;
   force dut.Playfield_inst.counter_r = 5'd0;
   force dut.Playfield_inst.counter_ghost_r_t = 5'd19;
@@ -323,7 +323,7 @@ initial begin
   release dut.Playfield_inst.type;
   repeat(2) @(posedge Clk);
 
-  //    四角各切 1x1: 角点黑, 紧邻边带亮
+
   force dut.Playfield_inst.ghost = 1'b1; force dut.Playfield_inst.ghost2 = 1'b0;
   force dut.Playfield_inst.type = 3'd0;
   repeat(3) @(posedge Clk);
@@ -374,12 +374,12 @@ initial begin
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
   $display("=== 11) 菜单屏: 无框选项 + 青色选中标记 ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
-  hc = 11'd495; vc = 11'd110; repeat(3) @(posedge Clk); // 标题第 1 字前 1 像素
+  hc = 11'd495; vc = 11'd110; repeat(3) @(posedge Clk);
   chk("标题取址已预取", dut.choose_menu_inst.ena_n, 1'b1);
   chk("标题取址 Y 正确", dut.choose_menu_inst.Y, 11'd96);
   chk("标题 vt 正确(2x)", dut.choose_menu_inst.vt, 6'd7);
   chk("菜单字模使能已预取", dut.choose_menu_inst.letter_inst0.ena, 1'b1);
-  hc = 11'd437; vc = 11'd570; repeat(3) @(posedge Clk); // 提示 1 第 1 字前 1 像素
+  hc = 11'd437; vc = 11'd570; repeat(3) @(posedge Clk);
   chk("提示取址 Y 正确", dut.choose_menu_inst.Y, 11'd560);
   chk("提示 big=0(1x)", dut.choose_menu_inst.big, 1'b0);
   chk("提示 vt 正确(1x)", dut.choose_menu_inst.vt, 6'd10);

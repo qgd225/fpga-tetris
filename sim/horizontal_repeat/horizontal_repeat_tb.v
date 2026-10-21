@@ -1,8 +1,8 @@
 `timescale 1ns/1ps
-//============================================================
-// 测试台：horizontal_repeat_tb
-// 测试目标：DAS/ARR、首移直通，以及松开/切换/暂停/结束复位。
-//============================================================
+
+
+
+
 module horizontal_repeat_tb;
 reg Clk_74M = 0;
 reg Reset_n = 0;
@@ -62,7 +62,7 @@ initial begin
   active = 1;
   tick();
 
-//    首移直通 + DAS/ARR
+
   @(negedge Clk_74M);
   left_held = 1;
   left_p = 1;
@@ -87,7 +87,7 @@ initial begin
   tick();
   chk("left second repeat after ARR", left_out, 1);
 
-//    松开方向立即清 DAS/ARR
+
   @(negedge Clk_74M);
   left_held = 0;
   tick();
@@ -95,7 +95,7 @@ initial begin
   chk("left release clears repeat", left_out, 0);
   chk("left release disarms", dut.armed, 0);
 
-//    重新按下必须重新等待完整 DAS
+
   @(negedge Clk_74M);
   left_held = 1;
   left_p = 1;
@@ -111,7 +111,7 @@ initial begin
   tick();
   chk("left repress repeat after DAS", left_out, 1);
 
-//    左右切换：右方向立即首移，DAS 重新开始
+
   @(negedge Clk_74M);
   right_held = 1;
   right_p = 1;
@@ -130,7 +130,7 @@ initial begin
   tick();
   chk("right switch repeat after DAS", right_out, 1);
 
-//    暂停/结束失能：保持按住也不连发，恢复后必须重新按下
+
   @(negedge Clk_74M);
   active = 0;
   tick();

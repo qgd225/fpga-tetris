@@ -1,8 +1,8 @@
-//============================================================
-// 模块：scoring
-// 作用：分数统计、消行加分、BCD 转换和七位分数绘制。
-// 时钟/复位：Clk_74M；Reset_n 低有效
-//============================================================
+
+
+
+
+
 module scoring(
     input Clk_74M,
     input Reset_n,
@@ -17,28 +17,28 @@ module scoring(
     input [4:0]c_clear,
     input [2:0]speed_level,
     input duo,
-    
+
     output reg [19:0]counter,
-    output wire [23:0]bcd, // 6 位十进制分数，供结算页面复用
+    output wire [23:0]bcd,
     output lit
     );
-    
+
     parameter SCORE_UNIT = 2;
 
-//    分数最右一位的基准 X: 让分数右端贴住场地右边界(双人 1085, 单人 950)
+
     wire [10:0]XBASE = duo ? 11'd1065 : 11'd930;
 
     integer i;
-    
+
     reg [3:0]counter0;
     reg [3:0]counter1;
     reg [3:0]counter2;
     reg [3:0]counter3;
     reg [3:0]counter4;
     reg [3:0]counter5;
-//    BCD 输出只读复用，不改变分数寄存器和显示时序
+
     assign bcd = {counter5,counter4,counter3,counter2,counter1,counter0};
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter <= 20'd0;
@@ -63,10 +63,10 @@ module scoring(
     else
     counter <= 20'd0;
     end
-    
-//    分数 -> BCD(串行双 dabble): 一拍只做一次"每位数比较+加3, 再左移一位", 20 拍出一轮结果
-//    组合深度从"原来一拍跑完 20 轮"降到 1 轮, 这是这条路径超时的根因所在
-    reg [43:0]cvt; // 移位寄存器: 高 24 位放 6 个数字, 低 20 位装分数
+
+
+
+    reg [43:0]cvt;
     reg [4:0] bcd_step;
     reg [43:0]bcd_tmp;
     reg [43:0]bcd_next;
@@ -110,7 +110,7 @@ module scoring(
             bcd_step <= bcd_step + 5'd1;
         end
     end
-    
+
     reg [10:0]X;
     reg [10:0]Y;
     reg ena;
@@ -154,13 +154,13 @@ module scoring(
     wire [9:0]addra = {cnt,vt};
     wire [10:0]ht = hcounter-X;
     assign lit = ena ? douta[19 - ht]:1'b0;
-   
+
     number number_inst0(
     .clka(Clk_74M),
     .ena(ena_n),
     .addra(addra),
     .douta(douta)
     );
-     
+
 endmodule
 

@@ -1,8 +1,8 @@
-//============================================================
-// 模块：timer
-// 作用：游戏计时、BCD 输出和 MM:SS 显示。
-// 时钟/复位：Clk_74M；Reset_n 低有效
-//============================================================
+
+
+
+
+
 module timer(
     input Clk_74M,
     input Reset_n,
@@ -13,27 +13,27 @@ module timer(
     input Stop,
     input Finalize,
     input switch_r_flag,
-    
+
     output lit,
     output [15:0] bcd,
     output [13:0] seconds
     );
-    
+
     wire point = ( (hcounter >= 396) && (hcounter < 400) && (vcounter >= 32) && (vcounter < 36) )||
                   ( (hcounter >= 396) && (hcounter < 400) && (vcounter >= 50) && (vcounter < 54) );
-    
+
     wire lit_second_units;
     wire lit_second_tens;
     wire lit_minute_units;
     wire lit_minute_tens;
-                 
+
     reg [26:0]counter;
     reg [3:0]counter0;
     reg [3:0]counter1;
     reg [3:0]counter2;
     reg [3:0]counter3;
-    
-    
+
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter <= 0;
@@ -54,7 +54,7 @@ module timer(
     else
     counter <= 0;
     end
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter0 <= 0;
@@ -69,7 +69,7 @@ module timer(
     counter0 <= counter0 + 1;
     end
     end
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter1 <= 0;
@@ -84,7 +84,7 @@ module timer(
     counter1 <= counter1 + 1;
     end
     end
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter2 <= 0;
@@ -99,7 +99,7 @@ module timer(
     counter2 <= counter2 + 1;
     end
     end
-    
+
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     counter3 <= 0;
@@ -114,17 +114,17 @@ module timer(
     counter3 <= counter3 + 1;
     end
     end
-    
+
     assign seconds = counter3*14'd600 + counter2*14'd60 + counter1*14'd10 + counter0;
     assign bcd = {counter3,counter2,counter1,counter0};
 
     integer i;
-    
+
     reg [10:0]X;
     reg [10:0]Y;
     reg ena;
     reg ena_n;
-    reg [3:0]cnt; 
+    reg [3:0]cnt;
 
     wire [10:0]hn = hcounter + 11'd1;
 
@@ -171,12 +171,12 @@ module timer(
     wire [9:0]addra = {cnt,vt};
     wire [10:0]ht = hcounter-X;
     assign lit = (ena ? douta[19 - ht]:1'b0) || point;
-    
+
     number number_inst0(
     .clka(Clk_74M),
     .ena(ena_n),
     .addra(addra),
     .douta(douta)
     );
-    
+
 endmodule
