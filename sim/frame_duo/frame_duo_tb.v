@@ -131,8 +131,8 @@ endtask
 `define GRAY_MID 24'h606060
 `define GRAY_LBL 24'hB0B0B0
 `define SLOT_BG  24'h202020
-`define FLDBG    24'h0A0F16
-`define SLOT_P1  24'h081A1E
+`define FLDBG    24'h081018
+`define SLOT_P1  24'h071018
 `define SLOT_P2  24'h1E0812
 
 initial begin
@@ -148,7 +148,7 @@ initial begin
   chk("duo=1 P2 方块=青色", rgb, `CYAN);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd971, 11'd91);
-  chk("duo=0 同位置为外层背景", rgb, 24'h101010);
+  chk("duo=0 同位置为外层背景", rgb, 24'h061017);
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
   clr_state;
 
@@ -178,7 +178,7 @@ initial begin
   chk("duo=1 第23列格=红色", rgb, `RED);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1067, 11'd630);
-  chk("duo=0 第23列不在场地", rgb, 24'h101010);
+  chk("duo=0 第23列不在场地", rgb, 24'h061017);
   clr_state;
   dut.state_color[23*20 + 17] = 3'd0; dut.Playfield_inst.state[23*20 + 17] = 1'b0;
 
@@ -194,18 +194,18 @@ initial begin
   look(11'd1230, 11'd339);  chk("duo=1 P2 Hold 色线", rgb, `PINK2);
   look(11'd1059, 11'd140);  chk("duo=1 单人槽位位置=黑", rgb, `FLDBG);
   look(11'd1059, 11'd123);  chk("duo=1 单人色线位置=黑", rgb, `FLDBG);
-  look(11'd1104, 11'd100);  chk("旧 Next 外框位置=外层背景", rgb, 24'h101010);
-  look(11'd1120, 11'd203);  chk("旧中间虚线位置=外层背景", rgb, 24'h101010);
+  look(11'd1104, 11'd100);  chk("旧 Next 外框位置=外层背景", rgb, 24'h061017);
+  look(11'd1120, 11'd203);  chk("旧中间虚线位置=外层背景", rgb, 24'h061017);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1059, 11'd140);  chk("duo=0 单人 Next 槽位", rgb, `SLOT_P1);
   look(11'd1059, 11'd123);  chk("duo=0 单人 Next 色线", rgb, `GRAY_MID);
   look(11'd1059, 11'd356);  chk("duo=0 单人 Hold 槽位", rgb, `SLOT_P1);
-  look(11'd100, 11'd140);   chk("duo=0 双人槽位位置=外层背景", rgb, 24'h101010);
-  look(11'd100, 11'd123);   chk("duo=0 双人色线位置=外层背景", rgb, 24'h101010);
-  look(11'd1230, 11'd140);  chk("duo=0 无 P2 槽位", rgb, `BLACK);
-  look(11'd1230, 11'd123);  chk("duo=0 无 P2 色线", rgb, `BLACK);
-  look(11'd1104, 11'd500);  chk("duo=0 旧 Next 外框位置=外层背景", rgb, 24'h101010);
-  look(11'd1040, 11'd100);  chk("duo=0 旧单人外框位置=外层背景", rgb, 24'h101010);
+  look(11'd100, 11'd140);   chk("duo=0 双人槽位位置=外层背景", rgb, 24'h061017);
+  look(11'd100, 11'd123);   chk("duo=0 双人色线位置=外层背景", rgb, 24'h061017);
+  look(11'd1230, 11'd140);  chk("duo=0 无 P2 槽位", rgb, 24'h02070B);
+  look(11'd1230, 11'd123);  chk("duo=0 无 P2 色线", rgb, 24'h02070B);
+  look(11'd1104, 11'd500);  chk("duo=0 旧 Next 外框位置=外层背景", rgb, 24'h061017);
+  look(11'd1040, 11'd100);  chk("duo=0 旧单人外框位置=外层背景", rgb, 24'h061017);
 
   $display("=== 5) 下一块预览(锚点随布局迁移) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
@@ -218,7 +218,7 @@ initial begin
   chk("duo=1 P1 下一块=黄", rgb, `YELLOW);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd140, 11'd240);
-  chk("duo=0 左栏位置为外层背景", rgb, 24'h101010);
+  chk("duo=0 左栏位置为外层背景", rgb, 24'h061017);
   look(11'd1101, 11'd240);
   chk("duo=0 单人下一块=黄", rgb, `YELLOW);
   look(11'd1161, 11'd240);
@@ -227,10 +227,10 @@ initial begin
 
   $display("=== 6) Hold 位置 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd1104, 11'd400);  chk("duo=1 旧 Hold 外框位置=外层背景", rgb, 24'h101010);
+  look(11'd1104, 11'd400);  chk("duo=1 旧 Hold 外框位置=外层背景", rgb, 24'h061017);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1040, 11'd300);  chk("duo=0 旧 Hold 外框位置=外层背景", rgb, 24'h101010);
-  look(11'd1230, 11'd356);  chk("duo=0 双人 Hold 位置=外层背景", rgb, 24'h101010);
+  look(11'd1040, 11'd300);  chk("duo=0 旧 Hold 外框位置=外层背景", rgb, 24'h061017);
+  look(11'd1230, 11'd356);  chk("duo=0 双人 Hold 位置=外层背景", rgb, 24'h061017);
 
   $display("=== 7) 单人 P1 显示回归 ===");
   duo = 1'b0; repeat(4) @(posedge Clk);
@@ -249,11 +249,11 @@ initial begin
   dut.state_color[20*20 + 3] = 3'd0;
   dut.Playfield_inst.state[20*20 + 3] = 1'b0;
   look(11'd318, 11'd40);
-  chk("左边框不出头(上方=外层背景)", rgb, 24'h202020);
+  chk("左边框不出头(上方=外层背景)", rgb, 24'h071018);
   look(11'd318, 11'd200);
   chk("左边框正常(旁边=白)", rgb, `WHITE);
   look(11'd321, 11'd81);
-  chk("有效格(第0行第0列)=背景网格", rgb, 24'h081A1E);
+  chk("有效格(第0行第0列)=顶部分色轨", rgb, 24'h00E5FF);
 
   $display("=== 9) 幽灵空心框: 边带浅色 / 内部纯黑 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
@@ -354,15 +354,15 @@ initial begin
   end
   force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
   look(11'd271, 11'd440);   chk("level frame left", rgb, 24'h606060);
-  look(11'd274, 11'd440);   chk("outside bar background", rgb, 24'h101010);
+  look(11'd274, 11'd440);   chk("outside bar background", rgb, 24'h061017);
   look(11'd276, 11'd440);   chk("bar left inner", rgb, 24'h303030);
   look(11'd309, 11'd440);   chk("bar inner right", rgb, 24'h303030);
   look(11'd311, 11'd440);   chk("level frame right", rgb, 24'h606060);
-  look(11'd293, 11'd88);    chk("segment gap dark", rgb, `SLOT_BG);
+  look(11'd293, 11'd88);    chk("segment gap dark", rgb, 24'h202020);
   look(11'd292, 11'd40);    chk("level digit color", rgb, 24'h00E5FF);
   look(11'd234, 11'd50);    chk("LV label color", rgb, 24'h00E5FF);
   look(11'd240, 11'd72);    chk("LV rule color", rgb, 24'h00E5FF);
-  look(11'd240, 11'd74);    chk("LV rule below background", rgb, 24'h202020);
+  look(11'd240, 11'd74);    chk("LV rule below background", rgb, 24'h29404D);
   look(11'd340, 11'd40);    chk("time still white", rgb, `WHITE);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.speed_level = 3'd5; repeat(40) @(posedge Clk);
@@ -385,14 +385,14 @@ initial begin
   chk("提示 vt 正确(1x)", dut.choose_menu_inst.vt, 6'd10);
   look(11'd426, 11'd290);   chk("选中项竖条=青", rgb, `CY_MENU);
   look(11'd600, 11'd337);   chk("选中项下划线=青", rgb, `CY_MENU);
-  look(11'd426, 11'd450);   chk("未选中行无竖条=菜单背景", rgb, 24'h0A0F16);
+  look(11'd426, 11'd450);   chk("未选中行无竖条=菜单背景", rgb, 24'h061017);
   look(11'd500, 11'd110);   chk("标题文字=白", rgb, `WHITE);
   look(11'd500, 11'd280);   chk("选中项文字=白", rgb, `WHITE);
   look(11'd500, 11'd440);   chk("未选中项文字=灰", rgb, `GRAY_MID);
   choose_cnt = 4'd1; repeat(4) @(posedge Clk);
   look(11'd426, 11'd450);   chk("切换后竖条=青", rgb, `CY_MENU);
   look(11'd600, 11'd497);   chk("切换后下划线=青", rgb, `CY_MENU);
-  look(11'd426, 11'd290);   chk("原选中行无竖条=菜单背景", rgb, 24'h0A0F16);
+  look(11'd426, 11'd290);   chk("原选中行无竖条=菜单背景", rgb, 24'h061017);
   look(11'd500, 11'd440);   chk("切换后该项文字=白", rgb, `WHITE);
   look(11'd500, 11'd280);   chk("切换后原项文字=灰", rgb, `GRAY_MID);
   choose = 1'b0; choose_cnt = 4'd0; Playing = 1'b1; repeat(4) @(posedge Clk);
@@ -401,11 +401,11 @@ initial begin
   duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("duo=1 分数贴场地右边界", rgb, `WHITE);
   look(11'd113,  11'd90);   chk("duo=1 NEXT 标签=标签灰", rgb, `GRAY_LBL);
-  look(11'd95,   11'd90);   chk("duo=1 标签旧位置=外层背景", rgb, 24'h101010);
+  look(11'd95,   11'd90);   chk("duo=1 标签旧位置=外层背景", rgb, 24'h061017);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1070, 11'd40);   chk("duo=0 该处为顶部背景", rgb, 24'h202020);
+  look(11'd1070, 11'd40);   chk("duo=0 该处为顶部背景", rgb, 24'h071018);
   look(11'd935,  11'd40);   chk("duo=0 分数贴场地右边界", rgb, `WHITE);
-  look(11'd95,   11'd90);   chk("duo=0 双人标签位置=外层背景", rgb, 24'h101010);
+  look(11'd95,   11'd90);   chk("duo=0 双人标签位置=外层背景", rgb, 24'h061017);
   look(11'd1077, 11'd90);   chk("duo=0 单人 NEXT 标签", rgb, `GRAY_LBL);
   look(11'd340,  11'd40);   chk("时间数字=白", rgb, `WHITE);
   force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
@@ -463,21 +463,33 @@ initial begin
   look(11'd1130, 11'd718);  chk("P2 面板底条=粉", rgb, `PINK2);
   look(11'd125, 11'd163);   chk("预览槽点阵=404040", rgb, 24'h404040);
   look(11'd400, 11'd300);   chk("场地内底色=0A0F16", rgb, `FLDBG);
-  look(11'd250, 11'd600);   chk("场地外为外层背景", rgb, 24'h101010);
+  look(11'd250, 11'd300);   chk("场地外为外层背景", rgb, 24'h061017);
   look(11'd126, 11'd163);   chk("点阵旁=槽底", rgb, `SLOT_P1);
-  look(11'd171, 11'd640);   chk("P1 号码徽标=青", rgb, `CY_MENU);
-  look(11'd1185, 11'd624);  chk("P2 号码徽标=粉", rgb, `PINK2);
+  look(11'd89, 11'd44);     chk("P1 独立徽标=青", rgb, `CY_MENU);
+  look(11'd1124, 11'd44);   chk("P2 独立徽标=粉", rgb, `PINK2);
+  look(11'd705, 11'd24);    chk("SCORE 标签=灰", rgb, `GRAY_LBL);
+  look(11'd171, 11'd640);   chk("大号码徽标已移除", rgb, 24'h061017);
+  look(11'd324, 11'd714);   chk("底部桁架橙色点缀", rgb, 24'h80551F);
+  look(11'd335, 11'd714);   chk("底部桁架斜撑", rgb, 24'h10252B);
+  look(11'd343, 11'd164);   chk("左侧供能节点=青", rgb, `CY_MENU);
+  look(11'd32, 11'd130);    chk("左侧观察窗星点", rgb, 24'h536A76);
+  look(11'd600, 11'd81);    chk("顶部左轨=青", rgb, `CY_MENU);
+  look(11'd800, 11'd81);    chk("顶部右轨=粉", rgb, `PINK2);
+  look(11'd245, 11'd620);   chk("DUO 标签=粉", rgb, `PINK2);
+  look(11'd21, 11'd520);    chk("CORE07 标签=灰", rgb, `GRAY_LBL);
+  look(11'd224, 11'd200);   chk("NEXT 面板竖线=框线", rgb, 24'h29404D);
+  look(11'd94, 11'd132);    chk("NEXT 槽位框线", rgb, 24'h29404D);
   look(11'd470, 11'd40);    chk("顶栏发丝线=标签灰", rgb, `GRAY_LBL);
-  look(11'd469, 11'd40);    chk("发丝线左侧=顶部背景", rgb, 24'h202020);
+  look(11'd469, 11'd40);    chk("发丝线左侧=顶部背景", rgb, 24'h071018);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1060, 11'd718);  chk("单人面板底条=灰", rgb, `GRAY_MID);
-  look(11'd171, 11'd640);   chk("单人无号码徽标=外层背景", rgb, 24'h101010);
+  look(11'd171, 11'd640);   chk("单人无大号码徽标=外层背景", rgb, 24'h061017);
   duo = 1'b1; repeat(4) @(posedge Clk);
 
   $display("=== 16) 菜单标题线 ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
   look(11'd600, 11'd181);   chk("菜单标题线=青", rgb, `CY_MENU);
-  look(11'd600, 11'd179);   chk("标题线上方=菜单背景", rgb, 24'h0A0F16);
+  look(11'd600, 11'd179);   chk("标题线上方=菜单背景", rgb, 24'h061017);
   force dut.choose_menu_inst.breath = 1'b1; repeat(4) @(posedge Clk);
   look(11'd426, 11'd290);   chk("菜单选中标记呼吸=暗青", rgb, 24'h00697F);
   release dut.choose_menu_inst.breath; repeat(4) @(posedge Clk);
@@ -581,10 +593,19 @@ initial begin
   dut.Playfield_inst.state[1*20 + 0] = 1'b1;
   repeat(4) @(posedge Clk);
   look(11'd400, 11'd79); chk("danger band red", rgb, `RED);
+  look(11'd409, 11'd79); chk("danger band gap dark", rgb, 24'h061017);
   clr_state;
-  dut.Playfield_inst.state[0*20 + 2] = 1'b1;
+  dut.Playfield_inst.state[0*20 + 3] = 1'b1;
+  repeat(4) @(posedge Clk);
+  look(11'd400, 11'd79); chk("row3 red danger", rgb, `RED);
+  clr_state;
+  dut.Playfield_inst.state[2*20 + 4] = 1'b1;
   repeat(4) @(posedge Clk);
   look(11'd400, 11'd79); chk("caution band orange", rgb, 24'hF77F24);
+  clr_state;
+  dut.Playfield_inst.state[2*20 + 6] = 1'b1;
+  repeat(4) @(posedge Clk);
+  look(11'd400, 11'd79); chk("row6 orange caution", rgb, 24'hF77F24);
   clr_state;
   $display("=== 21) action effects ===\n");
   duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0; clr_state;
@@ -652,18 +673,19 @@ initial begin
   duo = 1'b0; Playing = 1'b0; choose = 1'b0; Finalize = 1'b1; clr_state;
   force dut.cn_r = 4'd15;
   repeat(4) @(posedge Clk);
-  look(11'd452, 11'd368); chk("GO G visible", rgb, `WHITE);
-  look(11'd500, 11'd368); chk("GO A visible", rgb, `WHITE);
-  look(11'd548, 11'd368); chk("GO M visible", rgb, `WHITE);
-  look(11'd596, 11'd368); chk("GO E visible", rgb, `WHITE);
-  look(11'd644, 11'd368); chk("GO O visible", rgb, `WHITE);
-  look(11'd692, 11'd368); chk("GO V visible", rgb, `WHITE);
-  look(11'd740, 11'd368); chk("GO E2 visible", rgb, `WHITE);
-  look(11'd788, 11'd368); chk("GO R visible", rgb, `WHITE);
-  hc = 11'd509; vc = 11'd320; repeat(3) @(posedge Clk);
+  look(11'd452, 11'd352); chk("GO G visible", rgb, `WHITE);
+  look(11'd500, 11'd352); chk("GO A visible", rgb, `WHITE);
+  look(11'd548, 11'd352); chk("GO M visible", rgb, `WHITE);
+  look(11'd596, 11'd352); chk("GO E visible", rgb, `WHITE);
+  look(11'd644, 11'd352); chk("GO O visible", rgb, `WHITE);
+  look(11'd692, 11'd352); chk("GO V visible", rgb, `WHITE);
+  look(11'd740, 11'd352); chk("GO E2 visible", rgb, `WHITE);
+  look(11'd788, 11'd352); chk("GO R visible", rgb, `WHITE);
+  hc = 11'd509; vc = 11'd422; repeat(3) @(posedge Clk);
   chk("CORE BREACH label window", dut.lb_breach, 1'b1);
   chk("CORE BREACH C glyph", dut.lb_g, 5'd2);
   chk("CORE BREACH prefetch", dut.letter_hud_inst.ena, 1'b1);
+  look(11'd509, 11'd422); chk("CORE BREACH final pixel", rgb, `RED);
   look(11'd432, 11'd349); chk("GO dim inside", rgb, 24'h101010);
   look(11'd431, 11'd349); chk("GO dim outside left", rgb, `FLDBG);
   look(11'd432, 11'd348); chk("GO dim checker other", rgb, `FLDBG);

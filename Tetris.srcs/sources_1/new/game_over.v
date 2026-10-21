@@ -34,12 +34,12 @@ module game_over(
         if(Finalize)begin
             for(i = 0; i < 4; i = i + 1)begin
                 if( (hcounter >= (596 - i*48) ) && (hcounter < (596 - i*48 + 20*2) ) &&
-                    (vcounter >= 368) && (vcounter < 368 + 32*2) )begin
+                    (vcounter >= 352) && (vcounter < 352 + 32*2) )begin
                     ena = 1'b1;
                     X = 596 - i*48;
                 end
                 if( (hn >= (596 - i*48 - 1) ) && (hn < (596 - i*48 + 20*2) ) &&
-                    (vcounter >= 368) && (vcounter < 368 + 32*2) )begin
+                    (vcounter >= 352) && (vcounter < 352 + 32*2) )begin
                     ena_n = 1'b1;
                     case(i)
                     0:cnt = 4;
@@ -50,12 +50,12 @@ module game_over(
                     endcase
                 end
                 if( (hcounter >= (788 - i*48) ) && (hcounter < (788 - i*48 + 20*2) ) &&
-                    (vcounter >= 368) && (vcounter < 368 + 32*2) )begin
+                    (vcounter >= 352) && (vcounter < 352 + 32*2) )begin
                     ena = 1'b1;
                     X = 788 - i*48;
                 end
                 if( (hn >= (788 - i*48 - 1) ) && (hn < (788 - i*48 + 20*2) ) &&
-                    (vcounter >= 368) && (vcounter < 368 + 32*2) )begin
+                    (vcounter >= 352) && (vcounter < 352 + 32*2) )begin
                     ena_n = 1'b1;
                     case(i)
                     0:cnt = 17;
@@ -70,7 +70,7 @@ module game_over(
     end
 
     wire [19:0]douta;
-    wire [5:0]vt = (vcounter - 368)/2;
+    wire [5:0]vt = (vcounter - 352)/2;
     wire [10:0]addra = {cnt,vt};
     wire [10:0]ht = (hcounter-X)/2;
     assign lit = ena ? douta[19 - ht]:1'b0;

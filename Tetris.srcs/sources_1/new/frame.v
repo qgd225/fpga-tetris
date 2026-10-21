@@ -127,12 +127,15 @@ module frame(
                      YDIGI = 11'd24,
                      XRSCORE = 11'd365, XRLEVEL = 11'd568, XRLINES = 11'd748, XRTIME = 11'd900,
                      YRMODE = 11'd468, YRLAB = 11'd526, YRNUM = 11'd562,
-                     XBREACH = 11'd508, YBREACH = 11'd314;
+                     XBREACH = 11'd508, YBREACH = 11'd422;
     wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
     wire [10:0]XPN2 = XPNL2;
 
     wire [10:0]XLBN1 = XPN1 + 11'd18;
     wire [10:0]XLBN2 = XPN2 + 11'd18;
+    wire [10:0]XP1LBL = duo ? 11'd88 : 11'd1032;
+    wire [10:0]XP2LBL = duo ? 11'd1123 : 11'd1032;
+    wire [10:0]XSCORELBL = duo ? 11'd703 : 11'd572;
 
     reg [15:0]lines_total;
 
@@ -710,7 +713,7 @@ module frame(
     wire top_rule_lit = (hcounter >= 11'd470) && (hcounter <= 11'd470) &&
                         (vcounter >= 11'd24) && (vcounter < 11'd68);
     wire over_line_lit = Finalize && (hcounter >= 11'd449) && (hcounter <= 11'd825) &&
-                         (vcounter >= 11'd444) && (vcounter <= 11'd446);
+                         (vcounter >= 11'd417) && (vcounter <= 11'd419);
 
 
     wire rule1_lit = ((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
@@ -726,6 +729,20 @@ module frame(
     wire rule2_lit = duo && (((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
                              ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
                              ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))));
+    wire slot_frame_lit =
+        ((hcounter >= XPN1) && (hcounter <= (XPN1 + 11'd128)) &&
+         ((vcounter == YNEXT) || (vcounter == (YNEXT + 11'd128)) ||
+          (vcounter == YHOLD) || (vcounter == (YHOLD + 11'd128)))) ||
+        ((hcounter == XPN1) || (hcounter == (XPN1 + 11'd128))) &&
+         (((vcounter >= YNEXT) && (vcounter <= (YNEXT + 11'd128))) ||
+          ((vcounter >= YHOLD) && (vcounter <= (YHOLD + 11'd128)))) ||
+        (duo &&
+         (((hcounter >= XPN2) && (hcounter <= (XPN2 + 11'd128)) &&
+           ((vcounter == YNEXT) || (vcounter == (YNEXT + 11'd128)) ||
+            (vcounter == YHOLD) || (vcounter == (YHOLD + 11'd128)))) ||
+          ((hcounter == XPN2) || (hcounter == (XPN2 + 11'd128))) &&
+           (((vcounter >= YNEXT) && (vcounter <= (YNEXT + 11'd128))) ||
+            ((vcounter >= YHOLD) && (vcounter <= (YHOLD + 11'd128))))));
 
 
     wire [3:0] lv_dig = {1'b0, speed_level};
@@ -962,8 +979,8 @@ module frame(
 
     wire [10:0]XR = duo ? 11'd1088 : 11'd960;
     wire in_field = (hcounter >= 11'd321) && (hcounter < XR) && (vcounter >= 11'd81);
-    wire [23:0]field_bg = 24'h0A0F16;
-    wire [23:0]slot_bg = (duo && (hcounter >= XPN2)) ? 24'h1E0812 : 24'h081A1E;
+    wire [23:0]field_bg = 24'h081018;
+    wire [23:0]slot_bg = (duo && (hcounter >= XPN2)) ? 24'h1E0812 : 24'h071018;
     wire [10:0]field_mid = (11'd321 + XR) >> 1;
     reg [23:0]story_outer_color;
     reg [23:0]story_inner_color;
@@ -975,59 +992,84 @@ module frame(
 
 
     always@(*)begin
-    story_outer_color = 24'h101010;
+    story_outer_color = 24'h061017;
     if(vcounter < 11'd75)
-        story_outer_color = 24'h202020;
-    if((vcounter == 11'd82) || (vcounter == 11'd306) ||
-       (vcounter == 11'd520) || (vcounter == 11'd710))
-        story_outer_color = 24'h303030;
-    if((hcounter == 11'd12) || (hcounter == 11'd286) ||
-       (hcounter == 11'd301) || (hcounter == 11'd1015) ||
-       (hcounter == 11'd1206) || (hcounter == 11'd1260))
-        story_outer_color = 24'h202020;
-
-
+        story_outer_color = 24'h071018;
+    if((vcounter == 11'd74) || (vcounter == 11'd82) ||
+       (vcounter == 11'd306) || (vcounter == 11'd520) ||
+       (vcounter == 11'd710))
+        story_outer_color = 24'h29404D;
+    if((hcounter == 11'd12) || (hcounter == 11'd82) ||
+       (hcounter == 11'd224) || (hcounter == 11'd313) ||
+       (hcounter == (duo ? 11'd1117 : 11'd1024)) ||
+       (hcounter == (duo ? 11'd1265 : 11'd1204)))
+        story_outer_color = 24'h29404D;
     if(((hcounter >= 11'd22) && (hcounter <= 11'd76) &&
         (((vcounter >= 11'd112) && (vcounter <= 11'd162)) ||
          ((vcounter >= 11'd214) && (vcounter <= 11'd264)))) ||
        ((hcounter >= 11'd1230) && (hcounter <= 11'd1266) &&
         (((vcounter >= 11'd112) && (vcounter <= 11'd162)) ||
          ((vcounter >= 11'd214) && (vcounter <= 11'd264)))))
-        story_outer_color = 24'h000000;
-
-
+        story_outer_color = 24'h02070B;
+    if(((hcounter == 11'd32) && ((vcounter == 11'd130) || (vcounter == 11'd232))) ||
+       ((hcounter == 11'd50) && ((vcounter == 11'd122) || (vcounter == 11'd242))) ||
+       ((hcounter == 11'd64) && ((vcounter == 11'd142) || (vcounter == 11'd224))) ||
+       ((hcounter == 11'd1238) && ((vcounter == 11'd128) || (vcounter == 11'd232))) ||
+       ((hcounter == 11'd1254) && ((vcounter == 11'd142) || (vcounter == 11'd222))))
+        story_outer_color = 24'h536A76;
     if(((vcounter == 11'd164) || (vcounter == 11'd318) ||
         (vcounter == 11'd472) || (vcounter == 11'd626)) &&
-       (((hcounter >= 11'd292) && (hcounter < 11'd321)) ||
+       (((hcounter >= 11'd224) && (hcounter < 11'd321)) ||
         ((hcounter >= XR) && (hcounter <= (XR + 11'd21)))))
-        story_outer_color = 24'h04637E;
+        story_outer_color = (hcounter < 11'd321) ? 24'h08798A : 24'h7B2B54;
+    if((hcounter == 11'd94) && (vcounter >= 84) && (vcounter < 710))
+        story_outer_color = 24'h00E5FF;
+    if((hcounter == (duo ? 11'd1249 : 11'd1188)) &&
+       (vcounter >= 84) && (vcounter < 710))
+        story_outer_color = duo ? 24'hFF4DA6 : 24'h00E5FF;
+    if((((hcounter >= 18) && (hcounter <= 24)) ||
+        ((hcounter >= 1244) && (hcounter <= 1250))) &&
+       (((vcounter >= 160) && (vcounter <= 168)) ||
+        ((vcounter >= 396) && (vcounter <= 404)) ||
+        ((vcounter >= 686) && (vcounter <= 694))))
+        story_outer_color = 24'h80551F;
+    if((((hcounter >= 15) && (hcounter <= 21)) ||
+        ((hcounter >= 1249) && (hcounter <= 1255))) &&
+       (vcounter >= 93) && (vcounter <= 99))
+        story_outer_color = 24'h00E5FF;
 
     story_inner_color = field_bg;
     if(in_field)begin
         if((((hcounter - 11'd321) & 11'd31) == 11'd0) ||
            (((vcounter - 11'd81) & 11'd31) == 11'd0))
-            story_inner_color = 24'h081A1E;
-        if((hcounter == (11'd321 + 11'd22)) ||
-           (hcounter == (XR - 11'd23)))
-            story_inner_color = 24'h00697F;
-        if((hcounter == (11'd321 + 11'd22)) ||
-           (hcounter == (XR - 11'd23)))begin
-            if((vcounter == 11'd164) || (vcounter == 11'd318) ||
-               (vcounter == 11'd472) || (vcounter == 11'd626))
-                story_inner_color = (hcounter == (11'd321 + 11'd22)) ?
-                                     24'h00E5FF : 24'hFF4DA6;
-        end
-
+            story_inner_color = 24'h0D2029;
+        if((vcounter >= 11'd81) && (vcounter <= 11'd83))
+            story_inner_color = (hcounter < field_mid) ? 24'h00E5FF : 24'hFF4DA6;
+        if((hcounter == 11'd343) || (hcounter == (XR - 11'd23)))
+            story_inner_color = (hcounter == 11'd343) ? 24'h08798A : 24'h7B2B54;
+        if(((hcounter == 11'd343) || (hcounter == (XR - 11'd23))) &&
+           (((vcounter >= 11'd164) && (vcounter <= 11'd168)) ||
+            ((vcounter >= 11'd318) && (vcounter <= 11'd322)) ||
+            ((vcounter >= 11'd472) && (vcounter <= 11'd476)) ||
+            ((vcounter >= 11'd626) && (vcounter <= 11'd630))))
+            story_inner_color = (hcounter == 11'd343) ? 24'h00E5FF : 24'hFF4DA6;
         if((hcounter == field_mid) && ((vcounter & 11'd63) < 11'd24))
-            story_inner_color = 24'h00697F;
-        if((vcounter >= 11'd700) && ((vcounter & 11'd3) == 11'd0))
-            story_inner_color = 24'h202020;
-        if((vcounter >= 11'd714) && ((hcounter & 11'd31) < 11'd12))
-            story_inner_color = 24'h71411D;
+            story_inner_color = 24'h17414B;
+        if((vcounter >= 11'd700) && (vcounter <= 11'd715))
+            story_inner_color = 24'h09171C;
+        if((vcounter >= 11'd700) && (vcounter <= 11'd715) &&
+           (((hcounter - 11'd321) & 11'd31) == ((vcounter - 11'd700) & 11'd31)))
+            story_inner_color = 24'h10252B;
+        if((vcounter >= 11'd700) && (vcounter <= 11'd715) &&
+           (((hcounter - 11'd321) & 11'd31) < 11'd12))
+            story_inner_color = 24'h80551F;
+        if((vcounter >= 11'd700) && (vcounter <= 11'd715) &&
+           (((hcounter - 11'd321) & 11'd31) == 11'd0))
+            story_inner_color = 24'h10252B;
+        if((hcounter == 11'd326) || (hcounter == (XR - 11'd5)))
+            story_inner_color = 24'h536A76;
     end
-
-
-    story_menu_color = in_field ? 24'h0A0F16 : story_outer_color;
+    story_menu_color = story_outer_color;
     end
     reg lvd_r;
     reg lb_lv_r;
@@ -1311,17 +1353,6 @@ module frame(
     wire dy2 = (((vcounter - YHOLD) & 11'd31) == 11'd31);
     wire slot_dot = (next_slot_r && dy1 && (dx1 || dx2)) || (hold_slot_r && dy2 && (dx1 || dx2));
 
-    wire bd1 = duo && (hcounter >= 11'd138) && (hcounter < 11'd178) && (vcounter >= 11'd621) && (vcounter < 11'd709);
-    wire bd2 = duo && (hcounter >= 11'd1165) && (hcounter < 11'd1205) && (vcounter >= 11'd621) && (vcounter < 11'd709);
-    wire [10:0]bx = bd2 ? (hcounter - 11'd1165) : (hcounter - 11'd138);
-    wire [10:0]by = vcounter - 11'd621;
-    wire seg_a = (bx >= 11'd4) && (bx < 11'd36) && (by >= 11'd2) && (by < 11'd6);
-    wire seg_d = (bx >= 11'd4) && (bx < 11'd36) && (by >= 11'd82) && (by < 11'd86);
-    wire seg_g = (bx >= 11'd4) && (bx < 11'd36) && (by >= 11'd42) && (by < 11'd46);
-    wire seg_b = (bx >= 11'd32) && (bx < 11'd36) && (by >= 11'd6) && (by < 11'd42);
-    wire seg_c = (bx >= 11'd32) && (bx < 11'd36) && (by >= 11'd46) && (by < 11'd82);
-    wire seg_e = (bx >= 11'd4) && (bx < 11'd8) && (by >= 11'd46) && (by < 11'd82);
-    wire badge_lit = bd1 ? (seg_b || seg_c) : (bd2 ? (seg_a || seg_b || seg_g || seg_e || seg_d) : 1'b0);
 
     parameter CYAN = 24'h00CCFF,
                LIGHT_CYAN = 24'h99EEFF,
@@ -1355,8 +1386,11 @@ module frame(
     wire row1_any = |(row_f[1] & col_mask);
     wire row2_any = |(row_f[2] & col_mask);
     wire row3_any = |(row_f[3] & col_mask);
-    wire danger_state = row0_any || row1_any;
-    wire caution_state = danger_state || row2_any || row3_any;
+    wire row4_any = |(row_f[4] & col_mask);
+    wire row5_any = |(row_f[5] & col_mask);
+    wire row6_any = |(row_f[6] & col_mask);
+    wire danger_state = row0_any || row1_any || row2_any || row3_any;
+    wire caution_state = danger_state || row4_any || row5_any || row6_any;
     assign danger_lvl = danger_state ? 2'd2 : (caution_state ? 2'd1 : 2'd0);
     wire danger_active = (danger_lvl != 2'd0);
     wire [23:0]danger_color = (danger_lvl == 2'd2) ? RED : ORANGE;
@@ -1365,10 +1399,13 @@ module frame(
     wire danger_line = danger_active && (hcounter >= 11'd321) && (hcounter < XR) &&
                        (vcounter >= 11'd77) && (vcounter < 11'd81) &&
                        (danger_phase < 11'd16);
+    wire danger_gap = danger_active && (hcounter >= 11'd321) && (hcounter < XR) &&
+                      (vcounter >= 11'd77) && (vcounter < 11'd81) &&
+                      (danger_phase >= 11'd16);
     wire danger_dot = danger_active && in_field &&
                       (((hcounter - 11'd321) & 11'd15) == 11'd0) &&
                       (((vcounter - 11'd81) & 11'd15) == 11'd0) &&
-                      ((danger_lvl == 2'd2) ? (R_num <= 5'd1) : (R_num <= 5'd3));
+                      ((danger_lvl == 2'd2) ? (R_num <= 5'd3) : (R_num <= 5'd6));
     wire rail_l_lit = (hcounter >= 11'd313) && (hcounter <= 11'd316) &&
                       (vcounter >= 11'd81) && (vcounter < 11'd721);
     wire rail_r_lit = (hcounter >= (XR + 11'd4)) && (hcounter <= (XR + 11'd7)) &&
@@ -1495,7 +1532,137 @@ module frame(
     endcase
     end
 
+    function [4:0] mf_glyph;
+    input [4:0] ch;
+    input [2:0] row;
+    begin
+        case(ch)
+        5'd0: case(row) 0:mf_glyph=5'b11110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b11110; 4:mf_glyph=5'b10000; 5:mf_glyph=5'b10000; default:mf_glyph=5'b10000; endcase
+        5'd1: case(row) 0:mf_glyph=5'b00100; 1:mf_glyph=5'b01100; 2:mf_glyph=5'b00100; 3:mf_glyph=5'b00100; 4:mf_glyph=5'b00100; 5:mf_glyph=5'b00100; default:mf_glyph=5'b01110; endcase
+        5'd2: case(row) 0:mf_glyph=5'b01110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b00001; 3:mf_glyph=5'b00010; 4:mf_glyph=5'b00100; 5:mf_glyph=5'b01000; default:mf_glyph=5'b11111; endcase
+        5'd3: case(row) 0:mf_glyph=5'b01111; 1:mf_glyph=5'b10000; 2:mf_glyph=5'b10000; 3:mf_glyph=5'b01110; 4:mf_glyph=5'b00001; 5:mf_glyph=5'b00001; default:mf_glyph=5'b11110; endcase
+        5'd4: case(row) 0:mf_glyph=5'b01111; 1:mf_glyph=5'b10000; 2:mf_glyph=5'b10000; 3:mf_glyph=5'b10000; 4:mf_glyph=5'b10000; 5:mf_glyph=5'b10000; default:mf_glyph=5'b01111; endcase
+        5'd5: case(row) 0:mf_glyph=5'b01110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b10001; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b01110; endcase
+        5'd6: case(row) 0:mf_glyph=5'b11110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b11110; 4:mf_glyph=5'b10100; 5:mf_glyph=5'b10010; default:mf_glyph=5'b10001; endcase
+        5'd7: case(row) 0:mf_glyph=5'b11111; 1:mf_glyph=5'b10000; 2:mf_glyph=5'b10000; 3:mf_glyph=5'b11110; 4:mf_glyph=5'b10000; 5:mf_glyph=5'b10000; default:mf_glyph=5'b11111; endcase
+        5'd8: case(row) 0:mf_glyph=5'b11110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b10001; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b11110; endcase
+        5'd9: case(row) 0:mf_glyph=5'b10001; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b10001; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b01110; endcase
+        5'd10:case(row) 0:mf_glyph=5'b01110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10011; 3:mf_glyph=5'b10101; 4:mf_glyph=5'b11001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b01110; endcase
+        5'd11:case(row) 0:mf_glyph=5'b11111; 1:mf_glyph=5'b00001; 2:mf_glyph=5'b00010; 3:mf_glyph=5'b00100; 4:mf_glyph=5'b01000; 5:mf_glyph=5'b01000; default:mf_glyph=5'b01000; endcase
+        5'd12:case(row) 0:mf_glyph=5'b10001; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b11111; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b10001; endcase
+        5'd13:case(row) 0:mf_glyph=5'b01110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b11111; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b10001; endcase
+        5'd14:case(row) 0:mf_glyph=5'b10001; 1:mf_glyph=5'b11001; 2:mf_glyph=5'b10101; 3:mf_glyph=5'b10011; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b10001; endcase
+        5'd15:case(row) 0:mf_glyph=5'b11111; 1:mf_glyph=5'b00100; 2:mf_glyph=5'b00100; 3:mf_glyph=5'b00100; 4:mf_glyph=5'b00100; 5:mf_glyph=5'b00100; default:mf_glyph=5'b00100; endcase
+        5'd16:case(row) 0:mf_glyph=5'b11111; 1:mf_glyph=5'b00100; 2:mf_glyph=5'b00100; 3:mf_glyph=5'b00100; 4:mf_glyph=5'b00100; 5:mf_glyph=5'b00100; default:mf_glyph=5'b11111; endcase
+        5'd17:case(row) 0:mf_glyph=5'b10001; 1:mf_glyph=5'b11011; 2:mf_glyph=5'b10101; 3:mf_glyph=5'b10101; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b10001; endcase
+        default:mf_glyph=5'd0;
+        endcase
+    end
+    endfunction
 
+    function [4:0] mf_text_char;
+    input [2:0] text_id;
+    input [3:0] idx;
+    begin
+        mf_text_char=5'd0;
+        case(text_id)
+        0:case(idx) 0:mf_text_char=5'd0; 1:mf_text_char=5'd1; default:mf_text_char=5'd0; endcase
+        1:case(idx) 0:mf_text_char=5'd0; 1:mf_text_char=5'd2; default:mf_text_char=5'd0; endcase
+        2:case(idx) 0:mf_text_char=5'd3; 1:mf_text_char=5'd4; 2:mf_text_char=5'd5; 3:mf_text_char=5'd6; default:mf_text_char=5'd7; endcase
+        3:case(idx) 0:mf_text_char=5'd8; 1:mf_text_char=5'd9; default:mf_text_char=5'd5; endcase
+        4:case(idx) 0:mf_text_char=5'd4; 1:mf_text_char=5'd5; 2:mf_text_char=5'd6; 3:mf_text_char=5'd7; 4:mf_text_char=5'd10; default:mf_text_char=5'd11; endcase
+        5:case(idx) 0:mf_text_char=5'd3; 1:mf_text_char=5'd12; 2:mf_text_char=5'd13; 3:mf_text_char=5'd6; 4:mf_text_char=5'd7; default:mf_text_char=5'd8; endcase
+        6:case(idx)
+          0:mf_text_char=5'd4; 1:mf_text_char=5'd5; 2:mf_text_char=5'd14; 3:mf_text_char=5'd15; 4:mf_text_char=5'd13; 5:mf_text_char=5'd14;
+          6:mf_text_char=5'd16; 7:mf_text_char=5'd14; 8:mf_text_char=5'd17; 9:mf_text_char=5'd7; 10:mf_text_char=5'd14; default:mf_text_char=5'd15;
+          endcase
+        default:mf_text_char=5'd0;
+        endcase
+    end
+    endfunction
+
+    function mf_text_px;
+    input [2:0] text_id;
+    input [5:0] lx;
+    input [3:0] ly;
+    reg scaled;
+    reg [5:0] rem;
+    reg [3:0] idx;
+    reg [3:0] row;
+    reg [2:0] col;
+    reg [4:0] pattern;
+    begin
+        rem=lx;
+        idx=4'd0;
+        scaled=(text_id<3'd4);
+        if(scaled)begin
+            if(lx>=6'd44)begin idx=4'd4; rem=lx-6'd44; end
+            else if(lx>=6'd33)begin idx=4'd3; rem=lx-6'd33; end
+            else if(lx>=6'd22)begin idx=4'd2; rem=lx-6'd22; end
+            else if(lx>=6'd11)begin idx=4'd1; rem=lx-6'd11; end
+            row={1'b0,ly[3:1]};
+            col=rem[3:1];
+            if(rem>=6'd10)col=3'd7;
+            if(ly>4'd13)col=3'd7;
+        end
+        else begin
+            if(lx>=6'd60)begin idx=4'd10; rem=lx-6'd60; end
+            else if(lx>=6'd54)begin idx=4'd9; rem=lx-6'd54; end
+            else if(lx>=6'd48)begin idx=4'd8; rem=lx-6'd48; end
+            else if(lx>=6'd42)begin idx=4'd7; rem=lx-6'd42; end
+            else if(lx>=6'd36)begin idx=4'd6; rem=lx-6'd36; end
+            else if(lx>=6'd30)begin idx=4'd5; rem=lx-6'd30; end
+            else if(lx>=6'd24)begin idx=4'd4; rem=lx-6'd24; end
+            else if(lx>=6'd18)begin idx=4'd3; rem=lx-6'd18; end
+            else if(lx>=6'd12)begin idx=4'd2; rem=lx-6'd12; end
+            else if(lx>=6'd6)begin idx=4'd1; rem=lx-6'd6; end
+            row={1'b0,ly[2:0]};
+            col=rem[2:0];
+            if(rem>=6'd5)col=3'd7;
+            if(ly>4'd6)col=3'd7;
+        end
+        if(idx>((text_id==3'd0||text_id==3'd1)?4'd1:(text_id==3'd2)?4'd4:(text_id==3'd3)?4'd2:(text_id==3'd4||text_id==3'd5)?4'd5:4'd10))col=3'd7;
+        if((col<3'd5)&&(row<4'd7))begin
+            pattern=mf_glyph(mf_text_char(text_id,idx),row[2:0]);
+            mf_text_px=pattern[4-col];
+        end
+        else
+            mf_text_px=1'b0;
+    end
+    endfunction
+
+    wire [5:0]p1_lx=hcounter-XP1LBL;
+    wire [5:0]p2_lx=hcounter-XP2LBL;
+    wire [5:0]score_lx=hcounter-XSCORELBL;
+    wire [5:0]duo_lx=hcounter-11'd244;
+    wire [5:0]core_lx=hcounter-11'd20;
+    wire [3:0]p1_ly=vcounter-11'd44;
+    wire [3:0]score_ly=vcounter-11'd24;
+    wire [3:0]duo_ly=vcounter-11'd620;
+    wire [3:0]core1_ly=vcounter-11'd520;
+    wire [3:0]core2_ly=vcounter-11'd552;
+    wire [3:0]core3_ly=vcounter-11'd584;
+    wire p1_label_px = !choose && (hcounter >= XP1LBL) && (hcounter < XP1LBL + 11'd21) &&
+                       (vcounter >= 11'd44) && (vcounter < 11'd58) &&
+                       mf_text_px(3'd0,p1_lx,p1_ly);
+    wire p2_label_px = !choose && duo && (hcounter >= XP2LBL) && (hcounter < XP2LBL + 11'd21) &&
+                       (vcounter >= 11'd44) && (vcounter < 11'd58) &&
+                       mf_text_px(3'd1,p2_lx,p1_ly);
+    wire score_label_px = !choose && (hcounter >= XSCORELBL) && (hcounter < XSCORELBL + 11'd54) &&
+                          (vcounter >= 11'd24) && (vcounter < 11'd38) &&
+                          mf_text_px(3'd2,score_lx,score_ly);
+    wire duo_label_px = !choose && duo && (hcounter >= 11'd244) && (hcounter < 11'd276) &&
+                        (vcounter >= 11'd620) && (vcounter < 11'd634) &&
+                        mf_text_px(3'd3,duo_lx,duo_ly);
+    wire core1_label_px = (hcounter >= 11'd20) && (hcounter < 11'd55) &&
+                          (vcounter >= 11'd520) && (vcounter < 11'd527) &&
+                          mf_text_px(3'd4,core_lx,core1_ly);
+    wire core2_label_px = (hcounter >= 11'd20) && (hcounter < 11'd55) &&
+                          (vcounter >= 11'd552) && (vcounter < 11'd559) &&
+                          mf_text_px(3'd5,core_lx,core2_ly);
+    wire core3_label_px = (hcounter >= 11'd20) && (hcounter < 11'd85) &&
+                          (vcounter >= 11'd584) && (vcounter < 11'd591) &&
+                          mf_text_px(3'd6,core_lx,core3_ly);
 
     localparam [6:0]
         PS_BLACK            = 7'd0,
@@ -1567,55 +1734,60 @@ module frame(
         PS_SLOT_DOT         = 7'd66,
         PS_HOLD_SLOT        = 7'd67,
         PS_NEXT_SLOT        = 7'd68,
-        PS_BADGE_P1         = 7'd69,
-        PS_BADGE_P2         = 7'd70,
-        PS_SCORE_FLASH      = 7'd71,
-        PS_SCORE_WHITE      = 7'd72,
-        PS_TIME_WHITE       = 7'd73,
-        PS_RAIL_L_CYAN      = 7'd74,
-        PS_RAIL_L_WHITE     = 7'd75,
-        PS_RAIL_R_PINK      = 7'd76,
-        PS_RAIL_R_CYAN      = 7'd77,
-        PS_RAIL_R_WHITE     = 7'd78,
-        PS_DANGER           = 7'd79,
-        PS_MARGIN_WHITE     = 7'd80,
-        PS_ROT1             = 7'd81,
-        PS_ROT2             = 7'd82,
-        PS_BRACKET1         = 7'd83,
-        PS_BRACKET2         = 7'd84,
-        PS_PIECE_CORNER     = 7'd85,
-        PS_PIECE_LAND       = 7'd86,
-        PS_PIECE_GLINT      = 7'd87,
-        PS_PIECE_LIGHT_DUO  = 7'd88,
-        PS_PIECE_LIGHT      = 7'd89,
-        PS_PIECE_DARK       = 7'd90,
-        PS_PIECE_BASE       = 7'd91,
-        PS_GHOST_LIGHT      = 7'd92,
-        PS_GHOST_BG         = 7'd93,
-        PS_HINT             = 7'd94,
-        PS_RIM_WHITE        = 7'd95,
-        PS_CELL_CORNER      = 7'd96,
-        PS_CELL_CLEAR_BASE  = 7'd97,
-        PS_CELL_SPARK       = 7'd98,
-        PS_CELL_RING        = 7'd99,
-        PS_CELL_FLASH       = 7'd100,
-        PS_CELL_SHRINK      = 7'd101,
-        PS_CELL_GLINT       = 7'd102,
-        PS_CELL_LIGHT_DUO   = 7'd103,
-        PS_CELL_LIGHT       = 7'd104,
-        PS_CELL_DARK        = 7'd105,
-        PS_CELL_BASE        = 7'd106,
-        PS_PIECE2_CORNER    = 7'd107,
-        PS_PIECE2_LAND      = 7'd108,
-        PS_PIECE2_GLINT     = 7'd109,
-        PS_PIECE2_LIGHT_DUO = 7'd110,
-        PS_PIECE2_LIGHT     = 7'd111,
-        PS_PIECE2_DARK      = 7'd112,
-        PS_PIECE2_BASE      = 7'd113,
-        PS_GHOST2_LIGHT     = 7'd114,
-        PS_GHOST2_BG        = 7'd115,
-        PS_STORY_INNER      = 7'd116,
-        PS_STORY_OUTER      = 7'd117;
+        PS_SCORE_FLASH      = 7'd69,
+        PS_SCORE_WHITE      = 7'd70,
+        PS_TIME_WHITE       = 7'd71,
+        PS_RAIL_L_CYAN      = 7'd72,
+        PS_RAIL_L_WHITE     = 7'd73,
+        PS_RAIL_R_PINK      = 7'd74,
+        PS_RAIL_R_CYAN      = 7'd75,
+        PS_RAIL_R_WHITE     = 7'd76,
+        PS_DANGER           = 7'd77,
+        PS_MARGIN_WHITE     = 7'd78,
+        PS_ROT1             = 7'd79,
+        PS_ROT2             = 7'd80,
+        PS_BRACKET1         = 7'd81,
+        PS_BRACKET2         = 7'd82,
+        PS_PIECE_CORNER     = 7'd83,
+        PS_PIECE_LAND       = 7'd84,
+        PS_PIECE_GLINT      = 7'd85,
+        PS_PIECE_LIGHT_DUO  = 7'd86,
+        PS_PIECE_LIGHT      = 7'd87,
+        PS_PIECE_DARK       = 7'd88,
+        PS_PIECE_BASE       = 7'd89,
+        PS_GHOST_LIGHT      = 7'd90,
+        PS_GHOST_BG         = 7'd91,
+        PS_HINT             = 7'd92,
+        PS_RIM_WHITE        = 7'd93,
+        PS_CELL_CORNER      = 7'd94,
+        PS_CELL_CLEAR_BASE  = 7'd95,
+        PS_CELL_SPARK       = 7'd96,
+        PS_CELL_RING        = 7'd97,
+        PS_CELL_FLASH       = 7'd98,
+        PS_CELL_SHRINK      = 7'd99,
+        PS_CELL_GLINT       = 7'd100,
+        PS_CELL_LIGHT_DUO   = 7'd101,
+        PS_CELL_LIGHT       = 7'd102,
+        PS_CELL_DARK        = 7'd103,
+        PS_CELL_BASE        = 7'd104,
+        PS_PIECE2_CORNER    = 7'd105,
+        PS_PIECE2_LAND      = 7'd106,
+        PS_PIECE2_GLINT     = 7'd107,
+        PS_PIECE2_LIGHT_DUO = 7'd108,
+        PS_PIECE2_LIGHT     = 7'd109,
+        PS_PIECE2_DARK      = 7'd110,
+        PS_PIECE2_BASE      = 7'd111,
+        PS_GHOST2_LIGHT     = 7'd112,
+        PS_GHOST2_BG        = 7'd113,
+        PS_STORY_INNER      = 7'd114,
+        PS_STORY_OUTER      = 7'd115,
+        PS_LBL_P1           = 7'd116,
+        PS_LBL_P2           = 7'd117,
+        PS_LBL_DUO          = 7'd118,
+        PS_LBL_CORE         = 7'd119,
+        PS_LBL_SCORE        = 7'd120,
+        PS_DANGER_GAP       = 7'd121,
+        PS_SLOT_FRAME       = 7'd122;
 
     function [23:0] tet_light;
     input [2:0] t;
@@ -1692,6 +1864,16 @@ module frame(
         default:psel = PS_OVER_DEFAULT;
         endcase
         end
+    else if(p1_label_px)
+    psel = PS_LBL_P1;
+    else if(p2_label_px)
+    psel = PS_LBL_P2;
+    else if(duo_label_px)
+    psel = PS_LBL_DUO;
+    else if(score_label_px)
+    psel = PS_LBL_SCORE;
+    else if(core1_label_px || core2_label_px || core3_label_px)
+    psel = PS_LBL_CORE;
     else if(result_mode_r)
     psel = duo ? PS_RES_MODE_DUO : PS_RES_MODE_SOLO;
     else if(result_label_r)
@@ -1714,14 +1896,14 @@ module frame(
         end
     else if(result_colon_r)
     psel = PS_RES_COLON;
+    else if(lb_breach)
+    psel = PS_BREACH;
     else if(result_region)begin
         if(result_dim)
         psel = PS_RES_DIM;
         else
         psel = in_field ? PS_RES_BG_FIELD : PS_RES_BG_BLACK;
         end
-    else if(lb_breach)
-    psel = PS_BREACH;
     else if(level_frame_lit)
     psel = level_critical ? PS_LVFRAME_RED :
            (level_hot ? PS_LVFRAME_ORANGE : PS_LVFRAME_GRAY);
@@ -1763,6 +1945,8 @@ module frame(
         end
     else if(lvd_r)
     psel = lvflash ? PS_LVD_WHITE : PS_LVD_COLOR;
+    else if(slot_frame_lit)
+    psel = PS_SLOT_FRAME;
     else if(hold_r)begin
         if(!pv_round_r)
         psel = PS_SLOT_BG;
@@ -1805,8 +1989,6 @@ module frame(
     psel = PS_HOLD_SLOT;
     else if(next_slot_r)
     psel = PS_NEXT_SLOT;
-    else if(badge_lit)
-    psel = bd2 ? PS_BADGE_P2 : PS_BADGE_P1;
     else if(score_lit_r)
     psel = (scflash && !fin_r) ? PS_SCORE_FLASH : PS_SCORE_WHITE;
     else if(time_lit_r)
@@ -1821,6 +2003,8 @@ module frame(
         end
     else if(danger_line)
     psel = PS_DANGER;
+    else if(danger_gap)
+    psel = PS_DANGER_GAP;
     else if(margin_r)
     psel = PS_MARGIN_WHITE;
     else if(rot_corner1 || hard_fx1)
@@ -1963,6 +2147,7 @@ module frame(
     PS_LV_UNLIT:        rgb_c = 24'h303030;
     PS_LVD_COLOR:       rgb_c = lv_color;
     PS_LVD_WHITE:       rgb_c = WHITE;
+    PS_SLOT_FRAME:      rgb_c = 24'h29404D;
     PS_SLOT_BG:         rgb_c = slot_bg;
     PS_PREVIEW_WHITE:   rgb_c = WHITE;
     PS_PREVIEW_LIGHT_H: rgb_c = tet_light(hold_type_r);
@@ -1977,8 +2162,6 @@ module frame(
     PS_SLOT_DOT:        rgb_c = 24'h404040;
     PS_HOLD_SLOT:       rgb_c = slot_bg;
     PS_NEXT_SLOT:       rgb_c = slot_bg;
-    PS_BADGE_P1:        rgb_c = 24'h00E5FF;
-    PS_BADGE_P2:        rgb_c = 24'hFF4DA6;
     PS_SCORE_FLASH:     rgb_c = LV_H5;
     PS_SCORE_WHITE:     rgb_c = WHITE;
     PS_TIME_WHITE:      rgb_c = WHITE;
@@ -2026,6 +2209,12 @@ module frame(
     PS_GHOST2_BG:       rgb_c = field_bg;
     PS_STORY_INNER:     rgb_c = story_inner_color_r;
     PS_STORY_OUTER:     rgb_c = story_outer_color_r;
+    PS_LBL_P1:          rgb_c = 24'h00E5FF;
+    PS_LBL_P2:          rgb_c = 24'hFF4DA6;
+    PS_LBL_DUO:         rgb_c = 24'hFF4DA6;
+    PS_LBL_CORE:        rgb_c = 24'hB0B0B0;
+    PS_LBL_SCORE:       rgb_c = 24'hB0B0B0;
+    PS_DANGER_GAP:      rgb_c = 24'h061017;
     default:            rgb_c = BLACK;
     endcase
     end

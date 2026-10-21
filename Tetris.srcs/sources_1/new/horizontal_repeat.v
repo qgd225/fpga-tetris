@@ -17,8 +17,8 @@ module horizontal_repeat(
     );
 
 
-    parameter [23:0] DAS_CNT = 24'd9_801_000;
-    parameter [23:0] ARR_CNT = 24'd2_450_250;
+    parameter [23:0] DAS_CNT = 24'd16_335_000;
+    parameter [23:0] ARR_CNT = 24'd5_940_000;
 
     localparam [1:0] DIR_NONE  = 2'd0;
     localparam [1:0] DIR_LEFT  = 2'd1;

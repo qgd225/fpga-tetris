@@ -13,6 +13,8 @@ reg left_held = 0;
 reg right_held = 0;
 wire left_out;
 wire right_out;
+wire default_left_out;
+wire default_right_out;
 integer bad = 0;
 integer checks = 0;
 
@@ -31,6 +33,18 @@ horizontal_repeat #(
 .right_held(right_held),
 .left_out(left_out),
 .right_out(right_out)
+);
+
+horizontal_repeat default_dut(
+.Clk_74M(Clk_74M),
+.Reset_n(Reset_n),
+.active(1'b0),
+.left_p(1'b0),
+.right_p(1'b0),
+.left_held(1'b0),
+.right_held(1'b0),
+.left_out(default_left_out),
+.right_out(default_right_out)
 );
 
 task chk;
@@ -58,6 +72,8 @@ endtask
 initial begin
   $display("=== horizontal_repeat 横向连发 ===");
   repeat(2) tick();
+  chk("default DAS 220ms", default_dut.DAS_CNT, 16335000);
+  chk("default ARR 80ms", default_dut.ARR_CNT, 5940000);
   Reset_n = 1;
   active = 1;
   tick();
