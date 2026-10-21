@@ -21,6 +21,8 @@ module Key(
     output switch_en,
     output left_p_flag,
     output right_p_flag,
+    output left_held,
+    output right_held,
     output drop_r_flag,
     output drop_en,
     output rotate_p_flag,
@@ -33,14 +35,16 @@ module Key(
     .Clk(Clk),
     .Reset_n(Reset_n),
     .key(left),
-    .key_p_flag(left_p_flag)
+    .key_p_flag(left_p_flag),
+    .key_held(left_held)
     );
     
     key_filter key_filter_inst1(
     .Clk(Clk),
     .Reset_n(Reset_n),
     .key(right),
-    .key_p_flag(right_p_flag)
+    .key_p_flag(right_p_flag),
+    .key_held(right_held)
     );
     
     key_filter key_filter_inst2(

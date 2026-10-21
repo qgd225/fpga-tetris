@@ -1,6 +1,6 @@
 # 仿真台（可复现）
 
-九套自测直接编译 `../Tetris.srcs/sources_1/new/` 下的实时 RTL；仿真产物写入各自的 `build/`，日志写入 `logs/`，均不纳入 Git。
+十套自测直接编译 `../Tetris.srcs/sources_1/new/` 下的实时 RTL；仿真产物写入各自的 `build/`，日志写入 `logs/`，均不纳入 Git。
 
 ## 一键跑全部
 
@@ -10,7 +10,7 @@ sim\run_all.bat
 
 最终输出逐套显示 `=== ALL PASS ===` 或 `=== FAILED n ===`。
 
-## 九套测试说明
+## 十套测试说明
 
 | 套 | 顶层 | 覆盖内容 | 项数 |
 | --- | --- | --- | ---: |
@@ -18,13 +18,14 @@ sim\run_all.bat
 | `sim/frame_duo` | `frame_duo_tb` | 画面/HUD/菜单/等级柱/特效、GAME OVER 结算页、智能提示和局部压暗 | 294 |
 | `sim/level` | `net_level_tb` | 消行加分、分数/时间等级阈值、等级重置和自动下落速度 | 38 |
 | `sim/sound` | `sound_tb` | 18 类音效、查表音高/时长、P1 优先、消行音阶和蜂鸣器翻转 | 99 |
-| `sim/input_route` | `input_route_tb` | 单人板载+PC 合并、双人板载 P1/PC P2 的输入路由 | 21 |
+| `sim/input_route` | `input_route_tb` | 单人板载+PC 合并、双人板载 P1/PC P2 的输入路由与按住电平 | 29 |
+| `sim/horizontal_repeat` | `horizontal_repeat_tb` | 首移直通、DAS/ARR、方向切换及暂停/结束复位 | 28 |
 | `sim/hold_gesture` | `hold_gesture_tb` | Hold 短按换块、长按提示切换和 PC/板载输入 | 27 |
 | `sim/solo_hint` | `solo_hint_tb` | 4 旋转 x 20 列搜索、评分、空洞/悬空约束和类型切换 | 59 |
 | `sim/result_packet` | `result_packet_tb` | Type4 14 字节成绩包、SOLO/DUO 模式和 XOR 校验 | 17 |
 | `sim/rgb_palette` | `rgb_palette_tb` | 39 色调色板与 7 位无碰撞 RGB 索引映射 | 39 |
 
-总计 **705 项**。
+总计 **741 项**。
 
 ## 单独跑一套
 

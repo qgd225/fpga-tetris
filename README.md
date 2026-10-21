@@ -30,6 +30,7 @@
 
 - 单人 / 双人同场：单人 20 列，双人 24 列；双方方块、幽灵、锁存与消行独立计算，并支持同场碰撞。
 - 七种方块、旋转、软降、硬降、落底锁定、消行、Next 预览和共享 Hold。
+- 横向连发：首移立即发生，DAS 132ms、ARR 33ms；松开方向、换向、暂停或结束时复位。
 - 单人智能落点：长按 Hold 显示方块本色虚线靶框和中心点；按消行、空洞、高度、凹凸和悬空评分搜索 4 旋转 x 20 列。
 - 双人输入分流：板载键控制 P1，PC 键盘控制 P2；单人时板载键和 PC 键共同控制 P1。
 - 完整 UI：Impact Glass 方块、1px 圆角、幽灵空心框、危险带、阵营光条、8 级热力等级柱、菜单呼吸色和落锁/升级/加分/换块特效。
@@ -76,6 +77,7 @@ Tetris.srcs/
     │   ├── rgb_to_palette.v      # PC 画面 RGB→39 色索引
     │   ├── music.v / sound.v         # 音乐与音效
     │   ├── key_filter.v / Key.v      # 按键消抖
+    │   ├── horizontal_repeat.v       # 横向 DAS/ARR 连发
     │   └── game_over.v / Playfield_edge.v
     ├── imports/                      # 显示链路
     │   ├── new/VGA_1280_720.v        # 1280×720 时序发生器
@@ -98,12 +100,12 @@ Tetris.srcs/
 
 ## 验证与资源
 
-- 九套仿真共 705 项：`duo / frame_duo / level / sound / input_route / hold_gesture / solo_hint / result_packet / rgb_palette`。
+- 十套仿真共 741 项：`duo / frame_duo / level / sound / input_route / horizontal_repeat / hold_gesture / solo_hint / result_packet / rgb_palette`。
 - Python 接收端测试 5 项：新旧成绩包兼容、坏校验、分模式去重、CSV 迁移和 Top5 排序。
 - Vivado 2018.3 从零综合/实现：0 error、0 时序违例、0 未布通网络。
-- 当前资源：LUT 19239/20800（92.50%）、FF 6197、BRAM 15.5、DSP 4、IOB 34。
-- 当前时序：WNS +0.109ns、WHS +0.079ns。
-- 本轮 LUT 较基线 19437 减少 198；PC 调色板反查由 24 位全色比较改为 7 位无碰撞索引，代价为增加 0.5 个 BRAM Tile。
+- 当前资源：LUT 19333/20800（92.95%）、FF 6258、BRAM 15.5、DSP 4、IOB 34。
+- 当前时序：WNS +0.024ns、WHS +0.076ns。
+- 横向连发采用 24 位单计时器；综合阶段 2 个实例共增加约 106 LUT、60 FF。
 
 ## 备注
 

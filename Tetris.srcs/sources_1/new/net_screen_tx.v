@@ -28,6 +28,8 @@ module net_screen_tx(
   //-------- 键盘(网络)按键：形状与物理按键一致 --------
   output        kb_left_p,
   output        kb_right_p,
+  output        kb_left_held,
+  output        kb_right_held,
   output        kb_drop_r,
   output        kb_drop_en,
   output        kb_rotate_p,
@@ -618,6 +620,8 @@ assign kb_activity = (kb_act_cnt != 25'd0);
 
 assign kb_left_p    = kb_bits[0] && (!kb_bits_d[0]);
 assign kb_right_p   = kb_bits[1] && (!kb_bits_d[1]);
+assign kb_left_held  = kb_bits[0];
+assign kb_right_held = kb_bits[1];
 assign kb_rotate_p  = kb_bits[3] && (!kb_bits_d[3]);
 assign kb_hold_p    = kb_bits[4] && (!kb_bits_d[4]);
 assign kb_hold_en   = kb_bits[4];

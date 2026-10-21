@@ -45,6 +45,8 @@ module Tetris(
     
     wire kb_left_p;
     wire kb_right_p;
+    wire kb_left_held;
+    wire kb_right_held;
     wire kb_drop_r;
     wire kb_drop_en;
     wire kb_rotate_p;
@@ -87,6 +89,8 @@ module Tetris(
     wire switch_en;
     wire left_p_flag;
     wire right_p_flag;
+    wire left_held;
+    wire right_held;
     wire drop_r_flag;
     wire drop_en;
     wire rotate_p_flag;
@@ -110,6 +114,8 @@ module Tetris(
     .switch_en(switch_en),
     .left_p_flag(left_p_flag),
     .right_p_flag(right_p_flag),
+    .left_held(left_held),
+    .right_held(right_held),
     .drop_r_flag(drop_r_flag),
     .drop_en(drop_en),
     .rotate_p_flag(rotate_p_flag),
@@ -119,10 +125,14 @@ module Tetris(
     );
 
 wire p1_left, p1_right, p1_drop_r, p1_drop_en, p1_rotate, p1_hold;
+wire p1_left_held, p1_right_held;
 wire p2_left, p2_right, p2_drop_r, p2_drop_en, p2_rotate, p2_hold;
+wire p2_left_held, p2_right_held;
 
-wire left_p     = p1_left;
-wire right_p    = p1_right;
+wire left_p;
+wire right_p;
+wire p2_left_move;
+wire p2_right_move;
 wire left_p_menu  = left_p_flag | kb_left_p;
 wire right_p_menu = right_p_flag | kb_right_p;
 wire drop_r_f   = p1_drop_r;
@@ -159,24 +169,32 @@ control_route control_route_inst(
 .btn_drop_en(drop_en),
 .btn_rotate(rotate_p_flag),
 .btn_hold(hold_p_flag),
+.btn_left_held(left_held),
+.btn_right_held(right_held),
 .pc_left(kb_left_p),
 .pc_right(kb_right_p),
 .pc_drop_r(kb_drop_r),
 .pc_drop_en(kb_drop_en),
 .pc_rotate(kb_rotate_p),
 .pc_hold(kb_hold_p),
+.pc_left_held(kb_left_held),
+.pc_right_held(kb_right_held),
 .p1_left(p1_left),
 .p1_right(p1_right),
 .p1_drop_r(p1_drop_r),
 .p1_drop_en(p1_drop_en),
 .p1_rotate(p1_rotate),
 .p1_hold(p1_hold),
+.p1_left_held(p1_left_held),
+.p1_right_held(p1_right_held),
 .p2_left(p2_left),
 .p2_right(p2_right),
 .p2_drop_r(p2_drop_r),
 .p2_drop_en(p2_drop_en),
 .p2_rotate(p2_rotate),
-.p2_hold(p2_hold)
+.p2_hold(p2_hold),
+.p2_left_held(p2_left_held),
+.p2_right_held(p2_right_held)
 );
 
     wire sw_short;
@@ -200,6 +218,31 @@ control_route control_route_inst(
     .Stop(Stop),
     .Finalize(Finalize),
     .choose_cnt(choose_cnt)
+    );
+
+//    横向连发：首移直通，DAS 132ms，ARR 33ms
+    horizontal_repeat p1_horizontal_repeat(
+    .Clk_74M(Clk_74M),
+    .Reset_n(Reset_n),
+    .active(Playing),
+    .left_p(p1_left),
+    .right_p(p1_right),
+    .left_held(p1_left_held),
+    .right_held(p1_right_held),
+    .left_out(left_p),
+    .right_out(right_p)
+    );
+
+    horizontal_repeat p2_horizontal_repeat(
+    .Clk_74M(Clk_74M),
+    .Reset_n(Reset_n),
+    .active(Playing),
+    .left_p(p2_left),
+    .right_p(p2_right),
+    .left_held(p2_left_held),
+    .right_held(p2_right_held),
+    .left_out(p2_left_move),
+    .right_out(p2_right_move)
     );
 
     
@@ -274,8 +317,8 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .choose(choose),
     .choose_cnt(choose_cnt),
     .duo(duo),
-    .left_p_flag2(p2_left),
-    .right_p_flag2(p2_right),
+    .left_p_flag2(p2_left_move),
+    .right_p_flag2(p2_right_move),
     .drop_r_flag2(p2_drop_r),
     .drop_en2(p2_drop_en),
     .rotate_p_flag2(p2_rotate),
@@ -332,8 +375,8 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .menu_r(choose && right_p_menu),
     .land1(snd_land1),
     .land2(snd_land2),
-    .lft1(left_p && !blk_l1),
-    .rgt1(right_p && !blk_r1),
+    .lft1(p1_left && !blk_l1),
+    .rgt1(p1_right && !blk_r1),
     .rot1(rotate_p && !blk_rot1),
     .hard1(snd_hard1),
     .soft1(snd_soft1),
@@ -381,6 +424,8 @@ wire solo_hint_show = !duo && solo_hint_latched;
 
     .kb_left_p(kb_left_p),
     .kb_right_p(kb_right_p),
+    .kb_left_held(kb_left_held),
+    .kb_right_held(kb_right_held),
     .kb_drop_r(kb_drop_r),
     .kb_drop_en(kb_drop_en),
     .kb_rotate_p(kb_rotate_p),
