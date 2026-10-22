@@ -135,7 +135,7 @@ module frame(
     wire [10:0]XLBN2 = XPN2 + 11'd18;
     wire [10:0]XP1LBL = duo ? 11'd88 : 11'd1032;
     wire [10:0]XP2LBL = duo ? 11'd1123 : 11'd1032;
-    wire [10:0]XSCORELBL = duo ? 11'd703 : 11'd572;
+    wire [10:0]XSCORELBL = duo ? 11'd819 : 11'd688;
 
     reg [15:0]lines_total;
 
@@ -720,12 +720,12 @@ module frame(
                      ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128)));
     wire level_frame_lit =
-        (((hcounter >= 11'd271) && (hcounter <= 11'd272)) ||
-         ((hcounter >= 11'd311) && (hcounter <= 11'd312))) &&
+        (((hcounter >= 11'd263) && (hcounter <= 11'd264)) ||
+         ((hcounter >= 11'd303) && (hcounter <= 11'd304))) &&
         (vcounter >= 11'd86) && (vcounter <= 11'd713) ||
         (((vcounter >= 11'd86) && (vcounter <= 11'd87)) ||
          ((vcounter >= 11'd712) && (vcounter <= 11'd713))) &&
-        (hcounter >= 11'd271) && (hcounter <= 11'd312);
+        (hcounter >= 11'd263) && (hcounter <= 11'd304);
     wire rule2_lit = duo && (((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
                              ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))) ||
                              ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN2) && (hcounter < (XPN2 + 11'd128))));
@@ -982,6 +982,7 @@ module frame(
     wire [23:0]field_bg = 24'h081018;
     wire [23:0]slot_bg = (duo && (hcounter >= XPN2)) ? 24'h1E0812 : 24'h071018;
     wire [10:0]field_mid = (11'd321 + XR) >> 1;
+    wire field_node_row = (vcounter[5:0] >= 6'd47) && (vcounter[5:0] <= 6'd51);
     reg [23:0]story_outer_color;
     reg [23:0]story_inner_color;
     reg [23:0]story_menu_color;
@@ -1037,35 +1038,25 @@ module frame(
         ((hcounter >= 1249) && (hcounter <= 1255))) &&
        (vcounter >= 93) && (vcounter <= 99))
         story_outer_color = 24'h00E5FF;
-
     story_inner_color = field_bg;
     if(in_field)begin
         if((((hcounter - 11'd321) & 11'd31) == 11'd0) ||
            (((vcounter - 11'd81) & 11'd31) == 11'd0))
             story_inner_color = 24'h0D2029;
         if((vcounter >= 11'd81) && (vcounter <= 11'd83))
-            story_inner_color = (hcounter < field_mid) ? 24'h00E5FF : 24'hFF4DA6;
+            story_inner_color = 24'h536A76;
         if((hcounter == 11'd343) || (hcounter == (XR - 11'd23)))
             story_inner_color = (hcounter == 11'd343) ? 24'h08798A : 24'h7B2B54;
         if(((hcounter == 11'd343) || (hcounter == (XR - 11'd23))) &&
-           (((vcounter >= 11'd164) && (vcounter <= 11'd168)) ||
-            ((vcounter >= 11'd318) && (vcounter <= 11'd322)) ||
-            ((vcounter >= 11'd472) && (vcounter <= 11'd476)) ||
-            ((vcounter >= 11'd626) && (vcounter <= 11'd630))))
-            story_inner_color = (hcounter == 11'd343) ? 24'h00E5FF : 24'hFF4DA6;
+           field_node_row)
+            story_inner_color = (hcounter < field_mid) ? 24'h08798A : 24'h7B2B54;
         if((hcounter == field_mid) && ((vcounter & 11'd63) < 11'd24))
             story_inner_color = 24'h17414B;
         if((vcounter >= 11'd700) && (vcounter <= 11'd715))
             story_inner_color = 24'h09171C;
-        if((vcounter >= 11'd700) && (vcounter <= 11'd715) &&
+        if((vcounter >= 11'd701) && (vcounter <= 11'd713) &&
            (((hcounter - 11'd321) & 11'd31) == ((vcounter - 11'd700) & 11'd31)))
-            story_inner_color = 24'h10252B;
-        if((vcounter >= 11'd700) && (vcounter <= 11'd715) &&
-           (((hcounter - 11'd321) & 11'd31) < 11'd12))
             story_inner_color = 24'h80551F;
-        if((vcounter >= 11'd700) && (vcounter <= 11'd715) &&
-           (((hcounter - 11'd321) & 11'd31) == 11'd0))
-            story_inner_color = 24'h10252B;
         if((hcounter == 11'd326) || (hcounter == (XR - 11'd5)))
             story_inner_color = 24'h536A76;
     end
@@ -1416,8 +1407,8 @@ module frame(
     wire level_critical = (speed_level == 3'd7) || danger_active;
     wire [23:0]level_frame_color = level_critical ? RED : (level_hot ? ORANGE : 24'h606060);
     wire level_alert_lit = level_hot &&
-        (((hcounter >= 11'd267) && (hcounter <= 11'd270)) ||
-         ((hcounter >= 11'd315) && (hcounter <= 11'd318))) &&
+        (((hcounter >= 11'd259) && (hcounter <= 11'd262)) ||
+         ((hcounter >= 11'd307) && (hcounter <= 11'd310))) &&
         (((vcounter - 11'd88) & 11'd31) < 11'd8);
     wire [23:0]level_alert_color = level_critical ? RED : ORANGE;
 
@@ -1896,7 +1887,7 @@ module frame(
         end
     else if(result_colon_r)
     psel = PS_RES_COLON;
-    else if(lb_breach)
+    else if(lb_breach && lbl_lit)
     psel = PS_BREACH;
     else if(result_region)begin
         if(result_dim)
@@ -2171,7 +2162,7 @@ module frame(
     PS_RAIL_R_CYAN:     rgb_c = 24'h00E5FF;
     PS_RAIL_R_WHITE:    rgb_c = WHITE;
     PS_DANGER:          rgb_c = danger_color;
-    PS_MARGIN_WHITE:    rgb_c = WHITE;
+    PS_MARGIN_WHITE:    rgb_c = 24'h536A76;
     PS_ROT1:            rgb_c = 24'h00E5FF;
     PS_ROT2:            rgb_c = PINK;
     PS_BRACKET1:        rgb_c = 24'h00E5FF;

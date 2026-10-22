@@ -20,7 +20,7 @@ module level(
 
 
 
-    parameter [10:0]BX = 11'd276,
+    parameter [10:0]BX = 11'd268,
                      BY = 11'd88,
                      BW = 11'd34,
                      SH = 11'd78;

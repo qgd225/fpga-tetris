@@ -102,11 +102,11 @@ Tetris.srcs/
 
 ## 验证与资源
 
-- 十套仿真共 **789 项**：`duo 111 / frame_duo 318 / level 39 / sound 103 / input_route 29 / horizontal_repeat 30 / hold_gesture 27 / solo_hint 59 / result_packet 17 / rgb_palette 56`，全部通过。
+- 十套仿真共 **801 项**：`duo 111 / frame_duo 330 / level 39 / sound 103 / input_route 29 / horizontal_repeat 30 / hold_gesture 27 / solo_hint 59 / result_packet 17 / rgb_palette 56`，全部通过。
 - Python 接收端测试 5 项：新旧成绩包兼容、坏校验、分模式去重、CSV 迁移和 Top5 排序，全部通过。
 - Vivado 2018.3 最终从零综合/实现：0 error、0 时序违例、0 未布通网络。
-- 最终资源：LUT **19976/20800（96.04%）**、FF 6352、Block RAM 15.5/50、DSP 4、IOB 34。
-- 最终时序：**WNS +0.191ns、WHS +0.090ns**。
+- 最终资源：LUT **20502/20800（98.57%）**、FF 6347、Block RAM 15.5/50、DSP 4、IOB 34。
+- 最终时序：**WNS +0.005ns、WHS +0.092ns**。
 - 渲染取色采用 7 位命中码寄存一级并统一右移 1 像素，把原 20 余级 24 位优先链拆成“判层 + 取色”两级；背景颜色与命中码同拍寄存，整套画面保持统一相位。
 
 ### 本版构建产物
@@ -114,9 +114,9 @@ Tetris.srcs/
 | 项目 | 值 |
 | --- | --- |
 | 比特流 | `Tetris.runs/impl_1/Tetris.bit` |
-| 生成时间 | 2026-10-21 21:59:38 |
+| 生成时间 | 2026-10-22 12:56:25 |
 | 大小 | 2,192,114 字节 |
-| SHA256 | `7841A2B7F2DB1AD5E217E43E1F384CCCDA818E43E35D4D61830956E62E0BD035` |
+| SHA256 | `AFB0C1F4F7C03D7D764CE3BC7E075D9432EA65382C777EC31F47E983E04CD336` |
 
 ## 备注
 
