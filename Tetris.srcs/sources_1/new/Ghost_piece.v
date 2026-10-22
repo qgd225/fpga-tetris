@@ -1,3 +1,8 @@
+﻿//============================================================
+// 模块：Ghost_piece
+// 作用：幽灵方块落点扫描：计算落地行并保持旧落点直到新扫描完成。
+// 时钟/复位：Clk_74M；Reset_n 低有效
+//============================================================
 module Ghost_piece(
     Clk_74M,
     Reset_n,
@@ -232,7 +237,7 @@ module Ghost_piece(
     restart_d <= ghost_restart;
     end
 
-    wire restart_hold = ghost_restart || restart_d;
+    wire restart_hold = ghost_restart || restart_d;  //重启保持两拍，避开land_t的旧值
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
@@ -281,7 +286,7 @@ module Ghost_piece(
     lock_d <= 1'd0;
     end
 
-    always@(posedge Clk_74M or negedge Reset_n)begin
+    always@(posedge Clk_74M or negedge Reset_n)begin  //land_t打一拍所以counter_ghost_r_t也打一拍
     if(!Reset_n)
     counter_ghost_r_d <= 0;
     else

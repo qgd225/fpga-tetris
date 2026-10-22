@@ -1,5 +1,9 @@
-`timescale 1ns/1ps
+﻿`timescale 1ns/1ps
 
+//============================================================
+// 测试台：net_level_tb
+// 测试目标：单人计分、等级阈值和自动下落速度回归。
+//============================================================
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
   assign douta = 32'h0;
 endmodule

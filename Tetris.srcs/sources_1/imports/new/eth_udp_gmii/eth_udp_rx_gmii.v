@@ -1,3 +1,7 @@
+﻿//============================================================
+// 导入模块：eth_udp_rx_gmii
+// 本工程用途：UDP 接收、键盘报文解析与输入脉冲输出。
+//============================================================
 module eth_udp_rx_gmii(
   reset_p,
 
@@ -120,10 +124,11 @@ module eth_udp_rx_gmii(
   assign debug_crc_check = crc_check;
 
   BUFG BUFG_pclk (
-    .O(clk125m        ),
-    .I(gmii_rx_clk    )
+    .O(clk125m        ),  // 1-bit output: Clock output
+    .I(gmii_rx_clk    )  // 1-bit input: Clock input
   );
 
+//将本地MAC、IP、PORT寄存
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -138,6 +143,7 @@ module eth_udp_rx_gmii(
     local_port_reg <= local_port;
   end
 
+//将以太网输入的接收信号寄存
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -150,6 +156,7 @@ module eth_udp_rx_gmii(
     reg_gmii_rxdv <= gmii_rxdv;
   end
 
+//将以太网输入的接收信号寄存后打拍
   always@(posedge clk125m)
   begin
     rx_data_dly1  <= reg_gmii_rxd;
@@ -158,6 +165,7 @@ module eth_udp_rx_gmii(
     rx_datav_dly2 <= rx_datav_dly1;
   end
 
+//cnt_preamble
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_preamble <= 4'd0;
@@ -166,6 +174,7 @@ module eth_udp_rx_gmii(
   else
     cnt_preamble <= 4'd0;
 
+//cnt_eth_header
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_eth_header <= 4'd0;
@@ -174,6 +183,7 @@ module eth_udp_rx_gmii(
   else
     cnt_eth_header <= 4'd0;
 
+//eth_header
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -218,6 +228,7 @@ module eth_udp_rx_gmii(
   else
     eth_header_check_ok <= 1'b0;
 
+//cnt_ip_header
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_ip_header <= 5'd0;
@@ -226,6 +237,7 @@ module eth_udp_rx_gmii(
   else
     cnt_ip_header <= 5'd0;
 
+//ip_header
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -268,6 +280,9 @@ module eth_udp_rx_gmii(
     endcase
   end
 
+//udp_header: 8byte
+//ip_header: 20byte
+//rx_data_length = rx_total_len - udp_header - ip_header;
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     rx_data_length <= 16'd0;
@@ -316,6 +331,7 @@ module eth_udp_rx_gmii(
   else
     ip_header_check_ok <= 1'b0;
 
+//cnt_udp_header
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_udp_header <= 4'd0;
@@ -352,6 +368,7 @@ module eth_udp_rx_gmii(
   else
     udp_header_check_ok <= 1'b0;
 
+//cnt_data
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_data <= 16'd0;
@@ -360,6 +377,7 @@ module eth_udp_rx_gmii(
   else
     cnt_data <= 16'd0;
 
+//cnt_drp_data
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_drp_data <= 5'd0;
@@ -368,6 +386,7 @@ module eth_udp_rx_gmii(
   else
     cnt_drp_data <= 5'd0;
 
+//FSM
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     curr_state <= IDLE;
@@ -451,6 +470,7 @@ module eth_udp_rx_gmii(
   else
     crc_init <= 1'b0;
 
+//crc_en
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     crc_en <= 1'b0;
@@ -461,6 +481,7 @@ module eth_udp_rx_gmii(
   else
     crc_en <= 1'b0;
 
+//crc_data
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     crc_data <= 8'd0;
@@ -475,7 +496,7 @@ module eth_udp_rx_gmii(
     .data        (crc_data      ),
     .crc_init    (crc_init      ),
     .crc_en      (crc_en        ),
-    .crc_result  (crc_check     )
+    .crc_result  (crc_check     )  //latency=1
   );
 
   always@(posedge clk125m or posedge reset_p)
@@ -486,6 +507,7 @@ module eth_udp_rx_gmii(
   else
     reg_data_overflow <= reg_data_overflow;
 
+//payload output
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -517,6 +539,7 @@ module eth_udp_rx_gmii(
     exter_port <= rx_src_port;
   end
 
+//done
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin

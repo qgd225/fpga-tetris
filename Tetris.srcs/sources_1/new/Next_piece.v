@@ -1,3 +1,8 @@
+﻿//============================================================
+// 模块：Next_piece
+// 作用：NEXT 预览：读取下一方块类型并生成槽内显示坐标。
+// 时钟/复位：Clk_74M；Reset_n 低有效
+//============================================================
 module Next_piece(
     input Clk_74M,
     input Reset_n,
@@ -18,6 +23,8 @@ module Next_piece(
     output reg next_slot
     );
 
+//    无框面板: 预览区是 4x4 个 32px 格子组成的槽位(底色由 frame 画)
+//    格子编号从槽位左上角算起, 方块第 0 格画在 (1,3) 的位置, 与原来一致
     reg [1:0]C_num;
     reg [1:0]R_num;
     reg [1:0]C_num2;
@@ -25,6 +32,7 @@ module Next_piece(
     reg [3:0]cc;
     reg [3:0]rr;
 
+//    P1 预览槽位的行列号
     always@(*)begin : blk1
         integer o1, p1;
     C_num = 2'd0;
@@ -38,6 +46,7 @@ module Next_piece(
     end
     end
 
+//    P2 预览槽位的行列号(仅双人)
     always@(*)begin : blk2
         integer o2, p2;
     C_num2 = 2'd0;
@@ -51,6 +60,7 @@ module Next_piece(
     end
     end
 
+//    槽位底色区域: 双人两块, 单人一块
     always@(*)begin
     next_slot = 1'b0;
     if((hcounter >= X1) && (hcounter < (X1 + 11'd128)) && (vcounter >= Y1) && (vcounter < (Y1 + 11'd128)))
@@ -76,6 +86,7 @@ module Next_piece(
         .douta(Tetromino_dout2)
     );
 
+//    P1 下一块预览
     always@(*)begin : blk3
         integer i1;
     if(Idle)
@@ -92,6 +103,7 @@ module Next_piece(
     end
     end
 
+//    P2 下一块预览(仅双人)
     always@(*)begin : blk4
         integer i2;
     if(Idle || !duo)
@@ -108,6 +120,6 @@ module Next_piece(
     end
     end
 
-    assign next_margin = 1'b0;
+    assign next_margin = 1'b0;  //外框与虚线已删, 改为 frame 里的文字标签 + 2px 分隔线
 
 endmodule

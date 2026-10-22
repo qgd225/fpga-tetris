@@ -1,3 +1,8 @@
+﻿//============================================================
+// 模块：key_filter
+// 作用：单键消抖：生成按下脉冲、释放脉冲和稳定按住电平。
+// 时钟/复位：Clk；Reset_n 低有效
+//============================================================
 module key_filter(
     Clk,
     Reset_n,
@@ -29,6 +34,7 @@ module key_filter(
 
     parameter MCNT_CNT = 1_000_000 - 1;
 
+//    20ms计时
     always@(posedge Clk or negedge Reset_n)begin
     if(!Reset_n)
     counter_cnt <= 0;
@@ -38,6 +44,7 @@ module key_filter(
     counter_cnt <= counter_cnt + 1;
     end
 
+//    去亚稳态和记录下降沿和上升沿
     always@(posedge Clk or negedge Reset_n)
     if(!Reset_n)
     sync_d0_key <= 1'b1;
@@ -59,6 +66,7 @@ module key_filter(
     assign key_down = (!sync_d1_key) && (r_key);
     assign key_up = (sync_d1_key) && (!r_key);
 
+//    计数使能开关与是否按下开关
     always@(posedge Clk or negedge Reset_n)begin
     if(!Reset_n)begin
     en_cnt <= 0;
@@ -86,6 +94,7 @@ module key_filter(
     end
     end
 
+//    输出按下与松开信号
     always@(posedge Clk or negedge Reset_n)
     if(!Reset_n)
     key_en_tx <= 1'b0;

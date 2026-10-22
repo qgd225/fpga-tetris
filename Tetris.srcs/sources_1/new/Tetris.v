@@ -1,3 +1,8 @@
+﻿//============================================================
+// 模块：Tetris
+// 作用：顶层集成：按键、游戏状态、场地、画面、音频与以太网接口。
+// 时钟/复位：Clk；Reset_key
+//============================================================
 module Tetris(
     input Clk,
     input Reset_key,
@@ -27,6 +32,7 @@ module Tetris(
     output        eth_mdio
     );
 
+//上电复位
     reg [19:0]por_cnt = 20'd0;
 
     always@(posedge Clk)begin
@@ -53,6 +59,7 @@ module Tetris(
 
     wire Reset_n = (por_n) && (!rst_key_en) && (!kb_reset_en);
 
+//    VGA转HDMI及输出分频
     wire [10:0]hcounter;
     wire [10:0]vcounter;
     wire [23:0]rgb;
@@ -75,6 +82,7 @@ module Tetris(
     .de(hdmi_de)
     );
 
+//    按键输入及消抖
     wire switch_r_flag;
     wire switch_en;
     wire left_p_flag;
@@ -134,6 +142,7 @@ wire hold_route = p1_hold;
 wire solo_hold_short;
 wire solo_hold_long;
 
+//    游戏状态机
     wire Idle;
     wire Playing;
     wire Stop;
@@ -151,6 +160,7 @@ hold_gesture hold_gesture_inst(
 );
 wire hold_p = duo ? hold_route : solo_hold_short;
 
+//    单人: PC + 板载键都控制 P1; 双人: 板载 P1, PC P2
 control_route control_route_inst(
 .duo(duo),
 .btn_left(left_p_flag),
@@ -210,6 +220,7 @@ control_route control_route_inst(
     .choose_cnt(choose_cnt)
     );
 
+//    横向连发：首移直通，DAS 220ms，ARR 80ms
     horizontal_repeat p1_horizontal_repeat(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -234,6 +245,7 @@ control_route control_route_inst(
     .right_out(p2_right_move)
     );
 
+//    画面输出
     wire clear;
     wire [2:0]speed_level;
     wire [19:0]score;
@@ -261,6 +273,7 @@ control_route control_route_inst(
     reg [2:0]lvl_d;
     reg lvl_up;
 
+//    升级检测: speed_level 变化产生 1 拍脉冲(给音效)
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     lvl_d <= 3'd0;
@@ -272,6 +285,7 @@ control_route control_route_inst(
     end
     end
 
+//    危险等级上升沿：0->1 警报，0/1->2 紧急警报
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     danger_d <= 2'd0;
@@ -285,6 +299,7 @@ control_route control_route_inst(
     end
     end
 
+//    长按开关提示: 第一次长按常亮, 再次长按收起
 reg solo_hint_latched;
 reg solo_hold_long_d;
 always@(posedge Clk_74M or negedge Reset_n)begin
@@ -302,6 +317,7 @@ end
 end
 wire solo_hint_show = !duo && solo_hint_latched;
 
+//    像素合成：场地/HUD/菜单/结算页/UI 特效与调色板
    frame frame_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -398,6 +414,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .buzz_else(buzz_else)
     );
 
+//    以太网：UDP 画面/调色板与 PC 键盘输入
     net_screen_tx net_screen_tx_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),

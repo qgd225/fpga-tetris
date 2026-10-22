@@ -1,3 +1,8 @@
+﻿//============================================================
+// 模块：Game_state_machine
+// 作用：游戏状态机：菜单、游戏、暂停和结束状态转换。
+// 时钟/复位：Clk_74M；Reset_n 低有效
+//============================================================
 module Game_state_machine(
     input Clk_74M,
     input Reset_n,
@@ -21,6 +26,7 @@ module Game_state_machine(
     parameter MCNT = 74_250_000;
     parameter [3:0]CHOOSE_MAX = 4'd1;
 
+//    按键信号处理
     reg [26:0]counter;
     reg short_press_ok;
 
@@ -47,6 +53,7 @@ module Game_state_machine(
     short_press_ok <= 1'b1;
     end
 
+//    模式选择计数器
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     choose_cnt <= 4'd0;
@@ -60,6 +67,7 @@ module Game_state_machine(
     choose_cnt <= 4'd0;
     end
 
+//    状态转换
     localparam Choose_en   = 5'b00001;
     localparam Idle_en     = 5'b00010;
     localparam Playing_en  = 5'b00100;

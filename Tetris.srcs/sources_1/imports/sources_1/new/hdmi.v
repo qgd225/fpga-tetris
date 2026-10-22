@@ -1,3 +1,7 @@
+﻿//============================================================
+// 导入模块：hdmi
+// 本工程用途：HDMI/TMDS 顶层：时钟、并串转换和差分输出。
+//============================================================
 module hdmi(
     Clk,
     Clk_74M,
@@ -56,11 +60,14 @@ module hdmi(
     hdmi_pll hdmi_pll_inst
  (
 
+// Clock out ports
   .clk_out1(Clk_74M),
   .clk_out2(Clk_371M),
 
+// Status and control signals
   .reset(!Reset_n),
 
+// Clock in ports
   .clk_in1(Clk)
  );
 

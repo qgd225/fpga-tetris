@@ -1,5 +1,9 @@
-`timescale 1ns/1ps
+﻿`timescale 1ns/1ps
 
+//============================================================
+// 测试台：hold_gesture_tb
+// 测试目标：Hold 短按换块与长按智能提示手势回归。
+//============================================================
 module hold_gesture_tb;
 reg Clk=0, Rst=0;
 reg board_hold=0, pc_hold=0, legacy_hold=0, duo=0;
@@ -15,6 +19,7 @@ hold_gesture #(.HOLD_LONG_CNT(25'd300)) dut(
 .short_pulse(short_pulse), .long_level(long_level)
 );
 
+// 与 Tetris 顶层相同: 第一次长按打开提示, 再次长按关闭
 assign routed_hold = duo ? legacy_hold : short_pulse;
 assign hint_show = !duo && hint_latched;
 always@(posedge Clk or negedge Rst)begin

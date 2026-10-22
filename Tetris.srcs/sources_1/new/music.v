@@ -1,3 +1,8 @@
+﻿//============================================================
+// 模块：music
+// 作用：背景音乐序列器：按等级选择音符并输出 PWM 方波。
+// 时钟/复位：Clk_74M；Reset_n 低有效
+//============================================================
 module music(
     input Clk_74M,
     input Reset_n,
@@ -87,6 +92,7 @@ module music(
     .douta(note_data)
   );
 
+//主旋律
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     buzz_main <= 0;

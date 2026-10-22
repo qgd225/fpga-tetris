@@ -1,3 +1,8 @@
+﻿//============================================================
+// 模块：level
+// 作用：8 段等级能量柱：计算段位、填充、顶帽和外框像素。
+// 时钟/复位：Clk_74M；Reset_n 低有效
+//============================================================
 module level(
     input Clk_74M,
     input Reset_n,
@@ -27,7 +32,7 @@ module level(
                     (Yr >= 11'd156) ? 4'd2 :
                     (Yr >= 11'd78 ) ? 4'd1 : 4'd0;
     wire [10:0]Rr = Yr - (si * SH);
-    wire [3:0] sib = 4'd7 - si;
+    wire [3:0] sib = 4'd7 - si;  //从下往上的段号: 0 在最底
     wire in_bar = (vcounter >= BY) && (vcounter < (BY + 11'd624)) &&
                   (hcounter >= BX) && (hcounter < (BX + BW));
 

@@ -1,13 +1,20 @@
+﻿//============================================================
+// 模块：net_screen_tx
+// 作用：以太网发送：UDP 画面/调色板和 PC 键盘接收。
+// 时钟/复位：Clk_74M；Reset_n/por_n
+//============================================================
 module net_screen_tx(
   input         Clk_74M,
   input         Reset_n,
   input         por_n,
 
-  input         de,
+//-------- 画面输入（来自 hdmi / frame）--------
+  input         de,  // 1 = 当前像素在有效区(1280x720)
   input  [10:0] hcounter,
   input  [10:0] vcounter,
   input  [23:0] rgb,
 
+//-------- 以太网引脚 --------
   input         rgmii_rx_clk_i,
   input  [3:0]  rgmii_rxd,
   input         rgmii_rxdv,
@@ -18,6 +25,7 @@ module net_screen_tx(
   output        eth_mdc,
   output        eth_mdio,
 
+//-------- 键盘(网络)按键：形状与物理按键一致 --------
   output        kb_left_p,
   output        kb_right_p,
   output        kb_left_held,
@@ -32,19 +40,19 @@ module net_screen_tx(
   output        kb_reset_en,
   output        kb_activity
 );
-parameter DST_MAC    = 48'hFF_FF_FF_FF_FF_FF;
+parameter DST_MAC    = 48'hFF_FF_FF_FF_FF_FF;  // 默认广播，PC 端不用先知道也行
 parameter DST_IP     = 32'hFF_FF_FF_FF;
 parameter DST_PORT   = 16'd5000;
-parameter FPS_DIV    = 1;
-parameter PAL_FRAMES = 60;
-parameter LINE_LEN   = 16'd1287;
+parameter FPS_DIV    = 1;  // 1=60fps  2=30fps  3=20fps
+parameter PAL_FRAMES = 60;  // 每 60 帧插一个调色板包(=1s@60fps)
+parameter LINE_LEN   = 16'd1287;  // 7 字节包头 + 1280 个标号
 parameter PAL_LEN    = 16'd228;
 parameter [7:0] PAL_LAST = 8'd227;
 parameter PAL_N      = 8'd56;
-parameter KB_TIMEOUT = 24'd14_850_000;
-parameter KB_RST_CNT = 25'd1_485_000;
-parameter KB_ACT_CNT = 25'd22_275_000;
-parameter KB_GAP_MAX = 8'd255;
+parameter KB_TIMEOUT = 24'd14_850_000;  // 200ms @74.25MHz 没有按键包就全部松开
+parameter KB_RST_CNT = 25'd1_485_000;  // 小键盘9复位把 Reset_n 拉低 20ms
+parameter KB_ACT_CNT = 25'd22_275_000;  // 收到按键包后 kb_activity 亮 0.3s
+parameter KB_GAP_MAX = 8'd255;  // 包内字节间隔超时=包不完整，重新同步
 
 assign eth_rstn = 1'b1;
 assign eth_mdc  = 1'b1;
@@ -53,6 +61,9 @@ wire [7:0] rx_byte;
 wire       rx_empty;
 wire       kb_rd_en;
 
+//============================================================
+//    eth_udp_loopback_rgmii 例化
+//============================================================
 reg         tog_line;
 reg         tog_pal;
 reg  [7:0]  tx_fifo_din;
@@ -87,6 +98,9 @@ eth_udp_loopback_rgmii eth_udp_loopback_rgmii_inst(
   .pll_locked     (pll_locked     )
 );
 
+//============================================================
+//    clk125m 域：tx_start 脉冲 + 包长选择（toggle 握手）
+//============================================================
 reg  gl1, gl2, gl3;
 reg  gp1, gp2, gp3;
 
@@ -120,6 +134,9 @@ wire p_pal  = gp2 ^ gp3;
 assign tx_start_125 = p_line | p_pal;
 assign tx_len_125   = p_pal ? PAL_LEN : LINE_LEN;
 
+//============================================================
+//    pll_locked 同步到 74.25 域
+//============================================================
 reg pl_s1, pl_s2;
 
 always@(posedge Clk_74M or negedge Reset_n)begin
@@ -132,6 +149,9 @@ always@(posedge Clk_74M or negedge Reset_n)begin
 end
 wire link_up = pl_s2;
 
+//============================================================
+//    像素打一拍 + 颜色查表
+//============================================================
 reg        de_r, de_r2;
 reg [10:0] vc_r;
 reg [23:0] rgb_r;
@@ -163,13 +183,18 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else if(de_r) line_num <= vc_r;
 end
 
+// RGB→调色板索引：8 位无碰撞哈希后查 BRAM 表，避免 24 位全色比较。
+// 映射由 rgb_to_palette.v 的同步 ROM 完成，结果直接写入 TX FIFO。
+//============================================================
+//    行末/场末 打包序列器
+//============================================================
 localparam SEQ_IDLE = 4'd0;
-localparam SEQ_HDR  = 4'd1;
-localparam SEQ_TOG  = 4'd2;
-localparam SEQ_PAL  = 4'd3;
-localparam SEQ_PTOG = 4'd4;
-localparam SEQ_H0   = 4'd5;
-localparam SEQ_WAIT = 4'd6;
+localparam SEQ_HDR  = 4'd1;  // 写下一行包头 7 字节
+localparam SEQ_TOG  = 4'd2;  // tx_start（行包）
+localparam SEQ_PAL  = 4'd3;  // 写调色板包
+localparam SEQ_PTOG = 4'd4;  // tx_start（调色板包）
+localparam SEQ_H0   = 4'd5;  // 写下一帧第 0 行包头
+localparam SEQ_WAIT = 4'd6;  // 等 MAC 发完上一包
 
 reg [3:0]  seq;
 reg [7:0]  seq_idx;
@@ -187,6 +212,9 @@ wire frame_on  = (fps_cnt == 4'd0);
 wire pal_due   = (pal_cnt == PAL_FRAMES - 1);
 wire send_pal  = line_719 && pal_due && frame_on;
 
+//============================================================
+//    行末/调色板发送标志寄存
+//============================================================
 reg         h0_lat;
 reg         pal_lat;
 
@@ -296,6 +324,9 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   end
 end
 
+//============================================================
+//    包头 / 调色板包 字节
+//============================================================
 wire [10:0] hdr_line  = (seq == SEQ_H0) ? 11'd0 : (line_num + 11'd1);
 wire [15:0] hdr_frame = frame_cnt;
 
@@ -395,6 +426,9 @@ always@(*)begin
   end
 end
 
+//============================================================
+//    FIFO 写：像素 / 包头 / 调色板
+//============================================================
 always@(*)begin
   if(seq == SEQ_HDR || seq == SEQ_H0)
   tx_fifo_din = hdr_byte;
@@ -415,6 +449,9 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else wait_cnt <= 11'd0;
 end
 
+//============================================================
+//    网络按键：从接收 FIFO 解析 A5 5A 03 | 位图
+//============================================================
 localparam KB_WA5 = 2'd0;
 localparam KB_W5A = 2'd1;
 localparam KB_W03 = 2'd2;
@@ -494,6 +531,7 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   kb_act_cnt <= kb_act_cnt - 25'd1;
 end
 
+//    小键盘9复位：把 Reset_n 拉低一段时间，等效按板上复位键
 always@(posedge Clk_74M or negedge por_n)begin
   if(!por_n)
   kb_rst_cnt <= 25'd0;

@@ -1,5 +1,10 @@
-`timescale 1ns/1ps
+﻿`timescale 1ns/1ps
 
+//============================================================
+// 测试台：input_route_tb
+// 测试目标：单人/双人板载键与 PC 键输入路由回归。
+//============================================================
+//===== 输入路由回归: 单人 P1 合并, 双人 P1/P2 分离 =====
 module input_route_tb;
 reg duo = 0;
 reg btn_left=0, btn_right=0, btn_drop_r=0, btn_drop_en=0, btn_rotate=0, btn_hold=0;

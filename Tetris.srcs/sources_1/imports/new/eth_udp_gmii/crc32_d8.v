@@ -1,3 +1,7 @@
+﻿//============================================================
+// 导入模块：crc32_d8
+// 本工程用途：以太网帧 CRC32 计算。
+//============================================================
 module crc32_d8
 (
   input           clk         ,
@@ -31,6 +35,9 @@ begin
     crc_result_o <= crc_result_o;
 end
 
+// polynomial: x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 + x^7 + x^5 + x^4 + x^2 + x^1 + 1
+// data width: 8
+// convention: the first serial bit is D[7]
   function [31:0] nextCRC32_D8;
 
     input [7:0] Data;
