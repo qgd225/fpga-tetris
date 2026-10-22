@@ -1,6 +1,6 @@
 # FPGA 俄罗斯方块 (Tetris)
 
-基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效、PC 画面镜像与排行榜。
+基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
 ## 工程信息
 
@@ -36,9 +36,9 @@
 - CORE-07 故事板画面：“轨道核心：最后的收容”双层反应堆舱室、游戏区收容槽、双人单核心缝、观察窗与冷却管线。
 - 完整 UI：Impact Glass 方块、1px 圆角、幽灵空心框、34px 八级热力压力柱、警戒齿、分段危险灯带、阵营光条和菜单呼吸色。
 - 反应堆反馈：落锁/升级/换块/加分特效、消行坍缩环与中心热点、GAME OVER `CORE BREACH` 副标题和局部压暗结算面板。
-- GAME OVER 结算页：SCORE、LEVEL、LINES、TIME、SOLO/DUO 标识、模式化数据区和 PC 端分模式排行榜。
+- GAME OVER 结算页：SCORE、LEVEL、LINES、TIME、SOLO/DUO 标识和模式化数据区。
 - 音频：背景音乐 + 20 类操作/状态音效，音高与时长查表，危险等级上升沿触发反应堆警报，P1/P2 共用蜂鸣器且同拍 P1 优先。
-- PC 端：UDP 逐行画面、调色板同步、键盘遥控、静态 ARP 助手、SOLO/DUO Top5 排行榜。
+- PC 端：UDP 逐行画面、调色板同步、键盘遥控和静态 ARP 助手。
 
 ## 系统架构
 
@@ -58,7 +58,7 @@ Game_state_machine ────────┐
         │                  │
         ├──────► sound ────┴──────► buzz_main / buzz_else
         │
-        └──────► net_screen_tx ─────► UDP 画面 + Type4 成绩包
+        └──────► net_screen_tx ─────► UDP 画面
 ```
 
 ## 目录结构
@@ -102,11 +102,10 @@ Tetris.srcs/
 
 ## 验证与资源
 
-- 十套仿真共 **801 项**：`duo 111 / frame_duo 330 / level 39 / sound 103 / input_route 29 / horizontal_repeat 30 / hold_gesture 27 / solo_hint 59 / result_packet 17 / rgb_palette 56`，全部通过。
-- Python 接收端测试 5 项：新旧成绩包兼容、坏校验、分模式去重、CSV 迁移和 Top5 排序，全部通过。
+- 九套仿真共 **784 项**：`duo 111 / frame_duo 330 / level 39 / sound 103 / input_route 29 / horizontal_repeat 30 / hold_gesture 27 / solo_hint 59 / rgb_palette 56`，全部通过。
 - Vivado 2018.3 最终从零综合/实现：0 error、0 时序违例、0 未布通网络。
-- 最终资源：LUT **20502/20800（98.57%）**、FF 6347、Block RAM 15.5/50、DSP 4、IOB 34。
-- 最终时序：**WNS +0.005ns、WHS +0.092ns**。
+- 最终资源：LUT **20293/20800（97.56%）**、FF 6273、Block RAM 15.5/50、DSP 4、IOB 34。
+- 最终时序：**WNS +0.251ns、WHS +0.067ns**。
 - 渲染取色采用 7 位命中码寄存一级并统一右移 1 像素，把原 20 余级 24 位优先链拆成“判层 + 取色”两级；背景颜色与命中码同拍寄存，整套画面保持统一相位。
 
 ### 本版构建产物
@@ -114,9 +113,9 @@ Tetris.srcs/
 | 项目 | 值 |
 | --- | --- |
 | 比特流 | `Tetris.runs/impl_1/Tetris.bit` |
-| 生成时间 | 2026-10-22 12:56:25 |
+| 生成时间 | 2026-10-22 18:31:15 |
 | 大小 | 2,192,114 字节 |
-| SHA256 | `AFB0C1F4F7C03D7D764CE3BC7E075D9432EA65382C777EC31F47E983E04CD336` |
+| SHA256 | `EAAAC2C4C0490EE2EDD2179C2EA624E25744107310F7C3112E127543A40AE748` |
 
 ## 备注
 

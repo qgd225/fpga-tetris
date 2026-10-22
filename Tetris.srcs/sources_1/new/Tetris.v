@@ -426,12 +426,6 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .hcounter(hcounter),
     .vcounter(vcounter),
     .rgb(rgb),
-    .Finalize(Finalize),
-    .duo(duo),
-    .res_score(score),
-    .res_level(speed_level),
-    .res_lines(lines),
-    .res_time(time_sec),
 
     .rgmii_rx_clk_i(rgmii_rx_clk_i),
     .rgmii_rxd(rgmii_rxd),

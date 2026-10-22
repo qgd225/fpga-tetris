@@ -7,9 +7,6 @@ Tetris 以太网：PC 端画面显示 + 键盘按键发送
 FPGA 发来的包：
   行包   : A5 5A 01 | 帧号2B | 行号2B | 1280 个颜色标号(每像素 1B)   共 1287 字节
   调色板 : A5 5A 02 | N | N*(标号,R,G,B)                            共 4+4N 字节
-FPGA 发来的结果包（每局结束进结束画面时发，之后每 500ms 重发一次）：
-  A5 5A 04 | 局序号1B | 模式1B | 分数3B | 等级1B | 累计消行2B | 用时秒2B | 异或校验1B  共 14 字节
-
 本程序发给 FPGA 的按键包：
   A5 5A 03 | 位图1B
     位图: bit0=左  bit1=右  bit2=下  bit3=旋转(上)
@@ -26,9 +23,6 @@ FPGA_IP     = "192.168.0.2"     # FPGA 的 IP（和 net_screen_tx 里 LOCAL_IP �
 FPGA_PORT   = 5000              # FPGA 的 UDP 端口
 LISTEN_PORT = 5000              # 本机监听画面包的端口（不要和别的程序抢）
 RESEND_S    = 0.02              # 按键包重发周期 20ms
-RANK_W      = 300               # 右侧排行榜面板宽度(像素)
-SHOW_RANK   = True              # 屏幕不够宽时自动退回"状态行文字显示"
-DEDUP_SEC   = 10.0              # 同一局序号在这个秒数内的重发只记一条
 # ========================================
 
 W, H = 1280, 720
@@ -57,14 +51,7 @@ pal = dict(DEFAULT_PAL)
 buf = bytearray(W * H)
 line_ok = [0] * H
 lock = threading.Lock()
-stat = {"pkt":0, "line":0, "pal":0, "last_frame":-1, "fps":0.0, "kb":0,
-        "res":0, "res_dup":0, "res_bad":0}
-
-res_lock = threading.Lock()
-scores = []
-last_res = {"key": None, "t": 0.0}
-cur_res = {"got":False, "mode":"solo", "seq":0, "score":0, "level":0, "lines":0, "secs":0}
-SCORE_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scoreboard.csv")
+stat = {"pkt":0, "line":0, "pal":0, "last_frame":-1, "fps":0.0, "kb":0}
 STARTUP_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "startup_error.log")
 
 kb_lock = threading.Lock()
@@ -245,8 +232,6 @@ def rx_loop():
                     if b+3 < len(d):
                         pal[d[b]] = (d[b+1], d[b+2], d[b+3])
             stat["pal"] += 1
-        elif typ == 4:
-            res_handle(d)
         now = time.time()
         if now - t0 >= 1.0:
             stat["fps"] = (stat["pkt"] - n0) / (now - t0)
@@ -262,130 +247,10 @@ def pal_bytes():
     return bytes(p)
 
 
-def mmss(secs):
-    return "%d:%02d" % (secs // 60, secs % 60)
-
-
-def res_csv_migrate():
-    if not os.path.exists(SCORE_CSV):
-        return
-    try:
-        with open(SCORE_CSV, "r", encoding="utf-8") as f:
-            lines = [ln.strip() for ln in f if ln.strip()]
-        if not lines or lines[0].startswith("time,mode,"):
-            return
-        recs = []
-        for ln in lines:
-            p = ln.split(",")
-            if len(p) == 6 and p[0] != "time":
-                recs.append([p[0], "solo", p[1], p[2], p[3], p[4], p[5]])
-        tmp = SCORE_CSV + ".tmp"
-        with open(tmp, "w", encoding="utf-8") as f:
-            f.write("time,mode,seq,score,level,lines,seconds\n")
-            for p in recs:
-                f.write(",".join(p) + "\n")
-        os.replace(tmp, SCORE_CSV)
-        print("旧成绩已迁移为单人榜: %d 条" % len(recs))
-    except Exception as e:
-        print("[提示] 成绩迁移失败: %s" % e)
-
-
-def res_csv_load():
-    res_csv_migrate()
-    try:
-        with open(SCORE_CSV, "r", encoding="utf-8") as f:
-            for ln in f:
-                p = ln.strip().split(",")
-                if len(p) != 7 or p[0] == "time":
-                    continue
-                mode = p[1].lower()
-                if mode not in ("solo", "duo"):
-                    mode = "solo"
-                scores.append({"time":p[0], "mode":mode, "seq":int(p[2]), "score":int(p[3]),
-                               "level":int(p[4]), "lines":int(p[5]), "secs":int(p[6])})
-    except Exception:
-        pass
-
-
-def res_csv_append(rec):
-    newfile = not os.path.exists(SCORE_CSV)
-    try:
-        with open(SCORE_CSV, "a", encoding="utf-8") as f:
-            if newfile:
-                f.write("time,mode,seq,score,level,lines,seconds\n")
-            f.write("%s,%s,%d,%d,%d,%d,%d\n" % (rec["time"], rec["mode"], rec["seq"], rec["score"],
-                                                rec["level"], rec["lines"], rec["secs"]))
-    except Exception as e:
-        print("[提示] 写成绩文件失败: %s" % e)
-
-
-def top5_rows(mode):
-    with res_lock:
-        rows = [r for r in scores if r["mode"] == mode]
-    rows = sorted(rows, key=lambda r: (-r["score"], -r["lines"], r["secs"], r["seq"]))[:5]
-    if not rows:
-        return "还没有成绩"
-    out = []
-    for i, r in enumerate(rows):
-        out.append("%d. %06d  L%d  %3dL  %s" % (i+1, r["score"], r["level"], r["lines"], mmss(r["secs"])))
-    return "\n".join(out)
-
-
-def res_handle(d):
-    if len(d) not in (13, 14):
-        stat["res_bad"] += 1
-        return
-    if len(d) == 14:
-        x = 0
-        for b in d[3:13]:
-            x ^= b
-        if x != d[13]:
-            stat["res_bad"] += 1
-            return
-        mode = "duo" if (d[4] & 1) else "solo"
-        seq = d[3]
-        score = (d[5] << 16) | (d[6] << 8) | d[7]
-        level = d[8] & 7
-        lines = (d[9] << 8) | d[10]
-        secs = (d[11] << 8) | d[12]
-    else:
-        x = 0
-        for b in d[3:12]:
-            x ^= b
-        if x != d[12]:
-            stat["res_bad"] += 1
-            return
-        mode = "solo"
-        seq = d[3]
-        score = (d[4] << 16) | (d[5] << 8) | d[6]
-        level = d[7] & 7
-        lines = (d[8] << 8) | d[9]
-        secs = (d[10] << 8) | d[11]
-    rec = {"time": time.strftime("%Y-%m-%d %H:%M:%S"), "mode": mode, "seq": seq,
-           "score": score, "level": level, "lines": lines, "secs": secs}
-    now = time.time()
-    key = (mode, seq)
-    with res_lock:
-        dup = (key == last_res["key"]) and ((now - last_res["t"]) < DEDUP_SEC)
-        if dup:
-            stat["res_dup"] += 1
-        else:
-            last_res["key"] = key
-            last_res["t"] = now
-            scores.append(rec)
-            stat["res"] += 1
-        cur_res.update(rec)
-        cur_res["got"] = True
-    if not dup:
-        res_csv_append(rec)
-        print("收到%s成绩: 第%d局  分数=%d  等级=%d  消行=%d  用时=%s" %
-              ("双人" if mode == "duo" else "单人", seq, score, level, lines, mmss(secs)))
 def main():
     # 先创建窗口句柄，确保启动失败时不会留下一个无界面的后台进程
     root = tk.Tk()
     root.withdraw()
-    res_csv_load()
-    print("成绩文件: %s" % SCORE_CSV)
     print("画面目标: 监听 %d 端口 <- FPGA" % LISTEN_PORT)
     print("按键目标: 发给 %s:%d（静态 ARP 由 双击启动.bat 自动设置）" % (FPGA_IP, FPGA_PORT))
     threading.Thread(target=rx_loop, daemon=True).start()
@@ -395,36 +260,8 @@ def main():
     root.title("Tetris  (画面 udp:%d  ->  按键 %s:%d)" % (LISTEN_PORT, FPGA_IP, FPGA_PORT))
     label = tk.Label(root, text="等待画面...", fg="white", bg="black", font=("Consolas", 12), anchor="w")
     label.pack(fill="x")
-    cur_lab = None
-    solo_lab = None
-    duo_lab = None
-    if SHOW_RANK and (root.winfo_screenwidth() >= W + RANK_W + 20):
-        body = tk.Frame(root)
-        body.pack()
-        canvas = tk.Canvas(body, width=W, height=H, highlightthickness=0, bg="black")
-        canvas.pack(side="left")
-        panel = tk.Frame(body, width=RANK_W, height=H, bg="#101010")
-        panel.pack(side="left", fill="y")
-        panel.pack_propagate(False)
-        tk.Label(panel, text="排行榜 Top5", fg="#00E5FF", bg="#101010",
-                 font=("Consolas", 14, "bold")).pack(pady=(12, 8))
-        cur_lab = tk.Label(panel, text="本局: 等待结束...", fg="white", bg="#101010",
-                           font=("Consolas", 11), justify="left", anchor="w")
-        cur_lab.pack(fill="x", padx=10, pady=(0, 12))
-        tk.Label(panel, text="SOLO TOP5", fg="#00E5FF", bg="#101010",
-                 font=("Consolas", 12, "bold"), anchor="w").pack(fill="x", padx=10, pady=(4, 2))
-        solo_lab = tk.Label(panel, text=top5_rows("solo"), fg="#EEEEEE", bg="#101010",
-                            font=("Consolas", 11), justify="left", anchor="nw")
-        solo_lab.pack(fill="x", padx=10)
-        tk.Label(panel, text="DUO TOP5", fg="#FF4DA6", bg="#101010",
-                 font=("Consolas", 12, "bold"), anchor="w").pack(fill="x", padx=10, pady=(10, 2))
-        duo_lab = tk.Label(panel, text=top5_rows("duo"), fg="#EEEEEE", bg="#101010",
-                           font=("Consolas", 11), justify="left", anchor="nw")
-        duo_lab.pack(fill="both", expand=True, padx=10)
-        root.geometry("+0+0")
-    else:
-        canvas = tk.Canvas(root, width=W, height=H, highlightthickness=0, bg="black")
-        canvas.pack()
+    canvas = tk.Canvas(root, width=W, height=H, highlightthickness=0, bg="black")
+    canvas.pack()
 
     img = Image.new("P", (W, H), 0)
     img.putpalette(pal_bytes())
@@ -439,20 +276,9 @@ def main():
         imgtk.paste(im)
         canvas.itemconfigure(item, image=imgtk)
         missing = line_ok.count(0)
-        with res_lock:
-            solo_best = max([r["score"] for r in scores if r["mode"]=="solo"] or [0])
-            duo_best = max([r["score"] for r in scores if r["mode"]=="duo"] or [0])
-        label.config(text="pkt=%d 行包=%d pkt/s=%.0f 调色板包=%d 帧号=%d 未收到的行=%d | 按键:%s 已发按键包=%d | 成绩包=%d 本局=%d分 单高=%d 双高=%d"
+        label.config(text="pkt=%d 行包=%d pkt/s=%.0f 调色板包=%d 帧号=%d 未收到的行=%d | 按键:%s 已发按键包=%d"
                           % (stat["pkt"], stat["line"], stat["fps"], stat["pal"],
-                             stat["last_frame"], missing, kb_text(), stat["kb"],
-                             stat["res"], cur_res["score"], solo_best, duo_best))
-        if cur_lab is not None:
-            if cur_res["got"]:
-                cur_lab.config(text="本局 %s: %d 分\n等级 %d   消行 %d\n用时 %s\n(第 %d 局)"
-                                    % (cur_res["mode"].upper(), cur_res["score"], cur_res["level"],
-                                       cur_res["lines"], mmss(cur_res["secs"]), cur_res["seq"]))
-            solo_lab.config(text=top5_rows("solo"))
-            duo_lab.config(text=top5_rows("duo"))
+                             stat["last_frame"], missing, kb_text(), stat["kb"]))
         root.after(33, tick)
 
     root.update_idletasks()
