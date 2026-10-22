@@ -1,8 +1,3 @@
-
-
-
-
-
 module sound(
     input Clk_74M,
     input Reset_n,
@@ -38,10 +33,8 @@ module sound(
     output reg buzz_else
     );
 
-
     parameter [16:0]MS_MAX = 17'd74249;
     parameter [3:0]NOTE_SH = 4'd0;
-
 
     parameter [17:0]N_G4 = 18'd94707;
     parameter [17:0]N_B4 = 18'd75188;
@@ -74,7 +67,6 @@ module sound(
     reg [3:0]st;
     reg [3:0]st_last;
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     ms_cnt <= 17'd0;
@@ -95,7 +87,6 @@ module sound(
     ms_tick <= 1'b0;
     end
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -167,7 +158,6 @@ module sound(
     end
     end
 
-
     always@(*)begin
     case(en)
     5'd17: st_last = 4'd1;
@@ -192,7 +182,6 @@ module sound(
     default: st_last = 4'd0;
     endcase
     end
-
 
     always@(*)begin
     note = 18'd0;
@@ -294,7 +283,6 @@ module sound(
     endcase
     end
 
-
     always@(*)begin
     cnt = 9'd0;
     case(en)
@@ -395,14 +383,12 @@ module sound(
     endcase
     end
 
-
     always@(*)begin
     if(note == 18'd0)
     note_q = 18'd0;
     else
     note_q = note >> NOTE_SH;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -422,7 +408,6 @@ module sound(
     note_t <= 18'd0;
     end
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin

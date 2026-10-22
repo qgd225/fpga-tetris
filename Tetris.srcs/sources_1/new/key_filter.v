@@ -1,8 +1,3 @@
-
-
-
-
-
 module key_filter(
     Clk,
     Reset_n,
@@ -34,7 +29,6 @@ module key_filter(
 
     parameter MCNT_CNT = 1_000_000 - 1;
 
-
     always@(posedge Clk or negedge Reset_n)begin
     if(!Reset_n)
     counter_cnt <= 0;
@@ -43,7 +37,6 @@ module key_filter(
     else if(en_cnt)
     counter_cnt <= counter_cnt + 1;
     end
-
 
     always@(posedge Clk or negedge Reset_n)
     if(!Reset_n)
@@ -65,7 +58,6 @@ module key_filter(
 
     assign key_down = (!sync_d1_key) && (r_key);
     assign key_up = (sync_d1_key) && (!r_key);
-
 
     always@(posedge Clk or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -93,7 +85,6 @@ module key_filter(
     end
     end
     end
-
 
     always@(posedge Clk or negedge Reset_n)
     if(!Reset_n)

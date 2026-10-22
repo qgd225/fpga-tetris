@@ -1,8 +1,3 @@
-
-
-
-
-
 module Playfield_margin(
     input Clk_74M,
     input Reset_n,

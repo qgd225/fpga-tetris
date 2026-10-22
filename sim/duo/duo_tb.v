@@ -1,11 +1,5 @@
 `timescale 1ns/1ps
 
-
-
-
-
-
-
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
   assign douta = duo_tb.shape_val;
 endmodule
@@ -77,7 +71,6 @@ begin
 end
 endtask
 
-
 task p_left1;  begin @(negedge Clk_74M); left1 =1'b1; @(posedge Clk_74M); @(negedge Clk_74M); left1 =1'b0; @(posedge Clk_74M); end endtask
 task p_right1; begin @(negedge Clk_74M); right1=1'b1; @(posedge Clk_74M); @(negedge Clk_74M); right1=1'b0; @(posedge Clk_74M); end endtask
 task p_drop1;  begin @(negedge Clk_74M); drop1 =1'b1; @(posedge Clk_74M); @(negedge Clk_74M); drop1 =1'b0; @(posedge Clk_74M); end endtask
@@ -90,7 +83,6 @@ task p_rot2;   begin @(negedge Clk_74M); rot2  =1'b1; @(posedge Clk_74M); @(nege
 task p_hold2;  begin @(negedge Clk_74M); hold2 =1'b1; @(posedge Clk_74M); @(negedge Clk_74M); hold2 =1'b0; @(posedge Clk_74M); end endtask
 
 task settle; begin repeat(40) @(posedge Clk_74M); end endtask
-
 
 task hard1;
 begin
@@ -112,7 +104,6 @@ begin
   repeat(4) @(posedge Clk_74M);
 end
 endtask
-
 
 task lock1;
 begin

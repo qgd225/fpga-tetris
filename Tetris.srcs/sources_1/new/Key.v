@@ -1,8 +1,3 @@
-
-
-
-
-
 module Key(
     input Clk,
     input Clk_50M,

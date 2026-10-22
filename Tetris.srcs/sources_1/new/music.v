@@ -1,8 +1,3 @@
-
-
-
-
-
 module music(
     input Clk_74M,
     input Reset_n,
@@ -82,8 +77,6 @@ module music(
     end
     end
 
-
-
     reg [29:0]cnt_main;
     reg [5:0]note_addr;
     wire [21:0]note_data;
@@ -93,9 +86,6 @@ module music(
     .addra(note_addr),
     .douta(note_data)
   );
-
-
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
@@ -125,7 +115,6 @@ module music(
     cnt_main <= 0;
     end
 
-
     reg [16:0]cnt;
     reg tick;
 
@@ -153,7 +142,6 @@ module music(
     tick <= 1'b0;
     end
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)

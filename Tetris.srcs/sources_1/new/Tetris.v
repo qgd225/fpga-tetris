@@ -1,8 +1,3 @@
-
-
-
-
-
 module Tetris(
     input Clk,
     input Reset_key,
@@ -32,7 +27,6 @@ module Tetris(
     output        eth_mdio
     );
 
-
     reg [19:0]por_cnt = 20'd0;
 
     always@(posedge Clk)begin
@@ -59,9 +53,6 @@ module Tetris(
 
     wire Reset_n = (por_n) && (!rst_key_en) && (!kb_reset_en);
 
-
-
-
     wire [10:0]hcounter;
     wire [10:0]vcounter;
     wire [23:0]rgb;
@@ -83,7 +74,6 @@ module Tetris(
     .vcounter(vcounter),
     .de(hdmi_de)
     );
-
 
     wire switch_r_flag;
     wire switch_en;
@@ -220,7 +210,6 @@ control_route control_route_inst(
     .choose_cnt(choose_cnt)
     );
 
-
     horizontal_repeat p1_horizontal_repeat(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -244,8 +233,6 @@ control_route control_route_inst(
     .left_out(p2_left_move),
     .right_out(p2_right_move)
     );
-
-
 
     wire clear;
     wire [2:0]speed_level;
@@ -274,7 +261,6 @@ control_route control_route_inst(
     reg [2:0]lvl_d;
     reg lvl_up;
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     lvl_d <= 3'd0;
@@ -285,7 +271,6 @@ control_route control_route_inst(
     lvl_up <= Playing && (speed_level > lvl_d);
     end
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
@@ -299,7 +284,6 @@ control_route control_route_inst(
     danger2_pulse <= (danger_lvl == 2'd2) && (danger_d != 2'd2);
     end
     end
-
 
 reg solo_hint_latched;
 reg solo_hold_long_d;
@@ -370,8 +354,6 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .danger_lvl(danger_lvl)
     );
 
-
-
     music music_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -415,8 +397,6 @@ wire solo_hint_show = !duo && solo_hint_latched;
 
     .buzz_else(buzz_else)
     );
-
-
 
     net_screen_tx net_screen_tx_inst(
     .Clk_74M(Clk_74M),

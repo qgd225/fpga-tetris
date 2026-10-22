@@ -1,8 +1,3 @@
-
-
-
-
-
 module Ghost_piece(
     Clk_74M,
     Reset_n,
@@ -299,6 +294,5 @@ module Ghost_piece(
     else if(land_t_pulse && !scan_done && !restart_hold)
     counter_ghost_r_t <= counter_ghost_r_d;
     end
-
 
 endmodule

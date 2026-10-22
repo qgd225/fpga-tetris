@@ -1,8 +1,3 @@
-
-
-
-
-
 module timer(
     input Clk_74M,
     input Reset_n,
@@ -32,7 +27,6 @@ module timer(
     reg [3:0]counter1;
     reg [3:0]counter2;
     reg [3:0]counter3;
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)

@@ -1,9 +1,5 @@
 `timescale 1ns/1ps
 
-
-
-
-
 module hold_gesture_tb;
 reg Clk=0, Rst=0;
 reg board_hold=0, pc_hold=0, legacy_hold=0, duo=0;

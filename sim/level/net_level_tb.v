@@ -1,10 +1,5 @@
 `timescale 1ns/1ps
 
-
-
-
-
-
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
   assign douta = 32'h0;
 endmodule

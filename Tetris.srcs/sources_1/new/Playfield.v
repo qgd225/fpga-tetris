@@ -1,8 +1,3 @@
-
-
-
-
-
 module Playfield(
     input Clk_74M,
     input Reset_n,
@@ -100,9 +95,6 @@ module Playfield(
     output wire [4:0]hint_r0, hint_r1, hint_r2, hint_r3
     );
 
-
-
-
     parameter MCNT = 74_250_000;
     parameter MCNT_LAND = 20_000_000;
     parameter MCNT_Drop = 74_250_000 - 1;
@@ -126,7 +118,6 @@ module Playfield(
 
     wire [4:0]COL = duo ? 5'd24 : 5'd20;
 
-
     parameter [13:0]TIME_LV1_D = 14'd40;
     parameter [13:0]TIME_LV2_D = 14'd120;
     parameter [13:0]TIME_LV3_D = 14'd240;
@@ -135,13 +126,8 @@ module Playfield(
     parameter [13:0]TIME_LV6_D = 14'd880;
     parameter [13:0]TIME_LV7_D = 14'd1200;
 
-
     wire [4:0]SPAWN_C1 = duo ? 5'd8  : 5'd9;
     wire [4:0]SPAWN_C2 = duo ? 5'd16 : 5'd9;
-
-
-
-
 
     reg [1:0]rot;
     reg [4:0]counter_c;
@@ -154,13 +140,11 @@ module Playfield(
     reg touch_top;
     reg [5:0]rr_g;
 
-
     wire [31:0]Tetromino_dout;
     reg  [4:0]Tetromino_addr;
     reg [4:0]Tetromino_addr1;
     wire [31:0]Tetromino_dout1;
     reg  [4:0]counter_ghost_r_t;
-
 
     wire land_pulse;
     reg [1:0]lock_cnt;
@@ -168,7 +152,6 @@ module Playfield(
     reg [4:0]rr_t [0:3];
     reg [24:0]counter_land;
     reg [24:0]lock_counter;
-
 
     reg [19:0]line;
     reg clear_d;
@@ -184,13 +167,11 @@ module Playfield(
     reg [3:0]cl_stop;
     wire clear_step;
 
-
     reg [26:0]counter;
     reg drop_r_t;
     wire drop_hold  = (counter == MCNT) && (drop_r_t);
     wire drop_r = (drop_r_t) && (drop_r_flag);
     reg [26:0]counter_drop;
-
 
     reg en_rotate;
     reg [5:0] cc_r, rr_r;
@@ -201,7 +182,6 @@ module Playfield(
     wire [10:0] ddc_ext = {{7{ddc[3]}}, ddc};
     wire [10:0] ddr_ext = {{7{ddr[3]}}, ddr};
     reg rot_block;
-
 
     reg [31:0]rnd;
     reg [15:0]rnd_cnt;
@@ -222,11 +202,9 @@ module Playfield(
     wire [2:0]rnd_type_t1 = (r7t1 >= 4'd7) ? (r7t1 - 4'd7) : r7t1[2:0];
     wire [2:0]rnd_type_n1 = (r7n1 >= 4'd7) ? (r7n1 - 4'd7) : r7n1[2:0];
 
-
     reg en_hold_t;
     wire hold_up = !en_hold_t && en_hold;
     wire hold_down = en_hold_t && !en_hold;
-
 
     reg [1:0]rot2;
     reg [4:0]counter_c2;
@@ -265,7 +243,6 @@ module Playfield(
     reg lock_t2;
     wire [9:0]douta_dummy2;
 
-
     reg  other_down_hold;
     reg  other_down_hold2;
     reg  [5:0]gc1, gr1;
@@ -291,7 +268,6 @@ module Playfield(
     wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || hold_up || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved1);
     wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || hold_up2 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved2);
 
-
     wire drop_hold2;
     wire drop_r2;
     wire [7:0]weiyibiao_dout2;
@@ -300,7 +276,6 @@ module Playfield(
     wire [3:0]ddr2;
     wire [10:0]ddc_ext2;
     wire [10:0]ddr_ext2;
-
 
     integer i;
     integer y;
@@ -311,11 +286,9 @@ module Playfield(
     integer k;
     integer i2;
 
-
     wire [23:0]row_w [0:19];
 
     wire [23:0]full_mask = duo ? 24'hFFFFFF : 24'h000FFFFF;
-
 
     wire [5:0] oc2_0 = counter_c2 + { { 7{Tetromino_dout2[7]} }, Tetromino_dout2[7-:4] };
     wire [5:0] or2_0 = counter_r2 + { { 7{Tetromino_dout2[3]} }, Tetromino_dout2[3-:4] };
@@ -346,15 +319,11 @@ module Playfield(
     integer p2;
     integer k2;
 
-
-
-
     Tetromino Tetromino_inst0(
         .clka(Clk_74M),
         .addra(Tetromino_addr),
         .douta(Tetromino_dout)
     );
-
 
     always@(*)begin
         Tetromino_addr = {type[2:0], rot[1:0]};
@@ -430,27 +399,17 @@ module Playfield(
         end
     end
 
-
-
-
-
-
-
     always@(*)begin : blk1
         C_num = 5'd24;
         if((hcounter >= 11'd321) && (hcounter < (321 + 32*COL)) && (((hcounter - 11'd321) & 11'd31) < 11'd30))
         C_num = (hcounter - 11'd321) >> 5;
     end
 
-
     always@(*)begin : blk2
         R_num = 5'd24;
         if((vcounter >= 11'd81) && (vcounter < 11'd721) && (((vcounter - 11'd81) & 11'd31) < 11'd30))
         R_num = (vcounter - 11'd81) >> 5;
     end
-
-
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -459,14 +418,12 @@ module Playfield(
         rnd <= {rnd[30:0], rnd_fb_eff};
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         rnd_cnt <= 16'd0;
         else
         rnd_cnt <= rnd_cnt + 16'd1;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -476,7 +433,6 @@ module Playfield(
         else if((land_pulse || hold_up) && Playing)
         type <= type_t;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -489,16 +445,12 @@ module Playfield(
         type_t <= rnd_type_n;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_d <= 3'd0;
         else if(land_pulse && Playing)
         type_d <= type;
     end
-
-
-
 
     always@(posedge Clk_74M or negedge Reset_n)
     if(!Reset_n)
@@ -508,7 +460,6 @@ module Playfield(
     else if(counter < MCNT)
     counter <= counter + 30'd1;
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         drop_r_t <= 1'b1;
@@ -517,9 +468,6 @@ module Playfield(
         else if(drop_r_flag)
         drop_r_t <= 1'b1;
     end
-
-
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -566,11 +514,9 @@ module Playfield(
                          (time_sec >= TIME_LV2_D) ? 3'd2 :
                          (time_sec >= TIME_LV1_D) ? 3'd1 : 3'd0;
 
-
     wire [2:0]lv_time  = duo ? lv_time_d : lv_time_s;
 
     wire [2:0]lv_now   = (lv_score > lv_time) ? lv_score : lv_time;
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -578,7 +524,6 @@ module Playfield(
         else
         speed_level <= lv_now;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -595,7 +540,6 @@ module Playfield(
         7:Drop <= (MCNT_Drop*64'd21)/64'd100;
         endcase
      end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -626,7 +570,6 @@ module Playfield(
         counter_r <= 5'd0;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_c <= SPAWN_C1;
@@ -654,9 +597,6 @@ module Playfield(
         counter_c <= SPAWN_C1;
     end
 
-
-
-
     Tetromino Tetromino_inst1(
         .clka(Clk_74M),
         .addra(Tetromino_addr1),
@@ -670,7 +610,6 @@ module Playfield(
     );
 
     assign weiyibiao_addr = {type[2:0],rot[1:0]};
-
 
     always@(*)begin
         Tetromino_addr1 = {type[2:0], (rot[1:0] + 1)};
@@ -687,7 +626,6 @@ module Playfield(
         end
         en_rotate = (rotate_p_flag) && (!rot_block) && (!lock_we);
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -712,9 +650,6 @@ module Playfield(
         rot <= 2'd0;
     end
 
-
-
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_land <= 1'b0;
@@ -730,7 +665,6 @@ module Playfield(
 
     wire land_pulse_t = (land) && (counter_land == MCNT_LAND);
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_t <= 1'b0;
@@ -739,7 +673,6 @@ module Playfield(
         else
         lock_t <= 1'b0;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -751,7 +684,6 @@ module Playfield(
         else if(lock_cnt != 2'd0)
         lock_cnt <= lock_cnt + 2'd1;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -770,7 +702,6 @@ module Playfield(
     assign lock_we  = (lock_t) || (lock_cnt != 2'd0);
     assign lock_idx = (lock_t) ? 2'd0 : lock_cnt;
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             cc_t[0] <= 11'd0; cc_t[1] <= 11'd0; cc_t[2] <= 11'd0; cc_t[3] <= 11'd0;
@@ -779,7 +710,6 @@ module Playfield(
         for(y = 0; y < 4; y = y + 1)
         cc_t[y] <= counter_c + { {7{Tetromino_dout[y*8+7]}}, Tetromino_dout[y*8+7 -:4] };
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
@@ -792,10 +722,6 @@ module Playfield(
 
     assign cc_d = {cc_t[0],cc_t[1], cc_t[2],cc_t[3]};
     assign rr_d = {rr_t[0],rr_t[1], rr_t[2],rr_t[3]};
-
-
-
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -836,7 +762,6 @@ module Playfield(
         end
     end
 
-
     always@(*)begin : blk4
         integer m;
         clear = 1'b0;
@@ -851,7 +776,6 @@ module Playfield(
 
     assign clear_time = clear_t || clear;
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     cl_stop <= 4'd0;
@@ -860,7 +784,6 @@ module Playfield(
     else if(clear_tick == 3'd0)
     cl_stop <= (d_clear << 1) - 4'd1;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
@@ -875,7 +798,6 @@ module Playfield(
 
     assign clear_step = (clear_t) && (clear_cnt == CLEAR_STEP);
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_t <= 1'b0;
@@ -884,7 +806,6 @@ module Playfield(
     else if(clear_step && clear_tick == cl_stop)
     clear_t <= 1'b0;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
@@ -899,7 +820,6 @@ module Playfield(
     end
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     cl_tick <= 3'd0;
@@ -909,14 +829,12 @@ module Playfield(
     cl_tick <= cl_tick + 3'd1;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_t_t <= 1'b0;
     else
     clear_t_t <= clear_step && (cl_tick < d_clear);
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
@@ -926,7 +844,6 @@ module Playfield(
     else if(clear_step)
     clear_flash <= !clear_flash;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
@@ -939,7 +856,6 @@ module Playfield(
     line_t <= 20'd0;
     end
 
-
     always@(*)begin : blk5
         integer m;
     line_d = 20'd0;
@@ -948,7 +864,6 @@ module Playfield(
     line_d = (20'd1 << m);
     end
 
-
     always@(*)begin : blk6
         integer m;
         clear_row = 5'd0;
@@ -956,7 +871,6 @@ module Playfield(
         if(line[m])
         clear_row = m[4:0];
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -967,19 +881,12 @@ module Playfield(
 
     assign clear_pulse = (clear_time) && (!clear_d);
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     c_clear <= 5'd0;
     else if(clear_t_t)
     c_clear <= d_clear;
     end
-
-
-
-
-
-
 
     always@(*)begin
         ghost_blocked1 = 1'b0;
@@ -1015,7 +922,6 @@ module Playfield(
         end
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             ghost_scan_r <= 5'd0;
@@ -1045,7 +951,6 @@ module Playfield(
         end
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             sig_p1_d <= 16'd0;
@@ -1060,9 +965,6 @@ module Playfield(
             counter_r2_d1 <= counter_r2;
         end
     end
-
-
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -1083,14 +985,12 @@ module Playfield(
         en_hold <= 0;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold_t <= 0;
         else
         en_hold_t <= en_hold;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -1100,9 +1000,6 @@ module Playfield(
         else if(hold_up2)
         hold_type <= type2;
     end
-
-
-
 
     always@(*)begin
         if(Idle)
@@ -1118,7 +1015,6 @@ module Playfield(
         else
         over <= 1'b0;
     end
-
 
     Tetromino Tetromino_inst2(
         .clka(Clk_74M),
@@ -1136,12 +1032,10 @@ module Playfield(
     assign type_d2_out = type_d2;
     assign type_t2_out = type_t2;
 
-
     assign C_num2 = C_num;
     assign R_num2 = R_num;
 
     assign land_we2  = (lock_counter2 != 0) && (lock_counter2 != 5940000) && (lock_counter2[21]);
-
 
     assign snd_land1 = lock_t;
     assign snd_land2 = duo && lock_t2;
@@ -1165,7 +1059,6 @@ module Playfield(
     assign cc_d2 = {cc_t2[0], cc_t2[1], cc_t2[2], cc_t2[3]};
     assign rr_d2 = {rr_t2[0], rr_t2[1], rr_t2[2], rr_t2[3]};
 
-
     assign drop_hold2 = (counter2 == MCNT) && (drop_r_t2);
     assign drop_r2    = (drop_r_t2) && (drop_r_flag2);
     assign land_pulse_t2 = (land2) && (counter_land2 == MCNT_LAND);
@@ -1184,9 +1077,6 @@ module Playfield(
     assign ddr2     = weiyibiao_dout2[3:0];
     assign ddc_ext2 = {{7{ddc2[3]}}, ddc2};
     assign ddr_ext2 = {{7{ddr2[3]}}, ddr2};
-
-
-
 
     always@(*)begin
         ghost_blocked2 = 1'b0;
@@ -1222,7 +1112,6 @@ module Playfield(
         end
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             ghost_scan_r2 <= 5'd0;
@@ -1251,10 +1140,6 @@ module Playfield(
             end
         end
     end
-
-
-
-
 
     always@(*)begin
         Tetromino_addr2 = {type2[2:0], rot2[1:0]};
@@ -1331,7 +1216,6 @@ module Playfield(
         end
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type2 <= 3'd0;
@@ -1340,7 +1224,6 @@ module Playfield(
         else if((land_pulse2 || hold_up2) && Playing)
         type2 <= type_t2;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -1353,14 +1236,12 @@ module Playfield(
         type_t2 <= ((land_pulse && land_pulse2) ? rnd_type_n1 : rnd_type_n);
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_d2 <= 3'd0;
         else if(land_pulse2 && Playing)
         type_d2 <= type2;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)
     if(!Reset_n)
@@ -1370,7 +1251,6 @@ module Playfield(
     else if(counter2 < MCNT)
     counter2 <= counter2 + 30'd1;
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         drop_r_t2 <= 1'b1;
@@ -1379,7 +1259,6 @@ module Playfield(
         else if(drop_r_flag2)
         drop_r_t2 <= 1'b1;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -1401,7 +1280,6 @@ module Playfield(
         else
         counter_drop2 <= 1'd0;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -1432,7 +1310,6 @@ module Playfield(
         counter_r2 <= 5'd0;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_c2 <= SPAWN_C2;
@@ -1460,7 +1337,6 @@ module Playfield(
         counter_c2 <= SPAWN_C2;
     end
 
-
     always@(*)begin
         Tetromino_addr3 = {type2[2:0], (rot2[1:0] + 1)};
         rot_block2 = 1'b0;
@@ -1476,7 +1352,6 @@ module Playfield(
         end
         en_rotate2 = (rotate_p_flag2) && (!rot_block2) && (!lock_we2);
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -1501,7 +1376,6 @@ module Playfield(
         rot2 <= 2'd0;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_land2 <= 1'b0;
@@ -1515,7 +1389,6 @@ module Playfield(
         counter_land2 <= 1'b0;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_t2 <= 1'b0;
@@ -1524,7 +1397,6 @@ module Playfield(
         else
         lock_t2 <= 1'b0;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -1537,7 +1409,6 @@ module Playfield(
         lock_cnt2 <= lock_cnt2 + 2'd1;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_counter2 <= 2'd0;
@@ -1549,7 +1420,6 @@ module Playfield(
         lock_counter2 <= lock_counter2 + 2'd1;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             cc_t2[0] <= 11'd0; cc_t2[1] <= 11'd0; cc_t2[2] <= 11'd0; cc_t2[3] <= 11'd0;
@@ -1559,7 +1429,6 @@ module Playfield(
         cc_t2[y] <= counter_c2 + { {7{Tetromino_dout2[y*8+7]}}, Tetromino_dout2[y*8+7 -:4] };
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             rr_t2[0] <= 11'd0; rr_t2[1] <= 11'd0; rr_t2[2] <= 11'd0; rr_t2[3] <= 11'd0;
@@ -1568,7 +1437,6 @@ module Playfield(
         for(y = 0; y < 4; y = y + 1)
         rr_t2[y] <= counter_r2 + { {7{Tetromino_dout2[y*8+3]}}, Tetromino_dout2[y*8+3 -:4] };
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -1589,15 +1457,12 @@ module Playfield(
         en_hold2 <= 0;
     end
 
-
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold_t2 <= 0;
         else
         en_hold_t2 <= en_hold2;
     end
-
-
 
 wire [479:0]hint_row_bits = {row_w[19],row_w[18],row_w[17],row_w[16],row_w[15],row_w[14],row_w[13],row_w[12],row_w[11],row_w[10],row_w[9],row_w[8],row_w[7],row_w[6],row_w[5],row_w[4],row_w[3],row_w[2],row_w[1],row_w[0]};
 reg playing_d;

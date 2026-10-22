@@ -1,8 +1,3 @@
-
-
-
-
-
 module frame(
     input Clk_74M,
     input Reset_n,
@@ -58,8 +53,6 @@ module frame(
     reg [6:0]psel;
     reg [6:0]psel_r;
 
-
-
     wire [4:0]C_num;
     wire [4:0]R_num;
     wire [479:0]state;
@@ -86,7 +79,6 @@ module frame(
     wire [19:0]line_t;
     wire clear_flash;
 
-
     wire Piece2;
     wire ghost2;
     wire [2:0]type2;
@@ -108,9 +100,6 @@ module frame(
     wire [2:0]hint_type;
     wire [4:0]hint_c0, hint_c1, hint_c2, hint_c3;
     wire [4:0]hint_r0, hint_r1, hint_r2, hint_r3;
-
-
-
 
     localparam [10:0] XPNL1 = 11'd94,
                      XPNL2 = 11'd1121,
@@ -222,7 +211,6 @@ module frame(
 
     reg [2:0]state_color[0:479];
     reg state_owner[0:479];
-
 
     wire [23:0]row_f[0:19];
     wire [71:0]scw[0:19];
@@ -350,7 +338,6 @@ module frame(
     .hint_c0(hint_c0), .hint_c1(hint_c1), .hint_c2(hint_c2), .hint_c3(hint_c3),
     .hint_r0(hint_r0), .hint_r1(hint_r1), .hint_r2(hint_r2), .hint_r3(hint_r3)
     );
-
 
     wire margin;
 
@@ -509,9 +496,6 @@ module frame(
     .dim(chs_dim),
     .breath(chs_breath)
     );
-
-
-
 
     reg [10:0]lb_X;
     reg [10:0]lb_Y;
@@ -715,7 +699,6 @@ module frame(
     wire over_line_lit = Finalize && (hcounter >= 11'd449) && (hcounter <= 11'd825) &&
                          (vcounter >= 11'd417) && (vcounter <= 11'd419);
 
-
     wire rule1_lit = ((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128)));
@@ -743,7 +726,6 @@ module frame(
           ((hcounter == XPN2) || (hcounter == (XPN2 + 11'd128))) &&
            (((vcounter >= YNEXT) && (vcounter <= (YNEXT + 11'd128))) ||
             ((vcounter >= YHOLD) && (vcounter <= (YHOLD + 11'd128))))));
-
 
     wire [3:0] lv_dig = {1'b0, speed_level};
     wire [10:0]vdv = vcounter - YDIGI;
@@ -871,7 +853,6 @@ module frame(
     endcase
     end
 
-
     wire lv_rule_lit = (hcounter >= 11'd232) && (hcounter < 11'd306) &&
                        (vcounter >= 11'd72) && (vcounter < 11'd74);
     wire lvd_all_lit = lvd_lit || lv_rule_lit;
@@ -888,7 +869,6 @@ module frame(
                       (((hcounter >= 11'd432) && (hcounter <= 11'd847) && (vcounter >= 11'd310) && (vcounter <= 11'd451)) ||
                        ((hcounter >= 11'd352) && (hcounter <= 11'd1048) && (vcounter >= 11'd456) && (vcounter <= 11'd620)));
     wire result_dim = result_region && (hcounter[0] ^ vcounter[0]);
-
 
     wire [10:0]glx = (hcounter - 11'd321) & 11'd31;
     wire [10:0]gly = (vcounter - 11'd81) & 11'd31;
@@ -989,8 +969,6 @@ module frame(
     reg [23:0]story_outer_color_r;
     reg [23:0]story_inner_color_r;
     reg [23:0]story_menu_color_r;
-
-
 
     always@(*)begin
     story_outer_color = 24'h061017;
@@ -1344,7 +1322,6 @@ module frame(
     wire dy2 = (((vcounter - YHOLD) & 11'd31) == 11'd31);
     wire slot_dot = (next_slot_r && dy1 && (dx1 || dx2)) || (hold_slot_r && dy2 && (dx1 || dx2));
 
-
     parameter CYAN = 24'h00CCFF,
                LIGHT_CYAN = 24'h99EEFF,
                PURPPLE = 24'h9933CC,
@@ -1370,7 +1347,6 @@ module frame(
                DARK_J = 24'h74_2B_56,
                P1_SOFT = 24'h6B_F0_FF,
                P2_SOFT = 24'hFF_98_CB;
-
 
     wire [23:0]col_mask = duo ? 24'hFFFFFF : 24'h0FFFFF;
     wire row0_any = |(row_f[0] & col_mask);
@@ -1411,7 +1387,6 @@ module frame(
          ((hcounter >= 11'd307) && (hcounter <= 11'd310))) &&
         (((vcounter - 11'd88) & 11'd31) < 11'd8);
     wire [23:0]level_alert_color = level_critical ? RED : ORANGE;
-
 
     wire block_light = (glx_r == 11'd1) || (gly_r == 11'd1);
     wire block_soft = (glx_r >= 11'd6) && (glx_r <= 11'd11) && (gly_r == 11'd26);
@@ -1512,8 +1487,6 @@ module frame(
          ((vcounter >= brb2 - 11'd17) && (vcounter <= brb2) && (hcounter >= brl2) && (hcounter < brl2 + 11'd2)) ||
          ((hcounter >= brr2 - 11'd17) && (hcounter <= brr2) && (vcounter > brb2 - 11'd2) && (vcounter <= brb2)) ||
          ((vcounter >= brb2 - 11'd17) && (vcounter <= brb2) && (hcounter > brr2 - 11'd2) && (hcounter <= brr2)));
-
-
 
     always@(*)begin
     case(hint_type_r)
@@ -2209,7 +2182,6 @@ module frame(
     default:            rgb_c = BLACK;
     endcase
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)

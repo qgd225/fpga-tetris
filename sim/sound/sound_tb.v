@@ -1,11 +1,5 @@
 `timescale 1ns/1ps
 
-
-
-
-
-
-
 module sound_tb;
 reg Clk_74M = 0;
 reg Reset_n = 0;

@@ -1,8 +1,3 @@
-
-
-
-
-
 module choose_menu(
     input Clk_74M,
     input Reset_n,
@@ -17,8 +12,6 @@ module choose_menu(
     output dim,
     output reg breath
     );
-
-
 
     parameter [10:0]TX  = 11'd496,
                      TY  = 11'd96,
@@ -38,7 +31,6 @@ module choose_menu(
 
     wire sel1 = (choose_cnt == 4'd0);
     wire sel2 = (choose_cnt == 4'd1);
-
 
     wire bar1 = choose && sel1 && (hcounter >= MX) && (hcounter < (MX + MW)) &&
                 (vcounter >= OY1) && (vcounter < (OY1 + 11'd64));
@@ -66,7 +58,6 @@ module choose_menu(
     reg in2;
 
     wire [10:0]hn = hcounter + 11'd1;
-
 
     reg [26:0]br_cnt;
     always@(posedge Clk_74M or negedge Reset_n)begin

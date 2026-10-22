@@ -1,8 +1,3 @@
-
-
-
-
-
 module solo_hint(
     input Clk_74M,
     input Reset_n,
@@ -69,13 +64,11 @@ module solo_hint(
     end
     endfunction
 
-
     Tetromino Tetromino_hint_inst(
         .clka(Clk_74M),
         .addra(rom_addr[4:0]),
         .douta(rom_dout)
     );
-
 
     always@(*)begin
     case(cand_clears)
@@ -377,6 +370,3 @@ module solo_hint(
     end
     end
 endmodule
-
-
-

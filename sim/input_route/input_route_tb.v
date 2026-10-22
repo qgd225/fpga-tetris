@@ -1,11 +1,5 @@
 `timescale 1ns/1ps
 
-
-
-
-
-
-
 module input_route_tb;
 reg duo = 0;
 reg btn_left=0, btn_right=0, btn_drop_r=0, btn_drop_en=0, btn_rotate=0, btn_hold=0;

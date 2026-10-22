@@ -1,8 +1,3 @@
-
-
-
-
-
 module game_over(
     input Clk_74M,
     input Reset_n,

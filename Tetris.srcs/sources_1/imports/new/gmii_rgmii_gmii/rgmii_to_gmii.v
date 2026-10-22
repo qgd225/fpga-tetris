@@ -1,7 +1,3 @@
-
-
-
-
 module rgmii_to_gmii(
   reset,
 
@@ -15,8 +11,6 @@ module rgmii_to_gmii(
   gmii_rxer
 );
 
-
-
   input         reset;
 
   input         rgmii_rx_clk;
@@ -29,7 +23,6 @@ module rgmii_to_gmii(
   output        gmii_rxer;
 
   wire          gmii_rxer_r;
-
 
   assign gmii_rx_clk = rgmii_rx_clk;
 

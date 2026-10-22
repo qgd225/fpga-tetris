@@ -1,7 +1,3 @@
-
-
-
-
 module VGA_1280_720(
     Clk_74M,
     Reset_n,
@@ -38,8 +34,6 @@ parameter vdat_begin   = 24;
 parameter vdat_end     = 744;
 parameter vpixel_end   = 749;
 
-
-
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     hcounter_r <= 1'd0;
@@ -48,7 +42,6 @@ parameter vpixel_end   = 749;
     else
     hcounter_r <= hcounter_r + 1'd1;
     end
-
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
@@ -60,7 +53,6 @@ parameter vpixel_end   = 749;
     vcounter_r <= vcounter_r + 1'd1;
     end
     end
-
 
     assign VGA_CLK = !Clk_74M;
     assign VGA_BLK = ((hcounter_r >= hdat_begin) && (hcounter_r < hdat_end) && (vcounter_r >= vdat_begin) && (vcounter_r < vdat_end))?1'b1:1'b0;

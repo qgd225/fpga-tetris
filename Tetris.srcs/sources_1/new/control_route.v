@@ -1,8 +1,3 @@
-
-
-
-
-
 module control_route(
     input duo,
     input btn_left,

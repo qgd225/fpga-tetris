@@ -1,8 +1,3 @@
-
-
-
-
-
 module level(
     input Clk_74M,
     input Reset_n,
@@ -17,8 +12,6 @@ module level(
     output cap,
     output [2:0] seg
     );
-
-
 
     parameter [10:0]BX = 11'd268,
                      BY = 11'd88,

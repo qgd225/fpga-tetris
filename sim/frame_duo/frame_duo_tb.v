@@ -1,11 +1,5 @@
 `timescale 1ns/1ps
 
-
-
-
-
-
-
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
   assign douta = 32'h0000_0000;
 endmodule
@@ -119,7 +113,6 @@ begin
   for(q = 0; q < 480; q = q + 1) dut.state_color[q] = 3'd0;
 end
 endtask
-
 
 `define CYAN     24'h00CCFF
 `define YELLOW   24'hFFF_F00
@@ -291,7 +284,6 @@ initial begin
   release dut.Playfield_inst.type;  release dut.Playfield_inst.type2;
   repeat(4) @(posedge Clk);
 
-
   force dut.Playfield_inst.counter_c = 5'd8;
   force dut.Playfield_inst.counter_r = 5'd0;
   force dut.Playfield_inst.counter_ghost_r_t = 5'd19;
@@ -322,7 +314,6 @@ initial begin
   release dut.Playfield_inst.counter_ghost_r_t; release dut.Playfield_inst.ghost_done;
   release dut.Playfield_inst.type;
   repeat(2) @(posedge Clk);
-
 
   force dut.Playfield_inst.ghost = 1'b1; force dut.Playfield_inst.ghost2 = 1'b0;
   force dut.Playfield_inst.type = 3'd0;

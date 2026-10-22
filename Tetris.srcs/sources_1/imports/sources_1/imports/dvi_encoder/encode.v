@@ -1,7 +1,3 @@
-
-
-
-
 `timescale 1 ps / 1ps
 `define D #1
 
@@ -48,7 +44,6 @@ module encode(
   assign q_m[6] = (decision1) ? ~(q_m[5] ^ din_q[6]) : (q_m[5] ^ din_q[6]);
   assign q_m[7] = (decision1) ? ~(q_m[6] ^ din_q[7]) : (q_m[6] ^ din_q[7]);
   assign q_m[8] = (decision1) ? 1'b0 : 1'b1;
-
 
   reg [3:0] n1q_m, n0q_m;
   always @ (posedge clk) begin

@@ -1,19 +1,12 @@
-
-
-
-
-
 module net_screen_tx(
   input         Clk_74M,
   input         Reset_n,
   input         por_n,
 
-
   input         de,
   input  [10:0] hcounter,
   input  [10:0] vcounter,
   input  [23:0] rgb,
-
 
   input         rgmii_rx_clk_i,
   input  [3:0]  rgmii_rxd,
@@ -24,7 +17,6 @@ module net_screen_tx(
   output        eth_rstn,
   output        eth_mdc,
   output        eth_mdio,
-
 
   output        kb_left_p,
   output        kb_right_p,
@@ -61,9 +53,6 @@ wire [7:0] rx_byte;
 wire       rx_empty;
 wire       kb_rd_en;
 
-
-
-
 reg         tog_line;
 reg         tog_pal;
 reg  [7:0]  tx_fifo_din;
@@ -98,9 +87,6 @@ eth_udp_loopback_rgmii eth_udp_loopback_rgmii_inst(
   .pll_locked     (pll_locked     )
 );
 
-
-
-
 reg  gl1, gl2, gl3;
 reg  gp1, gp2, gp3;
 
@@ -134,9 +120,6 @@ wire p_pal  = gp2 ^ gp3;
 assign tx_start_125 = p_line | p_pal;
 assign tx_len_125   = p_pal ? PAL_LEN : LINE_LEN;
 
-
-
-
 reg pl_s1, pl_s2;
 
 always@(posedge Clk_74M or negedge Reset_n)begin
@@ -148,9 +131,6 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else         pl_s2 <= pl_s1;
 end
 wire link_up = pl_s2;
-
-
-
 
 reg        de_r, de_r2;
 reg [10:0] vc_r;
@@ -183,12 +163,6 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else if(de_r) line_num <= vc_r;
 end
 
-
-
-
-
-
-
 localparam SEQ_IDLE = 4'd0;
 localparam SEQ_HDR  = 4'd1;
 localparam SEQ_TOG  = 4'd2;
@@ -212,9 +186,6 @@ wire line_719  = (line_num == 11'd719);
 wire frame_on  = (fps_cnt == 4'd0);
 wire pal_due   = (pal_cnt == PAL_FRAMES - 1);
 wire send_pal  = line_719 && pal_due && frame_on;
-
-
-
 
 reg         h0_lat;
 reg         pal_lat;
@@ -325,9 +296,6 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   end
 end
 
-
-
-
 wire [10:0] hdr_line  = (seq == SEQ_H0) ? 11'd0 : (line_num + 11'd1);
 wire [15:0] hdr_frame = frame_cnt;
 
@@ -427,9 +395,6 @@ always@(*)begin
   end
 end
 
-
-
-
 always@(*)begin
   if(seq == SEQ_HDR || seq == SEQ_H0)
   tx_fifo_din = hdr_byte;
@@ -449,8 +414,6 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else if(seq == SEQ_WAIT) wait_cnt <= wait_cnt + 11'd1;
   else wait_cnt <= 11'd0;
 end
-
-
 
 localparam KB_WA5 = 2'd0;
 localparam KB_W5A = 2'd1;
@@ -472,7 +435,6 @@ wire kb_tout     = (kb_timer >= KB_TIMEOUT);
 wire kb_rst_trig = kb_bits[6] && (!kb_bits_d[6]);
 
 assign kb_rd_en = (!rx_empty);
-
 
 always@(posedge Clk_74M or negedge Reset_n)begin
   if(!Reset_n)
@@ -531,7 +493,6 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else if(kb_act_cnt != 25'd0)
   kb_act_cnt <= kb_act_cnt - 25'd1;
 end
-
 
 always@(posedge Clk_74M or negedge por_n)begin
   if(!por_n)

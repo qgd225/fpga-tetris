@@ -1,7 +1,3 @@
-
-
-
-
 module ip_checksum(
   input           clk            ,
   input           reset_p        ,

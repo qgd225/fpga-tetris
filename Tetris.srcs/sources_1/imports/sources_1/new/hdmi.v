@@ -1,7 +1,3 @@
-
-
-
-
 module hdmi(
     Clk,
     Clk_74M,

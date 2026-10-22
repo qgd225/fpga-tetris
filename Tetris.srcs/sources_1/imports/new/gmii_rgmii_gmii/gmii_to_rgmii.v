@@ -1,26 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 module gmii_to_rgmii(
   reset_n,
 
@@ -33,8 +10,6 @@ module gmii_to_rgmii(
   rgmii_txd,
   rgmii_txen
 );
-
-
 
   input        reset_n;
 

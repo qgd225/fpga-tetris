@@ -1,8 +1,3 @@
-
-
-
-
-
 module scoring(
     input Clk_74M,
     input Reset_n,
@@ -24,7 +19,6 @@ module scoring(
     );
 
     parameter SCORE_UNIT = 2;
-
 
     wire [10:0]XBASE = duo ? 11'd1065 : 11'd930;
 
@@ -63,8 +57,6 @@ module scoring(
     else
     counter <= 20'd0;
     end
-
-
 
     reg [43:0]cvt;
     reg [4:0] bcd_step;
@@ -163,4 +155,3 @@ module scoring(
     );
 
 endmodule
-

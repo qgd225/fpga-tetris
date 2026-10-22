@@ -1,8 +1,3 @@
-
-
-
-
-
 module hold_piece(
     input Clk_74M,
     input Reset_n,
@@ -22,14 +17,12 @@ module hold_piece(
     output reg hold_slot
     );
 
-
     reg [1:0]C_num;
     reg [1:0]R_num;
     reg [1:0]C_num2;
     reg [1:0]R_num2;
     reg [3:0]cc;
     reg [3:0]rr;
-
 
     always@(*)begin : blk1
         integer o1, p1;
@@ -44,7 +37,6 @@ module hold_piece(
     end
     end
 
-
     always@(*)begin : blk2
         integer o2, p2;
     C_num2 = 2'd0;
@@ -57,7 +49,6 @@ module hold_piece(
         R_num2 = p2[1:0];
     end
     end
-
 
     always@(*)begin
     hold_slot = 1'b0;
@@ -75,7 +66,6 @@ module hold_piece(
         .addra(Tetromino_addr),
         .douta(Tetromino_dout)
     );
-
 
     always@(*)begin : blk3
         integer i1;

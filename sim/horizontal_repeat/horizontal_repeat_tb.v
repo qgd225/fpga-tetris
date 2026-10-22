@@ -1,8 +1,5 @@
 `timescale 1ns/1ps
 
-
-
-
 module horizontal_repeat_tb;
 reg Clk_74M = 0;
 reg Reset_n = 0;
@@ -78,7 +75,6 @@ initial begin
   active = 1;
   tick();
 
-
   @(negedge Clk_74M);
   left_held = 1;
   left_p = 1;
@@ -103,14 +99,12 @@ initial begin
   tick();
   chk("left second repeat after ARR", left_out, 1);
 
-
   @(negedge Clk_74M);
   left_held = 0;
   tick();
   chk("left release clears das", dut.timer_cnt, 0);
   chk("left release clears repeat", left_out, 0);
   chk("left release disarms", dut.armed, 0);
-
 
   @(negedge Clk_74M);
   left_held = 1;
@@ -126,7 +120,6 @@ initial begin
   chk("left repress waits DAS", left_out, 0);
   tick();
   chk("left repress repeat after DAS", left_out, 1);
-
 
   @(negedge Clk_74M);
   right_held = 1;
@@ -145,7 +138,6 @@ initial begin
   chk("right switch waits DAS", right_out, 0);
   tick();
   chk("right switch repeat after DAS", right_out, 1);
-
 
   @(negedge Clk_74M);
   active = 0;

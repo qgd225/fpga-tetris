@@ -1,7 +1,3 @@
-
-
-
-
 module eth_udp_tx_gmii(
   clk125m,
   reset_p,
@@ -45,7 +41,6 @@ module eth_udp_tx_gmii(
   input     [7:0]payload_dat_i;
 
   output         gmii_tx_clk;
-
 
   output  reg[7:0] gmii_txd;
   output  reg      gmii_txen;
@@ -145,7 +140,6 @@ module eth_udp_tx_gmii(
     .checksum       (IP_check_sum   )
   );
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -165,7 +159,6 @@ module eth_udp_tx_gmii(
     dst_ip_reg   <= dst_ip;
     src_ip_reg   <= src_ip;
   end
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -251,7 +244,6 @@ module eth_udp_tx_gmii(
     endcase
   end
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_preamble <= 4'd0;
@@ -259,7 +251,6 @@ module eth_udp_tx_gmii(
     cnt_preamble <= cnt_preamble + 1'b1;
   else
     cnt_preamble <= 4'd0;
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -269,7 +260,6 @@ module eth_udp_tx_gmii(
   else
     cnt_eth_header <= 4'd0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_ip_header <= 5'd0;
@@ -277,7 +267,6 @@ module eth_udp_tx_gmii(
     cnt_ip_header <= cnt_ip_header + 1'b1;
   else
     cnt_ip_header <= 5'd0;
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -287,7 +276,6 @@ module eth_udp_tx_gmii(
   else
     cnt_udp_header <= 4'd0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_data <= 16'd0;
@@ -295,7 +283,6 @@ module eth_udp_tx_gmii(
     cnt_data <= cnt_data + 1'b1;
   else
     cnt_data <= 16'd0;
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -305,7 +292,6 @@ module eth_udp_tx_gmii(
   else
     cnt_fill_data <= 5'd0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_crc <= 5'd0;
@@ -314,7 +300,6 @@ module eth_udp_tx_gmii(
   else
     cnt_crc <= 5'd0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_delay <= 8'd0;
@@ -322,7 +307,6 @@ module eth_udp_tx_gmii(
     cnt_delay <= cnt_delay + 1'b1;
   else
     cnt_delay <= 8'd0;
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -440,7 +424,6 @@ module eth_udp_tx_gmii(
     endcase
   end
 
-
   assign payload_req_o = (curr_state == TX_DATA) ? 1'b1 : 1'b0;
 
   always@(posedge clk125m or posedge reset_p)
@@ -551,7 +534,6 @@ module eth_udp_tx_gmii(
     gmii_txen <= gmii_txen_renewcrc;
     gmii_txd  <= gmii_txd_renewcrc;
   end
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)

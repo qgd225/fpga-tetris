@@ -1,7 +1,3 @@
-
-
-
-
 module crc32_d8
 (
   input           clk         ,
@@ -34,9 +30,6 @@ begin
   else
     crc_result_o <= crc_result_o;
 end
-
-
-
 
   function [31:0] nextCRC32_D8;
 

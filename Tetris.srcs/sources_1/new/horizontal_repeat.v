@@ -1,9 +1,3 @@
-
-
-
-
-
-
 module horizontal_repeat(
     input Clk_74M,
     input Reset_n,
@@ -15,7 +9,6 @@ module horizontal_repeat(
     output wire left_out,
     output wire right_out
     );
-
 
     parameter [23:0] DAS_CNT = 24'd16_335_000;
     parameter [23:0] ARR_CNT = 24'd5_940_000;
@@ -30,7 +23,6 @@ module horizontal_repeat(
     reg [23:0]timer_cnt;
     reg repeat_l;
     reg repeat_r;
-
 
     assign left_out  = active && (left_p  || repeat_l);
     assign right_out = active && (right_p || repeat_r);
@@ -47,7 +39,6 @@ module horizontal_repeat(
     else begin
     repeat_l <= 1'b0;
     repeat_r <= 1'b0;
-
 
     if(!active || (!left_held && !right_held))begin
         dir <= DIR_NONE;

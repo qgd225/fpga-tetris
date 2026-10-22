@@ -1,8 +1,3 @@
-
-
-
-
-
 module Next_piece(
     input Clk_74M,
     input Reset_n,
@@ -23,15 +18,12 @@ module Next_piece(
     output reg next_slot
     );
 
-
-
     reg [1:0]C_num;
     reg [1:0]R_num;
     reg [1:0]C_num2;
     reg [1:0]R_num2;
     reg [3:0]cc;
     reg [3:0]rr;
-
 
     always@(*)begin : blk1
         integer o1, p1;
@@ -46,7 +38,6 @@ module Next_piece(
     end
     end
 
-
     always@(*)begin : blk2
         integer o2, p2;
     C_num2 = 2'd0;
@@ -59,7 +50,6 @@ module Next_piece(
         R_num2 = p2[1:0];
     end
     end
-
 
     always@(*)begin
     next_slot = 1'b0;
@@ -86,7 +76,6 @@ module Next_piece(
         .douta(Tetromino_dout2)
     );
 
-
     always@(*)begin : blk3
         integer i1;
     if(Idle)
@@ -102,7 +91,6 @@ module Next_piece(
     end
     end
     end
-
 
     always@(*)begin : blk4
         integer i2;

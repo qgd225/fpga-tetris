@@ -1,7 +1,3 @@
-
-
-
-
 module serdes_4b_10to1(
   clkx5,
   datain_0,
@@ -54,7 +50,6 @@ module serdes_4b_10to1(
 
   wire [4:0] TMDS_3_l = {datain_3[9],datain_3[7],datain_3[5],datain_3[3],datain_3[1]};
   wire [4:0] TMDS_3_h = {datain_3[8],datain_3[6],datain_3[4],datain_3[2],datain_3[0]};
-
 
   always @(posedge clkx5)
   begin
@@ -160,6 +155,5 @@ ODDR #(
     .OB (dataout_3_n ),
     .I  (dataout_3   )
   );
-
 
 endmodule

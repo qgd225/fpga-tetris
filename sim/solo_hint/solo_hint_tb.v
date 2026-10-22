@@ -1,11 +1,5 @@
 `timescale 1ns/1ps
 
-
-
-
-
-
-
 module Tetromino(input clka, input [4:0] addra, output reg [31:0] douta);
 function [31:0] shape_of;
 input [4:0] a;

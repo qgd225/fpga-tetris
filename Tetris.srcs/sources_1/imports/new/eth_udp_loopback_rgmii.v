@@ -1,7 +1,3 @@
-
-
-
-
 module eth_udp_loopback_rgmii(
   input         reset_n,
   input         clk_74m,
@@ -14,13 +10,11 @@ module eth_udp_loopback_rgmii(
   output  [3:0] rgmii_txd,
   output        rgmii_txen,
 
-
   output [7:0]  rx,
   input         rx_rd_en,
   output        rx_empty,
   output        rx_full,
   output [15:0] rx_data_length,
-
 
   input  [7:0]  tx,
   input         tx_wr_en,
@@ -31,7 +25,6 @@ module eth_udp_loopback_rgmii(
   input  [15:0] tx_dst_port,
   input  [15:0] tx_data_length,
   output        tx_done,
-
 
   output [111:0]msg_dout,
   input         msg_rd_en,
@@ -55,7 +48,6 @@ wire        rx_payload_valid;
 
 wire [7:0]  tx_payload_dat;
 wire        tx_payload_req;
-
 
 wire        gmii_rx_clk;
 wire [7:0]  gmii_rxd;
@@ -90,7 +82,6 @@ rgmii_to_gmii rgmii_to_gmii(
   .gmii_rxer( )
 );
 
-
 eth_udp_rx_gmii eth_udp_rx_gmii(
   .reset_p         (reset_p               ),
 
@@ -116,7 +107,6 @@ eth_udp_rx_gmii eth_udp_rx_gmii(
   .gmii_rxd        (gmii_rxd              )
 );
 
-
 eth_data_buf eth_rx_data_buf (
   .rst   (reset_p          ),
   .wr_clk(clk125m          ),
@@ -129,7 +119,6 @@ eth_data_buf eth_rx_data_buf (
   .empty (rx_empty         )
 );
 
-
 eth_msg_buf eth_msg_buf (
   .rst        (reset_p                                     ),
   .clk        (clk125m                                     ),
@@ -141,7 +130,6 @@ eth_msg_buf eth_msg_buf (
   .empty      (msg_empty                                   ),
   .data_count (msg_count                                   )
 );
-
 
 eth_data_buf eth_tx_data_buf (
   .rst   (reset_p          ),

@@ -1,7 +1,3 @@
-
-
-
-
 module eth_udp_rx_gmii(
   reset_p,
 
@@ -128,7 +124,6 @@ module eth_udp_rx_gmii(
     .I(gmii_rx_clk    )
   );
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -143,7 +138,6 @@ module eth_udp_rx_gmii(
     local_port_reg <= local_port;
   end
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -156,7 +150,6 @@ module eth_udp_rx_gmii(
     reg_gmii_rxdv <= gmii_rxdv;
   end
 
-
   always@(posedge clk125m)
   begin
     rx_data_dly1  <= reg_gmii_rxd;
@@ -164,7 +157,6 @@ module eth_udp_rx_gmii(
     rx_datav_dly1 <= reg_gmii_rxdv;
     rx_datav_dly2 <= rx_datav_dly1;
   end
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -174,7 +166,6 @@ module eth_udp_rx_gmii(
   else
     cnt_preamble <= 4'd0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_eth_header <= 4'd0;
@@ -182,7 +173,6 @@ module eth_udp_rx_gmii(
     cnt_eth_header <= cnt_eth_header + 1'b1;
   else
     cnt_eth_header <= 4'd0;
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -228,7 +218,6 @@ module eth_udp_rx_gmii(
   else
     eth_header_check_ok <= 1'b0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_ip_header <= 5'd0;
@@ -236,7 +225,6 @@ module eth_udp_rx_gmii(
     cnt_ip_header <= cnt_ip_header + 1'b1;
   else
     cnt_ip_header <= 5'd0;
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -279,9 +267,6 @@ module eth_udp_rx_gmii(
       default: ;
     endcase
   end
-
-
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -331,7 +316,6 @@ module eth_udp_rx_gmii(
   else
     ip_header_check_ok <= 1'b0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_udp_header <= 4'd0;
@@ -368,7 +352,6 @@ module eth_udp_rx_gmii(
   else
     udp_header_check_ok <= 1'b0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_data <= 16'd0;
@@ -377,7 +360,6 @@ module eth_udp_rx_gmii(
   else
     cnt_data <= 16'd0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     cnt_drp_data <= 5'd0;
@@ -385,7 +367,6 @@ module eth_udp_rx_gmii(
     cnt_drp_data <= cnt_drp_data + 1'b1;
   else
     cnt_drp_data <= 5'd0;
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -470,7 +451,6 @@ module eth_udp_rx_gmii(
   else
     crc_init <= 1'b0;
 
-
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
     crc_en <= 1'b0;
@@ -480,7 +460,6 @@ module eth_udp_rx_gmii(
     crc_en <= 1'b1;
   else
     crc_en <= 1'b0;
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -506,7 +485,6 @@ module eth_udp_rx_gmii(
     reg_data_overflow <= 1'b1;
   else
     reg_data_overflow <= reg_data_overflow;
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
@@ -538,7 +516,6 @@ module eth_udp_rx_gmii(
     exter_ip   <= rx_src_ip;
     exter_port <= rx_src_port;
   end
-
 
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)

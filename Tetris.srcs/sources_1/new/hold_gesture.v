@@ -1,8 +1,3 @@
-
-
-
-
-
 module hold_gesture(
     input Clk_74M,
     input Reset_n,

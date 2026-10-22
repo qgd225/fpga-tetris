@@ -1,7 +1,3 @@
-
-
-
-
 module dvi_encoder(
   pixelclk,
   pixelclk5x,
