@@ -80,9 +80,13 @@ def ipv4_table():
 
 
 def adapter_table():
-    _, out = ps("Get-NetAdapter -Physical | Select-Object InterfaceIndex,Name,Status,MediaType | "
+    _, out = ps("Get-NetAdapter | Select-Object InterfaceIndex,Name,Status,MediaType,"
+                "InterfaceDescription,Virtual | "
                 "ConvertTo-Csv -NoTypeInformation")
-    return [dict(idx=int(r[0]), name=r[1], status=r[2], media=r[3]) for r in csv_rows(out)]
+    return [dict(idx=int(r[0]), name=r[1], status=r[2], media=r[3],
+                 desc=r[4] if len(r) > 4 else "",
+                 virtual=r[5].lower() if len(r) > 5 else "false")
+            for r in csv_rows(out)]
 
 
 def neighbors():
@@ -123,14 +127,29 @@ def probe_source():
 
 
 def pick_target(ipv4s, adapters):
-    """优先用"已经有 192.168.0.x"的网卡；否则挑一块 Up 的有线网卡。"""
-    up_indices = {a["idx"] for a in adapters if a["status"].lower() == "up"}
+    """优先用已有场地网段地址的有线/USB网卡；否则挑一块 Up 的有线网卡。"""
+    def is_virtual_noise(a):
+        text = ("%s %s" % (a["name"], a["desc"])).lower()
+        return any(key in text for key in
+                   ("vpn", "radmin", "wi-fi direct", "wifi direct",
+                    "bluetooth", "loopback", "virtual"))
+
+    def is_wired(a):
+        if a["status"].lower() != "up" or is_virtual_noise(a):
+            return False
+        if a["media"].lower().startswith("802.3"):
+            return True
+        text = ("%s %s" % (a["name"], a["desc"])).lower()
+        return any(key in text for key in ("ethernet", "usb", "realtek", "asix", "rtl"))
+
+    up_wired = [a for a in adapters if is_wired(a)]
+    wired_indices = {a["idx"] for a in up_wired}
     for a in ipv4s:
-        if a["idx"] in up_indices and a["ip"].startswith(SUBNET):
+        if a["idx"] in wired_indices and a["ip"].startswith(SUBNET):
             return a["idx"], a["alias"], "already"
-    for a in adapters:
-        if a["status"].lower() == "up" and a["media"].lower().startswith("802.3"):
-            return a["idx"], a["name"], "addip"
+    if up_wired:
+        a = up_wired[0]
+        return a["idx"], a["name"], "addip"
     return None, None, None
 
 
@@ -192,7 +211,11 @@ def main():
               and ridx == idx and (src_now is None or src_now.startswith(SUBNET)))
     if idx is None:
         say("")
-        say("[结果] 没找到可用的有线网卡：把网线插到 PC 与 FPGA 之间，再双击启动一次。")
+        say("[结果] 没找到已连接的有线网卡。")
+        say("       使用 USB 转 RJ45/扩展坞网口时，请先确认：")
+        say("       1) USB 网卡驱动已安装，设备管理器中没有黄色感叹号；")
+        say("       2) 网线已连接，Windows 网络连接中的以太网状态为“已连接/Up”；")
+        say("       3) 不要只插 USB 网卡而不插网线，Disconnected 状态无法设置路由。")
         flush_log()
         return 2
 

@@ -158,11 +158,12 @@ def local_ip_in_subnet(prefix="192.168.0."):
         if ip.startswith(prefix):
             return ip
     try:
-        from set_static_arp import adapter_table, ipv4_table
+        from set_static_arp import adapter_table, ipv4_table, pick_target
 
-        up_indices = {a["idx"] for a in adapter_table() if a["status"].lower() == "up"}
-        for item in ipv4_table():
-            if item["idx"] in up_indices and item["ip"].startswith(prefix):
+        ipv4s = ipv4_table()
+        target_idx, _, _ = pick_target(ipv4s, adapter_table())
+        for item in ipv4s:
+            if item["idx"] == target_idx and item["ip"].startswith(prefix):
                 return item["ip"]
     except Exception:
         pass
