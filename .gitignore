@@ -51,3 +51,6 @@ tools/scoreboard.csv
 /Tetris_*.bit
 tools/startup_error.log
 /sim/compile/
+
+# ===== 本地发布压缩包 =====
+/Tetris*.zip

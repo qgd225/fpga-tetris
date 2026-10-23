@@ -52,7 +52,12 @@ buf = bytearray(W * H)
 line_ok = [0] * H
 lock = threading.Lock()
 stat = {"pkt":0, "line":0, "pal":0, "last_frame":-1, "fps":0.0, "kb":0}
-STARTUP_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "startup_error.log")
+APP_DIR = (
+    os.path.dirname(os.path.abspath(sys.executable))
+    if getattr(sys, "frozen", False)
+    else os.path.dirname(os.path.abspath(__file__))
+)
+STARTUP_LOG = os.path.join(APP_DIR, "startup_error.log")
 
 kb_lock = threading.Lock()
 kb_bits = 0

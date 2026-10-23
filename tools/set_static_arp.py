@@ -25,6 +25,13 @@ FPGA_MAC = "00-0a-35-01-fe-c0"    # 与 LOCAL_MAC 一致
 PC_IP    = "192.168.0.3"          # 需要时自动给有线网卡加一个
 SUBNET   = "192.168.0."
 LOG      = os.path.join(os.environ.get("TEMP", "."), "tetris_static_arp.log")
+POWERSHELL = os.path.join(
+    os.environ.get("SystemRoot", r"C:\Windows"),
+    "System32",
+    "WindowsPowerShell",
+    "v1.0",
+    "powershell.exe",
+)
 
 _lines = []
 
@@ -45,7 +52,7 @@ def flush_log():
 def ps(cmd):
     """执行一段 PowerShell（强制 UTF-8 输出），返回 (rc, 文本)。"""
     full = "[Console]::OutputEncoding=[Text.Encoding]::UTF8; " + cmd
-    p = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", full],
+    p = subprocess.run([POWERSHELL, "-NoProfile", "-NonInteractive", "-Command", full],
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out = (p.stdout or b"").decode("utf-8", "replace") + (p.stderr or b"").decode("utf-8", "replace")
     return p.returncode, out.strip()

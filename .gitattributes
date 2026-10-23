@@ -11,3 +11,6 @@
 
 # FPGA 比特流为二进制交付物，禁止换行转换
 *.bit binary
+
+# PC 便携启动程序为 Windows 二进制
+*.exe binary
