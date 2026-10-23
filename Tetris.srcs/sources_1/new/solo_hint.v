@@ -31,7 +31,7 @@ module solo_hint(
     reg [1:0] rot, best_rot;
     reg [5:0] col, top_r, hole_r, clear_row, eval_c, rom_addr;
     reg [4:0] top_c, hole_c, build_i, over_i;
-    reg [4:0] tops[0:19];
+    (* ram_style = "distributed" *) reg [4:0] tops[0:31];
     reg [4:0] tmp_dy[0:3];
     reg [4:0] cell_c[0:3], cell_r[0:3];
     reg [4:0] best_c[0:3], best_r[0:3];
@@ -70,6 +70,20 @@ module solo_hint(
     endfunction
 
 //    额外仅一个形状 ROM 实例, 与场地共用同一份 28 项形状数据
+    wire signed [6:0]candidate_col = col_s + s4(shp_r[build_i*8+7 -:4]);
+    wire [4:0]board_read_row = state == S_TOP ? top_r[4:0] :
+        state == S_HOLE ? hole_r[4:0] :
+        state == S_OVER ? cell_r[over_i[1:0]] + 5'd1 : clear_row[4:0];
+    wire [23:0]board_read_data = board[board_read_row];
+    wire [4:0]top_read_col = state == S_HOLE ? hole_c :
+        state == S_CELL ? candidate_col[4:0] : eval_c[4:0];
+    wire [4:0]top_read_data = tops[top_read_col];
+    wire cancel_search = duo || !Playing || (start && ((state == S_IDLE) || !start_d));
+    always@(posedge Clk_74M)begin
+        if(Reset_n && !cancel_search && state == S_TOP && (board_read_data[top_c] || top_r == 19))
+            tops[top_c] <= board_read_data[top_c] ? top_r[4:0] : 5'd20;
+    end
+
     Tetromino Tetromino_hint_inst(
         .clka(Clk_74M),
         .addra(rom_addr[4:0]),
@@ -106,7 +120,6 @@ module solo_hint(
     cand_clears<=0;cand_overhang<=0;clear_pop<=0;piece_mask<=0;clear_now<=0;own_below<=0;
     best_score<=-17'sd32768;best_valid<=1'b0;
     for(i=0;i<4;i=i+1)begin best_c[i]<=0;best_r[i]<=0;cell_c[i]<=0;cell_r[i]<=0;tmp_dy[i]<=0;end
-    for(i=0;i<20;i=i+1)tops[i]<=5'd20;
     end
     else begin
     start_d <= start;
@@ -148,8 +161,7 @@ module solo_hint(
         state <= S_TOP;
     end
     S_TOP:begin
-        if(board[top_r][top_c])begin
-            tops[top_c] <= top_r[4:0];
+        if(board_read_data[top_c])begin
             top_r <= 6'd0;
             if(top_c == 19)begin
                 hole_c <= 0;
@@ -160,7 +172,6 @@ module solo_hint(
                 top_c <= top_c + 5'd1;
         end
         else if(top_r == 6'd19)begin
-            tops[top_c] <= 5'd20;
             top_r <= 6'd0;
             if(top_c == 19)begin
                 hole_c <= 0;
@@ -174,7 +185,7 @@ module solo_hint(
             top_r <= top_r + 6'd1;
     end
     S_HOLE:begin
-        if((tops[hole_c] < 5'd20) && (hole_r > {1'b0,tops[hole_c]}) && !board[hole_r][hole_c])
+        if((top_read_data < 5'd20) && (hole_r > {1'b0,top_read_data}) && !board_read_data[hole_c])
             holes_total <= holes_total + 9'd1;
         if(hole_r == 0)begin
             hole_r <= 6'd19;
@@ -202,13 +213,13 @@ module solo_hint(
         state <= S_CELL;
     end
     S_CELL:begin
-        cc_s = col_s + s4(shp_r[build_i*8+7 -:4]);
+        cc_s = candidate_col;
         tmp_dy[build_i] <= shp_r[build_i*8+3 -:4];
         if((cc_s < 0) || (cc_s > 7'sd19))
             bad_cand <= 1'b1;
         else begin
             cell_c[build_i] <= cc_s[4:0];
-            rr_s = {1'b0,tops[cc_s[4:0]]} - s4(shp_r[build_i*8+3 -:4]) - 7'sd1;
+            rr_s = {1'b0,top_read_data} - s4(shp_r[build_i*8+3 -:4]) - 7'sd1;
             if(rr_s < 0)
                 bad_cand <= 1'b1;
             else if(rr_s < {1'b0,min_land})
@@ -256,7 +267,7 @@ module solo_hint(
             own_below = 1'b1;
         if(inner_i == 2'd3)begin
             if((cell_r[over_i[1:0]] < 5'd19) && !own_below &&
-               !board[cell_r[over_i[1:0]] + 5'd1][cell_c[over_i[1:0]]])
+               !board_read_data[cell_c[over_i[1:0]]])
                 cand_overhang <= cand_overhang + 3'd1;
             if(over_i == 3)begin
                 clear_row <= 0;
@@ -290,7 +301,7 @@ module solo_hint(
             piece_mask = piece_mask | (20'd1 << cell_c[cell_i]);
         end
         if(cell_i == 2'd3)begin
-            clear_now = (clear_pop != 0) && ((board[clear_row[4:0]][19:0] | piece_mask) == FULL20);
+            clear_now = (clear_pop != 0) && ((board_read_data[19:0] | piece_mask) == FULL20);
             cand_clears <= cand_clears + {2'd0,clear_now};
             if(clear_row == 19)
                 state <= S_EVAL_INIT;
@@ -324,7 +335,7 @@ module solo_hint(
             cell_i <= cell_i + 2'd1;
     end
     S_EVAL:begin
-        newtop_temp = (ptop < {1'b0,tops[eval_c[4:0]]}) ? ptop : {1'b0,tops[eval_c[4:0]]};
+        newtop_temp = (ptop < {1'b0,top_read_data}) ? ptop : {1'b0,top_read_data};
 
 // tops 是顶面行号, 真实高度必须用 20-top
         cand_total <= cand_total + (6'd20 - {1'b0,newtop_temp});

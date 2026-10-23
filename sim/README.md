@@ -1,6 +1,6 @@
 # 仿真台（可复现）
 
-十套自测直接编译 `../Tetris.srcs/sources_1/new/` 下的实时 RTL；仿真产物写入各自的 `build/`，日志写入 `logs/`，均不纳入 Git。
+十一套自测编译 `../Tetris.srcs/sources_1/new/` 下的实时 RTL；其中优化对照还从 Git 提交 `0a9b368` 读取旧版参考。仿真产物写入各自的 `build/`，日志写入 `logs/`，均不纳入 Git。
 
 ## 一键跑全部
 
@@ -10,7 +10,7 @@ sim\run_all.bat
 
 最终输出逐套显示 `=== ALL PASS ===` 或 `=== FAILED n ===`。
 
-## 十套测试说明
+## 十一套测试说明
 
 | 套 | 顶层 | 覆盖内容 | 项数 |
 | --- | --- | --- | ---: |
@@ -24,8 +24,17 @@ sim\run_all.bat
 | `sim/solo_hint` | `solo_hint_tb` | 4 旋转 x 20 列搜索、评分、空洞/悬空约束和类型切换 | 59 |
 | `sim/rgb_palette` | `rgb_palette_tb` | 56 色调色板与 8 位无碰撞 RGB 索引映射 | 56 |
 | `sim/lutram` | `board_lutram_tb`、`frame_storage_tb` | 32 个独立读口、镜像一致性、双人锁定排队与抢占、重开及连续消行；联合检查占用、颜色与归属 | 每种场地模型 21536 次读出比较及定向断言，另含显示存储联合断言 |
+| `sim/optimization` | 场地、画面、提示、元数据及存储对照 | 基线与候选对照；元数据 RTL/UNISIM 双模型；UNISIM 显示及消行联合验证 | 场地 74,497；画面快速 24,576；提示 1,399,517；元数据每模型 29,768；另含两套联合回归 |
 
 原有九套共 **784 项**，另加 LUTRAM 专项验证。完整结构和构建结果见 [LUTRAM 重试](../docs/lutram-retry.md)。
+
+优化入口默认执行画面快速对照。完整三模式逐像素优先级扫描可单独运行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File sim/optimization/run_frame.ps1 -FullFrame
+```
+
+完整画面对照共 2,789,376 项，涵盖三模式的像素优先级以及颜色选择、文字函数；存储写入/搬移由专项测试验证。逐轮结果及检查边界见 [逐轮优化记录](../docs/optimization-rounds.md)。总入口为每套测试启动独立 `cmd /d /c`，避免多次加载 Vivado 环境造成后续工具启动失败。
 
 ## 单独跑一套
 

@@ -222,45 +222,33 @@ module frame(
     assign rr_t2[2] = rr_d2[9:5];
     assign rr_t2[3] = rr_d2[4:0];
 
-    reg [2:0]state_color[0:479];
-    reg state_owner[0:479];
-
 //    取格行字: 20 行, 每行 24 列(state) / 24x3 位(颜色号) / owner; 纯连线, 0 LUT
     wire [23:0]row_f[0:19];
-    wire [71:0]scw[0:19];
-    wire [23:0]row_ow[0:19];
     genvar gr, gc;
     generate for(gr = 0; gr < 20; gr = gr + 1)begin : gen_rowf
         for(gc = 0; gc < 24; gc = gc + 1)begin : gen_colf
             assign row_f[gr][gc] = state[gc*20+gr];
-            assign scw[gr][gc*3 +: 3] = state_color[gc*20+gr];
-            assign row_ow[gr][gc] = state_owner[gc*20+gr];
         end
     end endgenerate
 
-    integer c;
-    integer m;
-    integer y;
-
-    always @(posedge Clk_74M) begin
-    if(lock_commit1 || lock_commit2)begin
-        if(lock_commit1)begin
-        state_color[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= type_d;
-        state_owner[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= 1'b0;
-        end
-        if(lock_commit2)begin
-        state_color[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= type_d2;
-        state_owner[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= 1'b1;
-        end
-    end
-    else if(move_we && move_row != 0)begin
-        for(c = 0; c < 24; c = c + 1)
-                begin
-                state_color[c*20 + move_row] <= state_color[c*20 + move_row - 1];
-                state_owner[c*20 + move_row] <= state_owner[c*20 + move_row - 1];
-                end
-        end
-    end
+    wire meta_is_lock = lock_commit1 || lock_commit2;
+    wire [4:0]meta_lock_col = lock_commit1 ? cc_t[lock_idx] : cc_t2[lock_idx2];
+    wire [4:0]meta_write_addr = meta_is_lock ?
+        (lock_commit1 ? rr_t[lock_idx] : rr_t2[lock_idx2]) : move_row;
+    wire [3:0]meta_lock_data = lock_commit1 ? {1'b0,type_d} : {1'b1,type_d2};
+    wire [95:0]meta_display;
+    wire [3:0]meta_pixel = meta_display[C_num*4 +: 4];
+    genvar bank;
+    generate for(bank=0;bank<24;bank=bank+1)begin : metadata_banks
+        wire [3:0]copy_data;
+        wire we = meta_is_lock ? meta_lock_col == bank : move_we && move_row != 0;
+        cell_metadata_bank storage(
+            .clk(Clk_74M),.we(we),.write_addr(meta_write_addr),
+            .write_data(meta_is_lock ? meta_lock_data : copy_data),
+            .display_row(R_num),.copy_row(move_row-5'd1),
+            .display_data(meta_display[bank*4 +:4]),.copy_data(copy_data)
+        );
+    end endgenerate
 
     Playfield Playfield_inst(
     .lock_commit1(lock_commit1), .lock_commit2(lock_commit2),
@@ -1194,8 +1182,8 @@ module frame(
 //    场地取色: 编号必须在场地内(哨兵 24 或 20 表示不在任何格)
     if((C_num <= 5'd23) && (R_num <= 5'd19))begin
     cell_r <= row_f[R_num][C_num];
-    sc_r <= scw[R_num][C_num*3 +: 3];
-    owner_r <= row_ow[R_num][C_num];
+    sc_r <= meta_pixel[2:0];
+    owner_r <= meta_pixel[3];
     end
     else begin
     cell_r <= 1'b0;
@@ -2235,4 +2223,39 @@ module frame(
     end
     assign snd_clr_n = c_clear[2:0];
 
+endmodule
+
+module cell_metadata_bank(
+    input clk,input we,input [4:0]write_addr,input [3:0]write_data,
+    input [4:0]display_row,input [4:0]copy_row,
+    output [3:0]display_data,output [3:0]copy_data
+);
+`ifdef SYNTHESIS
+    genvar bit_index;
+    generate for(bit_index=0;bit_index<4;bit_index=bit_index+1)begin : bits
+        RAM32X1D #(.INIT(32'd0)) display_ram(
+            .D(write_data[bit_index]),.WE(we),.WCLK(clk),
+            .A0(write_addr[0]),.A1(write_addr[1]),.A2(write_addr[2]),
+            .A3(write_addr[3]),.A4(write_addr[4]),
+            .DPRA0(display_row[0]),.DPRA1(display_row[1]),.DPRA2(display_row[2]),
+            .DPRA3(display_row[3]),.DPRA4(display_row[4]),
+            .DPO(display_data[bit_index]),.SPO()
+        );
+        RAM32X1D #(.INIT(32'd0)) copy_ram(
+            .D(write_data[bit_index]),.WE(we),.WCLK(clk),
+            .A0(write_addr[0]),.A1(write_addr[1]),.A2(write_addr[2]),
+            .A3(write_addr[3]),.A4(write_addr[4]),
+            .DPRA0(copy_row[0]),.DPRA1(copy_row[1]),.DPRA2(copy_row[2]),
+            .DPRA3(copy_row[3]),.DPRA4(copy_row[4]),
+            .DPO(copy_data[bit_index]),.SPO()
+        );
+    end endgenerate
+`else
+    reg [3:0]memory[0:31];
+    integer address;
+    initial for(address=0;address<32;address=address+1)memory[address]=4'd0;
+    always@(posedge clk)if(we)memory[write_addr]<=write_data;
+    assign display_data=memory[display_row];
+    assign copy_data=memory[copy_row];
+`endif
 endmodule

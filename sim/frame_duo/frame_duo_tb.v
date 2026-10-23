@@ -111,6 +111,23 @@ begin
 end
 endtask
 reg [4:0]test_row;
+reg [4:0]meta_col,meta_row;
+reg [3:0]meta_value;
+task set_metadata;
+input integer index;
+input [3:0]value;
+begin
+  @(negedge Clk);
+  meta_col=index/20;meta_row=index%20;meta_value=value;
+  force dut.meta_is_lock=1'b1;
+  force dut.meta_lock_col=meta_col;
+  force dut.meta_write_addr=meta_row;
+  force dut.meta_lock_data=meta_value;
+  @(posedge Clk);@(negedge Clk);
+  release dut.meta_is_lock;release dut.meta_lock_col;
+  release dut.meta_write_addr;release dut.meta_lock_data;
+end
+endtask
 task clr_state;
 integer q;
 begin
@@ -127,7 +144,7 @@ begin
   release dut.Playfield_inst.row_data;
   release dut.Playfield_inst.row_addr;
   @(posedge Clk);
-  for(q = 0; q < 480; q = q + 1) dut.state_color[q] = 3'd0;
+  for(q = 0; q < 480; q = q + 1) set_metadata(q,4'd0);
 end
 endtask
 
@@ -184,14 +201,14 @@ initial begin
 
   $display("=== 3) 24 列场地最右两列也能显示 ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  dut.state_color[23*20 + 17] = 3'd3; dut.Playfield_inst.state[23*20 + 17] = 1'b1;
+  set_metadata(23*20 + 17,4'h3); dut.Playfield_inst.state[23*20 + 17] = 1'b1;
   look(11'd1067, 11'd630);  // 第23列 第17行
   chk("duo=1 第23列格=红色", rgb, `RED);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1067, 11'd630);
   chk("duo=0 第23列不在场地", rgb, 24'h061017);
   clr_state;
-  dut.state_color[23*20 + 17] = 3'd0; dut.Playfield_inst.state[23*20 + 17] = 1'b0;
+  set_metadata(23*20 + 17,4'h0); dut.Playfield_inst.state[23*20 + 17] = 1'b0;
 
   $display("=== 4) 新面板布局: 色线 + 槽位底色(无框) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
@@ -253,11 +270,11 @@ initial begin
 
   $display("=== 8) 2px 死区取色屏蔽(编号搜索修复) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  dut.state_color[20*20 + 3] = 3'd3;
+  set_metadata(20*20 + 3,4'h3);
   dut.Playfield_inst.state[20*20 + 3] = 1'b1;
   look(11'd351, 11'd200);  // 列间 2px 死区
   chk("死区像素=黑", rgb, `FLDBG);
-  dut.state_color[20*20 + 3] = 3'd0;
+  set_metadata(20*20 + 3,4'h0);
   dut.Playfield_inst.state[20*20 + 3] = 1'b0;
   look(11'd318, 11'd40);  // 边框上方: 左边框不应出头
   chk("左边框不出头(上方=外层背景)", rgb, 24'h071018);
@@ -540,7 +557,7 @@ initial begin
   Finalize = 1'b0; repeat(40) @(posedge Clk);
   $display("=== 18) 实心方块 2px 圆角 ===");
   duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0;
-  dut.state_color[0] = 3'd0;
+  set_metadata(0,4'h0);
   dut.Playfield_inst.state[0] = 1'b0;
   repeat(40) @(posedge Clk);
   force dut.Playfield_inst.Piece = 1'b1;
@@ -558,7 +575,7 @@ initial begin
   look(11'd321, 11'd81);   chk("P2 下落块角=黑", rgb, `FLDBG);
   look(11'd323, 11'd81);   chk("P2 下落块边=绿", rgb, 24'h55A630);
   force dut.Playfield_inst.Piece2 = 1'b0;
-  dut.state_color[0] = 3'd3;
+  set_metadata(0,4'h3);
   dut.Playfield_inst.state[0] = 1'b1;
   repeat(4) @(posedge Clk);
   look(11'd321, 11'd81);   chk("已锁格角=黑", rgb, `FLDBG);
@@ -579,7 +596,7 @@ initial begin
   look(11'd323, 11'd81);   chk("消行闪白边=白", rgb, 24'hEEEEEE);
   release dut.clear_t_r;
   release dut.flash_r;
-  dut.state_color[0] = 3'd0;
+  set_metadata(0,4'h0);
   dut.Playfield_inst.state[0] = 1'b0;
   repeat(4) @(posedge Clk);
   $display("=== 19) 预览方块 1px 圆角 ===");
@@ -646,10 +663,10 @@ initial begin
   repeat(4) @(posedge Clk);
   $display("=== 22) owner tint / lock rim / piece bracket ===\n");
   duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0; clr_state;
-  dut.state_color[0] = 3'd3; dut.Playfield_inst.state[0] = 1'b1; dut.state_owner[0] = 1'b0;
+  set_metadata(0,4'h3); dut.Playfield_inst.state[0] = 1'b1;
   repeat(4) @(posedge Clk);
   look(11'd322, 11'd82); chk("locked P1 bevel tint", rgb, 24'h6BF0FF);
-  dut.state_owner[0] = 1'b1; repeat(4) @(posedge Clk);
+  set_metadata(0,4'hB); repeat(4) @(posedge Clk);
   look(11'd322, 11'd82); chk("locked P2 bevel tint", rgb, 24'hFF98CB);
   force dut.lf1 = 2'd2;
   look(11'd322, 11'd81); chk("lock white rim", rgb, `WHITE);
@@ -662,7 +679,7 @@ initial begin
   clr_state; repeat(4) @(posedge Clk);
   $display("=== 23) clear pixel collapse: 1~4 lines ===\n");
   duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0; clr_state;
-  dut.state_color[0] = 3'd3; dut.Playfield_inst.state[0] = 1'b1;
+  set_metadata(0,4'h3); dut.Playfield_inst.state[0] = 1'b1;
   force dut.clear_t_r = 1'b1; force dut.clear_shrink_r = 1'b1; force dut.flash_r = 1'b0;
   repeat(4) @(posedge Clk);
   look(11'd321, 11'd81);  chk("collapse edge black", rgb, `FLDBG);
@@ -737,7 +754,7 @@ initial begin
   look(11'd327, 11'd107); chk("P2 soft bar", rgb, 24'hFF98CB);
   look(11'd333, 11'd107); chk("P2 soft bar outside", rgb, 24'h55A630);
   release dut.Playfield_inst.Piece2; release dut.Playfield_inst.type2;
-  dut.state_color[0] = 3'd3; dut.Playfield_inst.state[0] = 1'b1; dut.state_owner[0] = 1'b0;
+  set_metadata(0,4'h3); dut.Playfield_inst.state[0] = 1'b1;
   repeat(4) @(posedge Clk);
   look(11'd327, 11'd107); chk("locked soft bar", rgb, 24'h6BF0FF);
   look(11'd333, 11'd107); chk("locked bar outside", rgb, `RED);
@@ -774,8 +791,7 @@ initial begin
     look(11'd399,11'd415); chk("hint center dot", rgb, hintcol(k[2:0]));
   end
   dut.Playfield_inst.state[2*20+10] = 1'b1;
-  dut.state_color[2*20+10] = 3'd3;
-  dut.state_owner[2*20+10] = 1'b0;
+  set_metadata(2*20+10,4'h3);
   repeat(5) @(posedge Clk);
   look(11'd399,11'd415); chk("hint clipped by real locked cell", rgb, `RED);
   clr_state;
@@ -819,8 +835,7 @@ initial begin
   look(11'd361,11'd470); chk("result dim checker on", rgb, 24'h101010);
   look(11'd360,11'd470); chk("result dim checker off", rgb, `FLDBG);
   dut.Playfield_inst.state[4*20+10] = 1'b1;
-  dut.state_color[4*20+10] = 3'd3;
-  dut.state_owner[4*20+10] = 1'b0;
+  set_metadata(4*20+10,4'h3);
   repeat(5) @(posedge Clk);
   look(11'd450,11'd402); chk("result masks locked cell", rgb, `FLDBG);
   dut.Playfield_inst.state[4*20+10] = 1'b0;

@@ -68,4 +68,26 @@ proc check_lutram_pins {report_path} {
     puts $output "PASS: 768 RAM bits; independent read addresses; common write address/data/enable/clock."
     close $output
     puts "LUTRAM_PIN_CHECK_PASS [llength $memories]"
+    check_metadata_pins "[file rootname $report_path]_metadata.rpt"
+}
+
+proc check_metadata_pins {report_path} {
+    set memories [get_cells -hierarchical -filter {REF_NAME == RAM32X1D && NAME =~ *metadata_banks*}]
+    if {[llength $memories] == 0} {return}
+    if {[llength $memories] != 192} {error "Expected 192 metadata RAM bits, found [llength $memories]"}
+    set output [open $report_path w]
+    set display_count 0
+    set copy_count 0
+    foreach memory $memories {
+        set name [get_property NAME $memory]
+        if {![regexp {^(.*)/bits\[([0-9]+)\][.](display|copy)_ram$} $name -> parent bit_index kind]} {
+            error "Unexpected metadata RAM name: $name"
+        }
+        if {$kind eq "display"} {incr display_count} else {incr copy_count}
+        puts $output "$name OK"
+    }
+    if {$display_count != 96 || $copy_count != 96} {error "Expected 96 display and 96 copy metadata RAM bits"}
+    puts $output "PASS: 96 display and 96 copy RAM32X1D bit instances; RTL/UNISIM transaction behavior is checked in metadata_tb."
+    close $output
+    puts "METADATA_PIN_CHECK_PASS [llength $memories]"
 }

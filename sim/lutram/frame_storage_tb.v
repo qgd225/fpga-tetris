@@ -17,6 +17,8 @@ module frame_storage_tb;
     integer failures=0, n;
     reg [4:0]test_row;
     reg [23:0]test_data;
+    reg [4:0]meta_col,meta_row;
+    reg [3:0]meta_value,read_value;
     wire [23:0]rgb;
     always #6.734 clk=~clk;
     frame dut(
@@ -39,6 +41,30 @@ module frame_storage_tb;
                 $display("FAIL %0s",name);
             end
             else $display("PASS %0s",name);
+        end
+    endtask
+    task write_metadata;
+        input integer index;
+        input [3:0]value;
+        begin
+            @(negedge clk);
+            meta_col=index/20;meta_row=index%20;meta_value=value;
+            force dut.meta_is_lock=1'b1;
+            force dut.meta_lock_col=meta_col;
+            force dut.meta_write_addr=meta_row;
+            force dut.meta_lock_data=meta_value;
+            @(posedge clk);@(negedge clk);
+            release dut.meta_is_lock;release dut.meta_lock_col;
+            release dut.meta_write_addr;release dut.meta_lock_data;
+        end
+    endtask
+    task read_metadata;
+        input integer index;
+        begin
+            meta_col=index/20;meta_row=index%20;
+            force dut.C_num=meta_col;force dut.R_num=meta_row;
+            #1;read_value=dut.meta_pixel;
+            release dut.C_num;release dut.R_num;
         end
     endtask
     task write_row;
@@ -84,30 +110,34 @@ module frame_storage_tb;
         repeat(14)@(negedge clk);
         for(n=0;n<4;n=n+1)begin
             check("P1 occupied",dut.state[3*20+5+n]);
-            check("P1 color",dut.state_color[3*20+5+n]==3'd1);
-            check("P1 owner",dut.state_owner[3*20+5+n]==1'b0);
+            read_metadata(3*20+5+n);
+            check("P1 color",read_value[2:0]==3'd1);
+            check("P1 owner",read_value[3]==1'b0);
             check("P2 occupied",dut.state[15*20+8+n]);
-            check("P2 color",dut.state_color[15*20+8+n]==3'd4);
-            check("P2 owner",dut.state_owner[15*20+8+n]==1'b1);
+            read_metadata(15*20+8+n);
+            check("P2 color",read_value[2:0]==3'd4);
+            check("P2 owner",read_value[3]==1'b1);
         end
         release dut.Playfield_inst.counter_c;release dut.Playfield_inst.counter_r;
         release dut.Playfield_inst.counter_c2;release dut.Playfield_inst.counter_r2;
         release dut.Playfield_inst.type;release dut.Playfield_inst.type2;
         release dut.Playfield_inst.rot;release dut.Playfield_inst.rot2;
-        dut.state_color[20*20+11]=3'd6;
-        dut.state_owner[20*20+11]=1'b1;
+        write_metadata(20*20+11,4'hE);
         write_row(11,(24'd1<<15)|(24'd1<<20));
         write_row(12,24'hFFFFFF);
         repeat(150)@(negedge clk);
         check("P1 moved occupancy",dut.state[3*20+6]);
-        check("P1 moved color",dut.state_color[3*20+6]==3'd1);
-        check("P1 moved owner",dut.state_owner[3*20+6]==1'b0);
+        read_metadata(3*20+6);
+        check("P1 moved color",read_value[2:0]==3'd1);
+        check("P1 moved owner",read_value[3]==1'b0);
         check("P2 moved occupancy",dut.state[15*20+12]);
-        check("P2 moved color",dut.state_color[15*20+12]==3'd4);
-        check("P2 moved owner",dut.state_owner[15*20+12]==1'b1);
+        read_metadata(15*20+12);
+        check("P2 moved color",read_value[2:0]==3'd4);
+        check("P2 moved owner",read_value[3]==1'b1);
         check("marker moved occupancy",dut.state[20*20+12]);
-        check("marker moved color",dut.state_color[20*20+12]==3'd6);
-        check("marker moved owner",dut.state_owner[20*20+12]==1'b1);
+        read_metadata(20*20+12);
+        check("marker moved color",read_value[2:0]==3'd6);
+        check("marker moved owner",read_value[3]==1'b1);
         check("compaction completed",!dut.clear);
         if(failures==0)$display("=== ALL PASS: LUTRAM FRAME ===");
         else $display("=== FAILED %0d ===",failures);
