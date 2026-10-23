@@ -141,6 +141,8 @@ Tetris.srcs/
 3. `tools\双击启动.bat` 保留为开发环境备用入口：存在 `TetrisPC.exe` 时优先启动便携程序，否则尝试使用本机 Python。
 4. 按键无效时查看 `%TEMP%\tetris_static_arp.log`。
 
+> Windows“网络连接”里连接 FPGA 的以太网必须显示为已连接/Up。如果显示 Disconnected，或 IP 地址处于 Deprecated 状态，系统无法把 `192.168.0.2` 路由到该网卡，会继续走 WLAN/VPN；此时请先检查网线、接口和网卡驱动。
+
 **踩过的坑（已规避）**：直接 `arp -s 192.168.0.2 00-0A-35-01-FE-C0` 不指定网卡时，
 Windows 会按自己挑的适配器绑定（实测挂到了 Radmin VPN 的 169.254.x 上），
 `arp -a` 显示 static 也照样发不出去；再加上默认路由可能把包从 WiFi 走出去，

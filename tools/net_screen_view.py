@@ -157,6 +157,15 @@ def local_ip_in_subnet(prefix="192.168.0."):
     for ip in sorted(ips):
         if ip.startswith(prefix):
             return ip
+    try:
+        from set_static_arp import adapter_table, ipv4_table
+
+        up_indices = {a["idx"] for a in adapter_table() if a["status"].lower() == "up"}
+        for item in ipv4_table():
+            if item["idx"] in up_indices and item["ip"].startswith(prefix):
+                return item["ip"]
+    except Exception:
+        pass
     return None
 
 
@@ -183,21 +192,17 @@ def tx_loop():
     else:
         print("[按键] 没找到本机 192.168.0.x 地址（源地址 %s）；按键若无效，请双击 双击启动.bat"
               % (auto_src or "未知"))
-    nxt = time.time()
     while True:
-        now = time.time()
-        if kb_ev.is_set() or now >= nxt:
-            kb_ev.clear()
-            nxt = now + RESEND_S
+        kb_ev.wait(RESEND_S)
+        kb_ev.clear()
+        try:
             with kb_lock:
                 bits = kb_bits
-            try:
-                s.sendto(kb_packet(bits), (FPGA_IP, FPGA_PORT))
-                stat["kb"] += 1
-            except Exception:
-                pass
-        else:
-            time.sleep(0.002)
+            s.sendto(kb_packet(bits), (FPGA_IP, FPGA_PORT))
+            stat["kb"] += 1
+        except Exception as exc:
+            print("[警告] 按键包发送失败：%s" % exc)
+            time.sleep(0.5)
 
 
 def rx_loop():

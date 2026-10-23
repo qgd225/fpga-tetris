@@ -80,7 +80,7 @@ def ipv4_table():
 
 
 def adapter_table():
-    _, out = ps("Get-NetAdapter | Select-Object InterfaceIndex,Name,Status,MediaType | "
+    _, out = ps("Get-NetAdapter -Physical | Select-Object InterfaceIndex,Name,Status,MediaType | "
                 "ConvertTo-Csv -NoTypeInformation")
     return [dict(idx=int(r[0]), name=r[1], status=r[2], media=r[3]) for r in csv_rows(out)]
 
@@ -124,8 +124,9 @@ def probe_source():
 
 def pick_target(ipv4s, adapters):
     """优先用"已经有 192.168.0.x"的网卡；否则挑一块 Up 的有线网卡。"""
+    up_indices = {a["idx"] for a in adapters if a["status"].lower() == "up"}
     for a in ipv4s:
-        if a["ip"].startswith(SUBNET):
+        if a["idx"] in up_indices and a["ip"].startswith(SUBNET):
             return a["idx"], a["alias"], "already"
     for a in adapters:
         if a["status"].lower() == "up" and a["media"].lower().startswith("802.3"):
@@ -154,8 +155,15 @@ def main():
     idx, name, how = pick_target(ipv4s, adapters)
 
     say("[网卡] 当前 IPv4：")
+    status_by_idx = {a["idx"]: a["status"] for a in adapters}
     for a in ipv4s:
-        mark = "  <- 本机的场地网卡" if a["ip"].startswith(SUBNET) else ""
+        if a["ip"].startswith(SUBNET):
+            if status_by_idx.get(a["idx"], "").lower() == "up":
+                mark = "  <- 本机的场地网卡"
+            else:
+                mark = "  <- 场地地址存在，但网卡未连接"
+        else:
+            mark = ""
         say("        idx=%-3s %-14s %s%s" % (a["idx"], a["alias"], a["ip"], mark))
 
     nb = neighbors()
@@ -236,14 +244,25 @@ def main():
     src_ip = local_v4_in_subnet(ipv4s) or PC_IP
     say("")
     say("[路由] 钉一条 %s/32 走 idx=%s（源地址 %s）..." % (FPGA_IP, idx, src_ip))
-    rc, out = ps("New-NetRoute -DestinationPrefix %s/32 -InterfaceIndex %d -NextHop 0.0.0.0 "
-                 "-ErrorAction SilentlyContinue | Out-Null; 'OK'" % (FPGA_IP, idx))
-    if "OK" not in out:
+    rc, out = ps("Remove-NetRoute -DestinationPrefix %s/32 -Confirm:$false "
+                 "-ErrorAction SilentlyContinue | Out-Null; "
+                 "New-NetRoute -DestinationPrefix %s/32 -InterfaceIndex %d -NextHop 0.0.0.0 "
+                 "-PolicyStore ActiveStore -RouteMetric 1 -ErrorAction SilentlyContinue | Out-Null; "
+                 "Get-NetRoute -PolicyStore ActiveStore -AddressFamily IPv4 "
+                 "-DestinationPrefix %s/32 -ErrorAction SilentlyContinue | "
+                 "Select-Object -First 1 InterfaceIndex | ConvertTo-Csv -NoTypeInformation"
+                 % (FPGA_IP, FPGA_IP, idx, FPGA_IP))
+    route_idx = None
+    for r in csv_rows(out):
+        if r and r[0].strip().isdigit():
+            route_idx = int(r[0])
+            break
+    if route_idx != idx:
         say("        New-NetRoute 失败，改用 route add ...")
-        ps("route delete %s >nul 2>nul & route add %s mask 255.255.255.255 %s metric 1"
-           % (FPGA_IP, FPGA_IP, src_ip))
+        ps("route delete %s >nul 2>nul & route add %s mask 255.255.255.255 0.0.0.0 if %d metric 1"
+           % (FPGA_IP, FPGA_IP, idx))
     else:
-        say("        ok")
+        say("        ok（活动路由 idx=%s）" % route_idx)
 
     # ---- 复核 ----
     say("")
