@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Tetris 以太网：PC 端画面显示 + 键盘按键发送
-双击 tools\启动-画面和按键.bat 即可运行（无需命令行参数）
+正常使用时双击根目录 TetrisPC.exe 即可运行。
 
 FPGA 发来的包：
   行包   : A5 5A 01 | 帧号2B | 行号2B | 1280 个颜色标号(每像素 1B)   共 1287 字节
@@ -13,7 +13,7 @@ FPGA 发来的包：
           bit4=小键盘0(保持)  bit5=小键盘5(开始/暂停)  bit6=小键盘9(复位)
   按下/松开立刻发一包，另外每 20ms 无条件重发一包（丢包 20ms 自愈）
 
-注意：FPGA 不回 ARP，所以第一次用（或重启后）请双击一次 tools\双击启动.bat，
+注意：FPGA 不回 ARP，所以第一次用（或重启后）请运行根目录 TetrisPC.exe，
       它会自动把静态 ARP 绑到正确的网卡，然后启动本程序。
 """
 import os, socket, sys, threading, time
@@ -191,7 +191,7 @@ def tx_loop():
         except Exception as e:
             print("[警告] 绑定本机地址 %s 失败(%s)，改用系统默认路由" % (local, e))
     else:
-        print("[按键] 没找到本机 192.168.0.x 地址（源地址 %s）；按键若无效，请双击 双击启动.bat"
+        print("[按键] 没找到本机 192.168.0.x 地址（源地址 %s）；按键若无效，请运行根目录 TetrisPC.exe"
               % (auto_src or "未知"))
     while True:
         kb_ev.wait(RESEND_S)
@@ -263,7 +263,7 @@ def main():
     root = tk.Tk()
     root.withdraw()
     print("画面目标: 监听 %d 端口 <- FPGA" % LISTEN_PORT)
-    print("按键目标: 发给 %s:%d（静态 ARP 由 双击启动.bat 自动设置）" % (FPGA_IP, FPGA_PORT))
+    print("按键目标: 发给 %s:%d（静态 ARP 由 TetrisPC.exe 自动设置）" % (FPGA_IP, FPGA_PORT))
     threading.Thread(target=rx_loop, daemon=True).start()
     start_listener()
     threading.Thread(target=tx_loop, daemon=True).start()
@@ -325,7 +325,7 @@ try:
     from PIL import Image, ImageTk
 except Exception as _e:
     print("启动失败: 缺少图形依赖（%s）" % _e)
-    print("请双击 tools\\双击启动.bat，它会自动安装 pillow 和 pynput")
+    print("请使用根目录 TetrisPC.exe；源码开发模式需先安装 pillow 和 pynput")
     report_startup_error("Tetris PC 启动失败", "缺少图形依赖：%s" % _e)
     sys.exit(1)
 

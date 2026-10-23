@@ -9,7 +9,7 @@
 
 用法：
     python set_static_arp.py --check    # 只检查，不改任何东西（不需要管理员）
-    python set_static_arp.py            # 修复（需要管理员；双击启动.bat 会自动提权调用）
+    python set_static_arp.py            # 修复（需要管理员；根目录 TetrisPC.exe 会自动提权调用）
 """
 import argparse
 import csv
@@ -222,13 +222,13 @@ def main():
     if args.check:
         say("")
         say("[结果] %s" % ("静态 ARP 正常，可以直接用。" if ok_now else
-                          "静态 ARP 需要修复：请用 双击启动.bat（或管理员运行本脚本）设置一次。"))
+                          "静态 ARP 需要修复：请用根目录 TetrisPC.exe（或管理员运行本脚本）设置一次。"))
         flush_log()
         return 0 if ok_now else 2
 
     if not is_admin():
         say("")
-        say("[错误] 需要管理员权限。请用 tools\\双击启动.bat（会自动提权），")
+        say("[错误] 需要管理员权限。请用根目录 TetrisPC.exe（会自动提权），")
         say("       或以管理员身份运行本脚本。")
         flush_log()
         return 3

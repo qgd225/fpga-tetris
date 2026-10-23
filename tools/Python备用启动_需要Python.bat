@@ -1,10 +1,10 @@
 @echo off
 chcp 936 >nul
-title Tetris PC 一键启动
+title Tetris PC Python 开发备用启动（需要 Python）
 cd /d "%~dp0"
 setlocal
 
-if exist "%~dp0TetrisPC.exe" goto run_exe
+if exist "%~dp0..\TetrisPC.exe" goto run_exe
 
 set "PY="
 for /f "delims=" %%p in ('py -3 -c "import sys; print(sys.executable)" 2^>nul') do if not defined PY set "PY=%%p"
@@ -29,15 +29,15 @@ if errorlevel 1 (
 goto end
 
 :run_exe
-"%~dp0TetrisPC.exe"
+"%~dp0..\TetrisPC.exe" %*
 if errorlevel 1 pause
 goto end
 
 :no_python
 echo.
 echo [错误] 未找到可用的 Python。
-echo 请直接使用随包提供的 tools\TetrisPC.exe，无需安装 Python。
-echo 如果 TetrisPC.exe 不存在，请重新解压完整压缩包。
+echo 请直接使用仓库根目录的 TetrisPC.exe，无需安装 Python。
+echo 如果根目录 TetrisPC.exe 不存在，请重新解压完整压缩包。
 pause
 exit /b 1
 

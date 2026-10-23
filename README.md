@@ -133,12 +133,12 @@ Tetris.srcs/
 ## PC 端怎么用（画面 + 键盘按键）
 
 1. 网线直连 PC 有线网卡与 FPGA（PC 侧建议 `192.168.0.3/24`，程序在需要时会自动添加）。
-2. **直接双击 `tools\TetrisPC.exe`**：
+2. **直接双击仓库根目录的 `TetrisPC.exe`**：
    - 已内置 Python、Pillow 和 pynput，目标电脑不需要安装 Python，也不需要使用 pip。
    - 程序先检查静态 ARP；需要修复时自动弹出 UAC，请选择“是”。
    - 静态 ARP 正常后直接启动画面与按键窗口，不会重复要求提权。
    - 如果取消 UAC，画面仍可显示，但 PC 键盘控制可能无效。
-3. `tools\双击启动.bat` 保留为开发环境备用入口：存在 `TetrisPC.exe` 时优先启动便携程序，否则尝试使用本机 Python。
+3. `tools\Python备用启动_需要Python.bat` 仅作为源码开发备用入口；正常用户不需要运行它。
 4. 按键无效时查看 `%TEMP%\tetris_static_arp.log`。
 
 > Windows“网络连接”里连接 FPGA 的以太网必须显示为已连接/Up。如果显示 Disconnected，或 IP 地址处于 Deprecated 状态，系统无法把 `192.168.0.2` 路由到该网卡，会继续走 WLAN/VPN；此时请先检查网线、接口和网卡驱动。
