@@ -99,9 +99,9 @@ Tetris.srcs/
 1. 克隆本仓库。
 2. 用 **Vivado 2018.3** 打开 `Tetris.xpr`。
 3. 直接 Run Synthesis / Implementation。首次综合时 Vivado 会依据 IP 目录下的 `.xci` 配置文件**自动重新生成** IP 输出产物(仓库中未提交任何生成物,属正常现象)。
-4. 生成比特流后下载到器件。
+4. 可直接使用仓库根目录提供的 `Tetris.bit` 下载到器件，也可以重新综合生成。
 
-> 本仓库只包含源码:Vivado 的编译产物(`.runs/`、`.cache/`、`.hw/`、`.ip_user_files/`、`.sim/`)以及 IP 生成的 HDL 均已由 `.gitignore` 排除。
+> 本仓库包含源码、IP 配置和根目录比特流 `Tetris.bit`。Vivado 的编译产物(`.runs/`、`.cache/`、`.hw/`、`.ip_user_files/`、`.sim/`)以及 IP 生成的 HDL 均已由 `.gitignore` 排除。
 
 > Verilog 文件统一使用 GB18030 无 BOM，以匹配 Vivado 2018.3 在中文 Windows 下的源码显示编码。GitHub 网页查看中文注释时可能出现编码显示差异。
 
@@ -118,15 +118,17 @@ Tetris.srcs/
 
 | 项目 | 值 |
 | --- | --- |
-| 比特流 | `Tetris.runs/impl_1/Tetris.bit` |
+| 顶层比特流 | `Tetris.bit` |
+| Vivado 原始输出 | `Tetris.runs/impl_1/Tetris.bit` |
 | 生成时间 | 2026-10-22 19:46:50 |
 | 大小 | 2,192,114 字节 |
 | SHA256 | `962B9E741856CA2D7ECA53CAB7214B29DF2794A3AA7C38C37A8F2159BE556097` |
 
+> 根目录 `Tetris.bit` 与 Vivado 实现目录中的比特流内容完全一致，可直接下载和烧录。
+
 ## 备注
 
 - `sources_1/new/clock.v`、`sources_1/new/num.v`、`ip/blk_mem_gen_0/`、`ip/number/` 是早期迭代遗留、未被工程引用的文件,已写入 `.gitignore` 不纳入版本管理。
-- 未提交比特流文件(`.bit`),如需请本地生成。
 
 ## PC 端怎么用（画面 + 键盘按键）
 

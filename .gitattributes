@@ -8,3 +8,6 @@
 *.bat text eol=crlf
 .gitignore text eol=lf
 .gitattributes text eol=lf
+
+# FPGA 比特流为二进制交付物，禁止换行转换
+*.bit binary
