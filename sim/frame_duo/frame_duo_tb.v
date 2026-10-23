@@ -110,11 +110,23 @@ begin
   repeat(10) @(posedge Clk);
 end
 endtask
+reg [4:0]test_row;
 task clr_state;
 integer q;
 begin
-  force dut.Playfield_inst.state = 480'd0; @(posedge Clk);
-  release dut.Playfield_inst.state; @(posedge Clk);
+  @(negedge Clk);
+  force dut.Playfield_inst.row_we = 1'b1;
+  force dut.Playfield_inst.row_data = 24'd0;
+  force dut.Playfield_inst.row_addr = test_row;
+  for(test_row=0; test_row<20; test_row=test_row+1)begin
+    @(posedge Clk); @(negedge Clk);
+  end
+  force dut.Playfield_inst.row_we = 1'b0;
+  #1;
+  release dut.Playfield_inst.row_we;
+  release dut.Playfield_inst.row_data;
+  release dut.Playfield_inst.row_addr;
+  @(posedge Clk);
   for(q = 0; q < 480; q = q + 1) dut.state_color[q] = 3'd0;
 end
 endtask
@@ -136,7 +148,7 @@ endtask
 
 initial begin
   bad = 0;
-  Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk);
+  Rst = 0; #200; Rst = 1; repeat(30) @(posedge Clk);
   force dut.Playfield_inst.Drop = 30'd100_000_000;  // 抑制自动下落
 
   $display("=== 1) 双人: P2 运动块像素(同色表) ===");

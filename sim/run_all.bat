@@ -10,8 +10,16 @@ call "%~dp0horizontal_repeat\run.bat" > "%~dp0logs\horizontal_repeat.log" 2>&1
 call "%~dp0hold_gesture\run.bat" > "%~dp0logs\hold_gesture.log" 2>&1
 call "%~dp0solo_hint\run.bat" > "%~dp0logs\solo_hint.log" 2>&1
 call "%~dp0rgb_palette\run.bat" > "%~dp0logs\rgb_palette.log" 2>&1
+call "%~dp0lutram\run.bat" > "%~dp0logs\lutram.log" 2>&1
 echo ===== SUMMARY =====
-for %%f in (duo frame_duo level sound input_route horizontal_repeat hold_gesture solo_hint rgb_palette) do (
+set failures=0
+for %%f in (duo frame_duo level sound input_route horizontal_repeat hold_gesture solo_hint rgb_palette lutram) do (
   echo --- %%f ---
   findstr /C:"ALL PASS" /C:"FAILED" "%~dp0logs\%%f.log"
+  findstr /C:"ALL PASS" "%~dp0logs\%%f.log" >nul
+  if errorlevel 1 set /a failures+=1 >nul
+  findstr /C:"FAILED" /C:"ERROR:" /C:"XVLOG_FAIL" /C:"XELAB_FAIL" "%~dp0logs\%%f.log" >nul
+  if not errorlevel 1 set /a failures+=1 >nul
 )
+if not "%failures%"=="0" exit /b 1
+exit /b 0

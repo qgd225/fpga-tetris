@@ -62,6 +62,8 @@ module frame(
     wire [4:0]C_num;
     wire [4:0]R_num;
     wire [479:0]state;
+    wire lock_commit1, lock_commit2, move_we;
+    wire [4:0]move_row;
     wire Piece;
     wire ghost;
     wire clear_t;
@@ -241,27 +243,28 @@ module frame(
     integer y;
 
     always @(posedge Clk_74M) begin
-    if(lock_we || (duo && lock_we2))begin
-        if(lock_we && (cc_t[lock_idx] <= (duo ? 5'd23 : 5'd19)) && (rr_t[lock_idx] <= 5'd19))begin
+    if(lock_commit1 || lock_commit2)begin
+        if(lock_commit1)begin
         state_color[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= type_d;
         state_owner[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= 1'b0;
         end
-        if(duo && lock_we2 && (cc_t2[lock_idx2] <= 5'd23) && (rr_t2[lock_idx2] <= 5'd19))begin
+        if(lock_commit2)begin
         state_color[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= type_d2;
         state_owner[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= 1'b1;
         end
     end
-    else if(clear_time && !clear_t && !clear_pulse)begin
+    else if(move_we && move_row != 0)begin
         for(c = 0; c < 24; c = c + 1)
-            for(m = 1; m < 20; m = m + 1)
-                if(m <= clear_row)begin
-                state_color[c*20 + m] <= state_color[c*20 + m - 1];
-                state_owner[c*20 + m] <= state_owner[c*20 + m - 1];
+                begin
+                state_color[c*20 + move_row] <= state_color[c*20 + move_row - 1];
+                state_owner[c*20 + move_row] <= state_owner[c*20 + move_row - 1];
                 end
         end
     end
 
     Playfield Playfield_inst(
+    .lock_commit1(lock_commit1), .lock_commit2(lock_commit2),
+    .move_we(move_we), .move_row(move_row),
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
     .hcounter(hcounter),

@@ -31,6 +31,10 @@ module Playfield(
     input hold_p_flag2,
 
     output reg [479:0]state,
+    output wire lock_commit1,
+    output wire lock_commit2,
+    output wire move_we,
+    output wire [4:0]move_row,
     output reg Piece,
     output reg ghost,
     output reg [4:0]C_num,
@@ -288,7 +292,8 @@ module Playfield(
     wire other_moved2 = (sig_p1 != sig_p1_d);
     wire new_piece1 = (counter_r == 5'd0) && (counter_r_d1 != 5'd0);
     wire new_piece2 = (counter_r2 == 5'd0) && (counter_r2_d1 != 5'd0);
-    wire field_chg = lock_we || lock_we2 || clear_pulse || clear_t_t || (clear_time && (!clear_t) && (!clear_pulse));
+    reg row_we;
+    wire field_chg = row_we || lock_we || lock_we2 || clear_pulse || clear_t_t;
     wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || hold_up || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved1);
     wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || hold_up2 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved2);
 
@@ -314,6 +319,104 @@ module Playfield(
 
 //    行字: row_w[m] = 第 m 行 24 列(纯连线, 只作写路径的源与整行判满)
     wire [23:0]row_w [0:19];
+
+    // A single row transaction updates the mirror and every independent read replica.
+    reg board_init;
+    reg [4:0]init_row;
+    reg idle_d;
+    reg move_active;
+    reg [4:0]move_ptr;
+    reg lock_pending2;
+    reg [4:0]row_addr;
+    reg [23:0]row_data;
+    wire restart_board = (Idle && !idle_d) || (Finalize && switch_r_flag);
+    wire board_busy = board_init || move_active || restart_board;
+    wire lock_valid1 = lock_we && cc_t[lock_idx] < COL && rr_t[lock_idx] < 20;
+    wire lock_valid2 = duo && lock_we2 && cc_t2[lock_idx2] < COL && rr_t2[lock_idx2] < 20;
+    assign lock_commit1 = !board_busy && !Idle && !Finalize && lock_valid1;
+    assign lock_commit2 = !board_busy && !Idle && !Finalize && !lock_we && lock_valid2;
+    wire move_start = !board_init && !restart_board && !Idle && !Finalize &&
+                      !lock_we && !(duo && lock_we2) && clear_time && !clear_t && !clear_pulse && !move_active;
+    assign move_we = !board_init && !restart_board && (move_active || move_start);
+    assign move_row = move_active ? move_ptr : clear_row;
+
+    always@(*)begin
+        row_we = 1'b0;
+        row_addr = 5'd0;
+        row_data = 24'd0;
+        if(board_init || restart_board)begin
+            row_we = 1'b1;
+            row_addr = restart_board ? 5'd0 : init_row;
+        end
+        else if(lock_commit1)begin
+            row_we = 1'b1;
+            row_addr = rr_t[lock_idx];
+            row_data = row_w[rr_t[lock_idx]] | (24'd1 << cc_t[lock_idx]);
+        end
+        else if(lock_commit2)begin
+            row_we = 1'b1;
+            row_addr = rr_t2[lock_idx2];
+            row_data = row_w[rr_t2[lock_idx2]] | (24'd1 << cc_t2[lock_idx2]);
+        end
+        else if(move_we)begin
+            row_we = 1'b1;
+            row_addr = move_row;
+            row_data = move_row == 0 ? 24'd0 : row_w[move_row - 5'd1];
+        end
+    end
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin
+            board_init <= 1'b1;
+            init_row <= 5'd0;
+            idle_d <= 1'b0;
+            move_active <= 1'b0;
+            move_ptr <= 5'd0;
+        end
+        else begin
+            idle_d <= Idle;
+            if(restart_board)begin
+                board_init <= 1'b1;
+                init_row <= 5'd1;
+                move_active <= 1'b0;
+            end
+            else if(board_init)begin
+                if(init_row == 19)begin
+                    board_init <= 1'b0;
+                    init_row <= 5'd0;
+                end
+                else init_row <= init_row + 5'd1;
+            end
+            else if(move_we)begin
+                move_active <= move_row != 0;
+                move_ptr <= move_row - 5'd1;
+            end
+        end
+    end
+
+    wire [23:0]read_current1[0:3], read_below1[0:3];
+    wire [23:0]read_current2[0:3], read_below2[0:3];
+    wire [23:0]read_ghost1[0:3], read_ghost2[0:3];
+    wire [23:0]read_rotate1[0:3], read_rotate2[0:3];
+    genvar lane;
+    generate for(lane=0; lane<4; lane=lane+1)begin : board_reads
+        wire [5:0]r1 = counter_r + {{7{Tetromino_dout[lane*8+3]}}, Tetromino_dout[lane*8+3 -:4]};
+        wire [5:0]r2 = counter_r2 + {{7{Tetromino_dout2[lane*8+3]}}, Tetromino_dout2[lane*8+3 -:4]};
+        wire [5:0]g1 = ghost_scan_r + {{7{Tetromino_dout[lane*8+3]}}, Tetromino_dout[lane*8+3 -:4]};
+        wire [5:0]g2 = ghost_scan_r2 + {{7{Tetromino_dout2[lane*8+3]}}, Tetromino_dout2[lane*8+3 -:4]};
+        wire [5:0]t1 = counter_r + ddr_ext + {{7{Tetromino_dout1[lane*8+3]}}, Tetromino_dout1[lane*8+3 -:4]};
+        wire [5:0]t2 = counter_r2 + ddr_ext2 + {{7{Tetromino_dout3[lane*8+3]}}, Tetromino_dout3[lane*8+3 -:4]};
+        wire [4:0]next1 = r1 + 6'd1;
+        wire [4:0]next2 = r2 + 6'd1;
+        board_row_replica current1(Clk_74M,row_we,row_addr,row_data,r1[4:0],read_current1[lane]);
+        board_row_replica below1(Clk_74M,row_we,row_addr,row_data,next1,read_below1[lane]);
+        board_row_replica current2(Clk_74M,row_we,row_addr,row_data,r2[4:0],read_current2[lane]);
+        board_row_replica below2(Clk_74M,row_we,row_addr,row_data,next2,read_below2[lane]);
+        board_row_replica ghost1(Clk_74M,row_we,row_addr,row_data,g1[4:0],read_ghost1[lane]);
+        board_row_replica ghost2(Clk_74M,row_we,row_addr,row_data,g2[4:0],read_ghost2[lane]);
+        board_row_replica rotate1(Clk_74M,row_we,row_addr,row_data,t1[4:0],read_rotate1[lane]);
+        board_row_replica rotate2(Clk_74M,row_we,row_addr,row_data,t2[4:0],read_rotate2[lane]);
+    end endgenerate
 
 //    整行判满用的列掩码(单机只看 0..19 列)
     wire [23:0]full_mask = duo ? 24'hFFFFFF : 24'h000FFFFF;
@@ -371,7 +474,7 @@ module Playfield(
         ghost = 1'b0;
         touch_top = 1'b0;
         other_down_hold = 1'b0;
-        if(Idle || Finalize)begin
+        if(Idle || Finalize || board_init)begin
              Piece = 1'b0;
              ghost = 1'b0;
         end
@@ -393,39 +496,39 @@ module Playfield(
                     if(oc2_0 == (cc + 6'd1)) boundary_collision_right = 1'b1;
                     if(oc2_0 == cc) touch_top = 1'b1;
                 end
-                if((oc2_0 == cc) && (or2_0 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
+                if((oc2_0 == cc) && (or2_0 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && read_below1[i][cc]))
                 other_down_hold = 1'b1;
                 if(or2_1 == rr)begin
                     if((cc > 0) && (oc2_1 == (cc - 6'd1))) boundary_collision_left = 1'b1;
                     if(oc2_1 == (cc + 6'd1)) boundary_collision_right = 1'b1;
                     if(oc2_1 == cc) touch_top = 1'b1;
                 end
-                if((oc2_1 == cc) && (or2_1 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
+                if((oc2_1 == cc) && (or2_1 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && read_below1[i][cc]))
                 other_down_hold = 1'b1;
                 if(or2_2 == rr)begin
                     if((cc > 0) && (oc2_2 == (cc - 6'd1))) boundary_collision_left = 1'b1;
                     if(oc2_2 == (cc + 6'd1)) boundary_collision_right = 1'b1;
                     if(oc2_2 == cc) touch_top = 1'b1;
                 end
-                if((oc2_2 == cc) && (or2_2 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
+                if((oc2_2 == cc) && (or2_2 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && read_below1[i][cc]))
                 other_down_hold = 1'b1;
                 if(or2_3 == rr)begin
                     if((cc > 0) && (oc2_3 == (cc - 6'd1))) boundary_collision_left = 1'b1;
                     if(oc2_3 == (cc + 6'd1)) boundary_collision_right = 1'b1;
                     if(oc2_3 == cc) touch_top = 1'b1;
                 end
-                if((oc2_3 == cc) && (or2_3 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
+                if((oc2_3 == cc) && (or2_3 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && read_below1[i][cc]))
                 other_down_hold = 1'b1;
             end
-            if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && row_w[rr + 6'd1][cc]))  //落底检测
+            if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && read_below1[i][cc]))  //落底检测
             land = 1'b1;
-            if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc - 6'd1]))  //左边界碰撞检测
+            if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && read_current1[i][cc - 6'd1]))  //左边界碰撞检测
             boundary_collision_left = 1'b1;
-            if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc + 6'd1]))  //右边界碰撞检测
+            if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && read_current1[i][cc + 6'd1]))  //右边界碰撞检测
             boundary_collision_right = 1'b1;
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr) && !rr[5])  //正在运动方块
             Piece = 1'b1;
-            if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && row_w[rr][cc])  //和已锁方块重叠=顶到
+            if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && read_current1[i][cc])  //和已锁方块重叠=顶到
             touch_top = 1'b1;
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && ghost_valid && (!clear_time) && (counter_ghost_r_t > (counter_r + 5'd4)))
@@ -533,7 +636,7 @@ module Playfield(
             else
             counter_drop <= counter_drop;
         end
-        else if(Stop)
+        else if(Stop || board_busy)
         counter_drop <= counter_drop;
         else if(Playing)begin
             if(counter_drop == Drop)
@@ -609,7 +712,7 @@ module Playfield(
             else
             counter_r <= counter_r;
         end
-        else if(Stop)
+        else if(Stop || board_busy)
         counter_r <= counter_r;
         else if(Playing)begin
             if(land_we)
@@ -639,7 +742,7 @@ module Playfield(
             else
             counter_c <= counter_c;
         end
-        else if(Stop)
+        else if(Stop || board_busy)
         counter_c <= counter_c;
         else if(Playing)begin
             if(land_we)
@@ -685,10 +788,10 @@ module Playfield(
             rot_block = 1'b1;
             else if((rr_r > 11'd19) && !rr_r[5])
             rot_block = 1'b1;
-            else if((cc_r <= (COL - 1'b1)) && (rr_r <= 11'd19) && row_w[rr_r][cc_r])
+            else if((cc_r <= (COL - 1'b1)) && (rr_r <= 11'd19) && read_rotate1[k][cc_r])
             rot_block = 1'b1;
         end
-        en_rotate = (rotate_p_flag) && (!rot_block) && (!lock_we);
+        en_rotate = (rotate_p_flag) && (!rot_block) && (!lock_we) && !board_busy;
     end
 
 //    P1 当前旋转序号
@@ -701,7 +804,7 @@ module Playfield(
             else
             rot <= rot;
         end
-        else if(Stop)
+        else if(Stop || board_busy)
         rot <= rot;
         else if(Playing)begin
             if(land_we)
@@ -737,6 +840,8 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_t <= 1'b0;
+        else if(restart_board)
+        lock_t <= 1'b0;
         else if(land_pulse)
         lock_t <= 1'b1;
         else
@@ -747,6 +852,10 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_cnt <= 2'd0;
+        else if(restart_board)
+        lock_cnt <= 2'd0;
+        else if(board_busy)
+        lock_cnt <= lock_cnt;
         else if(lock_t)
         lock_cnt <= 2'd1;
         else if(lock_cnt == 2'd3)
@@ -799,44 +908,13 @@ module Playfield(
 //============================================================
 //    场地状态与消行
 //============================================================
-//    场地状态: 直接存 480 位(state), 写口一次写一行(清零/落锁/消行搬移都在这里)
+//    Canonical mirror and replicas consume the same single-row transaction.
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         state <= 480'd0;
-        else if(Idle)
-        state <= 480'd0;
-        else if(Finalize)begin
-            if(switch_r_flag)begin
-                state <= 480'd0;
-            end
-            else begin
-                state <= state;
-            end
-        end
-        else if(lock_we || (duo && lock_we2))begin
-            if(lock_we && (cc_t[lock_idx] <= (COL - 1'b1)) && (rr_t[lock_idx] <= 19))
-            state[cc_t[lock_idx]*20 + rr_t[lock_idx]] <= 1'b1;
-            if(duo && lock_we2 && (cc_t2[lock_idx2] <= (COL - 1'b1)) && (rr_t2[lock_idx2] <= 19))
-            state[cc_t2[lock_idx2]*20 + rr_t2[lock_idx2]] <= 1'b1;
-        end
-        else if(clear_time)begin
-            if(clear_t)begin
-                for(c = 0; c < 24; c = c + 1)
-                        for(m = 0; m < 20; m = m + 1)
-                            if(line_t[m])
-                                state[c*20 + m] <= state[c*20 + m];
-            end
-            else if(!clear_pulse)begin
-                for(c = 0; c < 24; c = c + 1)begin
-                    state[c*20 + 0] <= 1'b0;
-                    for(m = 1; m < 20; m = m + 1)begin
-                        if(m <= clear_row)begin
-                            state[c*20 + m] <= state[c*20 + m - 1];
-                        end
-                    end
-                end
-            end
-        end
+        else if(row_we)
+            for(c = 0; c < 24; c = c + 1)
+                state[c*20 + row_addr] <= row_data[c];
     end
 
 //    整行判满: 24 格全满的行要消
@@ -845,14 +923,14 @@ module Playfield(
         clear = 1'b0;
         line = 20'd0;
         for(m = 0; m < 20; m = m + 1)begin
-            if(&(row_w[m] | ~full_mask))begin
+            if(!board_busy && !lock_we && !(duo && lock_we2) && &(row_w[m] | ~full_mask))begin
                 line[m] = 1'b1;
                 clear = 1'b1;
             end
         end
     end
 
-    assign clear_time = clear_t || clear;
+    assign clear_time = clear_t || clear || move_active;
 
 //    闪白次数: 消 n 行闪 2n 下
     always@(posedge Clk_74M or negedge Reset_n)begin
@@ -992,7 +1070,7 @@ module Playfield(
             gr1 = ghost_scan_r + { { 7{Tetromino_dout[jg1*8+3]} }, Tetromino_dout[(jg1*8+3)-:4] };
             if((!gr1[5]) && (gr1 > 6'd19))
             ghost_blocked1 = 1'b1;
-            else if((!gr1[5]) && (gc1 <= (COL - 1'b1)) && row_w[gr1][gc1])begin
+            else if((!gr1[5]) && (gc1 <= (COL - 1'b1)) && read_ghost1[jg1][gc1])begin
                 ghost_blocked1 = 1'b1;
                 ghost_blk_state1 = 1'b1;
             end
@@ -1071,7 +1149,7 @@ module Playfield(
         en_hold <= 0;
         else if(Idle)
         en_hold <= 1'b0;
-        else if(Stop)
+        else if(Stop || board_busy)
         en_hold <= en_hold;
         else if(Finalize)begin
             if(switch_r_flag)
@@ -1115,7 +1193,7 @@ module Playfield(
             else
             over <=1'b0;
         end
-        else if((touch_top || (duo && touch_top2)) && Playing && !lock_we && !(duo && lock_we2))
+        else if((touch_top || (duo && touch_top2)) && Playing && !board_busy && !lock_we && !(duo && lock_we2))
         over <= 1'b1;
         else
         over <= 1'b0;
@@ -1162,8 +1240,8 @@ module Playfield(
     assign ghost_ev1 = ghost_restart1;
     assign ghost_ev2 = duo && ghost_restart2;
     assign land_pulse2 = (lock_counter2 == 5940000) ? 1 : 0;
-    assign lock_we2  = (lock_t2) || (lock_cnt2 != 2'd0);
-    assign lock_idx2 = (lock_t2) ? 2'd0 : lock_cnt2;
+    assign lock_we2  = (lock_t2) || lock_pending2 || (lock_cnt2 != 2'd0);
+    assign lock_idx2 = (lock_t2 || lock_pending2) ? 2'd0 : lock_cnt2;
     assign cc_d2 = {cc_t2[0], cc_t2[1], cc_t2[2], cc_t2[3]};
     assign rr_d2 = {rr_t2[0], rr_t2[1], rr_t2[2], rr_t2[3]};
 
@@ -1200,7 +1278,7 @@ module Playfield(
             gr2 = ghost_scan_r2 + { { 7{Tetromino_dout2[jg2*8+3]} }, Tetromino_dout2[(jg2*8+3)-:4] };
             if((!gr2[5]) && (gr2 > 6'd19))
             ghost_blocked2 = 1'b1;
-            else if((!gr2[5]) && (gc2 <= (COL - 1'b1)) && row_w[gr2][gc2])begin
+            else if((!gr2[5]) && (gc2 <= (COL - 1'b1)) && read_ghost2[jg2][gc2])begin
                 ghost_blocked2 = 1'b1;
                 ghost_blk_state2 = 1'b1;
             end
@@ -1272,7 +1350,7 @@ module Playfield(
         ghost2 = 1'b0;
         touch_top2 = 1'b0;
         other_down_hold2 = 1'b0;
-        if(Idle || Finalize || !duo)begin  //单人模式下 P2 不显示也不下落
+        if(Idle || Finalize || !duo || board_init)begin  //单人模式下 P2 不显示也不下落
              Piece2 = 1'b0;
              ghost2 = 1'b0;
              land2 = 1'b1;
@@ -1295,39 +1373,39 @@ module Playfield(
                     if(oc1_0 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
                     if(oc1_0 == cc2) touch_top2 = 1'b1;
                 end
-                if((oc1_0 == cc2) && (or1_0 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
+                if((oc1_0 == cc2) && (or1_0 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && read_below2[i2][cc2]))
                 other_down_hold2 = 1'b1;
                 if(or1_1 == rr2)begin
                     if((cc2 > 0) && (oc1_1 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
                     if(oc1_1 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
                     if(oc1_1 == cc2) touch_top2 = 1'b1;
                 end
-                if((oc1_1 == cc2) && (or1_1 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
+                if((oc1_1 == cc2) && (or1_1 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && read_below2[i2][cc2]))
                 other_down_hold2 = 1'b1;
                 if(or1_2 == rr2)begin
                     if((cc2 > 0) && (oc1_2 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
                     if(oc1_2 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
                     if(oc1_2 == cc2) touch_top2 = 1'b1;
                 end
-                if((oc1_2 == cc2) && (or1_2 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
+                if((oc1_2 == cc2) && (or1_2 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && read_below2[i2][cc2]))
                 other_down_hold2 = 1'b1;
                 if(or1_3 == rr2)begin
                     if((cc2 > 0) && (oc1_3 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
                     if(oc1_3 == (cc2 + 6'd1)) boundary_collision_right2 = 1'b1;
                     if(oc1_3 == cc2) touch_top2 = 1'b1;
                 end
-                if((oc1_3 == cc2) && (or1_3 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
+                if((oc1_3 == cc2) && (or1_3 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && read_below2[i2][cc2]))
                 other_down_hold2 = 1'b1;
             end
-            if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && row_w[rr2 + 6'd1][cc2]))  //落底检测
+            if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && read_below2[i2][cc2]))  //落底检测
             land2 = 1'b1;
-            if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 - 6'd1]))  //左边界碰撞检测
+            if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && read_current2[i2][cc2 - 6'd1]))  //左边界碰撞检测
             boundary_collision_left2 = 1'b1;
-            if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 + 6'd1]))  //右边界碰撞检测
+            if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && read_current2[i2][cc2 + 6'd1]))  //右边界碰撞检测
             boundary_collision_right2 = 1'b1;
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr2) && !rr2[5])  //正在运动方块
             Piece2 = 1'b1;
-            if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && row_w[rr2][cc2])  //和已锁方块重叠=顶到
+            if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && read_current2[i2][cc2])  //和已锁方块重叠=顶到
             touch_top2 = 1'b1;
             rr_g2 = counter_ghost_r_t2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && ghost_valid2 && (!clear_time) && (counter_ghost_r_t2 > (counter_r2 + 5'd4)))
@@ -1394,7 +1472,7 @@ module Playfield(
             else
             counter_drop2 <= counter_drop2;
         end
-        else if(Stop)
+        else if(Stop || board_busy)
         counter_drop2 <= counter_drop2;
         else if(Playing)begin
             if(counter_drop2 == Drop)
@@ -1416,7 +1494,7 @@ module Playfield(
             else
             counter_r2 <= counter_r2;
         end
-        else if(Stop)
+        else if(Stop || board_busy)
         counter_r2 <= counter_r2;
         else if(Playing)begin
             if(land_we2)
@@ -1446,7 +1524,7 @@ module Playfield(
             else
             counter_c2 <= counter_c2;
         end
-        else if(Stop)
+        else if(Stop || board_busy)
         counter_c2 <= counter_c2;
         else if(Playing)begin
             if(land_we2)
@@ -1475,10 +1553,10 @@ module Playfield(
             rot_block2 = 1'b1;
             else if((rr_r2 > 11'd19) && !rr_r2[5])
             rot_block2 = 1'b1;
-            else if((cc_r2 <= (COL - 1'b1)) && (rr_r2 <= 11'd19) && row_w[rr_r2][cc_r2])
+            else if((cc_r2 <= (COL - 1'b1)) && (rr_r2 <= 11'd19) && read_rotate2[k2][cc_r2])
             rot_block2 = 1'b1;
         end
-        en_rotate2 = (rotate_p_flag2) && (!rot_block2) && (!lock_we2);
+        en_rotate2 = (rotate_p_flag2) && (!rot_block2) && (!lock_we2) && !board_busy;
     end
 
 //    P2 当前旋转序号
@@ -1491,7 +1569,7 @@ module Playfield(
             else
             rot2 <= rot2;
         end
-        else if(Stop)
+        else if(Stop || board_busy)
         rot2 <= rot2;
         else if(Playing)begin
             if(land_we2)
@@ -1523,6 +1601,8 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_t2 <= 1'b0;
+        else if(restart_board)
+        lock_t2 <= 1'b0;
         else if(land_pulse2)
         lock_t2 <= 1'b1;
         else
@@ -1533,12 +1613,21 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_cnt2 <= 2'd0;
-        else if(lock_t2)
-        lock_cnt2 <= 2'd1;
-        else if(lock_cnt2 == 2'd3)
+        else if(restart_board)
         lock_cnt2 <= 2'd0;
-        else if(lock_cnt2 != 2'd0)
+        else if((lock_t2 || lock_pending2) && !board_busy && !lock_we)
+        lock_cnt2 <= 2'd1;
+        else if(lock_cnt2 == 2'd3 && !board_busy && !lock_we)
+        lock_cnt2 <= 2'd0;
+        else if(lock_cnt2 != 2'd0 && !board_busy && !lock_we)
         lock_cnt2 <= lock_cnt2 + 2'd1;
+    end
+
+    always@(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n) lock_pending2 <= 1'b0;
+        else if(restart_board) lock_pending2 <= 1'b0;
+        else if(lock_t2 && (board_busy || lock_we)) lock_pending2 <= 1'b1;
+        else if(!board_busy && !lock_we) lock_pending2 <= 1'b0;
     end
 
 //    P2 锁存闪白计时
@@ -1579,7 +1668,7 @@ module Playfield(
         en_hold2 <= 0;
         else if(Idle)
         en_hold2 <= 1'b0;
-        else if(Stop)
+        else if(Stop || board_busy)
         en_hold2 <= en_hold2;
         else if(Finalize)begin
             if(switch_r_flag)
@@ -1635,4 +1724,36 @@ solo_hint solo_hint_inst(
 .hint_c0(hint_c0), .hint_c1(hint_c1), .hint_c2(hint_c2), .hint_c3(hint_c3),
 .hint_r0(hint_r0), .hint_r1(hint_r1), .hint_r2(hint_r2), .hint_r3(hint_r3)
 );
+endmodule
+
+// Each parallel cell owns an independent asynchronous read address. Explicit
+// primitives prevent read addresses from being mistaken for the write address.
+(* KEEP_HIERARCHY = "yes" *)
+module board_row_replica(
+    input clk,
+    input we,
+    input [4:0]write_addr,
+    input [23:0]write_data,
+    input [4:0]read_addr,
+    output [23:0]read_data
+);
+`ifdef SYNTHESIS
+    genvar bit_index;
+    generate for(bit_index=0; bit_index<24; bit_index=bit_index+1)begin : bits
+        RAM32X1D #(.INIT(32'd0)) ram(
+            .D(write_data[bit_index]), .WE(we), .WCLK(clk),
+            .A0(write_addr[0]), .A1(write_addr[1]), .A2(write_addr[2]),
+            .A3(write_addr[3]), .A4(write_addr[4]),
+            .DPRA0(read_addr[0]), .DPRA1(read_addr[1]), .DPRA2(read_addr[2]),
+            .DPRA3(read_addr[3]), .DPRA4(read_addr[4]),
+            .DPO(read_data[bit_index]), .SPO()
+        );
+    end endgenerate
+`else
+    reg [23:0]memory[0:31];
+    integer address;
+    initial for(address=0; address<32; address=address+1) memory[address]=24'd0;
+    always@(posedge clk) if(we) memory[write_addr] <= write_data;
+    assign read_data = memory[read_addr];
+`endif
 endmodule

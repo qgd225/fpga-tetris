@@ -1,5 +1,7 @@
 # FPGA 俄罗斯方块 (Tetris)
 
+当前分支包含场地 LUTRAM 实验改造：最终 LUT 为 17,272 (83.04%)，较原版净省 3,021；结构与验证记录见 [LUTRAM 重试](docs/lutram-retry.md)。根目录 `Tetris.bit` 仍为下文记载的已发布版本；候选 `Tetris_lutram.bit` 待上板验收。
+
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
 ## 工程信息

@@ -138,19 +138,37 @@ begin
 end
 endtask
 
-task clr_state; begin force dut.state = 480'd0; @(posedge Clk_74M); release dut.state; @(posedge Clk_74M); end endtask
+reg [4:0]test_row;
+task clr_state;
+begin
+  // Exercise the shared writer so all physical replicas are cleared as well.
+  @(negedge Clk_74M);
+  force dut.row_we = 1'b1;
+  force dut.row_data = 24'd0;
+  force dut.row_addr = test_row;
+  for(test_row=0; test_row<20; test_row=test_row+1)begin
+    @(posedge Clk_74M); @(negedge Clk_74M);
+  end
+  force dut.row_we = 1'b0;
+  #1;
+  release dut.row_we;
+  release dut.row_data;
+  release dut.row_addr;
+  @(posedge Clk_74M);
+end
+endtask
 
 initial begin
   bad = 0;
-  Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk_74M);
+  Rst = 0; #200; Rst = 1; repeat(30) @(posedge Clk_74M);
 
   $display("=== 1) 出生列(双人 = 24 列三等分点) ===");
   chk("duo=1 P1 出生列", dut.counter_c, 8);
   chk("duo=1 P2 出生列", dut.counter_c2, 16);
-  duo = 1'b0; Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk_74M);
+  duo = 1'b0; Rst = 0; #200; Rst = 1; repeat(30) @(posedge Clk_74M);
   chk("duo=0 P1 出生列", dut.counter_c, 9);
   chk("duo=0 P2 出生列", dut.counter_c2, 9);
-  duo = 1'b1; Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk_74M);
+  duo = 1'b1; Rst = 0; #200; Rst = 1; repeat(30) @(posedge Clk_74M);
   force dut.Drop = 30'd100_000_000;  // 关闭自动下落, 便于精确测试
 
   $display("=== 2) 压在对方运动方块上: 停住但不开始锁存 ===");

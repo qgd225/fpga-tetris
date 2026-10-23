@@ -1,6 +1,6 @@
 # 仿真台（可复现）
 
-九套自测直接编译 `../Tetris.srcs/sources_1/new/` 下的实时 RTL；仿真产物写入各自的 `build/`，日志写入 `logs/`，均不纳入 Git。
+十套自测直接编译 `../Tetris.srcs/sources_1/new/` 下的实时 RTL；仿真产物写入各自的 `build/`，日志写入 `logs/`，均不纳入 Git。
 
 ## 一键跑全部
 
@@ -10,7 +10,7 @@ sim\run_all.bat
 
 最终输出逐套显示 `=== ALL PASS ===` 或 `=== FAILED n ===`。
 
-## 九套测试说明
+## 十套测试说明
 
 | 套 | 顶层 | 覆盖内容 | 项数 |
 | --- | --- | --- | ---: |
@@ -23,8 +23,9 @@ sim\run_all.bat
 | `sim/hold_gesture` | `hold_gesture_tb` | Hold 短按换块、长按提示切换和 PC/板载输入 | 27 |
 | `sim/solo_hint` | `solo_hint_tb` | 4 旋转 x 20 列搜索、评分、空洞/悬空约束和类型切换 | 59 |
 | `sim/rgb_palette` | `rgb_palette_tb` | 56 色调色板与 8 位无碰撞 RGB 索引映射 | 56 |
+| `sim/lutram` | `board_lutram_tb`、`frame_storage_tb` | 32 个独立读口、镜像一致性、双人锁定排队与抢占、重开及连续消行；联合检查占用、颜色与归属 | 每种场地模型 21536 次读出比较及定向断言，另含显示存储联合断言 |
 
-总计 **784 项**。
+原有九套共 **784 项**，另加 LUTRAM 专项验证。完整结构和构建结果见 [LUTRAM 重试](../docs/lutram-retry.md)。
 
 ## 单独跑一套
 
@@ -36,7 +37,7 @@ run.bat
 ## 说明
 
 - ROM（Tetromino / weiyibiao / number / letter）在仿真中使用行为桩，重点验证逻辑通路。
-- 场地存储为单份 `state` + 行字直读，渲染和判定读取同一份状态。
+- 场地保留规范 `state` 镜像，判定使用与其同拍写入的独立 LUTRAM 副本；测试清场也通过公共行写口更新副本。
 - CORE-07 回归覆盖外层舱壁/内层反应堆槽、双人单核心缝、压力柱警戒齿、分段危险带、`CORE BREACH`、坍缩环/白热点和 56 色协议。
 - 历史迭代记录保留在下方附录，不再混入当前测试使用说明。
 
