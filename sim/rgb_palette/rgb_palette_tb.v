@@ -1,4 +1,4 @@
-﻿`timescale 1ns/1ps
+`timescale 1ns/1ps
 module rgb_palette_tb;
   reg Clk;
   reg  [23:0] rgb;

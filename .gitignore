@@ -44,7 +44,6 @@ tools/scoreboard.csv
 
 # ===== 仿真台产物 =====
 /sim/*/build/
-/sim/_nobom/
 *.wdb
 /sim/logs/
 

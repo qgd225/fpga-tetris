@@ -1,7 +1,7 @@
-ï»¿//============================================================
-// æ¨¡å—ï¼šPlayfield
-// ä½œç”¨ï¼šæ ¸å¿ƒæ¸¸æˆåŒºï¼šåœºåœ°å­˜å‚¨ã€æ–¹å—è¿åŠ¨ã€ç¢°æ’ã€é”å­˜ã€æ¶ˆè¡Œã€å¹½çµå’Œæ™ºèƒ½è½ç‚¹ã€‚
-// æ—¶é’Ÿ/å¤ä½ï¼šClk_74Mï¼›Reset_n ä½æœ‰æ•ˆ
+//============================================================
+// Ä£¿é£ºPlayfield
+// ×÷ÓÃ£ººËĞÄÓÎÏ·Çø£º³¡µØ´æ´¢¡¢·½¿éÔË¶¯¡¢Åö×²¡¢Ëø´æ¡¢ÏûĞĞ¡¢ÓÄÁéºÍÖÇÄÜÂäµã¡£
+// Ê±ÖÓ/¸´Î»£ºClk_74M£»Reset_n µÍÓĞĞ§
 //============================================================
 module Playfield(
     input Clk_74M,
@@ -101,11 +101,11 @@ module Playfield(
     );
 
 //============================================================
-//    å‚æ•°
+//    ²ÎÊı
 //============================================================
     parameter MCNT = 74_250_000;
     parameter MCNT_LAND = 20_000_000;
-    parameter MCNT_Drop = 74_250_000 - 1;  //è‡ªåŠ¨ä¸‹è½æ—¶é—´
+    parameter MCNT_Drop = 74_250_000 - 1;  //×Ô¶¯ÏÂÂäÊ±¼ä
 
     parameter [19:0]LV1_TH = 20'd4;
     parameter [19:0]LV2_TH = 20'd15;
@@ -126,7 +126,7 @@ module Playfield(
 
     wire [4:0]COL = duo ? 5'd24 : 5'd20;
 
-//    åŒäººæ¨¡å¼æ—¶é—´é˜ˆå€¼(æ”¾å®½)
+//    Ë«ÈËÄ£Ê½Ê±¼äãĞÖµ(·Å¿í)
     parameter [13:0]TIME_LV1_D = 14'd40;
     parameter [13:0]TIME_LV2_D = 14'd120;
     parameter [13:0]TIME_LV3_D = 14'd240;
@@ -135,14 +135,14 @@ module Playfield(
     parameter [13:0]TIME_LV6_D = 14'd880;
     parameter [13:0]TIME_LV7_D = 14'd1200;
 
-//    å‡ºç”Ÿåˆ—: åŒäººç”¨ 24 åˆ—çš„ä¸‰ç­‰åˆ†ç‚¹
+//    ³öÉúÁĞ: Ë«ÈËÓÃ 24 ÁĞµÄÈıµÈ·Öµã
     wire [4:0]SPAWN_C1 = duo ? 5'd8  : 5'd9;
     wire [4:0]SPAWN_C2 = duo ? 5'd16 : 5'd9;
 
 //============================================================
-//    ä¿¡å·å£°æ˜
+//    ĞÅºÅÉùÃ÷
 //============================================================
-//    æ–¹å—ä½ç½®ä¿¡æ¯
+//    ·½¿éÎ»ÖÃĞÅÏ¢
     reg [1:0]rot;
     reg [4:0]counter_c;
     reg [4:0]counter_r;
@@ -154,14 +154,14 @@ module Playfield(
     reg touch_top;
     reg [5:0]rr_g;
 
-//    å½¢çŠ¶ ROM
+//    ĞÎ×´ ROM
     wire [31:0]Tetromino_dout;
     reg  [4:0]Tetromino_addr;
     reg [4:0]Tetromino_addr1;
     wire [31:0]Tetromino_dout1;
     reg  [4:0]counter_ghost_r_t;
 
-//    è½åœ°ä¸é”å®š
+//    ÂäµØÓëËø¶¨
     wire land_pulse;
     reg [1:0]lock_cnt;
     reg [4:0]cc_t [0:3];
@@ -169,7 +169,7 @@ module Playfield(
     reg [24:0]counter_land;
     reg [24:0]lock_counter;
 
-//    æ¶ˆè¡Œ
+//    ÏûĞĞ
     reg [19:0]line;
     reg clear_d;
     wire [4:0]d_clear = line[0] + line[1] + line[2] + line[3] + line[4] + line[5] + line[6] + line[7] + line[8] +
@@ -184,14 +184,14 @@ module Playfield(
     reg [3:0]cl_stop;
     wire clear_step;
 
-//    æŒ‰é”®ä¸ä¸‹è½
+//    °´¼üÓëÏÂÂä
     reg [26:0]counter;
     reg drop_r_t;
     wire drop_hold  = (counter == MCNT) && (drop_r_t);
     wire drop_r = (drop_r_t) && (drop_r_flag);
     reg [26:0]counter_drop;
 
-//    æ—‹è½¬
+//    Ğı×ª
     reg en_rotate;
     reg [5:0] cc_r, rr_r;
     wire [7:0]weiyibiao_dout;
@@ -202,7 +202,7 @@ module Playfield(
     wire [10:0] ddr_ext = {{7{ddr[3]}}, ddr};
     reg rot_block;
 
-//    éšæœºå‡ºå—
+//    Ëæ»ú³ö¿é
     reg [31:0]rnd;
     reg [15:0]rnd_cnt;
     wire rnd_fb  = rnd[31] ^ rnd[21] ^ rnd[1] ^ rnd[0];
@@ -227,7 +227,7 @@ module Playfield(
     wire hold_up = !en_hold_t && en_hold;
     wire hold_down = en_hold_t && !en_hold;
 
-//    P2 æ–¹å—ä½ç½®ä¿¡æ¯
+//    P2 ·½¿éÎ»ÖÃĞÅÏ¢
     reg [1:0]rot2;
     reg [4:0]counter_c2;
     reg [4:0]counter_r2;
@@ -265,7 +265,7 @@ module Playfield(
     reg lock_t2;
     wire [9:0]douta_dummy2;
 
-//    Duo: äº’æ’/é¡¶ä½ + é€šç”¨å¹½çµæ‰«æ(æœ¬è½®æ–°å¢)
+//    Duo: »¥×²/¶¥×¡ + Í¨ÓÃÓÄÁéÉ¨Ãè(±¾ÂÖĞÂÔö)
     reg  other_down_hold;
     reg  other_down_hold2;
     reg  [5:0]gc1, gr1;
@@ -281,7 +281,7 @@ module Playfield(
     integer jg1;
     integer jg2;
 
-//    å¹½çµé‡æ‰«åªçœ‹æ°´å¹³/å§¿æ€å˜åŒ–; ä»»æ„ä¸€æ–¹ä¸‹è½ä¸è§¦å‘é‡æ‰«
+//    ÓÄÁéÖØÉ¨Ö»¿´Ë®Æ½/×ËÌ¬±ä»¯; ÈÎÒâÒ»·½ÏÂÂä²»´¥·¢ÖØÉ¨
     wire [10:0]sig_p1 = {duo, counter_c[4:0], type[2:0], rot[1:0]};
     wire [10:0]sig_p2 = {duo, counter_c2[4:0], type2[2:0], rot2[1:0]};
     wire other_moved1 = (sig_p2 != sig_p2_d);
@@ -292,7 +292,7 @@ module Playfield(
     wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || hold_up || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved1);
     wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || hold_up2 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved2);
 
-//    P2 ç‹¬ç«‹ä¿¡å·(ä¿®å¤: åŸå…‹éš†æ¼æ”¹, è¯¯ç”¨ P1 ä¿¡å·)
+//    P2 ¶ÀÁ¢ĞÅºÅ(ĞŞ¸´: Ô­¿ËÂ¡Â©¸Ä, ÎóÓÃ P1 ĞÅºÅ)
     wire drop_hold2;
     wire drop_r2;
     wire [7:0]weiyibiao_dout2;
@@ -302,7 +302,7 @@ module Playfield(
     wire [10:0]ddc_ext2;
     wire [10:0]ddr_ext2;
 
-//    å¾ªç¯å˜é‡
+//    Ñ­»·±äÁ¿
     integer i;
     integer y;
     integer m;
@@ -312,13 +312,13 @@ module Playfield(
     integer k;
     integer i2;
 
-//    è¡Œå­—: row_w[m] = ç¬¬ m è¡Œ 24 åˆ—(çº¯è¿çº¿, åªä½œå†™è·¯å¾„çš„æºä¸æ•´è¡Œåˆ¤æ»¡)
+//    ĞĞ×Ö: row_w[m] = µÚ m ĞĞ 24 ÁĞ(´¿Á¬Ïß, Ö»×÷Ğ´Â·¾¶µÄÔ´ÓëÕûĞĞÅĞÂú)
     wire [23:0]row_w [0:19];
 
-//    æ•´è¡Œåˆ¤æ»¡ç”¨çš„åˆ—æ©ç (å•æœºåªçœ‹ 0..19 åˆ—)
+//    ÕûĞĞÅĞÂúÓÃµÄÁĞÑÚÂë(µ¥»úÖ»¿´ 0..19 ÁĞ)
     wire [23:0]full_mask = duo ? 24'hFFFFFF : 24'h000FFFFF;
 
-//    å¯¹æ–¹æ–¹å— 4 æ ¼ç»å¯¹åæ ‡(å…¬å…±è¿çº¿)
+//    ¶Ô·½·½¿é 4 ¸ñ¾ø¶Ô×ø±ê(¹«¹²Á¬Ïß)
     wire [5:0] oc2_0 = counter_c2 + { { 7{Tetromino_dout2[7]} }, Tetromino_dout2[7-:4] };
     wire [5:0] or2_0 = counter_r2 + { { 7{Tetromino_dout2[3]} }, Tetromino_dout2[3-:4] };
     wire [5:0] oc2_1 = counter_c2 + { { 7{Tetromino_dout2[15]} }, Tetromino_dout2[15-:4] };
@@ -349,7 +349,7 @@ module Playfield(
     integer k2;
 
 //============================================================
-//    æå–æ–¹å—ä¿¡æ¯
+//    ÌáÈ¡·½¿éĞÅÏ¢
 //============================================================
     Tetromino Tetromino_inst0(
         .clka(Clk_74M),
@@ -357,7 +357,7 @@ module Playfield(
         .douta(Tetromino_dout)
     );
 
-//    P1 è¿åŠ¨æ–¹å—æ˜¾ç¤ºä¸åˆ¤å®š: å½¢çŠ¶æŸ¥è¡¨ / è½åº• / å·¦å³è¾¹ç•Œ / é¡¶åˆ° / å¹½çµ / ä¸å¯¹æ–¹è¿åŠ¨æ–¹å—äº’æ’
+//    P1 ÔË¶¯·½¿éÏÔÊ¾ÓëÅĞ¶¨: ĞÎ×´²é±í / Âäµ× / ×óÓÒ±ß½ç / ¶¥µ½ / ÓÄÁé / Óë¶Ô·½ÔË¶¯·½¿é»¥×²
     always@(*)begin
         Tetromino_addr = {type[2:0], rot[1:0]};
         Piece = 1'b0;
@@ -386,7 +386,7 @@ module Playfield(
                 if(rr > piece_rmax1) piece_rmax1 = rr;
             end
 
-//    ä¸å¯¹æ–¹è¿åŠ¨æ–¹å—äº’æ’: å·¦å³é˜»æŒ¡ / ä¸‹è¡Œé¡¶ä½(ä¸ç®—è½åº•) / é‡åˆ
+//    Óë¶Ô·½ÔË¶¯·½¿é»¥×²: ×óÓÒ×èµ² / ÏÂĞĞ¶¥×¡(²»ËãÂäµ×) / ÖØºÏ
             if(duo)begin
                 if(or2_0 == rr)begin
                     if((cc > 0) && (oc2_0 == (cc - 6'd1))) boundary_collision_left = 1'b1;
@@ -417,15 +417,15 @@ module Playfield(
                 if((oc2_3 == cc) && (or2_3 == (rr + 6'd1)) && (rr < 11'd19) && !((cc <= (COL - 1'b1)) && row_w[rr + 6'd1][cc]))
                 other_down_hold = 1'b1;
             end
-            if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && row_w[rr + 6'd1][cc]))  //è½åº•æ£€æµ‹
+            if(rr == 19 || ((cc <= (COL - 1'b1)) && (rr < 19) && row_w[rr + 6'd1][cc]))  //Âäµ×¼ì²â
             land = 1'b1;
-            if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc - 6'd1]))  //å·¦è¾¹ç•Œç¢°æ’æ£€æµ‹
+            if(cc == 0 || ((cc > 0) && (cc <= (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc - 6'd1]))  //×ó±ß½çÅö×²¼ì²â
             boundary_collision_left = 1'b1;
-            if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc + 6'd1]))  //å³è¾¹ç•Œç¢°æ’æ£€æµ‹
+            if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && row_w[rr][cc + 6'd1]))  //ÓÒ±ß½çÅö×²¼ì²â
             boundary_collision_right = 1'b1;
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr) && !rr[5])  //æ­£åœ¨è¿åŠ¨æ–¹å—
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr) && !rr[5])  //ÕıÔÚÔË¶¯·½¿é
             Piece = 1'b1;
-            if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && row_w[rr][cc])  //å’Œå·²é”æ–¹å—é‡å =é¡¶åˆ°
+            if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && row_w[rr][cc])  //ºÍÒÑËø·½¿éÖØµş=¶¥µ½
             touch_top = 1'b1;
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && ghost_valid && (!clear_time) && (counter_ghost_r_t > (counter_r + 5'd4)))
@@ -434,18 +434,18 @@ module Playfield(
     end
 
 //============================================================
-//    åˆ’åŒº
+//    »®Çø
 //============================================================
-//    æ¨ªçºµæ‹†å¼€: åˆ—åªçœ‹ hcounter, è¡Œåªçœ‹ vcounter; æ— å‘½ä¸­ç»™å“¨å…µ 24
-//    åœºåœ°æ˜¯ 32px å‡åŒ€æ ¼å­, æ‰€ä»¥ç›´æ¥ç®—æœ¯å®šç¼–å·(ä¸åŸæ¥é€æ ¼æ¯”è¾ƒé€ä½ç­‰ä»·, ä½†é“¾çŸ­å¾ˆå¤š);
-//    æ¯æ ¼ 30px: æœ«å°¾ 2px ä¸ç»™ç¼–å·(å“¨å…µ 24), ä¿æŒåŸæ¥çš„è¡Œä¸º
+//    ºá×İ²ğ¿ª: ÁĞÖ»¿´ hcounter, ĞĞÖ»¿´ vcounter; ÎŞÃüÖĞ¸øÉÚ±ø 24
+//    ³¡µØÊÇ 32px ¾ùÔÈ¸ñ×Ó, ËùÒÔÖ±½ÓËãÊõ¶¨±àºÅ(ÓëÔ­À´Öğ¸ñ±È½ÏÖğÎ»µÈ¼Û, µ«Á´¶ÌºÜ¶à);
+//    Ã¿¸ñ 30px: Ä©Î² 2px ²»¸ø±àºÅ(ÉÚ±ø 24), ±£³ÖÔ­À´µÄĞĞÎª
     always@(*)begin : blk1
         C_num = 5'd24;
         if((hcounter >= 11'd321) && (hcounter < (321 + 32*COL)) && (((hcounter - 11'd321) & 11'd31) < 11'd30))
         C_num = (hcounter - 11'd321) >> 5;
     end
 
-//    è¡Œç¼–å·: åªçœ‹ vcounter, åŒæ ·ç®—æœ¯å®šè¡Œå·
+//    ĞĞ±àºÅ: Ö»¿´ vcounter, Í¬ÑùËãÊõ¶¨ĞĞºÅ
     always@(*)begin : blk2
         R_num = 5'd24;
         if((vcounter >= 11'd81) && (vcounter < 11'd721) && (((vcounter - 11'd81) & 11'd31) < 11'd30))
@@ -453,7 +453,7 @@ module Playfield(
     end
 
 //============================================================
-//    éšæœºæ–¹å—ç±»å‹é€‰æ‹©
+//    Ëæ»ú·½¿éÀàĞÍÑ¡Ôñ
 //============================================================
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
@@ -462,7 +462,7 @@ module Playfield(
         rnd <= {rnd[30:0], rnd_fb_eff};
     end
 
-//    è‡ªç”±è®¡æ•°: ç»™éšæœºå–æ ·ä¸ Idle æ…åŠ¨ç”¨
+//    ×ÔÓÉ¼ÆÊı: ¸øËæ»úÈ¡ÑùÓë Idle ½Á¶¯ÓÃ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         rnd_cnt <= 16'd0;
@@ -470,7 +470,7 @@ module Playfield(
         rnd_cnt <= rnd_cnt + 16'd1;
     end
 
-//    P1 å½“å‰æ–¹å—ç±»å‹: åˆ°ä¸‹ä¸€å—æˆ– Hold æ—¶æ›¿æ¢
+//    P1 µ±Ç°·½¿éÀàĞÍ: µ½ÏÂÒ»¿é»ò Hold Ê±Ìæ»»
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type <= 3'd0;
@@ -480,7 +480,7 @@ module Playfield(
         type <= type_t;
     end
 
-//    P1 ä¸‹ä¸€å—ç±»å‹: æ˜¾ç¤ºåœ¨ç”»é¢ Next æ¡†ä¸ŠåŠ
+//    P1 ÏÂÒ»¿éÀàĞÍ: ÏÔÊ¾ÔÚ»­Ãæ Next ¿òÉÏ°ë
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_t <= 3'd0;
@@ -492,7 +492,7 @@ module Playfield(
         type_t <= rnd_type_n;
     end
 
-//    P1 è½é”æ—¶çš„ç±»å‹: äº¤ç»™ frame å®šæ ¼å­é¢œè‰²
+//    P1 ÂäËøÊ±µÄÀàĞÍ: ½»¸ø frame ¶¨¸ñ×ÓÑÕÉ«
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_d <= 3'd0;
@@ -501,8 +501,8 @@ module Playfield(
     end
 
 //============================================================
-//    æŒ‰é”®ä¿¡å·å¤„ç†
-//    P1 è½¯é™è®¡æ—¶: æ»¡ MCNT æ‰è®¤ä¸€æ¬¡è½¯é™
+//    °´¼üĞÅºÅ´¦Àí
+//    P1 Èí½µ¼ÆÊ±: Âú MCNT ²ÅÈÏÒ»´ÎÈí½µ
     always@(posedge Clk_74M or negedge Reset_n)
     if(!Reset_n)
     counter <= 30'd0;
@@ -511,7 +511,7 @@ module Playfield(
     else if(counter < MCNT)
     counter <= counter + 30'd1;
 
-//    P1 ç¡¬é™æ ‡å¿—: æŒ‰ä¸€æ¬¡åªåƒä¸€æ¬¡, æ¾é”®åå¤ä½
+//    P1 Ó²½µ±êÖ¾: °´Ò»´ÎÖ»³ÔÒ»´Î, ËÉ¼üºó¸´Î»
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         drop_r_t <= 1'b1;
@@ -522,8 +522,8 @@ module Playfield(
     end
 
 //============================================================
-//    è‡ªåŠ¨ä¸‹è½ä¸å‚è€ƒç‚¹ç§»åŠ¨
-//    P1 è‡ªåŠ¨ä¸‹è½è®¡æ—¶: æ»¡ Drop è‡ªåŠ¨é™ä¸€æ ¼
+//    ×Ô¶¯ÏÂÂäÓë²Î¿¼µãÒÆ¶¯
+//    P1 ×Ô¶¯ÏÂÂä¼ÆÊ±: Âú Drop ×Ô¶¯½µÒ»¸ñ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_drop <= 1'd0;
@@ -569,12 +569,12 @@ module Playfield(
                          (time_sec >= TIME_LV2_D) ? 3'd2 :
                          (time_sec >= TIME_LV1_D) ? 3'd1 : 3'd0;
 
-//    åŒäºº: æ—¶é—´é˜ˆå€¼æ”¾å®½; è§„åˆ™ä»ä¸º åˆ†æ•°ç­‰çº§/æ—¶é—´ç­‰çº§ å–è¾ƒå¤§å€¼
+//    Ë«ÈË: Ê±¼äãĞÖµ·Å¿í; ¹æÔòÈÔÎª ·ÖÊıµÈ¼¶/Ê±¼äµÈ¼¶ È¡½Ï´óÖµ
     wire [2:0]lv_time  = duo ? lv_time_d : lv_time_s;
 
     wire [2:0]lv_now   = (lv_score > lv_time) ? lv_score : lv_time;
 
-//    é€Ÿåº¦ç­‰çº§: åˆ†æ•°ç­‰çº§ä¸æ—¶é—´ç­‰çº§å–è¾ƒå¤§å€¼
+//    ËÙ¶ÈµÈ¼¶: ·ÖÊıµÈ¼¶ÓëÊ±¼äµÈ¼¶È¡½Ï´óÖµ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         speed_level <= 0;
@@ -582,7 +582,7 @@ module Playfield(
         speed_level <= lv_now;
     end
 
-//    è‡ªåŠ¨ä¸‹è½é—´éš”: æŒ‰é€Ÿåº¦ç­‰çº§æŸ¥è¡¨
+//    ×Ô¶¯ÏÂÂä¼ä¸ô: °´ËÙ¶ÈµÈ¼¶²é±í
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         Drop <= MCNT_Drop;
@@ -599,7 +599,7 @@ module Playfield(
         endcase
      end
 
-//    å‚è€ƒç‚¹ç§»åŠ¨
+//    ²Î¿¼µãÒÆ¶¯
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_r <= 5'd0;
@@ -614,22 +614,22 @@ module Playfield(
         else if(Playing)begin
             if(land_we)
             counter_r <= counter_r;
-            else if(land_pulse || hold_up)  //å½’ä½
+            else if(land_pulse || hold_up)  //¹éÎ»
             counter_r <= 5'd0;
-            else if(drop_r && !land && !lock_we && !other_down_hold)  //è½¯é™
+            else if(drop_r && !land && !lock_we && !other_down_hold)  //Èí½µ
             counter_r <= counter_r + 1'd1;
-            else if(drop_hold && !lock_we)  //ç¡¬é™
+            else if(drop_hold && !lock_we)  //Ó²½µ
             counter_r <= counter_ghost_r_t;
-            else if(en_rotate)  //æ—‹è½¬
+            else if(en_rotate)  //Ğı×ª
             counter_r <= counter_r + ddr_ext;
-            else if(counter_drop == Drop && !land && !lock_we && !other_down_hold)  //è‡ªåŠ¨ä¸‹è½
+            else if(counter_drop == Drop && !land && !lock_we && !other_down_hold)  //×Ô¶¯ÏÂÂä
             counter_r <= counter_r + 1'd1;
         end
         else
         counter_r <= 5'd0;
     end
 
-//    P1 å‚è€ƒç‚¹åˆ—: å·¦å³ç§»åŠ¨/æ—‹è½¬/å½’ä½(åŒäººå‡ºç”Ÿåˆ— 8)
+//    P1 ²Î¿¼µãÁĞ: ×óÓÒÒÆ¶¯/Ğı×ª/¹éÎ»(Ë«ÈË³öÉúÁĞ 8)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_c <= SPAWN_C1;
@@ -644,13 +644,13 @@ module Playfield(
         else if(Playing)begin
             if(land_we)
             counter_c <= counter_c;
-            else if(land_pulse || hold_up)  //å½’ä½
+            else if(land_pulse || hold_up)  //¹éÎ»
             counter_c <= SPAWN_C1;
-            else if(en_rotate)  //æ—‹è½¬
+            else if(en_rotate)  //Ğı×ª
             counter_c <= counter_c + ddc_ext;
-            else if(!boundary_collision_left && left_p_flag && !lock_we)  //å·¦ç§»
+            else if(!boundary_collision_left && left_p_flag && !lock_we)  //×óÒÆ
             counter_c <= counter_c - 1;
-            else if(!boundary_collision_right && right_p_flag && !lock_we)  //å³ç§»
+            else if(!boundary_collision_right && right_p_flag && !lock_we)  //ÓÒÒÆ
             counter_c <= counter_c + 1;
         end
         else
@@ -658,7 +658,7 @@ module Playfield(
     end
 
 //============================================================
-//    æ–¹å—æ—‹è½¬åºå·
+//    ·½¿éĞı×ªĞòºÅ
 //============================================================
     Tetromino Tetromino_inst1(
         .clka(Clk_74M),
@@ -674,7 +674,7 @@ module Playfield(
 
     assign weiyibiao_addr = {type[2:0],rot[1:0]};
 
-//    P1 æ—‹è½¬é¢„åˆ¤: è½¬è¿‡å»ä¼šä¸ä¼šå‡ºç•Œæˆ–æ’åˆ°å·²è½æ ¼
+//    P1 Ğı×ªÔ¤ÅĞ: ×ª¹ıÈ¥»á²»»á³ö½ç»ò×²µ½ÒÑÂä¸ñ
     always@(*)begin
         Tetromino_addr1 = {type[2:0], (rot[1:0] + 1)};
         rot_block = 1'b0;
@@ -691,7 +691,7 @@ module Playfield(
         en_rotate = (rotate_p_flag) && (!rot_block) && (!lock_we);
     end
 
-//    P1 å½“å‰æ—‹è½¬åºå·
+//    P1 µ±Ç°Ğı×ªĞòºÅ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         rot <= 2'd0;
@@ -716,8 +716,8 @@ module Playfield(
     end
 
 //============================================================
-//    è½åœ°è®¡æ—¶ä¸é”å®š
-//    P1 è½åº•åœç•™è®¡æ—¶: æ»¡ MCNT_LAND å°±å¼€å§‹é”å­˜
+//    ÂäµØ¼ÆÊ±ÓëËø¶¨
+//    P1 Âäµ×Í£Áô¼ÆÊ±: Âú MCNT_LAND ¾Í¿ªÊ¼Ëø´æ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_land <= 1'b0;
@@ -733,7 +733,7 @@ module Playfield(
 
     wire land_pulse_t = (land) && (counter_land == MCNT_LAND);
 
-//    P1 é”å­˜å¯åŠ¨
+//    P1 Ëø´æÆô¶¯
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_t <= 1'b0;
@@ -743,7 +743,7 @@ module Playfield(
         lock_t <= 1'b0;
     end
 
-//    P1 é”å­˜è®¡æ•°: 4 ä¸ªæ ¼å­ä¸€æ‹å†™ä¸€ä¸ª
+//    P1 Ëø´æ¼ÆÊı: 4 ¸ö¸ñ×ÓÒ»ÅÄĞ´Ò»¸ö
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_cnt <= 2'd0;
@@ -755,7 +755,7 @@ module Playfield(
         lock_cnt <= lock_cnt + 2'd1;
     end
 
-//    é—ªç™½
+//    ÉÁ°×
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_counter <= 2'd0;
@@ -773,7 +773,7 @@ module Playfield(
     assign lock_we  = (lock_t) || (lock_cnt != 2'd0);
     assign lock_idx = (lock_t) ? 2'd0 : lock_cnt;
 
-//    P1 è½é”æ—¶ 4 ä¸ªæ ¼å­çš„åˆ—
+//    P1 ÂäËøÊ± 4 ¸ö¸ñ×ÓµÄÁĞ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             cc_t[0] <= 11'd0; cc_t[1] <= 11'd0; cc_t[2] <= 11'd0; cc_t[3] <= 11'd0;
@@ -783,7 +783,7 @@ module Playfield(
         cc_t[y] <= counter_c + { {7{Tetromino_dout[y*8+7]}}, Tetromino_dout[y*8+7 -:4] };
     end
 
-//    P1 è½é”æ—¶ 4 ä¸ªæ ¼å­çš„è¡Œ
+//    P1 ÂäËøÊ± 4 ¸ö¸ñ×ÓµÄĞĞ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             rr_t[0] <= 11'd0; rr_t[1] <= 11'd0; rr_t[2] <= 11'd0; rr_t[3] <= 11'd0;
@@ -797,9 +797,9 @@ module Playfield(
     assign rr_d = {rr_t[0],rr_t[1], rr_t[2],rr_t[3]};
 
 //============================================================
-//    åœºåœ°çŠ¶æ€ä¸æ¶ˆè¡Œ
+//    ³¡µØ×´Ì¬ÓëÏûĞĞ
 //============================================================
-//    åœºåœ°çŠ¶æ€: ç›´æ¥å­˜ 480 ä½(state), å†™å£ä¸€æ¬¡å†™ä¸€è¡Œ(æ¸…é›¶/è½é”/æ¶ˆè¡Œæ¬ç§»éƒ½åœ¨è¿™é‡Œ)
+//    ³¡µØ×´Ì¬: Ö±½Ó´æ 480 Î»(state), Ğ´¿ÚÒ»´ÎĞ´Ò»ĞĞ(ÇåÁã/ÂäËø/ÏûĞĞ°áÒÆ¶¼ÔÚÕâÀï)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         state <= 480'd0;
@@ -839,7 +839,7 @@ module Playfield(
         end
     end
 
-//    æ•´è¡Œåˆ¤æ»¡: 24 æ ¼å…¨æ»¡çš„è¡Œè¦æ¶ˆ
+//    ÕûĞĞÅĞÂú: 24 ¸ñÈ«ÂúµÄĞĞÒªÏû
     always@(*)begin : blk4
         integer m;
         clear = 1'b0;
@@ -854,7 +854,7 @@ module Playfield(
 
     assign clear_time = clear_t || clear;
 
-//    é—ªç™½æ¬¡æ•°: æ¶ˆ n è¡Œé—ª 2n ä¸‹
+//    ÉÁ°×´ÎÊı: Ïû n ĞĞÉÁ 2n ÏÂ
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     cl_stop <= 4'd0;
@@ -864,7 +864,7 @@ module Playfield(
     cl_stop <= (d_clear << 1) - 4'd1;
     end
 
-//    é—ªç™½åˆ†é¢‘è®¡æ•°
+//    ÉÁ°×·ÖÆµ¼ÆÊı
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_cnt <= 0;
@@ -878,7 +878,7 @@ module Playfield(
 
     assign clear_step = (clear_t) && (clear_cnt == CLEAR_STEP);
 
-//    é—ªç™½æ ‡å¿—: æ¶ˆè¡ŒåŠ¨ç”»æœŸé—´é”ä½åœºåœ°
+//    ÉÁ°×±êÖ¾: ÏûĞĞ¶¯»­ÆÚ¼äËø×¡³¡µØ
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_t <= 1'b0;
@@ -888,7 +888,7 @@ module Playfield(
     clear_t <= 1'b0;
     end
 
-//    é—ªç™½èŠ‚æ‹
+//    ÉÁ°×½ÚÅÄ
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_tick <= 3'd0;
@@ -902,7 +902,7 @@ module Playfield(
     end
     end
 
-//    å·²æ¶ˆè¡Œè®¡æ•°(åŠ¨ç”»ç”¨)
+//    ÒÑÏûĞĞ¼ÆÊı(¶¯»­ÓÃ)
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     cl_tick <= 3'd0;
@@ -912,7 +912,7 @@ module Playfield(
     cl_tick <= cl_tick + 3'd1;
     end
 
-//    æ¶ˆè¡ŒèŠ‚æ‹è„‰å†²: æ¯æ¶ˆä¸€è¡Œç»™ä¸€æ‹
+//    ÏûĞĞ½ÚÅÄÂö³å: Ã¿ÏûÒ»ĞĞ¸øÒ»ÅÄ
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_t_t <= 1'b0;
@@ -920,7 +920,7 @@ module Playfield(
     clear_t_t <= clear_step && (cl_tick < d_clear);
     end
 
-//    é—ªç™½ç¿»è½¬: äº®/æš—äº¤æ›¿
+//    ÉÁ°×·­×ª: ÁÁ/°µ½»Ìæ
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_flash <= 1'b1;
@@ -930,7 +930,7 @@ module Playfield(
     clear_flash <= !clear_flash;
     end
 
-//    æ­£åœ¨æ¶ˆçš„è¡Œæ ‡è®°
+//    ÕıÔÚÏûµÄĞĞ±ê¼Ç
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     line_t <= 20'd0;
@@ -942,7 +942,7 @@ module Playfield(
     line_t <= 20'd0;
     end
 
-//    æ‰¾å‡ºè¿˜æ²¡å¼€å§‹æ¶ˆçš„ä¸‹ä¸€è¡Œ
+//    ÕÒ³ö»¹Ã»¿ªÊ¼ÏûµÄÏÂÒ»ĞĞ
     always@(*)begin : blk5
         integer m;
     line_d = 20'd0;
@@ -951,7 +951,7 @@ module Playfield(
     line_d = (20'd1 << m);
     end
 
-//    æ¶ˆè¡Œæ¬ç§»çš„ä¸Šç•Œè¡Œ(æœ€é«˜çš„æ»¡è¡Œ)
+//    ÏûĞĞ°áÒÆµÄÉÏ½çĞĞ(×î¸ßµÄÂúĞĞ)
     always@(*)begin : blk6
         integer m;
         clear_row = 5'd0;
@@ -960,7 +960,7 @@ module Playfield(
         clear_row = m[4:0];
     end
 
-//    æ¶ˆè¡Œå¼€å§‹çš„æ²¿æ£€æµ‹(å»¶è¿Ÿä¸€æ‹)
+//    ÏûĞĞ¿ªÊ¼µÄÑØ¼ì²â(ÑÓ³ÙÒ»ÅÄ)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         clear_d <= 1'b0;
@@ -970,7 +970,7 @@ module Playfield(
 
     assign clear_pulse = (clear_time) && (!clear_d);
 
-//    æœ¬æ¬¡æ¶ˆæ‰çš„è¡Œæ•°(ç»™è®¡åˆ†/ç­‰çº§ç”¨)
+//    ±¾´ÎÏûµôµÄĞĞÊı(¸ø¼Æ·Ö/µÈ¼¶ÓÃ)
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     c_clear <= 5'd0;
@@ -979,9 +979,9 @@ module Playfield(
     end
 
 //============================================================
-//    Ghost æ–¹å—
+//    Ghost ·½¿é
 //============================================================
-//    P1 å¹½çµè½ç‚¹: é€šç”¨é€è¡Œæ‰«æ(åœ°æ¿/å·²è½æ ¼/å¯¹æ–¹è¿åŠ¨æ–¹å—)
+//    P1 ÓÄÁéÂäµã: Í¨ÓÃÖğĞĞÉ¨Ãè(µØ°å/ÒÑÂä¸ñ/¶Ô·½ÔË¶¯·½¿é)
 //============================================================
     always@(*)begin
         ghost_blocked1 = 1'b0;
@@ -1017,7 +1017,7 @@ module Playfield(
         end
     end
 
-//    å¹½çµæ‰«æçŠ¶æ€æœº: è§¦å‘é‡æ‰« -> é€è¡Œæ¨è¿› -> é”å­˜è½ç‚¹
+//    ÓÄÁéÉ¨Ãè×´Ì¬»ú: ´¥·¢ÖØÉ¨ -> ÖğĞĞÍÆ½ø -> Ëø´æÂäµã
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             ghost_scan_r <= 5'd0;
@@ -1038,7 +1038,7 @@ module Playfield(
                 ghost_blk_oth <= ghost_blk_other1;
                 counter_ghost_r_t <= (ghost_scan_r > counter_r) ? (ghost_scan_r - 5'd1) : counter_r;
             end
-            else if(ghost_scan_r < 5'd21)  //ä¸Šé™ 21: å½¢çŠ¶è¡Œåç§»éƒ½ >= -1, åˆ° 21 å¿…è¢«åœ°æ¿æŒ¡ä½, è½ç‚¹è‡ªç„¶æ˜¯ 20
+            else if(ghost_scan_r < 5'd21)  //ÉÏÏŞ 21: ĞÎ×´ĞĞÆ«ÒÆ¶¼ >= -1, µ½ 21 ±Ø±»µØ°åµ²×¡, Âäµã×ÔÈ»ÊÇ 20
             ghost_scan_r <= ghost_scan_r + 5'd1;
             else begin
             ghost_done <= 1'b1;
@@ -1047,7 +1047,7 @@ module Playfield(
         end
     end
 
-//    å»¶è¿Ÿå¯„å­˜(ä¾›é‡å¯æ¡ä»¶ä½¿ç”¨)
+//    ÑÓ³Ù¼Ä´æ(¹©ÖØÆôÌõ¼şÊ¹ÓÃ)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             sig_p1_d <= 16'd0;
@@ -1064,8 +1064,8 @@ module Playfield(
     end
 
 //============================================================
-//    Hold åŠŸèƒ½
-//    P1 Hold é”®æŒ‰ä¸‹/æ¾å¼€çŠ¶æ€
+//    Hold ¹¦ÄÜ
+//    P1 Hold ¼ü°´ÏÂ/ËÉ¿ª×´Ì¬
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold <= 0;
@@ -1085,7 +1085,7 @@ module Playfield(
         en_hold <= 0;
     end
 
-//    P1 Hold é”®å»¶è¿Ÿä¸€æ‹: ç”¨æ¥å–æŒ‰ä¸‹/æ¾å¼€è¾¹æ²¿
+//    P1 Hold ¼üÑÓ³ÙÒ»ÅÄ: ÓÃÀ´È¡°´ÏÂ/ËÉ¿ª±ßÑØ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold_t <= 0;
@@ -1093,7 +1093,7 @@ module Playfield(
         en_hold_t <= en_hold;
     end
 
-//    Hold æ§½å†…å®¹(ä¸¤äººå…±ç”¨ä¸€ä¸ª)
+//    Hold ²ÛÄÚÈİ(Á½ÈË¹²ÓÃÒ»¸ö)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         hold_type <= 0;
@@ -1104,7 +1104,7 @@ module Playfield(
     end
 
 //============================================================
-//    æ¸¸æˆç»“æŸåˆ¤æ–­
+//    ÓÎÏ·½áÊøÅĞ¶Ï
 //============================================================
     always@(*)begin
         if(Idle)
@@ -1121,7 +1121,7 @@ module Playfield(
         over <= 1'b0;
     end
 
-//    P2 å½¢çŠ¶ ROM
+//    P2 ĞÎ×´ ROM
     Tetromino Tetromino_inst2(
         .clka(Clk_74M),
         .addra(Tetromino_addr2),
@@ -1138,13 +1138,13 @@ module Playfield(
     assign type_d2_out = type_d2;
     assign type_t2_out = type_t2;
 
-//    C_num2/R_num2 ä¸ C_num/R_num å®Œå…¨åŒæº(åŒä¸€æ¬¡æœç´¢), ç›´æ¥å¤ç”¨çœé€»è¾‘
+//    C_num2/R_num2 Óë C_num/R_num ÍêÈ«Í¬Ô´(Í¬Ò»´ÎËÑË÷), Ö±½Ó¸´ÓÃÊ¡Âß¼­
     assign C_num2 = C_num;
     assign R_num2 = R_num;
 
     assign land_we2  = (lock_counter2 != 0) && (lock_counter2 != 5940000) && (lock_counter2[21]);
 
-//    éŸ³æ•ˆäº‹ä»¶(åªè¯»å¼•å‡º): ç¡¬é™/è½¯é™/å·¦å³è¢«æŒ¡/æ¢å—
+//    ÒôĞ§ÊÂ¼ş(Ö»¶ÁÒı³ö): Ó²½µ/Èí½µ/×óÓÒ±»µ²/»»¿é
     assign snd_land1 = lock_t;
     assign snd_land2 = duo && lock_t2;
     assign snd_hard1 = drop_hold;
@@ -1167,12 +1167,12 @@ module Playfield(
     assign cc_d2 = {cc_t2[0], cc_t2[1], cc_t2[2], cc_t2[3]};
     assign rr_d2 = {rr_t2[0], rr_t2[1], rr_t2[2], rr_t2[3]};
 
-//    P2 ç‹¬ç«‹çš„é™é”®/è½åœ°/æ—‹è½¬åç§»(ä¿®å¤å…‹éš†æ¼æ”¹)
+//    P2 ¶ÀÁ¢µÄ½µ¼ü/ÂäµØ/Ğı×ªÆ«ÒÆ(ĞŞ¸´¿ËÂ¡Â©¸Ä)
     assign drop_hold2 = (counter2 == MCNT) && (drop_r_t2);
     assign drop_r2    = (drop_r_t2) && (drop_r_flag2);
     assign land_pulse_t2 = (land2) && (counter_land2 == MCNT_LAND);
 
-//    åŒæ‹ä¸¤äººå–æ ·: P2 å–ä¸‹ä¸€ä¸ªå€¼(å¼€å±€ Idle åŒæ—¶è£…è½½ä¹Ÿç®—åŒæ‹)
+//    Í¬ÅÄÁ½ÈËÈ¡Ñù: P2 È¡ÏÂÒ»¸öÖµ(¿ª¾Ö Idle Í¬Ê±×°ÔØÒ²ËãÍ¬ÅÄ)
     wire p2_late;
     assign p2_late = Idle || (land_pulse && land_pulse2);
 
@@ -1189,7 +1189,7 @@ module Playfield(
     assign ddr_ext2 = {{7{ddr2[3]}}, ddr2};
 
 //============================================================
-//    P2 å¹½çµè½ç‚¹: é€šç”¨é€è¡Œæ‰«æ
+//    P2 ÓÄÁéÂäµã: Í¨ÓÃÖğĞĞÉ¨Ãè
 //============================================================
     always@(*)begin
         ghost_blocked2 = 1'b0;
@@ -1225,7 +1225,7 @@ module Playfield(
         end
     end
 
-//    P2 å¹½çµæ‰«æçŠ¶æ€æœº: è§¦å‘é‡æ‰« -> é€è¡Œæ¨è¿› -> é”å­˜è½ç‚¹
+//    P2 ÓÄÁéÉ¨Ãè×´Ì¬»ú: ´¥·¢ÖØÉ¨ -> ÖğĞĞÍÆ½ø -> Ëø´æÂäµã
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             ghost_scan_r2 <= 5'd0;
@@ -1246,7 +1246,7 @@ module Playfield(
                 ghost_blk_oth2 <= ghost_blk_other2;
                 counter_ghost_r_t2 <= (ghost_scan_r2 > counter_r2) ? (ghost_scan_r2 - 5'd1) : counter_r2;
             end
-            else if(ghost_scan_r2 < 5'd21)  //åŒä¸Š: ä¸Šé™ 21, è½ç‚¹è‡ªç„¶åˆ° 20
+            else if(ghost_scan_r2 < 5'd21)  //Í¬ÉÏ: ÉÏÏŞ 21, Âäµã×ÔÈ»µ½ 20
             ghost_scan_r2 <= ghost_scan_r2 + 5'd1;
             else begin
             ghost_done2 <= 1'b1;
@@ -1256,9 +1256,9 @@ module Playfield(
     end
 
 //============================================================
-//    P2 é€»è¾‘(ä¸ P1 ä¸€ä¸€å¯¹åº”)
+//    P2 Âß¼­(Óë P1 Ò»Ò»¶ÔÓ¦)
 //============================================================
-//    P2 è¿åŠ¨æ–¹å—æ˜¾ç¤ºä¸åˆ¤å®š: å½¢çŠ¶æŸ¥è¡¨ / è½åº• / å·¦å³è¾¹ç•Œ / é¡¶åˆ° / å¹½çµ / ä¸å¯¹æ–¹è¿åŠ¨æ–¹å—äº’æ’
+//    P2 ÔË¶¯·½¿éÏÔÊ¾ÓëÅĞ¶¨: ĞÎ×´²é±í / Âäµ× / ×óÓÒ±ß½ç / ¶¥µ½ / ÓÄÁé / Óë¶Ô·½ÔË¶¯·½¿é»¥×²
     always@(*)begin
         Tetromino_addr2 = {type2[2:0], rot2[1:0]};
         Piece2 = 1'b0;
@@ -1272,7 +1272,7 @@ module Playfield(
         ghost2 = 1'b0;
         touch_top2 = 1'b0;
         other_down_hold2 = 1'b0;
-        if(Idle || Finalize || !duo)begin  //å•äººæ¨¡å¼ä¸‹ P2 ä¸æ˜¾ç¤ºä¹Ÿä¸ä¸‹è½
+        if(Idle || Finalize || !duo)begin  //µ¥ÈËÄ£Ê½ÏÂ P2 ²»ÏÔÊ¾Ò²²»ÏÂÂä
              Piece2 = 1'b0;
              ghost2 = 1'b0;
              land2 = 1'b1;
@@ -1288,7 +1288,7 @@ module Playfield(
                 if(rr2 > piece_rmax2) piece_rmax2 = rr2;
             end
 
-//    ä¸å¯¹æ–¹è¿åŠ¨æ–¹å—äº’æ’
+//    Óë¶Ô·½ÔË¶¯·½¿é»¥×²
             if(duo)begin
                 if(or1_0 == rr2)begin
                     if((cc2 > 0) && (oc1_0 == (cc2 - 6'd1))) boundary_collision_left2 = 1'b1;
@@ -1319,15 +1319,15 @@ module Playfield(
                 if((oc1_3 == cc2) && (or1_3 == (rr2 + 6'd1)) && (rr2 < 11'd19) && !((cc2 <= (COL - 1'b1)) && row_w[rr2 + 6'd1][cc2]))
                 other_down_hold2 = 1'b1;
             end
-            if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && row_w[rr2 + 6'd1][cc2]))  //è½åº•æ£€æµ‹
+            if(rr2 == 19 || ((cc2 <= (COL - 1'b1)) && (rr2 < 19) && row_w[rr2 + 6'd1][cc2]))  //Âäµ×¼ì²â
             land2 = 1'b1;
-            if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 - 6'd1]))  //å·¦è¾¹ç•Œç¢°æ’æ£€æµ‹
+            if(cc2 == 0 || ((cc2 > 0) && (cc2 <= (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 - 6'd1]))  //×ó±ß½çÅö×²¼ì²â
             boundary_collision_left2 = 1'b1;
-            if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 + 6'd1]))  //å³è¾¹ç•Œç¢°æ’æ£€æµ‹
+            if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && row_w[rr2][cc2 + 6'd1]))  //ÓÒ±ß½çÅö×²¼ì²â
             boundary_collision_right2 = 1'b1;
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr2) && !rr2[5])  //æ­£åœ¨è¿åŠ¨æ–¹å—
+            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr2) && !rr2[5])  //ÕıÔÚÔË¶¯·½¿é
             Piece2 = 1'b1;
-            if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && row_w[rr2][cc2])  //å’Œå·²é”æ–¹å—é‡å =é¡¶åˆ°
+            if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && row_w[rr2][cc2])  //ºÍÒÑËø·½¿éÖØµş=¶¥µ½
             touch_top2 = 1'b1;
             rr_g2 = counter_ghost_r_t2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
             if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && ghost_valid2 && (!clear_time) && (counter_ghost_r_t2 > (counter_r2 + 5'd4)))
@@ -1335,7 +1335,7 @@ module Playfield(
         end
     end
 
-//    P2 å½“å‰æ–¹å—ç±»å‹: åˆ°ä¸‹ä¸€å—æˆ– Hold æ—¶æ›¿æ¢
+//    P2 µ±Ç°·½¿éÀàĞÍ: µ½ÏÂÒ»¿é»ò Hold Ê±Ìæ»»
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type2 <= 3'd0;
@@ -1345,7 +1345,7 @@ module Playfield(
         type2 <= type_t2;
     end
 
-//    P2 ä¸‹ä¸€å—ç±»å‹: æ˜¾ç¤ºåœ¨ç”»é¢ Next æ¡†ä¸‹åŠ
+//    P2 ÏÂÒ»¿éÀàĞÍ: ÏÔÊ¾ÔÚ»­Ãæ Next ¿òÏÂ°ë
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_t2 <= 3'd0;
@@ -1357,7 +1357,7 @@ module Playfield(
         type_t2 <= ((land_pulse && land_pulse2) ? rnd_type_n1 : rnd_type_n);
     end
 
-//    P2 è½é”æ—¶çš„ç±»å‹: äº¤ç»™ frame å®šæ ¼å­é¢œè‰²
+//    P2 ÂäËøÊ±µÄÀàĞÍ: ½»¸ø frame ¶¨¸ñ×ÓÑÕÉ«
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_d2 <= 3'd0;
@@ -1365,7 +1365,7 @@ module Playfield(
         type_d2 <= type2;
     end
 
-//    P2 è½¯é™è®¡æ—¶: æ»¡ MCNT æ‰è®¤ä¸€æ¬¡è½¯é™
+//    P2 Èí½µ¼ÆÊ±: Âú MCNT ²ÅÈÏÒ»´ÎÈí½µ
     always@(posedge Clk_74M or negedge Reset_n)
     if(!Reset_n)
     counter2 <= 30'd0;
@@ -1374,7 +1374,7 @@ module Playfield(
     else if(counter2 < MCNT)
     counter2 <= counter2 + 30'd1;
 
-//    P2 ç¡¬é™æ ‡å¿—: æŒ‰ä¸€æ¬¡åªåƒä¸€æ¬¡, æ¾é”®åå¤ä½
+//    P2 Ó²½µ±êÖ¾: °´Ò»´ÎÖ»³ÔÒ»´Î, ËÉ¼üºó¸´Î»
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         drop_r_t2 <= 1'b1;
@@ -1384,7 +1384,7 @@ module Playfield(
         drop_r_t2 <= 1'b1;
     end
 
-//    P2 è‡ªåŠ¨ä¸‹è½è®¡æ—¶: æ»¡ Drop è‡ªåŠ¨é™ä¸€æ ¼
+//    P2 ×Ô¶¯ÏÂÂä¼ÆÊ±: Âú Drop ×Ô¶¯½µÒ»¸ñ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_drop2 <= 1'd0;
@@ -1406,7 +1406,7 @@ module Playfield(
         counter_drop2 <= 1'd0;
     end
 
-//    P2 å‚è€ƒç‚¹è¡Œ: è½¯é™/ç¡¬é™/æ—‹è½¬/å½’ä½éƒ½æ”¹å®ƒ
+//    P2 ²Î¿¼µãĞĞ: Èí½µ/Ó²½µ/Ğı×ª/¹éÎ»¶¼¸ÄËü
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_r2 <= 5'd0;
@@ -1421,22 +1421,22 @@ module Playfield(
         else if(Playing)begin
             if(land_we2)
             counter_r2 <= counter_r2;
-            else if(land_pulse2 || hold_up2)  //å½’ä½
+            else if(land_pulse2 || hold_up2)  //¹éÎ»
             counter_r2 <= 5'd0;
-            else if(drop_r2 && !land2 && !lock_we2 && !other_down_hold2)  //è½¯é™
+            else if(drop_r2 && !land2 && !lock_we2 && !other_down_hold2)  //Èí½µ
             counter_r2 <= counter_r2 + 1'd1;
-            else if(drop_hold2 && !lock_we2)  //ç¡¬é™
+            else if(drop_hold2 && !lock_we2)  //Ó²½µ
             counter_r2 <= counter_ghost_r_t2;
-            else if(en_rotate2)  //æ—‹è½¬
+            else if(en_rotate2)  //Ğı×ª
             counter_r2 <= counter_r2 + ddr_ext2;
-            else if(counter_drop2 == Drop && !land2 && !lock_we2 && !other_down_hold2)  //è‡ªåŠ¨ä¸‹è½
+            else if(counter_drop2 == Drop && !land2 && !lock_we2 && !other_down_hold2)  //×Ô¶¯ÏÂÂä
             counter_r2 <= counter_r2 + 1'd1;
         end
         else
         counter_r2 <= 5'd0;
     end
 
-//    P2 å‚è€ƒç‚¹åˆ—: å·¦å³ç§»åŠ¨/æ—‹è½¬/å½’ä½(åŒäººå‡ºç”Ÿåˆ— 16)
+//    P2 ²Î¿¼µãÁĞ: ×óÓÒÒÆ¶¯/Ğı×ª/¹éÎ»(Ë«ÈË³öÉúÁĞ 16)
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_c2 <= SPAWN_C2;
@@ -1451,20 +1451,20 @@ module Playfield(
         else if(Playing)begin
             if(land_we2)
             counter_c2 <= counter_c2;
-            else if(land_pulse2 || hold_up2)  //å½’ä½
+            else if(land_pulse2 || hold_up2)  //¹éÎ»
             counter_c2 <= SPAWN_C2;
-            else if(en_rotate2)  //æ—‹è½¬
+            else if(en_rotate2)  //Ğı×ª
             counter_c2 <= counter_c2 + ddc_ext2;
-            else if(!boundary_collision_left2 && left_p_flag2 && !lock_we2)  //å·¦ç§»
+            else if(!boundary_collision_left2 && left_p_flag2 && !lock_we2)  //×óÒÆ
             counter_c2 <= counter_c2 - 1;
-            else if(!boundary_collision_right2 && right_p_flag2 && !lock_we2)  //å³ç§»
+            else if(!boundary_collision_right2 && right_p_flag2 && !lock_we2)  //ÓÒÒÆ
             counter_c2 <= counter_c2 + 1;
         end
         else
         counter_c2 <= SPAWN_C2;
     end
 
-//    P2 æ—‹è½¬é¢„åˆ¤: è½¬è¿‡å»ä¼šä¸ä¼šå‡ºç•Œæˆ–æ’åˆ°å·²è½æ ¼
+//    P2 Ğı×ªÔ¤ÅĞ: ×ª¹ıÈ¥»á²»»á³ö½ç»ò×²µ½ÒÑÂä¸ñ
     always@(*)begin
         Tetromino_addr3 = {type2[2:0], (rot2[1:0] + 1)};
         rot_block2 = 1'b0;
@@ -1481,7 +1481,7 @@ module Playfield(
         en_rotate2 = (rotate_p_flag2) && (!rot_block2) && (!lock_we2);
     end
 
-//    P2 å½“å‰æ—‹è½¬åºå·
+//    P2 µ±Ç°Ğı×ªĞòºÅ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         rot2 <= 2'd0;
@@ -1505,7 +1505,7 @@ module Playfield(
         rot2 <= 2'd0;
     end
 
-//    P2 è½åº•åœç•™è®¡æ—¶: æ»¡ MCNT_LAND å°±å¼€å§‹é”å­˜
+//    P2 Âäµ×Í£Áô¼ÆÊ±: Âú MCNT_LAND ¾Í¿ªÊ¼Ëø´æ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_land2 <= 1'b0;
@@ -1519,7 +1519,7 @@ module Playfield(
         counter_land2 <= 1'b0;
     end
 
-//    P2 é”å­˜å¯åŠ¨
+//    P2 Ëø´æÆô¶¯
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_t2 <= 1'b0;
@@ -1529,7 +1529,7 @@ module Playfield(
         lock_t2 <= 1'b0;
     end
 
-//    P2 é”å­˜è®¡æ•°: 4 ä¸ªæ ¼å­ä¸€æ‹å†™ä¸€ä¸ª
+//    P2 Ëø´æ¼ÆÊı: 4 ¸ö¸ñ×ÓÒ»ÅÄĞ´Ò»¸ö
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_cnt2 <= 2'd0;
@@ -1541,7 +1541,7 @@ module Playfield(
         lock_cnt2 <= lock_cnt2 + 2'd1;
     end
 
-//    P2 é”å­˜é—ªç™½è®¡æ—¶
+//    P2 Ëø´æÉÁ°×¼ÆÊ±
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_counter2 <= 2'd0;
@@ -1553,7 +1553,7 @@ module Playfield(
         lock_counter2 <= lock_counter2 + 2'd1;
     end
 
-//    P2 è½é”æ—¶ 4 ä¸ªæ ¼å­çš„åˆ—
+//    P2 ÂäËøÊ± 4 ¸ö¸ñ×ÓµÄÁĞ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             cc_t2[0] <= 11'd0; cc_t2[1] <= 11'd0; cc_t2[2] <= 11'd0; cc_t2[3] <= 11'd0;
@@ -1563,7 +1563,7 @@ module Playfield(
         cc_t2[y] <= counter_c2 + { {7{Tetromino_dout2[y*8+7]}}, Tetromino_dout2[y*8+7 -:4] };
     end
 
-//    P2 è½é”æ—¶ 4 ä¸ªæ ¼å­çš„è¡Œ
+//    P2 ÂäËøÊ± 4 ¸ö¸ñ×ÓµÄĞĞ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             rr_t2[0] <= 11'd0; rr_t2[1] <= 11'd0; rr_t2[2] <= 11'd0; rr_t2[3] <= 11'd0;
@@ -1573,7 +1573,7 @@ module Playfield(
         rr_t2[y] <= counter_r2 + { {7{Tetromino_dout2[y*8+3]}}, Tetromino_dout2[y*8+3 -:4] };
     end
 
-//    P2 Hold é”®æŒ‰ä¸‹/æ¾å¼€çŠ¶æ€
+//    P2 Hold ¼ü°´ÏÂ/ËÉ¿ª×´Ì¬
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold2 <= 0;
@@ -1593,7 +1593,7 @@ module Playfield(
         en_hold2 <= 0;
     end
 
-//    P2 Hold é”®å»¶è¿Ÿä¸€æ‹: ç”¨æ¥å–æŒ‰ä¸‹/æ¾å¼€è¾¹æ²¿
+//    P2 Hold ¼üÑÓ³ÙÒ»ÅÄ: ÓÃÀ´È¡°´ÏÂ/ËÉ¿ª±ßÑØ
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         en_hold_t2 <= 0;
@@ -1601,7 +1601,7 @@ module Playfield(
         en_hold_t2 <= en_hold2;
     end
 
-//    å•äººæ™ºèƒ½æç¤ºï¼šæ£‹ç›˜äº‹ä»¶æˆ–æ–¹å—ç±»å‹å˜åŒ–åé‡æ–°æœç´¢ï¼›é•¿æŒ‰ Hold åªæ§åˆ¶æ˜¯å¦æ˜¾ç¤º
+//    µ¥ÈËÖÇÄÜÌáÊ¾£ºÆåÅÌÊÂ¼ş»ò·½¿éÀàĞÍ±ä»¯ºóÖØĞÂËÑË÷£»³¤°´ Hold Ö»¿ØÖÆÊÇ·ñÏÔÊ¾
 wire [479:0]hint_row_bits = {row_w[19],row_w[18],row_w[17],row_w[16],row_w[15],row_w[14],row_w[13],row_w[12],row_w[11],row_w[10],row_w[9],row_w[8],row_w[7],row_w[6],row_w[5],row_w[4],row_w[3],row_w[2],row_w[1],row_w[0]};
 reg playing_d;
 reg lock_we_d;
@@ -1622,7 +1622,7 @@ hint_type_d <= type;
 end
 end
 
-// å››æ ¼é”å­˜å†™å®Œåå†é‡ç®—æç¤º, é¿å…åŸºäºåŠå†™å…¥æ£‹ç›˜å¾—åˆ°é”™è¯¯è½ç‚¹
+// ËÄ¸ñËø´æĞ´ÍêºóÔÙÖØËãÌáÊ¾, ±ÜÃâ»ùÓÚ°ëĞ´ÈëÆåÅÌµÃµ½´íÎóÂäµã
 wire hint_lock_done = lock_we_d && !lock_we;
 wire hint_enable_rise = hint_enable && !hint_enable_d;
 wire hint_type_changed = (type != hint_type_d);

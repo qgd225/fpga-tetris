@@ -11,6 +11,7 @@
 | 顶层模块 | `Tetris` |
 | 显示输出 | HDMI TMDS,1280×720 @60Hz(像素时钟 74.25 MHz) |
 | 描述语言 | Verilog HDL |
+| 源码编码 | Verilog 为 GB18030 无 BOM；README、Python、BAT 为 UTF-8 |
 
 ## 玩法
 
@@ -30,7 +31,7 @@
 
 - 单人 / 双人同场：单人 20 列，双人 24 列；双方方块、幽灵、锁存与消行独立计算，并支持同场碰撞。
 - 七种方块、旋转、软降、硬降、落底锁定、消行、Next 预览和共享 Hold。
-- 横向连发：首移立即发生，DAS 132ms、ARR 33ms；松开方向、换向、暂停或结束时复位。
+- 横向连发：首移立即发生，DAS 220ms、ARR 80ms；松开方向、换向、暂停或结束时复位。
 - 单人智能落点：长按 Hold 显示方块本色虚线靶框和中心点；按消行、空洞、高度、凹凸和悬空评分搜索 4 旋转 x 20 列。
 - 双人输入分流：板载键控制 P1，PC 键盘控制 P2；单人时板载键和 PC 键共同控制 P1。
 - CORE-07 故事板画面：“轨道核心：最后的收容”双层反应堆舱室、游戏区收容槽、双人单核心缝、观察窗与冷却管线。
@@ -71,12 +72,14 @@ Tetris.srcs/
     ├── new/                          # 游戏逻辑(手写 Verilog)
     │   ├── Tetris.v                  # 顶层
     │   ├── Game_state_machine.v      # 游戏状态机
+    │   ├── control_route.v           # 单双人输入路由
+    │   ├── hold_gesture.v            # Hold 长短按识别
     │   ├── Playfield.v               # 主游戏区(碰撞/消行/绘制)
-    │   ├── Ghost_piece.v             # 幽灵方块
+    │   ├── solo_hint.v               # 单人智能落点搜索
     │   ├── Next_piece.v              # 下一个方块预览
     │   ├── hold_piece.v              # Hold 暂存区
     │   ├── scoring.v / level.v / timer.v / frame.v
-    │   ├── rgb_to_palette.v      # PC 画面 RGB→44 色索引
+    │   ├── rgb_to_palette.v          # PC 画面 RGB→56 色 BRAM 索引
     │   ├── music.v / sound.v         # 音乐与音效
     │   ├── key_filter.v / Key.v      # 按键消抖
     │   ├── horizontal_repeat.v       # 横向 DAS/ARR 连发
@@ -100,6 +103,8 @@ Tetris.srcs/
 
 > 本仓库只包含源码:Vivado 的编译产物(`.runs/`、`.cache/`、`.hw/`、`.ip_user_files/`、`.sim/`)以及 IP 生成的 HDL 均已由 `.gitignore` 排除。
 
+> Verilog 文件统一使用 GB18030 无 BOM，以匹配 Vivado 2018.3 在中文 Windows 下的源码显示编码。GitHub 网页查看中文注释时可能出现编码显示差异。
+
 ## 验证与资源
 
 - 九套仿真共 **784 项**：`duo 111 / frame_duo 330 / level 39 / sound 103 / input_route 29 / horizontal_repeat 30 / hold_gesture 27 / solo_hint 59 / rgb_palette 56`，全部通过。
@@ -114,9 +119,9 @@ Tetris.srcs/
 | 项目 | 值 |
 | --- | --- |
 | 比特流 | `Tetris.runs/impl_1/Tetris.bit` |
-| 生成时间 | 2026-10-22 19:35:14 |
+| 生成时间 | 2026-10-22 19:46:50 |
 | 大小 | 2,192,114 字节 |
-| SHA256 | `D103D3B88337519272E3602BFCA6C5BDCD4A216D7F568978758809E3C88CC05F` |
+| SHA256 | `962B9E741856CA2D7ECA53CAB7214B29DF2794A3AA7C38C37A8F2159BE556097` |
 
 ## 备注
 

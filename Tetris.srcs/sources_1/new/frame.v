@@ -1,7 +1,7 @@
-ï»¿//============================================================
-// æ¨¡å—ï¼šframe
-// ä½œç”¨ï¼šåƒç´ åˆæˆï¼šåœºåœ°ã€HUDã€èœå•ã€ç»“ç®—é¡µã€ç‰¹æ•ˆå’Œè°ƒè‰²æ¿è¾“å‡ºã€‚
-// æ—¶é’Ÿ/å¤ä½ï¼šClk_74Mï¼›Reset_n ä½æœ‰æ•ˆ
+//============================================================
+// Ä£¿é£ºframe
+// ×÷ÓÃ£ºÏñËØºÏ³É£º³¡µØ¡¢HUD¡¢²Ëµ¥¡¢½áËãÒ³¡¢ÌØĞ§ºÍµ÷É«°åÊä³ö¡£
+// Ê±ÖÓ/¸´Î»£ºClk_74M£»Reset_n µÍÓĞĞ§
 //============================================================
 module frame(
     input Clk_74M,
@@ -55,10 +55,10 @@ module frame(
     output [1:0] danger_lvl
     );
     reg [23:0]rgb_c;
-    reg [6:0]psel;  // å½“å‰åƒç´ çš„ç»„åˆå‘½ä¸­ç 
-    reg [6:0]psel_r;  // å‘½ä¸­ç å¯„å­˜ä¸€çº§ï¼Œæ•´å±ç»Ÿä¸€å³ç§» 1 åƒç´ 
+    reg [6:0]psel;  // µ±Ç°ÏñËØµÄ×éºÏÃüÖĞÂë
+    reg [6:0]psel_r;  // ÃüÖĞÂë¼Ä´æÒ»¼¶£¬ÕûÆÁÍ³Ò»ÓÒÒÆ 1 ÏñËØ
 
-//    æ¸¸æˆåŒº
+//    ÓÎÏ·Çø
     wire [4:0]C_num;
     wire [4:0]R_num;
     wire [479:0]state;
@@ -85,7 +85,7 @@ module frame(
     wire [19:0]line_t;
     wire clear_flash;
 
-//    P2(åŒäºº)æ˜¾ç¤ºç”¨
+//    P2(Ë«ÈË)ÏÔÊ¾ÓÃ
     wire Piece2;
     wire ghost2;
     wire [2:0]type2;
@@ -109,20 +109,20 @@ module frame(
     wire [4:0]hint_r0, hint_r1, hint_r2, hint_r3;
 
 //============================================================
-//    HUD å¸ƒå±€(å”¯ä¸€æ¥æº): é¢æ¿é”šç‚¹ / æ ‡ç­¾ / åˆ†éš”çº¿ / æ§½ä½ / ç­‰çº§æ¡ / ç­‰çº§æ•°å­—
+//    HUD ²¼¾Ö(Î¨Ò»À´Ô´): Ãæ°åÃªµã / ±êÇ© / ·Ö¸ôÏß / ²ÛÎ» / µÈ¼¶Ìõ / µÈ¼¶Êı×Ö
 //============================================================
-    localparam [10:0] XPNL1 = 11'd94,  //åŒäºº P1 é¢æ¿(å·¦æ )é”šç‚¹
-                     XPNL2 = 11'd1121,  //åŒäºº P2 é¢æ¿(å³æ )é”šç‚¹
-                     XSOLO = 11'd1057,  //å•äººé¢æ¿(å³æ )é”šç‚¹
-                     YNEXT = 11'd132,  //é¢„è§ˆæ§½ä½ Y
-                     YHOLD = 11'd348,  //Hold æ§½ä½ Y
-                     YLBNX = 11'd84,  //NEXT æ ‡ç­¾ Y
-                     YLBHD = 11'd300,  //HOLD æ ‡ç­¾ Y
-                     YRLNX = 11'd122,  //NEXT åˆ†éš”çº¿ Y
-                     YRLHD = 11'd338,  //HOLD åˆ†éš”çº¿ Y
-                     XLVLB = 11'd232,  //LV æ ‡ç­¾ X
-                     XLDIG = 11'd283,  //ç­‰çº§æ•°å­— X(ä¸ç­‰çº§æ¡åŒè½´)
-                     YLBLV = 11'd36,  //LV æ ‡ç­¾ Y(ä¸ 44px é«˜çš„æ•°å­—åº•éƒ¨å¯¹é½)
+    localparam [10:0] XPNL1 = 11'd94,  //Ë«ÈË P1 Ãæ°å(×óÀ¸)Ãªµã
+                     XPNL2 = 11'd1121,  //Ë«ÈË P2 Ãæ°å(ÓÒÀ¸)Ãªµã
+                     XSOLO = 11'd1057,  //µ¥ÈËÃæ°å(ÓÒÀ¸)Ãªµã
+                     YNEXT = 11'd132,  //Ô¤ÀÀ²ÛÎ» Y
+                     YHOLD = 11'd348,  //Hold ²ÛÎ» Y
+                     YLBNX = 11'd84,  //NEXT ±êÇ© Y
+                     YLBHD = 11'd300,  //HOLD ±êÇ© Y
+                     YRLNX = 11'd122,  //NEXT ·Ö¸ôÏß Y
+                     YRLHD = 11'd338,  //HOLD ·Ö¸ôÏß Y
+                     XLVLB = 11'd232,  //LV ±êÇ© X
+                     XLDIG = 11'd283,  //µÈ¼¶Êı×Ö X(ÓëµÈ¼¶ÌõÍ¬Öá)
+                     YLBLV = 11'd36,  //LV ±êÇ© Y(Óë 44px ¸ßµÄÊı×Öµ×²¿¶ÔÆë)
                      YDIGI = 11'd24,
                      XRSCORE = 11'd365, XRLEVEL = 11'd568, XRLINES = 11'd748, XRTIME = 11'd900,
                      YRMODE = 11'd468, YRLAB = 11'd526, YRNUM = 11'd562,
@@ -130,7 +130,7 @@ module frame(
     wire [10:0]XPN1 = duo ? XPNL1 : XSOLO;
     wire [10:0]XPN2 = XPNL2;
 
-//    NEXT/HOLD æ ‡ç­¾å±…ä¸­: 4 å­— x 24 é—´è·(å®å®½ 92) åœ¨ 128 å®½é¢æ¿é‡Œå·¦è¾¹è· 18
+//    NEXT/HOLD ±êÇ©¾ÓÖĞ: 4 ×Ö x 24 ¼ä¾à(Êµ¿í 92) ÔÚ 128 ¿íÃæ°åÀï×ó±ß¾à 18
     wire [10:0]XLBN1 = XPN1 + 11'd18;
     wire [10:0]XLBN2 = XPN2 + 11'd18;
     wire [10:0]XP1LBL = duo ? 11'd88 : 11'd1032;
@@ -223,7 +223,7 @@ module frame(
     reg [2:0]state_color[0:479];
     reg state_owner[0:479];
 
-//    å–æ ¼è¡Œå­—: 20 è¡Œ, æ¯è¡Œ 24 åˆ—(state) / 24x3 ä½(é¢œè‰²å·) / owner; çº¯è¿çº¿, 0 LUT
+//    È¡¸ñĞĞ×Ö: 20 ĞĞ, Ã¿ĞĞ 24 ÁĞ(state) / 24x3 Î»(ÑÕÉ«ºÅ) / owner; ´¿Á¬Ïß, 0 LUT
     wire [23:0]row_f[0:19];
     wire [71:0]scw[0:19];
     wire [23:0]row_ow[0:19];
@@ -509,8 +509,8 @@ module frame(
     .breath(chs_breath)
     );
 
-//    æ–‡å­—æ ‡ç­¾ NEXT/HOLD/LV: 1x å­—å·(20x32), å­—è· 24
-//    åœ°å€ä¸ BRAM ä½¿èƒ½æå‰ 1 åƒç´ (ena_n ç”¨ lb_hn, å·¦è¾¹ç•Œå¤šå‡ 1): å¦åˆ™æ¯å­—ç¬¬ 1 åˆ—ä¼šä¸²ä¸Šä¸€å­—ç¬¬ 1 åˆ—
+//    ÎÄ×Ö±êÇ© NEXT/HOLD/LV: 1x ×ÖºÅ(20x32), ×Ö¾à 24
+//    µØÖ·Óë BRAM Ê¹ÄÜÌáÇ° 1 ÏñËØ(ena_n ÓÃ lb_hn, ×ó±ß½ç¶à¼õ 1): ·ñÔòÃ¿×ÖµÚ 1 ÁĞ»á´®ÉÏÒ»×ÖµÚ 1 ÁĞ
     reg [10:0]lb_X;
     reg [10:0]lb_Y;
     reg [4:0] lb_g;
@@ -708,13 +708,13 @@ module frame(
     );
     wire lbl_lit = lb_ena ? lb_dout[19 - (hcounter - lb_X)] : 1'b0;
 
-//    é¡¶æ å‘ä¸çº¿(æ—¶é—´/åˆ†æ•°åˆ†ç»„) ä¸ ç»“æŸç”»é¢ä¸‹åˆ’çº¿: éƒ½èµ°æ ‡ç­¾ç°
+//    ¶¥À¸·¢Ë¿Ïß(Ê±¼ä/·ÖÊı·Ö×é) Óë ½áÊø»­ÃæÏÂ»®Ïß: ¶¼×ß±êÇ©»Ò
     wire top_rule_lit = (hcounter >= 11'd470) && (hcounter <= 11'd470) &&
                         (vcounter >= 11'd24) && (vcounter < 11'd68);
     wire over_line_lit = Finalize && (hcounter >= 11'd449) && (hcounter <= 11'd825) &&
                          (vcounter >= 11'd417) && (vcounter <= 11'd419);
 
-//    é¢æ¿åˆ†éš”çº¿: 2px, ä½äºæ ‡ç­¾ä¸‹æ–¹
+//    Ãæ°å·Ö¸ôÏß: 2px, Î»ÓÚ±êÇ©ÏÂ·½
     wire rule1_lit = ((vcounter >= YRLNX) && (vcounter < (YRLNX + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= YRLHD) && (vcounter < (YRLHD + 11'd2)) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128))) ||
                      ((vcounter >= 11'd717) && (vcounter < 11'd721) && (hcounter >= XPN1) && (hcounter < (XPN1 + 11'd128)));
@@ -743,17 +743,17 @@ module frame(
            (((vcounter >= YNEXT) && (vcounter <= (YNEXT + 11'd128))) ||
             ((vcounter >= YHOLD) && (vcounter <= (YHOLD + 11'd128))))));
 
-//    ç­‰çº§æ•°å­—: 1 ä½, ä¸ç­‰çº§æ¡åŒè½´
+//    µÈ¼¶Êı×Ö: 1 Î», ÓëµÈ¼¶ÌõÍ¬Öá
     wire [3:0] lv_dig = {1'b0, speed_level};
     wire [10:0]vdv = vcounter - YDIGI;
     wire lvd_ena = (hcounter >= XLDIG) && (hcounter < (XLDIG + 11'd20)) &&
                    (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
 
-//    å–å­—ä½¿èƒ½æå‰ 1 åƒç´ (number ä¹Ÿæ˜¯ READ_LATENCY=1): å¦åˆ™æ¯è¡Œç¬¬ 1 åˆ—ä¼šä¸²ä¸Šä¸€è¡Œ
+//    È¡×ÖÊ¹ÄÜÌáÇ° 1 ÏñËØ(number Ò²ÊÇ READ_LATENCY=1): ·ñÔòÃ¿ĞĞµÚ 1 ÁĞ»á´®ÉÏÒ»ĞĞ
     wire lvd_ena_n = (lb_hn >= (XLDIG - 11'd1)) && (lb_hn < (XLDIG + 11'd20)) &&
                      (vcounter >= YDIGI) && (vcounter < (YDIGI + 11'd44));
 
-//    ç»“ç®—é¡µæ•°å€¼å¤ç”¨ number ROMï¼šSCORE(6 ä½)/LEVEL(1 ä½)/LINES(5 ä½)/TIME(MM:SS)
+//    ½áËãÒ³ÊıÖµ¸´ÓÃ number ROM£ºSCORE(6 Î»)/LEVEL(1 Î»)/LINES(5 Î»)/TIME(MM:SS)
     reg result_num_ena;
     reg result_num_ena_n;
     reg [10:0]result_num_X;
@@ -834,7 +834,7 @@ module frame(
     wire lvd_lit = lvd_ena ? lvd_dout[19 - (hcounter - XLDIG)] : 1'b0;
     wire result_num_lit = result_num_ena ? lvd_dout[19 - (hcounter - result_num_X)] : 1'b0;
 
-//    ç­‰çº§è‰²: CORE-07 å‹åŠ›æŸ± 8 çº§çƒ­åŠ›æ¸å˜
+//    µÈ¼¶É«: CORE-07 Ñ¹Á¦Öù 8 ¼¶ÈÈÁ¦½¥±ä
     localparam [23:0] LV_H0 = 24'h00E5FF,
                       LV_H1 = 24'h38D996,
                       LV_H2 = 24'h9BD64D,
@@ -873,7 +873,7 @@ module frame(
     endcase
     end
 
-//    LV ç»„ä¸‹æ–¹ 2px ç­‰çº§è‰²æ¨ªçº¿: å¹¶å…¥ç­‰çº§æ•°å­—åˆ†æ”¯(åŒè‰²)
+//    LV ×éÏÂ·½ 2px µÈ¼¶É«ºáÏß: ²¢ÈëµÈ¼¶Êı×Ö·ÖÖ§(Í¬É«)
     wire lv_rule_lit = (hcounter >= 11'd232) && (hcounter < 11'd306) &&
                        (vcounter >= 11'd72) && (vcounter < 11'd74);
     wire lvd_all_lit = lvd_lit || lv_rule_lit;
@@ -886,14 +886,14 @@ module frame(
                             (((vcounter >= 11'd576) && (vcounter <= 11'd579)) ||
                              ((vcounter >= 11'd590) && (vcounter <= 11'd593)));
 
-//    ç»“ç®—åŒºåŸŸå…ˆå±è”½åº•å±‚æ¸¸æˆå†…å®¹ï¼Œå†ç”¨æ£‹ç›˜çº¹å‹æš—ï¼›æ ‡é¢˜ã€æ ‡ç­¾å’Œæ•°å€¼åœ¨å…¶ä¸Šå±‚ç»˜åˆ¶
+//    ½áËãÇøÓòÏÈÆÁ±Îµ×²ãÓÎÏ·ÄÚÈİ£¬ÔÙÓÃÆåÅÌÎÆÑ¹°µ£»±êÌâ¡¢±êÇ©ºÍÊıÖµÔÚÆäÉÏ²ã»æÖÆ
     wire result_region = Finalize &&
                       (((hcounter >= 11'd432) && (hcounter <= 11'd847) && (vcounter >= 11'd310) && (vcounter <= 11'd451)) ||
                        ((hcounter >= 11'd352) && (hcounter <= 11'd1048) && (vcounter >= 11'd456) && (vcounter <= 11'd620)));
     wire result_dim = result_region && (hcounter[0] ^ vcounter[0]);
 
-//    å¹½çµæ¡†: 2px è¾¹å¸¦ + å››è§’å„åˆ‡ 1x1(å†…éƒ¨çº¯é»‘, ä¸å®å¿ƒä¸‹è½æ–¹å—åŒºåˆ†)
-//    åˆ¤å®šå¿…é¡»ä¸ ghost_r åŒæ‹å¯„å­˜: ghost_r æ¯” hcounter æ™š 1 æ‹, å¦åˆ™æ¡†ä¼šå·¦çª„å³å®½
+//    ÓÄÁé¿ò: 2px ±ß´ø + ËÄ½Ç¸÷ÇĞ 1x1(ÄÚ²¿´¿ºÚ, ÓëÊµĞÄÏÂÂä·½¿éÇø·Ö)
+//    ÅĞ¶¨±ØĞëÓë ghost_r Í¬ÅÄ¼Ä´æ: ghost_r ±È hcounter Íí 1 ÅÄ, ·ñÔò¿ò»á×óÕ­ÓÒ¿í
     wire [10:0]glx = (hcounter - 11'd321) & 11'd31;
     wire [10:0]gly = (vcounter - 11'd81) & 11'd31;
     wire glx_bd = (glx < 11'd2) || (glx > 11'd27);
@@ -902,7 +902,7 @@ module frame(
     wire gly_cn = (gly < 11'd1) || (gly > 11'd28);
     wire ghost_edge = (glx_bd || gly_bd) && !(glx_cn && gly_cn);
 
-//    å®å¿ƒæ–¹å— 1px åœ†è§’: å››è§’å„åˆ‡ 1x1(ä¸å¹½çµåˆ‡è§’åŒä¸€åˆ¤å®š)
+//    ÊµĞÄ·½¿é 1px Ô²½Ç: ËÄ½Ç¸÷ÇĞ 1x1(ÓëÓÄÁéÇĞ½ÇÍ¬Ò»ÅĞ¶¨)
     wire piece_round = !(glx_cn && gly_cn);
 
     reg over_lit_r;
@@ -926,7 +926,7 @@ module frame(
     reg [10:0]glx_r;
     reg [10:0]gly_r;
 
-//    å¹½çµå†…è§’æ ‡ï¼šä½¿ç”¨ä¸ ghost_r å¯¹é½çš„å¯„å­˜å±€éƒ¨åæ ‡
+//    ÓÄÁéÄÚ½Ç±ê£ºÊ¹ÓÃÓë ghost_r ¶ÔÆëµÄ¼Ä´æ¾Ö²¿×ø±ê
     wire gt_tl = ((glx_r >= 11'd4) && (glx_r <= 11'd8) && (gly_r == 11'd4)) ||
                  ((glx_r == 11'd4) && (gly_r >= 11'd5) && (gly_r <= 11'd8));
     wire gt_tr = ((glx_r >= 11'd23) && (glx_r <= 11'd27) && (gly_r == 11'd4)) ||
@@ -975,7 +975,7 @@ module frame(
     reg next_slot_r;
     reg hold_slot_r;
 
-//    é¢„è§ˆæ–¹å— 1px åœ†è§’: ç›¸ä½æŒ‰é¢æ¿/æ§½ä½åˆ†åˆ«å–(é¿å…è·¨é¢æ¿ä¸²ç›¸ä½)
+//    Ô¤ÀÀ·½¿é 1px Ô²½Ç: ÏàÎ»°´Ãæ°å/²ÛÎ»·Ö±ğÈ¡(±ÜÃâ¿çÃæ°å´®ÏàÎ»)
     wire [10:0]pvx1 = (hcounter - XPN1) & 11'd31;
     wire [10:0]pvx2 = (hcounter - XPN2) & 11'd31;
     wire [10:0]pvx = (duo && (hcounter >= XPN2)) ? pvx2 : pvx1;
@@ -984,7 +984,7 @@ module frame(
     wire [10:0]pvy = hold_slot_r ? pvy_h : pvy_n;
     wire pv_corner = ((pvx == 11'd0) || (pvx == 11'd29)) && ((pvy == 11'd0) || (pvy == 11'd29));
 
-//    æ–°é…è‰²: åœºåœ°åº•è‰² vs å¤–éƒ¨ / P1P2 æ§½ä½åº•è‰²
+//    ĞÂÅäÉ«: ³¡µØµ×É« vs Íâ²¿ / P1P2 ²ÛÎ»µ×É«
     wire [10:0]XR = duo ? 11'd1088 : 11'd960;
     wire in_field = (hcounter >= 11'd321) && (hcounter < XR) && (vcounter >= 11'd81);
     wire [23:0]field_bg = 24'h081018;
@@ -998,8 +998,8 @@ module frame(
     reg [23:0]story_inner_color_r;
     reg [23:0]story_menu_color_r;
 
-//    CORE-07 åŒå±‚èƒŒæ™¯ï¼šå¤–å±‚èˆ±å®¤ + å†…å±‚ååº”å †æ”¶å®¹æ§½ã€‚
-//    èƒŒæ™¯åªä½œä¸ºæœ€ä½ä¼˜å…ˆçº§å¡«å……ï¼Œæ‰€æœ‰æ–¹å—ã€HUDã€èœå•å’Œç»“ç®—å†…å®¹ä»åœ¨ä¸Šå±‚ã€‚
+//    CORE-07 Ë«²ã±³¾°£ºÍâ²ã²ÕÊÒ + ÄÚ²ã·´Ó¦¶ÑÊÕÈİ²Û¡£
+//    ±³¾°Ö»×÷Îª×îµÍÓÅÏÈ¼¶Ìî³ä£¬ËùÓĞ·½¿é¡¢HUD¡¢²Ëµ¥ºÍ½áËãÄÚÈİÈÔÔÚÉÏ²ã¡£
     always@(*)begin
     story_outer_color = 24'h061017;
     if(vcounter < 11'd75)
@@ -1013,7 +1013,7 @@ module frame(
        (hcounter == (duo ? 11'd1117 : 11'd1024)) ||
        (hcounter == (duo ? 11'd1265 : 11'd1204)))
         story_outer_color = 24'h29404D;
-// è§‚å¯Ÿçª—ï¼šå·¦ä¾§ä¸¤ä¸ªã€å³ä¾§ä¸¤ä¸ªçª„çª—ã€‚
+// ¹Û²ì´°£º×ó²àÁ½¸ö¡¢ÓÒ²àÁ½¸öÕ­´°¡£
     if(((hcounter >= 11'd22) && (hcounter <= 11'd76) &&
         (((vcounter >= 11'd112) && (vcounter <= 11'd162)) ||
          ((vcounter >= 11'd214) && (vcounter <= 11'd264)))) ||
@@ -1027,7 +1027,7 @@ module frame(
        ((hcounter == 11'd1238) && ((vcounter == 11'd128) || (vcounter == 11'd232))) ||
        ((hcounter == 11'd1254) && ((vcounter == 11'd142) || (vcounter == 11'd222))))
         story_outer_color = 24'h536A76;
-// å†·å´ç®¡çº¿ï¼šä»å¤–å±‚èˆ±å£æ¥å…¥å†…å±‚åœºåœ°ä¸¤ä¾§ã€‚
+// ÀäÈ´¹ÜÏß£º´ÓÍâ²ã²Õ±Ú½ÓÈëÄÚ²ã³¡µØÁ½²à¡£
     if(((vcounter == 11'd164) || (vcounter == 11'd318) ||
         (vcounter == 11'd472) || (vcounter == 11'd626)) &&
        (((hcounter >= 11'd224) && (hcounter < 11'd321)) ||
@@ -1188,7 +1188,7 @@ module frame(
     type_t_r <= type_t;
     hold_type_r <= hold_type;
 
-//    åœºåœ°å–è‰²: ç¼–å·å¿…é¡»åœ¨åœºåœ°å†…(å“¨å…µ 24 æˆ– 20 è¡¨ç¤ºä¸åœ¨ä»»ä½•æ ¼)
+//    ³¡µØÈ¡É«: ±àºÅ±ØĞëÔÚ³¡µØÄÚ(ÉÚ±ø 24 »ò 20 ±íÊ¾²»ÔÚÈÎºÎ¸ñ)
     if((C_num <= 5'd23) && (R_num <= 5'd19))begin
     cell_r <= row_f[R_num][C_num];
     sc_r <= scw[R_num][C_num*3 +: 3];
@@ -1201,7 +1201,7 @@ module frame(
     end
     clear_t_r <= clear_t;
 
-//    æ¶ˆè¡Œå‹ç¼©: 1~4 è¡Œåªè¦è¯¥è¡Œå‚ä¸æ¶ˆè¡Œå°±æŒç»­æ”¶ç¼©, ä¸å—ç™½é—ªç›¸ä½å½±å“
+//    ÏûĞĞÑ¹Ëõ: 1~4 ĞĞÖ»Òª¸ÃĞĞ²ÎÓëÏûĞĞ¾Í³ÖĞøÊÕËõ, ²»ÊÜ°×ÉÁÏàÎ»Ó°Ïì
     clear_shrink_r <= (clear_t) && (line_t[R_num]);
     flash_r <= (clear_t) && (line_t[R_num]) && (!clear_flash);
     chs_margin_r <= chs_margin;
@@ -1235,8 +1235,8 @@ module frame(
     end
     end
 
-//    UI ç‰¹æ•ˆ: 60Hz èŠ‚æ‹ + è½é”è„‰å†²(E1) / å‡çº§é—ªç™½(E2)
-    parameter [20:0]EFF_TICK = 21'd1_237_499;  //ä»¿çœŸå¯è¦†ç›–
+//    UI ÌØĞ§: 60Hz ½ÚÅÄ + ÂäËøÂö³å(E1) / Éı¼¶ÉÁ°×(E2)
+    parameter [20:0]EFF_TICK = 21'd1_237_499;  //·ÂÕæ¿É¸²¸Ç
     reg [20:0]eff_cnt;
     wire eff_tick = (eff_cnt == EFF_TICK);
     always@(posedge Clk_74M or negedge Reset_n)begin
@@ -1351,29 +1351,29 @@ module frame(
     wire hflash = (hf != 2'd0);
     wire scflash = (scf != 2'd0);
 
-//    é¢„è§ˆæ§½ 32px ç‚¹é˜µ(åªåœ¨æ§½ä½å†…, ä¼˜å…ˆçº§ä½äºé¢„è§ˆæ–¹å—)
+//    Ô¤ÀÀ²Û 32px µãÕó(Ö»ÔÚ²ÛÎ»ÄÚ, ÓÅÏÈ¼¶µÍÓÚÔ¤ÀÀ·½¿é)
     wire dx1 = (((hcounter - XPN1) & 11'd31) == 11'd31);
     wire dx2 = (((hcounter - XPN2) & 11'd31) == 11'd31);
     wire dy1 = (((vcounter - YNEXT) & 11'd31) == 11'd31);
     wire dy2 = (((vcounter - YHOLD) & 11'd31) == 11'd31);
     wire slot_dot = (next_slot_r && dy1 && (dx1 || dx2)) || (hold_slot_r && dy2 && (dx1 || dx2));
 
-    parameter CYAN = 24'h00CCFF,  //é’è‰²I
-               LIGHT_CYAN = 24'h99EEFF,  //æµ…é’è‰²I
-               PURPPLE = 24'h9933CC,  //ç´«è‰²T
-               LIGHT_PURPPLE = 24'hD9B3E6,  //æµ…ç´«è‰²T
-               YELLOW = 24'hFFF_F00,  //é»„è‰²O
-               LIGHT_YELLOW = 24'hFFFF99,  //æµ…é»„è‰²O
-               RED = 24'hE63946,  //çº¢è‰²S
-               LIGHT_RED = 24'hFFB3B9,  //æµ…çº¢è‰²S
-               GREEN = 24'h55A630,  //ç»¿è‰²Z
-               LIGHT_GREEN = 24'hBDE0AA,  //æµ…ç»¿è‰²Z
-               ORANGE = 24'hF77F24,  //æ©™è‰²L
-               LIGHT_ORANGE = 24'hFFD9B3,  //æµ…æ©™è‰²L
-               PINK = 24'hFF4DA6,  //äº®ç²‰è‰²J
-               LIGHT_PINK = 24'hFFB3D9,  //æµ…ç²‰è‰²J
-               BLACK = 24'h000_000,  //é»‘è‰²
-               WHITE = 24'hFFF_FFF,  //ç™½è‰²
+    parameter CYAN = 24'h00CCFF,  //ÇàÉ«I
+               LIGHT_CYAN = 24'h99EEFF,  //Ç³ÇàÉ«I
+               PURPPLE = 24'h9933CC,  //×ÏÉ«T
+               LIGHT_PURPPLE = 24'hD9B3E6,  //Ç³×ÏÉ«T
+               YELLOW = 24'hFFF_F00,  //»ÆÉ«O
+               LIGHT_YELLOW = 24'hFFFF99,  //Ç³»ÆÉ«O
+               RED = 24'hE63946,  //ºìÉ«S
+               LIGHT_RED = 24'hFFB3B9,  //Ç³ºìÉ«S
+               GREEN = 24'h55A630,  //ÂÌÉ«Z
+               LIGHT_GREEN = 24'hBDE0AA,  //Ç³ÂÌÉ«Z
+               ORANGE = 24'hF77F24,  //³ÈÉ«L
+               LIGHT_ORANGE = 24'hFFD9B3,  //Ç³³ÈÉ«L
+               PINK = 24'hFF4DA6,  //ÁÁ·ÛÉ«J
+               LIGHT_PINK = 24'hFFB3D9,  //Ç³·ÛÉ«J
+               BLACK = 24'h000_000,  //ºÚÉ«
+               WHITE = 24'hFFF_FFF,  //°×É«
                DARK_I = 24'h04_63_7E,
                DARK_T = 24'h47_1F_67,
                DARK_O = 24'h74_79_0D,
@@ -1384,7 +1384,7 @@ module frame(
                P1_SOFT = 24'h6B_F0_FF,
                P2_SOFT = 24'hFF_98_CB;
 
-//    å±é™©ç¯å¸¦ä¸ä¸¤ä¾§ä¾›èƒ½è½¨
+//    Î£ÏÕµÆ´øÓëÁ½²à¹©ÄÜ¹ì
     wire [23:0]col_mask = duo ? 24'hFFFFFF : 24'h0FFFFF;
     wire row0_any = |(row_f[0] & col_mask);
     wire row1_any = |(row_f[1] & col_mask);
@@ -1425,15 +1425,15 @@ module frame(
         (((vcounter - 11'd88) & 11'd31) < 11'd8);
     wire [23:0]level_alert_color = level_critical ? RED : ORANGE;
 
-//    Impact Glass è¾¹æ¡†ä¸ SOFT é«˜å…‰
+//    Impact Glass ±ß¿òÓë SOFT ¸ß¹â
     wire block_light = (glx_r == 11'd1) || (gly_r == 11'd1);
-    wire block_soft = (glx_r >= 11'd6) && (glx_r <= 11'd11) && (gly_r == 11'd26);  //å·¦ä¸‹6x1æŸ”å…‰
+    wire block_soft = (glx_r >= 11'd6) && (glx_r <= 11'd11) && (gly_r == 11'd26);  //×óÏÂ6x1Èá¹â
     wire block_dark = (glx_r == 11'd30) || (gly_r == 11'd30);
     wire block_glint = (((gly_r == 11'd2) || (gly_r == 11'd3)) && (glx_r >= 11'd2) && (glx_r <= 11'd9)) ||
                        (((glx_r == 11'd2) || (glx_r == 11'd3)) && (gly_r >= 11'd2) && (gly_r <= 11'd9)) ||
                        ((glx_r >= 11'd3) && (glx_r <= 11'd4) && (gly_r >= 11'd3) && (gly_r <= 11'd4));
     wire pv_light = (pvx_r == 11'd1) || (pvy_r == 11'd1);
-    wire pv_soft = (pvx_r >= 11'd6) && (pvx_r <= 11'd11) && (pvy_r == 11'd26);  //é¢„è§ˆå·¦ä¸‹6x1æŸ”å…‰
+    wire pv_soft = (pvx_r >= 11'd6) && (pvx_r <= 11'd11) && (pvy_r == 11'd26);  //Ô¤ÀÀ×óÏÂ6x1Èá¹â
     wire pv_dark = (pvx_r == 11'd30) || (pvy_r == 11'd30);
     wire pv_glint = (((pvy_r == 11'd2) || (pvy_r == 11'd3)) && (pvx_r >= 11'd2) && (pvx_r <= 11'd9)) ||
                     (((pvx_r == 11'd2) || (pvx_r == 11'd3)) && (pvy_r >= 11'd2) && (pvy_r <= 11'd9)) ||
@@ -1666,8 +1666,8 @@ module frame(
                           (vcounter >= 11'd584) && (vcounter < 11'd591) &&
                           mf_text_px(3'd6,core_lx,core3_ly);
 
-//    åƒç´ å‘½ä¸­ç ï¼šåªä¿ç•™ä¼˜å…ˆçº§åˆ¤å®šï¼Œé¢œè‰²åœ¨ä¸‹ä¸€çº§ä¸€æ¬¡æ€§å±•å¼€ã€‚
-//    è¿™æ ·é¿å…æŠŠ 24 ä½é¢œè‰²å¸¸é‡å¤åˆ¶è¿›æ•´æ¡ä¼˜å…ˆé“¾ï¼Œé™ä½ LUT ä¸å…³é”®è·¯å¾„çº§æ•°ã€‚
+//    ÏñËØÃüÖĞÂë£ºÖ»±£ÁôÓÅÏÈ¼¶ÅĞ¶¨£¬ÑÕÉ«ÔÚÏÂÒ»¼¶Ò»´ÎĞÔÕ¹¿ª¡£
+//    ÕâÑù±ÜÃâ°Ñ 24 Î»ÑÕÉ«³£Á¿¸´ÖÆ½øÕûÌõÓÅÏÈÁ´£¬½µµÍ LUT Óë¹Ø¼üÂ·¾¶¼¶Êı¡£
     localparam [6:0]
         PS_BLACK            = 7'd0,
         PS_MENU_DARK        = 7'd1,
@@ -2223,7 +2223,7 @@ module frame(
     endcase
     end
 
-//    æ¶ˆè¡ŒéŸ³æ•ˆç¼–å·(åªè¯»)
+//    ÏûĞĞÒôĞ§±àºÅ(Ö»¶Á)
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     rgb <= BLACK;

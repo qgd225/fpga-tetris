@@ -1,7 +1,7 @@
-ï»¿//============================================================
-// æ¨¡å—ï¼šGame_state_machine
-// ä½œç”¨ï¼šæ¸¸æˆçŠ¶æ€æœºï¼šèœå•ã€æ¸¸æˆã€æš‚åœå’Œç»“æŸçŠ¶æ€è½¬æ¢ã€‚
-// æ—¶é’Ÿ/å¤ä½ï¼šClk_74Mï¼›Reset_n ä½æœ‰æ•ˆ
+//============================================================
+// Ä£¿é£ºGame_state_machine
+// ×÷ÓÃ£ºÓÎÏ·×´Ì¬»ú£º²Ëµ¥¡¢ÓÎÏ·¡¢ÔİÍ£ºÍ½áÊø×´Ì¬×ª»»¡£
+// Ê±ÖÓ/¸´Î»£ºClk_74M£»Reset_n µÍÓĞĞ§
 //============================================================
 module Game_state_machine(
     input Clk_74M,
@@ -26,7 +26,7 @@ module Game_state_machine(
     parameter MCNT = 74_250_000;
     parameter [3:0]CHOOSE_MAX = 4'd1;
 
-//    æŒ‰é”®ä¿¡å·å¤„ç†
+//    °´¼üĞÅºÅ´¦Àí
     reg [26:0]counter;
     reg short_press_ok;
 
@@ -53,7 +53,7 @@ module Game_state_machine(
     short_press_ok <= 1'b1;
     end
 
-//    æ¨¡å¼é€‰æ‹©è®¡æ•°å™¨
+//    Ä£Ê½Ñ¡Ôñ¼ÆÊıÆ÷
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     choose_cnt <= 4'd0;
@@ -67,7 +67,7 @@ module Game_state_machine(
     choose_cnt <= 4'd0;
     end
 
-//    çŠ¶æ€è½¬æ¢
+//    ×´Ì¬×ª»»
     localparam Choose_en   = 5'b00001;
     localparam Idle_en     = 5'b00010;
     localparam Playing_en  = 5'b00100;

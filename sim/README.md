@@ -10,8 +10,6 @@ sim\run_all.bat
 
 最终输出逐套显示 `=== ALL PASS ===` 或 `=== FAILED n ===`。
 
-源码统一保存为 UTF-8 with BOM。由于 Vivado 2018.3 的 `xvlog` 不接受文件开头 BOM，每套脚本会先调用 `prepare_nobom.py`，在忽略目录 `_nobom/` 中生成仅供仿真的无 BOM 副本。
-
 ## 九套测试说明
 
 | 套 | 顶层 | 覆盖内容 | 项数 |

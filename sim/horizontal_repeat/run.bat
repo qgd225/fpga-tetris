@@ -3,9 +3,7 @@ if not defined XILINX_VIVADO call "D:\xilinx\Vivado\2018.3\settings64.bat" >nul 
 cd /d "%~dp0"
 if not exist build mkdir build
 cd build
-python ..\..\prepare_nobom.py
-if errorlevel 1 ( echo PREPARE_FAIL & exit /b 1 )
-call xvlog.bat ..\..\_nobom\sim\horizontal_repeat\horizontal_repeat_tb.v ..\..\_nobom\Tetris.srcs\sources_1\new\horizontal_repeat.v --nolog
+call xvlog.bat ..\horizontal_repeat_tb.v ..\..\..\Tetris.srcs\sources_1\new\horizontal_repeat.v --nolog
 if errorlevel 1 ( echo XVLOG_FAIL & exit /b 1 )
 call xelab.bat horizontal_repeat_tb -s snap --timescale 1ns/1ps --nolog
 if errorlevel 1 ( echo XELAB_FAIL & exit /b 1 )

@@ -1,21 +1,21 @@
-ï»¿`timescale 1ns/1ps
+`timescale 1ns/1ps
 
 //============================================================
-// æµ‹è¯•å°ï¼šframe_duo_tb
-// æµ‹è¯•ç›®æ ‡ï¼šframe æ˜¾ç¤ºå›å½’ï¼šæ–¹å—/HUD/èœå•/ç‰¹æ•ˆ/ç»“ç®—é¡µ/æ™ºèƒ½æç¤ºå’Œå±€éƒ¨å‹æš—ã€‚
+// ²âÊÔÌ¨£ºframe_duo_tb
+// ²âÊÔÄ¿±ê£ºframe ÏÔÊ¾»Ø¹é£º·½¿é/HUD/²Ëµ¥/ÌØĞ§/½áËãÒ³/ÖÇÄÜÌáÊ¾ºÍ¾Ö²¿Ñ¹°µ¡£
 //============================================================
-//===== frame çº§åŒäººæ˜¾ç¤ºå›å½’: P2 è¿åŠ¨å—/è½æ ¼/ä¸‹ä¸€å—/Hold/æ–° HUD å¸ƒå±€/èœå•å± =====
+//===== frame ¼¶Ë«ÈËÏÔÊ¾»Ø¹é: P2 ÔË¶¯¿é/Âä¸ñ/ÏÂÒ»¿é/Hold/ĞÂ HUD ²¼¾Ö/²Ëµ¥ÆÁ =====
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
-  assign douta = 32'h0000_0000;  // æ¡©: åç§»å…¨ 0 -> é¢„è§ˆå—å  (åˆ—1,è¡Œ3)
+  assign douta = 32'h0000_0000;  // ×®: Æ«ÒÆÈ« 0 -> Ô¤ÀÀ¿éÕ¼ (ÁĞ1,ĞĞ3)
 endmodule
 module weiyibiao(input clka, input [4:0] addra, output [7:0] douta);
   assign douta = 8'h00;
 endmodule
 module number(input clka, input ena, input [9:0] addra, output [19:0] douta);
-  assign douta = 20'hF_FFFF;  // æ¡©: å…¨äº®, ä¾¿äºæ–­è¨€æ•°å­—åŒºåŸŸé¢œè‰²
+  assign douta = 20'hF_FFFF;  // ×®: È«ÁÁ, ±ãÓÚ¶ÏÑÔÊı×ÖÇøÓòÑÕÉ«
 endmodule
 module letter(input clka, input ena, input [10:0] addra, output [19:0] douta);
-  assign douta = 20'hF_FFFF;  // æ¡©: å…¨äº®, ä¾¿äºæ–­è¨€æ ‡ç­¾/èœå•æ–‡å­—é¢œè‰²
+  assign douta = 20'hF_FFFF;  // ×®: È«ÁÁ, ±ãÓÚ¶ÏÑÔ±êÇ©/²Ëµ¥ÎÄ×ÖÑÕÉ«
 endmodule
 
 module frame_duo_tb;
@@ -119,7 +119,7 @@ begin
 end
 endtask
 
-//    é¢œè‰²(ä¸ frame ä¸€è‡´)
+//    ÑÕÉ«(Óë frame Ò»ÖÂ)
 `define CYAN     24'h00CCFF
 `define YELLOW   24'hFFF_F00
 `define RED      24'hE63946
@@ -137,161 +137,161 @@ endtask
 initial begin
   bad = 0;
   Rst = 0; #200; Rst = 1; repeat(10) @(posedge Clk);
-  force dut.Playfield_inst.Drop = 30'd100_000_000;  // æŠ‘åˆ¶è‡ªåŠ¨ä¸‹è½
+  force dut.Playfield_inst.Drop = 30'd100_000_000;  // ÒÖÖÆ×Ô¶¯ÏÂÂä
 
-  $display("=== 1) åŒäºº: P2 è¿åŠ¨å—åƒç´ (åŒè‰²è¡¨) ===");
+  $display("=== 1) Ë«ÈË: P2 ÔË¶¯¿éÏñËØ(Í¬É«±í) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c2 = 5'd20; force dut.Playfield_inst.counter_r2 = 5'd0;
   force dut.Playfield_inst.type2 = 3'd0;
-  look(11'd971, 11'd91);  // ç¬¬20åˆ— ç¬¬0è¡Œ
-  chk("duo=1 P2 æ–¹å—=é’è‰²", rgb, `CYAN);
+  look(11'd971, 11'd91);  // µÚ20ÁĞ µÚ0ĞĞ
+  chk("duo=1 P2 ·½¿é=ÇàÉ«", rgb, `CYAN);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd971, 11'd91);
-  chk("duo=0 åŒä½ç½®ä¸ºå¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
+  chk("duo=0 Í¬Î»ÖÃÎªÍâ²ã±³¾°", rgb, 24'h061017);
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
   clr_state;
 
-  $display("=== 2) åŒäºº: P2 è½æ ¼åæ˜¾ç¤ºé¢œè‰² ===");
+  $display("=== 2) Ë«ÈË: P2 Âä¸ñºóÏÔÊ¾ÑÕÉ« ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c2 = 5'd10; force dut.Playfield_inst.counter_r2 = 5'd19;
   force dut.Playfield_inst.type2 = 3'd3;
   repeat(4) @(posedge Clk);
-  lock2;  // P2 è½é” (10,19)
+  lock2;  // P2 ÂäËø (10,19)
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
-  look(11'd656, 11'd704);  // ç¬¬10åˆ— ç¬¬19è¡Œ
-  chk("duo=1 P2 è½æ ¼=çº¢è‰²", rgb, `RED);
+  look(11'd656, 11'd704);  // µÚ10ÁĞ µÚ19ĞĞ
+  chk("duo=1 P2 Âä¸ñ=ºìÉ«", rgb, `RED);
   clr_state;
   duo = 1'b0; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c2 = 5'd10; force dut.Playfield_inst.counter_r2 = 5'd19;
   repeat(4) @(posedge Clk);
-  lock2;  // å•äºº: ä¸åº”å†™å…¥
+  lock2;  // µ¥ÈË: ²»Ó¦Ğ´Èë
   release dut.Playfield_inst.counter_c2; release dut.Playfield_inst.counter_r2;
   look(11'd643, 11'd691);
-  chk("duo=0 P2 è½æ ¼ä¸æ˜¾ç¤º", rgb, `FLDBG);
+  chk("duo=0 P2 Âä¸ñ²»ÏÔÊ¾", rgb, `FLDBG);
   clr_state;
 
-  $display("=== 3) 24 åˆ—åœºåœ°æœ€å³ä¸¤åˆ—ä¹Ÿèƒ½æ˜¾ç¤º ===");
+  $display("=== 3) 24 ÁĞ³¡µØ×îÓÒÁ½ÁĞÒ²ÄÜÏÔÊ¾ ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   dut.state_color[23*20 + 17] = 3'd3; dut.Playfield_inst.state[23*20 + 17] = 1'b1;
-  look(11'd1067, 11'd630);  // ç¬¬23åˆ— ç¬¬17è¡Œ
-  chk("duo=1 ç¬¬23åˆ—æ ¼=çº¢è‰²", rgb, `RED);
+  look(11'd1067, 11'd630);  // µÚ23ÁĞ µÚ17ĞĞ
+  chk("duo=1 µÚ23ÁĞ¸ñ=ºìÉ«", rgb, `RED);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd1067, 11'd630);
-  chk("duo=0 ç¬¬23åˆ—ä¸åœ¨åœºåœ°", rgb, 24'h061017);
+  chk("duo=0 µÚ23ÁĞ²»ÔÚ³¡µØ", rgb, 24'h061017);
   clr_state;
   dut.state_color[23*20 + 17] = 3'd0; dut.Playfield_inst.state[23*20 + 17] = 1'b0;
 
-  $display("=== 4) æ–°é¢æ¿å¸ƒå±€: è‰²çº¿ + æ§½ä½åº•è‰²(æ— æ¡†) ===");
+  $display("=== 4) ĞÂÃæ°å²¼¾Ö: É«Ïß + ²ÛÎ»µ×É«(ÎŞ¿ò) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd100, 11'd140);   chk("duo=1 P1 Next æ§½ä½", rgb, `SLOT_P1);
-  look(11'd100, 11'd123);   chk("duo=1 P1 Next è‰²çº¿", rgb, `CY_MENU);
-  look(11'd100, 11'd356);   chk("duo=1 P1 Hold æ§½ä½", rgb, `SLOT_P1);
-  look(11'd100, 11'd339);   chk("duo=1 P1 Hold è‰²çº¿", rgb, `CY_MENU);
-  look(11'd1230, 11'd140);  chk("duo=1 P2 Next æ§½ä½", rgb, `SLOT_P2);
-  look(11'd1230, 11'd123);  chk("duo=1 P2 Next è‰²çº¿", rgb, `PINK2);
-  look(11'd1230, 11'd356);  chk("duo=1 P2 Hold æ§½ä½", rgb, `SLOT_P2);
-  look(11'd1230, 11'd339);  chk("duo=1 P2 Hold è‰²çº¿", rgb, `PINK2);
-  look(11'd1059, 11'd140);  chk("duo=1 å•äººæ§½ä½ä½ç½®=é»‘", rgb, `FLDBG);
-  look(11'd1059, 11'd123);  chk("duo=1 å•äººè‰²çº¿ä½ç½®=é»‘", rgb, `FLDBG);
-  look(11'd1104, 11'd100);  chk("æ—§ Next å¤–æ¡†ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd1120, 11'd203);  chk("æ—§ä¸­é—´è™šçº¿ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
+  look(11'd100, 11'd140);   chk("duo=1 P1 Next ²ÛÎ»", rgb, `SLOT_P1);
+  look(11'd100, 11'd123);   chk("duo=1 P1 Next É«Ïß", rgb, `CY_MENU);
+  look(11'd100, 11'd356);   chk("duo=1 P1 Hold ²ÛÎ»", rgb, `SLOT_P1);
+  look(11'd100, 11'd339);   chk("duo=1 P1 Hold É«Ïß", rgb, `CY_MENU);
+  look(11'd1230, 11'd140);  chk("duo=1 P2 Next ²ÛÎ»", rgb, `SLOT_P2);
+  look(11'd1230, 11'd123);  chk("duo=1 P2 Next É«Ïß", rgb, `PINK2);
+  look(11'd1230, 11'd356);  chk("duo=1 P2 Hold ²ÛÎ»", rgb, `SLOT_P2);
+  look(11'd1230, 11'd339);  chk("duo=1 P2 Hold É«Ïß", rgb, `PINK2);
+  look(11'd1059, 11'd140);  chk("duo=1 µ¥ÈË²ÛÎ»Î»ÖÃ=ºÚ", rgb, `FLDBG);
+  look(11'd1059, 11'd123);  chk("duo=1 µ¥ÈËÉ«ÏßÎ»ÖÃ=ºÚ", rgb, `FLDBG);
+  look(11'd1104, 11'd100);  chk("¾É Next Íâ¿òÎ»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
+  look(11'd1120, 11'd203);  chk("¾ÉÖĞ¼äĞéÏßÎ»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1059, 11'd140);  chk("duo=0 å•äºº Next æ§½ä½", rgb, `SLOT_P1);
-  look(11'd1059, 11'd123);  chk("duo=0 å•äºº Next è‰²çº¿", rgb, `GRAY_MID);
-  look(11'd1059, 11'd356);  chk("duo=0 å•äºº Hold æ§½ä½", rgb, `SLOT_P1);
-  look(11'd100, 11'd140);   chk("duo=0 åŒäººæ§½ä½ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd100, 11'd123);   chk("duo=0 åŒäººè‰²çº¿ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd1230, 11'd140);  chk("duo=0 æ—  P2 æ§½ä½", rgb, 24'h02070B);
-  look(11'd1230, 11'd123);  chk("duo=0 æ—  P2 è‰²çº¿", rgb, 24'h02070B);
-  look(11'd1104, 11'd500);  chk("duo=0 æ—§ Next å¤–æ¡†ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd1040, 11'd100);  chk("duo=0 æ—§å•äººå¤–æ¡†ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
+  look(11'd1059, 11'd140);  chk("duo=0 µ¥ÈË Next ²ÛÎ»", rgb, `SLOT_P1);
+  look(11'd1059, 11'd123);  chk("duo=0 µ¥ÈË Next É«Ïß", rgb, `GRAY_MID);
+  look(11'd1059, 11'd356);  chk("duo=0 µ¥ÈË Hold ²ÛÎ»", rgb, `SLOT_P1);
+  look(11'd100, 11'd140);   chk("duo=0 Ë«ÈË²ÛÎ»Î»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
+  look(11'd100, 11'd123);   chk("duo=0 Ë«ÈËÉ«ÏßÎ»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
+  look(11'd1230, 11'd140);  chk("duo=0 ÎŞ P2 ²ÛÎ»", rgb, 24'h02070B);
+  look(11'd1230, 11'd123);  chk("duo=0 ÎŞ P2 É«Ïß", rgb, 24'h02070B);
+  look(11'd1104, 11'd500);  chk("duo=0 ¾É Next Íâ¿òÎ»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
+  look(11'd1040, 11'd100);  chk("duo=0 ¾Éµ¥ÈËÍâ¿òÎ»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
 
-  $display("=== 5) ä¸‹ä¸€å—é¢„è§ˆ(é”šç‚¹éšå¸ƒå±€è¿ç§») ===");
+  $display("=== 5) ÏÂÒ»¿éÔ¤ÀÀ(ÃªµãËæ²¼¾ÖÇ¨ÒÆ) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.type_t2 = 3'd3;
   force dut.Playfield_inst.type_t  = 3'd2;
   repeat(4) @(posedge Clk);
-  look(11'd1161, 11'd240);  // P2 é¢„è§ˆ (åˆ—1,è¡Œ3)
-  chk("duo=1 P2 ä¸‹ä¸€å—=çº¢", rgb, `RED);
-  look(11'd140, 11'd240);  // P1 é¢„è§ˆ (åˆ—1,è¡Œ3)
-  chk("duo=1 P1 ä¸‹ä¸€å—=é»„", rgb, `YELLOW);
+  look(11'd1161, 11'd240);  // P2 Ô¤ÀÀ (ÁĞ1,ĞĞ3)
+  chk("duo=1 P2 ÏÂÒ»¿é=ºì", rgb, `RED);
+  look(11'd140, 11'd240);  // P1 Ô¤ÀÀ (ÁĞ1,ĞĞ3)
+  chk("duo=1 P1 ÏÂÒ»¿é=»Æ", rgb, `YELLOW);
   duo = 1'b0; repeat(4) @(posedge Clk);
   look(11'd140, 11'd240);
-  chk("duo=0 å·¦æ ä½ç½®ä¸ºå¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd1101, 11'd240);  // å•äººé¢„è§ˆ (åˆ—1,è¡Œ3)
-  chk("duo=0 å•äººä¸‹ä¸€å—=é»„", rgb, `YELLOW);
+  chk("duo=0 ×óÀ¸Î»ÖÃÎªÍâ²ã±³¾°", rgb, 24'h061017);
+  look(11'd1101, 11'd240);  // µ¥ÈËÔ¤ÀÀ (ÁĞ1,ĞĞ3)
+  chk("duo=0 µ¥ÈËÏÂÒ»¿é=»Æ", rgb, `YELLOW);
   look(11'd1161, 11'd240);
-  chk("duo=0 æ—  P2 é¢„è§ˆ", rgb, `SLOT_P1);
+  chk("duo=0 ÎŞ P2 Ô¤ÀÀ", rgb, `SLOT_P1);
   release dut.Playfield_inst.type_t2; release dut.Playfield_inst.type_t;
 
-  $display("=== 6) Hold ä½ç½® ===");
+  $display("=== 6) Hold Î»ÖÃ ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd1104, 11'd400);  chk("duo=1 æ—§ Hold å¤–æ¡†ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
+  look(11'd1104, 11'd400);  chk("duo=1 ¾É Hold Íâ¿òÎ»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1040, 11'd300);  chk("duo=0 æ—§ Hold å¤–æ¡†ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd1230, 11'd356);  chk("duo=0 åŒäºº Hold ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
+  look(11'd1040, 11'd300);  chk("duo=0 ¾É Hold Íâ¿òÎ»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
+  look(11'd1230, 11'd356);  chk("duo=0 Ë«ÈË Hold Î»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
 
-  $display("=== 7) å•äºº P1 æ˜¾ç¤ºå›å½’ ===");
+  $display("=== 7) µ¥ÈË P1 ÏÔÊ¾»Ø¹é ===");
   duo = 1'b0; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.counter_c = 5'd9; force dut.Playfield_inst.counter_r = 5'd0;
   force dut.Playfield_inst.type = 3'd2;
-  look(11'd619, 11'd91);  // ç¬¬9åˆ— ç¬¬0è¡Œ
-  chk("duo=0 P1 æ–¹å—=é»„", rgb, `YELLOW);
+  look(11'd619, 11'd91);  // µÚ9ÁĞ µÚ0ĞĞ
+  chk("duo=0 P1 ·½¿é=»Æ", rgb, `YELLOW);
   release dut.Playfield_inst.counter_c; release dut.Playfield_inst.counter_r; release dut.Playfield_inst.type;
 
-  $display("=== 8) 2px æ­»åŒºå–è‰²å±è”½(ç¼–å·æœç´¢ä¿®å¤) ===");
+  $display("=== 8) 2px ËÀÇøÈ¡É«ÆÁ±Î(±àºÅËÑË÷ĞŞ¸´) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   dut.state_color[20*20 + 3] = 3'd3;
   dut.Playfield_inst.state[20*20 + 3] = 1'b1;
-  look(11'd351, 11'd200);  // åˆ—é—´ 2px æ­»åŒº
-  chk("æ­»åŒºåƒç´ =é»‘", rgb, `FLDBG);
+  look(11'd351, 11'd200);  // ÁĞ¼ä 2px ËÀÇø
+  chk("ËÀÇøÏñËØ=ºÚ", rgb, `FLDBG);
   dut.state_color[20*20 + 3] = 3'd0;
   dut.Playfield_inst.state[20*20 + 3] = 1'b0;
-  look(11'd318, 11'd40);  // è¾¹æ¡†ä¸Šæ–¹: å·¦è¾¹æ¡†ä¸åº”å‡ºå¤´
-  chk("å·¦è¾¹æ¡†ä¸å‡ºå¤´(ä¸Šæ–¹=å¤–å±‚èƒŒæ™¯)", rgb, 24'h071018);
-  look(11'd318, 11'd200);  // è¾¹æ¡†æ—: å·¦è¾¹æ¡†æ­£å¸¸
-  chk("å·¦è¾¹æ¡†æ­£å¸¸(é’¢ç°)", rgb, 24'h536A76);
+  look(11'd318, 11'd40);  // ±ß¿òÉÏ·½: ×ó±ß¿ò²»Ó¦³öÍ·
+  chk("×ó±ß¿ò²»³öÍ·(ÉÏ·½=Íâ²ã±³¾°)", rgb, 24'h071018);
+  look(11'd318, 11'd200);  // ±ß¿òÅÔ: ×ó±ß¿òÕı³£
+  chk("×ó±ß¿òÕı³£(¸Ö»Ò)", rgb, 24'h536A76);
   look(11'd321, 11'd81);
-  chk("æœ‰æ•ˆæ ¼(ç¬¬0è¡Œç¬¬0åˆ—)=é¡¶éƒ¨é’¢ç°æ¡†", rgb, 24'h536A76);
+  chk("ÓĞĞ§¸ñ(µÚ0ĞĞµÚ0ÁĞ)=¶¥²¿¸Ö»Ò¿ò", rgb, 24'h536A76);
 
-  $display("=== 9) å¹½çµç©ºå¿ƒæ¡†: è¾¹å¸¦æµ…è‰² / å†…éƒ¨çº¯é»‘ ===");
+  $display("=== 9) ÓÄÁé¿ÕĞÄ¿ò: ±ß´øÇ³É« / ÄÚ²¿´¿ºÚ ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd351, 11'd85);   chk("æ ¼æœ«æ­»åŒº=é»‘", rgb, `FLDBG);
+  look(11'd351, 11'd85);   chk("¸ñÄ©ËÀÇø=ºÚ", rgb, `FLDBG);
   force dut.Playfield_inst.Piece = 1'b0;  force dut.Playfield_inst.Piece2 = 1'b0;
   force dut.Playfield_inst.ghost = 1'b1;  force dut.Playfield_inst.type = 3'd0;
   force dut.Playfield_inst.ghost2 = 1'b0;
   repeat(4) @(posedge Clk);
-  look(11'd322, 11'd85);   chk("å¹½çµå·¦è¾¹å¸¦=æµ…é’", rgb, 24'h99EEFF);
-  look(11'd349, 11'd108);  chk("å¹½çµå³è¾¹å¸¦=æµ…é’", rgb, 24'h99EEFF);
-  look(11'd325, 11'd82);   chk("å¹½çµä¸Šè¾¹å¸¦=æµ…é’", rgb, 24'h99EEFF);
-  look(11'd348, 11'd109);  chk("å¹½çµä¸‹è¾¹å¸¦=æµ…é’", rgb, 24'h99EEFF);
+  look(11'd322, 11'd85);   chk("ÓÄÁé×ó±ß´ø=Ç³Çà", rgb, 24'h99EEFF);
+  look(11'd349, 11'd108);  chk("ÓÄÁéÓÒ±ß´ø=Ç³Çà", rgb, 24'h99EEFF);
+  look(11'd325, 11'd82);   chk("ÓÄÁéÉÏ±ß´ø=Ç³Çà", rgb, 24'h99EEFF);
+  look(11'd348, 11'd109);  chk("ÓÄÁéÏÂ±ß´ø=Ç³Çà", rgb, 24'h99EEFF);
   look(11'd325, 11'd85);   chk("ghost inner tick TL", rgb, 24'h99EEFF);
   look(11'd330, 11'd90);   chk("ghost interior black", rgb, `FLDBG);
   look(11'd348, 11'd108);  chk("ghost inner tick BR", rgb, 24'h99EEFF);
   force dut.Playfield_inst.ghost = 1'b0;
   force dut.Playfield_inst.ghost2 = 1'b1; force dut.Playfield_inst.type2 = 3'd3;
   repeat(4) @(posedge Clk);
-  look(11'd322, 11'd85);   chk("P2 å¹½çµå·¦è¾¹å¸¦=æµ…çº¢", rgb, 24'hFFB3B9);
-  look(11'd348, 11'd109);  chk("P2 å¹½çµä¸‹è¾¹å¸¦=æµ…çº¢", rgb, 24'hFFB3B9);
+  look(11'd322, 11'd85);   chk("P2 ÓÄÁé×ó±ß´ø=Ç³ºì", rgb, 24'hFFB3B9);
+  look(11'd348, 11'd109);  chk("P2 ÓÄÁéÏÂ±ß´ø=Ç³ºì", rgb, 24'hFFB3B9);
   look(11'd325, 11'd85);   chk("P2 ghost inner tick", rgb, 24'hFFB3B9);
   look(11'd330, 11'd90);   chk("P2 ghost interior black", rgb, `FLDBG);
   force dut.Playfield_inst.ghost2 = 1'b0;
 
-//    å¹½çµé‡æ–°æ‰«æä¸å¾—è§¦å‘åŠ¨æ€è™šçº¿ç¯
+//    ÓÄÁéÖØĞÂÉ¨Ãè²»µÃ´¥·¢¶¯Ì¬ĞéÏß»·
   force dut.Playfield_inst.ghost = 1'b1; force dut.Playfield_inst.type = 3'd0;
   l1 = 1'b1; @(posedge Clk); #1; l1 = 1'b0; repeat(4) @(posedge Clk);
   look(11'd331, 11'd85); chk("ghost no rescan flash", rgb, `FLDBG);
   repeat(8) @(posedge Clk);
   look(11'd331, 11'd85); chk("ghost stays static", rgb, `FLDBG);  force dut.Playfield_inst.Piece = 1'b1; force dut.Playfield_inst.type = 3'd0;
   repeat(4) @(posedge Clk);
-  look(11'd330, 11'd90);   chk("ä¸‹è½æ–¹å—å†…éƒ¨=å®è‰²", rgb, 24'h00CCFF);
+  look(11'd330, 11'd90);   chk("ÏÂÂä·½¿éÄÚ²¿=ÊµÉ«", rgb, 24'h00CCFF);
   look(11'd322, 11'd85);   chk("falling edge P1 soft", rgb, 24'h6BF0FF);
   release dut.Playfield_inst.Piece; release dut.Playfield_inst.Piece2;
   release dut.Playfield_inst.ghost; release dut.Playfield_inst.ghost2;
   release dut.Playfield_inst.type;  release dut.Playfield_inst.type2;
   repeat(4) @(posedge Clk);
 
-//    åŠ¨æ€æ‰«æ: ç”¨çœŸå®å¹½çµ(ä¸ force ghost), hcounter æ¯æ‹ +1, æŠ“ 1 æ‹é”™ä½å¯¼è‡´çš„å·¦çª„å³å®½
+//    ¶¯Ì¬É¨Ãè: ÓÃÕæÊµÓÄÁé(²» force ghost), hcounter Ã¿ÅÄ +1, ×¥ 1 ÅÄ´íÎ»µ¼ÖÂµÄ×óÕ­ÓÒ¿í
   force dut.Playfield_inst.counter_c = 5'd8;
   force dut.Playfield_inst.counter_r = 5'd0;
   force dut.Playfield_inst.counter_ghost_r_t = 5'd19;
@@ -316,22 +316,22 @@ initial begin
     prev = lit[k];
   end
   if(prev)begin nrun = nrun + 1; if(runlen != 2) nbad = nbad + 1; end
-  chk("æ‰«æ: æ¯æ¡è¾¹å¸¦éƒ½æ­£å¥½ 2px", nbad, 0);
-  chk("æ‰«æ: å•æ ¼æ­£å¥½ 2 æ¡è¾¹å¸¦", nrun, 2);
+  chk("É¨Ãè: Ã¿Ìõ±ß´ø¶¼ÕıºÃ 2px", nbad, 0);
+  chk("É¨Ãè: µ¥¸ñÕıºÃ 2 Ìõ±ß´ø", nrun, 2);
   release dut.Playfield_inst.counter_c; release dut.Playfield_inst.counter_r;
   release dut.Playfield_inst.counter_ghost_r_t; release dut.Playfield_inst.ghost_done;
   release dut.Playfield_inst.type;
   repeat(2) @(posedge Clk);
 
-//    å››è§’å„åˆ‡ 1x1: è§’ç‚¹é»‘, ç´§é‚»è¾¹å¸¦äº®
+//    ËÄ½Ç¸÷ÇĞ 1x1: ½ÇµãºÚ, ½ôÁÚ±ß´øÁÁ
   force dut.Playfield_inst.ghost = 1'b1; force dut.Playfield_inst.ghost2 = 1'b0;
   force dut.Playfield_inst.type = 3'd0;
   repeat(3) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("å·¦ä¸Šè§’åˆ‡è§’=é»‘", rgb, `FLDBG);
-  look(11'd322, 11'd81);   chk("å·¦ä¸Šè§’å³ä¾§=æµ…é’", rgb, 24'h99EEFF);
-  look(11'd321, 11'd82);   chk("å·¦ä¸Šè§’ä¸‹ä¾§=æµ…é’", rgb, 24'h99EEFF);
-  look(11'd350, 11'd81);   chk("å³ä¸Šè§’åˆ‡è§’=é»‘", rgb, `FLDBG);
-  look(11'd321, 11'd110);  chk("å·¦ä¸‹è§’åˆ‡è§’=é»‘", rgb, `FLDBG);
+  look(11'd321, 11'd81);   chk("×óÉÏ½ÇÇĞ½Ç=ºÚ", rgb, `FLDBG);
+  look(11'd322, 11'd81);   chk("×óÉÏ½ÇÓÒ²à=Ç³Çà", rgb, 24'h99EEFF);
+  look(11'd321, 11'd82);   chk("×óÉÏ½ÇÏÂ²à=Ç³Çà", rgb, 24'h99EEFF);
+  look(11'd350, 11'd81);   chk("ÓÒÉÏ½ÇÇĞ½Ç=ºÚ", rgb, `FLDBG);
+  look(11'd321, 11'd110);  chk("×óÏÂ½ÇÇĞ½Ç=ºÚ", rgb, `FLDBG);
   release dut.Playfield_inst.ghost; release dut.Playfield_inst.type;
   repeat(2) @(posedge Clk);
 
@@ -372,46 +372,46 @@ initial begin
   look(11'd259, 11'd90);    chk("critical pressure tooth", rgb, 24'hE63946);
   look(11'd263, 11'd440);   chk("critical pressure frame", rgb, 24'hE63946);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
-  $display("=== 11) èœå•å±: æ— æ¡†é€‰é¡¹ + é’è‰²é€‰ä¸­æ ‡è®° ===");
+  $display("=== 11) ²Ëµ¥ÆÁ: ÎŞ¿òÑ¡Ïî + ÇàÉ«Ñ¡ÖĞ±ê¼Ç ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
-  hc = 11'd495; vc = 11'd110; repeat(3) @(posedge Clk);  // æ ‡é¢˜ç¬¬ 1 å­—å‰ 1 åƒç´ 
-  chk("æ ‡é¢˜å–å€å·²é¢„å–", dut.choose_menu_inst.ena_n, 1'b1);
-  chk("æ ‡é¢˜å–å€ Y æ­£ç¡®", dut.choose_menu_inst.Y, 11'd96);
-  chk("æ ‡é¢˜ vt æ­£ç¡®(2x)", dut.choose_menu_inst.vt, 6'd7);
-  chk("èœå•å­—æ¨¡ä½¿èƒ½å·²é¢„å–", dut.choose_menu_inst.letter_inst0.ena, 1'b1);
-  hc = 11'd437; vc = 11'd570; repeat(3) @(posedge Clk);  // æç¤º 1 ç¬¬ 1 å­—å‰ 1 åƒç´ 
-  chk("æç¤ºå–å€ Y æ­£ç¡®", dut.choose_menu_inst.Y, 11'd560);
-  chk("æç¤º big=0(1x)", dut.choose_menu_inst.big, 1'b0);
-  chk("æç¤º vt æ­£ç¡®(1x)", dut.choose_menu_inst.vt, 6'd10);
-  look(11'd426, 11'd290);   chk("é€‰ä¸­é¡¹ç«–æ¡=é’", rgb, `CY_MENU);
-  look(11'd600, 11'd337);   chk("é€‰ä¸­é¡¹ä¸‹åˆ’çº¿=é’", rgb, `CY_MENU);
-  look(11'd426, 11'd450);   chk("æœªé€‰ä¸­è¡Œæ— ç«–æ¡=èœå•èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd500, 11'd110);   chk("æ ‡é¢˜æ–‡å­—=ç™½", rgb, `WHITE);
-  look(11'd500, 11'd280);   chk("é€‰ä¸­é¡¹æ–‡å­—=ç™½", rgb, `WHITE);
-  look(11'd500, 11'd440);   chk("æœªé€‰ä¸­é¡¹æ–‡å­—=ç°", rgb, `GRAY_MID);
+  hc = 11'd495; vc = 11'd110; repeat(3) @(posedge Clk);  // ±êÌâµÚ 1 ×ÖÇ° 1 ÏñËØ
+  chk("±êÌâÈ¡Ö·ÒÑÔ¤È¡", dut.choose_menu_inst.ena_n, 1'b1);
+  chk("±êÌâÈ¡Ö· Y ÕıÈ·", dut.choose_menu_inst.Y, 11'd96);
+  chk("±êÌâ vt ÕıÈ·(2x)", dut.choose_menu_inst.vt, 6'd7);
+  chk("²Ëµ¥×ÖÄ£Ê¹ÄÜÒÑÔ¤È¡", dut.choose_menu_inst.letter_inst0.ena, 1'b1);
+  hc = 11'd437; vc = 11'd570; repeat(3) @(posedge Clk);  // ÌáÊ¾ 1 µÚ 1 ×ÖÇ° 1 ÏñËØ
+  chk("ÌáÊ¾È¡Ö· Y ÕıÈ·", dut.choose_menu_inst.Y, 11'd560);
+  chk("ÌáÊ¾ big=0(1x)", dut.choose_menu_inst.big, 1'b0);
+  chk("ÌáÊ¾ vt ÕıÈ·(1x)", dut.choose_menu_inst.vt, 6'd10);
+  look(11'd426, 11'd290);   chk("Ñ¡ÖĞÏîÊúÌõ=Çà", rgb, `CY_MENU);
+  look(11'd600, 11'd337);   chk("Ñ¡ÖĞÏîÏÂ»®Ïß=Çà", rgb, `CY_MENU);
+  look(11'd426, 11'd450);   chk("Î´Ñ¡ÖĞĞĞÎŞÊúÌõ=²Ëµ¥±³¾°", rgb, 24'h061017);
+  look(11'd500, 11'd110);   chk("±êÌâÎÄ×Ö=°×", rgb, `WHITE);
+  look(11'd500, 11'd280);   chk("Ñ¡ÖĞÏîÎÄ×Ö=°×", rgb, `WHITE);
+  look(11'd500, 11'd440);   chk("Î´Ñ¡ÖĞÏîÎÄ×Ö=»Ò", rgb, `GRAY_MID);
   choose_cnt = 4'd1; repeat(4) @(posedge Clk);
-  look(11'd426, 11'd450);   chk("åˆ‡æ¢åç«–æ¡=é’", rgb, `CY_MENU);
-  look(11'd600, 11'd497);   chk("åˆ‡æ¢åä¸‹åˆ’çº¿=é’", rgb, `CY_MENU);
-  look(11'd426, 11'd290);   chk("åŸé€‰ä¸­è¡Œæ— ç«–æ¡=èœå•èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd500, 11'd440);   chk("åˆ‡æ¢åè¯¥é¡¹æ–‡å­—=ç™½", rgb, `WHITE);
-  look(11'd500, 11'd280);   chk("åˆ‡æ¢ååŸé¡¹æ–‡å­—=ç°", rgb, `GRAY_MID);
+  look(11'd426, 11'd450);   chk("ÇĞ»»ºóÊúÌõ=Çà", rgb, `CY_MENU);
+  look(11'd600, 11'd497);   chk("ÇĞ»»ºóÏÂ»®Ïß=Çà", rgb, `CY_MENU);
+  look(11'd426, 11'd290);   chk("Ô­Ñ¡ÖĞĞĞÎŞÊúÌõ=²Ëµ¥±³¾°", rgb, 24'h061017);
+  look(11'd500, 11'd440);   chk("ÇĞ»»ºó¸ÃÏîÎÄ×Ö=°×", rgb, `WHITE);
+  look(11'd500, 11'd280);   chk("ÇĞ»»ºóÔ­ÏîÎÄ×Ö=»Ò", rgb, `GRAY_MID);
   choose = 1'b0; choose_cnt = 4'd0; Playing = 1'b1; repeat(4) @(posedge Clk);
 
-  $display("=== 12) é¡¶æ : åˆ†æ•°å³å¯¹é½ + æ—¶é—´ + LV æ•°å­— + æ ‡ç­¾ ===");
+  $display("=== 12) ¶¥À¸: ·ÖÊıÓÒ¶ÔÆë + Ê±¼ä + LV Êı×Ö + ±êÇ© ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd1070, 11'd40);   chk("duo=1 åˆ†æ•°è´´åœºåœ°å³è¾¹ç•Œ", rgb, `WHITE);
-  look(11'd113,  11'd90);   chk("duo=1 NEXT æ ‡ç­¾=æ ‡ç­¾ç°", rgb, `GRAY_LBL);
-  look(11'd95,   11'd90);   chk("duo=1 æ ‡ç­¾æ—§ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
+  look(11'd1070, 11'd40);   chk("duo=1 ·ÖÊıÌù³¡µØÓÒ±ß½ç", rgb, `WHITE);
+  look(11'd113,  11'd90);   chk("duo=1 NEXT ±êÇ©=±êÇ©»Ò", rgb, `GRAY_LBL);
+  look(11'd95,   11'd90);   chk("duo=1 ±êÇ©¾ÉÎ»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1070, 11'd40);   chk("duo=0 è¯¥å¤„ä¸ºé¡¶éƒ¨èƒŒæ™¯", rgb, 24'h071018);
-  look(11'd935,  11'd40);   chk("duo=0 åˆ†æ•°è´´åœºåœ°å³è¾¹ç•Œ", rgb, `WHITE);
-  look(11'd690,  11'd24);   chk("duo=0 SCORE æ ‡ç­¾è´´è¿‘åˆ†æ•°", rgb, `GRAY_LBL);
-  look(11'd95,   11'd90);   chk("duo=0 åŒäººæ ‡ç­¾ä½ç½®=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd1077, 11'd90);   chk("duo=0 å•äºº NEXT æ ‡ç­¾", rgb, `GRAY_LBL);
-  look(11'd340,  11'd40);   chk("æ—¶é—´æ•°å­—=ç™½", rgb, `WHITE);
+  look(11'd1070, 11'd40);   chk("duo=0 ¸Ã´¦Îª¶¥²¿±³¾°", rgb, 24'h071018);
+  look(11'd935,  11'd40);   chk("duo=0 ·ÖÊıÌù³¡µØÓÒ±ß½ç", rgb, `WHITE);
+  look(11'd690,  11'd24);   chk("duo=0 SCORE ±êÇ©Ìù½ü·ÖÊı", rgb, `GRAY_LBL);
+  look(11'd95,   11'd90);   chk("duo=0 Ë«ÈË±êÇ©Î»ÖÃ=Íâ²ã±³¾°", rgb, 24'h061017);
+  look(11'd1077, 11'd90);   chk("duo=0 µ¥ÈË NEXT ±êÇ©", rgb, `GRAY_LBL);
+  look(11'd340,  11'd40);   chk("Ê±¼äÊı×Ö=°×", rgb, `WHITE);
   force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
-  look(11'd292,  11'd40);   chk("LV æ•°å­—=ç­‰çº§è‰²", rgb, 24'h00E5FF);
-  look(11'd240,  11'd40);   chk("LV æ ‡ç­¾=ç­‰çº§è‰²", rgb, 24'h00E5FF);
+  look(11'd292,  11'd40);   chk("LV Êı×Ö=µÈ¼¶É«", rgb, 24'h00E5FF);
+  look(11'd240,  11'd40);   chk("LV ±êÇ©=µÈ¼¶É«", rgb, 24'h00E5FF);
   release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
   Finalize = 1'b1; duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd113,   11'd90);   chk("Finalize label dim", rgb, `SLOT_BG);
@@ -420,113 +420,113 @@ initial begin
   look(11'd293,   11'd674);  chk("Finalize level bar kept", rgb, 24'h00E5FF);
   look(11'd263,   11'd440);  chk("Finalize level frame kept", rgb, 24'h606060);  Finalize = 1'b0; repeat(4) @(posedge Clk);
 
-  $display("=== 13) æ ‡ç­¾å­—æ¨¡ 1 åƒç´ é¢„å–(ä¿®ç¬¬ 1 åˆ—ä¸²å­—) ===");
+  $display("=== 13) ±êÇ©×ÖÄ£ 1 ÏñËØÔ¤È¡(ĞŞµÚ 1 ÁĞ´®×Ö) ===");
   duo = 1'b1; repeat(4) @(posedge Clk);
   hc = 11'd94 + 11'd41; vc = 11'd100; repeat(3) @(posedge Clk);
-  chk("NEXT ç¬¬2å­—åœ°å€å·²é¢„å–", dut.lb_g, 5'd4);
-  chk("BRAM ä½¿èƒ½å·²é¢„å–(ena_n)", dut.letter_hud_inst.ena, 1'b1);
-  chk("æ˜¾ç¤ºçª—å£æ­¤æ—¶ä»å…³", dut.lb_ena, 1'b0);
-  chk("åœ°å€çª—å£å·²å¼€", dut.lb_ena_n, 1'b1);
+  chk("NEXT µÚ2×ÖµØÖ·ÒÑÔ¤È¡", dut.lb_g, 5'd4);
+  chk("BRAM Ê¹ÄÜÒÑÔ¤È¡(ena_n)", dut.letter_hud_inst.ena, 1'b1);
+  chk("ÏÔÊ¾´°¿Ú´ËÊ±ÈÔ¹Ø", dut.lb_ena, 1'b0);
+  chk("µØÖ·´°¿ÚÒÑ¿ª", dut.lb_ena_n, 1'b1);
   hc = 11'd94 + 11'd42; vc = 11'd100; repeat(3) @(posedge Clk);
-  chk("NEXT ç¬¬2å­—ç¬¬1åˆ—å–åˆ°å­—æ¨¡", dut.lb_g, 5'd4);
-  chk("NEXT ç¬¬2å­—ç¬¬1åˆ—äº®", dut.lbl_r, 1'b1);
-  chk("æ˜¾ç¤ºçª—å£å·²å¼€", dut.lb_ena, 1'b1);
+  chk("NEXT µÚ2×ÖµÚ1ÁĞÈ¡µ½×ÖÄ£", dut.lb_g, 5'd4);
+  chk("NEXT µÚ2×ÖµÚ1ÁĞÁÁ", dut.lbl_r, 1'b1);
+  chk("ÏÔÊ¾´°¿ÚÒÑ¿ª", dut.lb_ena, 1'b1);
   hc = 11'd236 + 11'd23; vc = 11'd40; repeat(3) @(posedge Clk);
-  chk("LV ç¬¬2å­—åœ°å€å·²é¢„å–", dut.lb_g, 5'd21);
-  chk("LV BRAM ä½¿èƒ½å·²é¢„å–", dut.letter_hud_inst.ena, 1'b1);
-  chk("LV åœ°å€çª—å£å·²å¼€", dut.lb_ena_n, 1'b1);
+  chk("LV µÚ2×ÖµØÖ·ÒÑÔ¤È¡", dut.lb_g, 5'd21);
+  chk("LV BRAM Ê¹ÄÜÒÑÔ¤È¡", dut.letter_hud_inst.ena, 1'b1);
+  chk("LV µØÖ·´°¿ÚÒÑ¿ª", dut.lb_ena_n, 1'b1);
   hc = 11'd282; vc = 11'd40; repeat(3) @(posedge Clk);
-  chk("LV æ•°å­—ä½¿èƒ½å·²é¢„å–", dut.number_lv_inst.ena, 1'b1);
-  chk("LV æ•°å­—æ˜¾ç¤ºçª—å£ä»å…³", dut.lvd_ena, 1'b0);
+  chk("LV Êı×ÖÊ¹ÄÜÒÑÔ¤È¡", dut.number_lv_inst.ena, 1'b1);
+  chk("LV Êı×ÖÏÔÊ¾´°¿ÚÈÔ¹Ø", dut.lvd_ena, 1'b0);
   hc = 11'd283; vc = 11'd40; repeat(3) @(posedge Clk);
-  chk("LV æ•°å­—æ˜¾ç¤ºçª—å£å·²å¼€", dut.lvd_ena, 1'b1);
+  chk("LV Êı×ÖÏÔÊ¾´°¿ÚÒÑ¿ª", dut.lvd_ena, 1'b1);
 
-  $display("=== 14) åŒäºº P2 Hold åœ¨ HOLD æ¡†å¯è§ ===");
+  $display("=== 14) Ë«ÈË P2 Hold ÔÚ HOLD ¿ò¿É¼û ===");
   duo = 1'b1; Playing = 1'b1; repeat(4) @(posedge Clk);
   force dut.Playfield_inst.type2 = 3'd3;
   force dut.Playfield_inst.type_t2 = 3'd0;
   hd2 = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd140, 11'd458);  chk("P2 hold å‰ HOLD æ¡†ä¸ºç©º", rgb, `SLOT_P1);
+  look(11'd140, 11'd458);  chk("P2 hold Ç° HOLD ¿òÎª¿Õ", rgb, `SLOT_P1);
   hd2 = 1'b1; @(posedge Clk); hd2 = 1'b0; repeat(2) @(posedge Clk);
   chk("P2 en_hold2=1", dut.Playfield_inst.en_hold2, 1'b1);
-  chk("å…±ç”¨æ§½å­˜çš„æ˜¯ P2 çš„å—", dut.Playfield_inst.hold_type, 3'd3);
+  chk("¹²ÓÃ²Û´æµÄÊÇ P2 µÄ¿é", dut.Playfield_inst.hold_type, 3'd3);
   look(11'd140, 11'd458);
-  chk("æ¢å—ç¬é—´ HOLD é¢„è§ˆé—ªç™½", rgb, `WHITE);
+  chk("»»¿éË²¼ä HOLD Ô¤ÀÀÉÁ°×", rgb, `WHITE);
   repeat(40) @(posedge Clk);
   look(11'd140, 11'd458);
-  chk("P2 hold å HOLD æ¡†æ˜¾ç¤ºæ–¹å—", rgb, `RED);
+  chk("P2 hold ºó HOLD ¿òÏÔÊ¾·½¿é", rgb, `RED);
   release dut.Playfield_inst.type2; release dut.Playfield_inst.type_t2;
 
-  $display("=== 15) UI å‡çº§: é¢æ¿åº•æ¡/é¢„è§ˆç‚¹é˜µ/é¡¶æ å‘ä¸çº¿ ===");
+  $display("=== 15) UI Éı¼¶: Ãæ°åµ×Ìõ/Ô¤ÀÀµãÕó/¶¥À¸·¢Ë¿Ïß ===");
   duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0; Idle = 1'b0; Stop = 1'b0;
   repeat(40) @(posedge Clk);
-  look(11'd100, 11'd718);   chk("P1 é¢æ¿åº•æ¡=é’", rgb, `CY_MENU);
-  look(11'd1130, 11'd718);  chk("P2 é¢æ¿åº•æ¡=ç²‰", rgb, `PINK2);
-  look(11'd125, 11'd163);   chk("é¢„è§ˆæ§½ç‚¹é˜µ=404040", rgb, 24'h404040);
-  look(11'd400, 11'd300);   chk("åœºåœ°å†…åº•è‰²=0A0F16", rgb, `FLDBG);
-  look(11'd250, 11'd300);   chk("åœºåœ°å¤–ä¸ºå¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd126, 11'd163);   chk("ç‚¹é˜µæ—=æ§½åº•", rgb, `SLOT_P1);
-  look(11'd89, 11'd44);     chk("P1 ç‹¬ç«‹å¾½æ ‡=é’", rgb, `CY_MENU);
-  look(11'd1124, 11'd44);   chk("P2 ç‹¬ç«‹å¾½æ ‡=ç²‰", rgb, `PINK2);
-  look(11'd821, 11'd24);    chk("SCORE æ ‡ç­¾=ç°", rgb, `GRAY_LBL);
-  look(11'd171, 11'd640);   chk("å¤§å·ç å¾½æ ‡å·²ç§»é™¤", rgb, 24'h061017);
-  look(11'd450, 11'd701);   chk("åº•éƒ¨æ¡æ¶æ©™è‰²æ–œæ’‘", rgb, 24'h80551F);
-  look(11'd480, 11'd702);   chk("åº•éƒ¨æ¡æ¶å¸¦åº•å±‚", rgb, 24'h09171C);
-  look(11'd480, 11'd716);   chk("åº•éƒ¨æ¡æ¶ä¸‹æ–¹æ¢å¤åœºåœ°åº•è‰²", rgb, `FLDBG);
-  look(11'd343, 11'd111);   chk("å·¦ä¾§ä¾›èƒ½èŠ‚ç‚¹é¦–ç‚¹", rgb, 24'h08798A);
-  look(11'd342, 11'd111);   chk("å·¦ä¾§ä¾›èƒ½èŠ‚ç‚¹ä¿æŒ1px", rgb, `FLDBG);
-  look(11'd343, 11'd175);   chk("å·¦ä¾§ä¾›èƒ½èŠ‚ç‚¹æ¬¡ç‚¹", rgb, 24'h08798A);
-  look(11'd343, 11'd687);   chk("å·¦ä¾§ä¾›èƒ½èŠ‚ç‚¹æœ«ç‚¹", rgb, 24'h08798A);
-  look(11'd343, 11'd143);   chk("å·¦ä¾§ä¾›èƒ½èŠ‚ç‚¹é—´ç«–è½¨", rgb, 24'h08798A);
-  look(11'd342, 11'd143);   chk("å·¦ä¾§ä¾›èƒ½èŠ‚ç‚¹é—´æ— æ¨ªå®½", rgb, `FLDBG);
-  look(11'd343, 11'd164);   chk("å·¦ä¾§ä¾›èƒ½æ—§ç‚¹ä½ç½®ç«–è½¨", rgb, 24'h08798A);
-  look(11'd32, 11'd130);    chk("å·¦ä¾§è§‚å¯Ÿçª—æ˜Ÿç‚¹", rgb, 24'h536A76);
-  look(11'd700, 11'd81);    chk("é¡¶éƒ¨ä¸»è½¨=é’¢ç°", rgb, 24'h536A76);
-  look(11'd1088, 11'd600);  chk("æ¸¸æˆåŒºå³æ¡†çº¿=é’¢ç°", rgb, 24'h536A76);
-  look(11'd245, 11'd620);   chk("DUO æ ‡ç­¾=ç²‰", rgb, `PINK2);
-  look(11'd21, 11'd520);    chk("CORE07 æ ‡ç­¾=ç°", rgb, `GRAY_LBL);
-  look(11'd224, 11'd200);   chk("NEXT é¢æ¿ç«–çº¿=æ¡†çº¿", rgb, 24'h29404D);
-  look(11'd94, 11'd132);    chk("NEXT æ§½ä½æ¡†çº¿", rgb, 24'h29404D);
-  look(11'd470, 11'd40);    chk("é¡¶æ å‘ä¸çº¿=æ ‡ç­¾ç°", rgb, `GRAY_LBL);
-  look(11'd469, 11'd40);    chk("å‘ä¸çº¿å·¦ä¾§=é¡¶éƒ¨èƒŒæ™¯", rgb, 24'h071018);
+  look(11'd100, 11'd718);   chk("P1 Ãæ°åµ×Ìõ=Çà", rgb, `CY_MENU);
+  look(11'd1130, 11'd718);  chk("P2 Ãæ°åµ×Ìõ=·Û", rgb, `PINK2);
+  look(11'd125, 11'd163);   chk("Ô¤ÀÀ²ÛµãÕó=404040", rgb, 24'h404040);
+  look(11'd400, 11'd300);   chk("³¡µØÄÚµ×É«=0A0F16", rgb, `FLDBG);
+  look(11'd250, 11'd300);   chk("³¡µØÍâÎªÍâ²ã±³¾°", rgb, 24'h061017);
+  look(11'd126, 11'd163);   chk("µãÕóÅÔ=²Ûµ×", rgb, `SLOT_P1);
+  look(11'd89, 11'd44);     chk("P1 ¶ÀÁ¢»Õ±ê=Çà", rgb, `CY_MENU);
+  look(11'd1124, 11'd44);   chk("P2 ¶ÀÁ¢»Õ±ê=·Û", rgb, `PINK2);
+  look(11'd821, 11'd24);    chk("SCORE ±êÇ©=»Ò", rgb, `GRAY_LBL);
+  look(11'd171, 11'd640);   chk("´óºÅÂë»Õ±êÒÑÒÆ³ı", rgb, 24'h061017);
+  look(11'd450, 11'd701);   chk("µ×²¿èì¼Ü³ÈÉ«Ğ±³Å", rgb, 24'h80551F);
+  look(11'd480, 11'd702);   chk("µ×²¿èì¼Ü´øµ×²ã", rgb, 24'h09171C);
+  look(11'd480, 11'd716);   chk("µ×²¿èì¼ÜÏÂ·½»Ö¸´³¡µØµ×É«", rgb, `FLDBG);
+  look(11'd343, 11'd111);   chk("×ó²à¹©ÄÜ½ÚµãÊ×µã", rgb, 24'h08798A);
+  look(11'd342, 11'd111);   chk("×ó²à¹©ÄÜ½Úµã±£³Ö1px", rgb, `FLDBG);
+  look(11'd343, 11'd175);   chk("×ó²à¹©ÄÜ½Úµã´Îµã", rgb, 24'h08798A);
+  look(11'd343, 11'd687);   chk("×ó²à¹©ÄÜ½ÚµãÄ©µã", rgb, 24'h08798A);
+  look(11'd343, 11'd143);   chk("×ó²à¹©ÄÜ½Úµã¼äÊú¹ì", rgb, 24'h08798A);
+  look(11'd342, 11'd143);   chk("×ó²à¹©ÄÜ½Úµã¼äÎŞºá¿í", rgb, `FLDBG);
+  look(11'd343, 11'd164);   chk("×ó²à¹©ÄÜ¾ÉµãÎ»ÖÃÊú¹ì", rgb, 24'h08798A);
+  look(11'd32, 11'd130);    chk("×ó²à¹Û²ì´°ĞÇµã", rgb, 24'h536A76);
+  look(11'd700, 11'd81);    chk("¶¥²¿Ö÷¹ì=¸Ö»Ò", rgb, 24'h536A76);
+  look(11'd1088, 11'd600);  chk("ÓÎÏ·ÇøÓÒ¿òÏß=¸Ö»Ò", rgb, 24'h536A76);
+  look(11'd245, 11'd620);   chk("DUO ±êÇ©=·Û", rgb, `PINK2);
+  look(11'd21, 11'd520);    chk("CORE07 ±êÇ©=»Ò", rgb, `GRAY_LBL);
+  look(11'd224, 11'd200);   chk("NEXT Ãæ°åÊúÏß=¿òÏß", rgb, 24'h29404D);
+  look(11'd94, 11'd132);    chk("NEXT ²ÛÎ»¿òÏß", rgb, 24'h29404D);
+  look(11'd470, 11'd40);    chk("¶¥À¸·¢Ë¿Ïß=±êÇ©»Ò", rgb, `GRAY_LBL);
+  look(11'd469, 11'd40);    chk("·¢Ë¿Ïß×ó²à=¶¥²¿±³¾°", rgb, 24'h071018);
   duo = 1'b0; repeat(4) @(posedge Clk);
-  look(11'd1060, 11'd718);  chk("å•äººé¢æ¿åº•æ¡=ç°", rgb, `GRAY_MID);
-  look(11'd171, 11'd640);   chk("å•äººæ— å¤§å·ç å¾½æ ‡=å¤–å±‚èƒŒæ™¯", rgb, 24'h061017);
-  look(11'd600, 11'd81);    chk("å•äººé¡¶éƒ¨ä¸»è½¨=é’¢ç°", rgb, 24'h536A76);
-  look(11'd960, 11'd120);   chk("å•æ¸¸æˆåŒºå³æ¡†çº¿=é’¢ç°", rgb, 24'h536A76);
-  look(11'd450, 11'd701);   chk("å•åº•éƒ¨æ¡æ¶æ©™è‰²æ–œæ’‘", rgb, 24'h80551F);
+  look(11'd1060, 11'd718);  chk("µ¥ÈËÃæ°åµ×Ìõ=»Ò", rgb, `GRAY_MID);
+  look(11'd171, 11'd640);   chk("µ¥ÈËÎŞ´óºÅÂë»Õ±ê=Íâ²ã±³¾°", rgb, 24'h061017);
+  look(11'd600, 11'd81);    chk("µ¥ÈË¶¥²¿Ö÷¹ì=¸Ö»Ò", rgb, 24'h536A76);
+  look(11'd960, 11'd120);   chk("µ¥ÓÎÏ·ÇøÓÒ¿òÏß=¸Ö»Ò", rgb, 24'h536A76);
+  look(11'd450, 11'd701);   chk("µ¥µ×²¿èì¼Ü³ÈÉ«Ğ±³Å", rgb, 24'h80551F);
   duo = 1'b1; repeat(4) @(posedge Clk);
 
-  $display("=== 16) èœå•æ ‡é¢˜çº¿ ===");
+  $display("=== 16) ²Ëµ¥±êÌâÏß ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
-  look(11'd600, 11'd181);   chk("èœå•æ ‡é¢˜çº¿=é’", rgb, `CY_MENU);
-  look(11'd600, 11'd179);   chk("æ ‡é¢˜çº¿ä¸Šæ–¹=èœå•èƒŒæ™¯", rgb, 24'h061017);
+  look(11'd600, 11'd181);   chk("²Ëµ¥±êÌâÏß=Çà", rgb, `CY_MENU);
+  look(11'd600, 11'd179);   chk("±êÌâÏßÉÏ·½=²Ëµ¥±³¾°", rgb, 24'h061017);
   force dut.choose_menu_inst.breath = 1'b1; repeat(4) @(posedge Clk);
-  look(11'd426, 11'd290);   chk("èœå•é€‰ä¸­æ ‡è®°å‘¼å¸=æš—é’", rgb, 24'h00697F);
+  look(11'd426, 11'd290);   chk("²Ëµ¥Ñ¡ÖĞ±ê¼ÇºôÎü=°µÇà", rgb, 24'h00697F);
   release dut.choose_menu_inst.breath; repeat(4) @(posedge Clk);
   choose = 1'b0; Playing = 1'b1; repeat(4) @(posedge Clk);
 
-  $display("=== 17) UI ç‰¹æ•ˆ: è½é”è„‰å†²/å‡çº§é—ªç™½/åˆ†æ•°é—ªé’/ç»“æŸä¸‹åˆ’çº¿ ===");
+  $display("=== 17) UI ÌØĞ§: ÂäËøÂö³å/Éı¼¶ÉÁ°×/·ÖÊıÉÁÇà/½áÊøÏÂ»®Ïß ===");
   duo = 1'b1; repeat(40) @(posedge Clk);
-  look(11'd100, 11'd123);   chk("è„‰å†²å‰ P1 è‰²çº¿=é’", rgb, `CY_MENU);
+  look(11'd100, 11'd123);   chk("Âö³åÇ° P1 É«Ïß=Çà", rgb, `CY_MENU);
   force dut.lock_we = 1'b1; @(posedge Clk); release dut.lock_we;
-  look(11'd100, 11'd123);   chk("è½é”ç¬é—´ P1 è‰²çº¿=ç™½", rgb, `WHITE);
+  look(11'd100, 11'd123);   chk("ÂäËøË²¼ä P1 É«Ïß=°×", rgb, `WHITE);
   repeat(40) @(posedge Clk);
-  look(11'd100, 11'd123);   chk("è„‰å†²å P1 è‰²çº¿å›é’", rgb, `CY_MENU);
+  look(11'd100, 11'd123);   chk("Âö³åºó P1 É«Ïß»ØÇà", rgb, `CY_MENU);
   force dut.Playfield_inst.speed_level = 3'd5; repeat(2) @(posedge Clk);
-  look(11'd293, 11'd280);   chk("å‡çº§ç¬é—´å½“å‰æ®µ=ç™½", rgb, `WHITE);
+  look(11'd293, 11'd280);   chk("Éı¼¶Ë²¼äµ±Ç°¶Î=°×", rgb, `WHITE);
   repeat(40) @(posedge Clk);
-  look(11'd293, 11'd280);   chk("å‡çº§åå½“å‰æ®µ=çƒ­åŠ›æ©™çº¢", rgb, 24'hFF6B35);
+  look(11'd293, 11'd280);   chk("Éı¼¶ºóµ±Ç°¶Î=ÈÈÁ¦³Èºì", rgb, 24'hFF6B35);
   release dut.Playfield_inst.speed_level; repeat(40) @(posedge Clk);
   force dut.Playfield_inst.score = 20'd777; repeat(2) @(posedge Clk);
-  look(11'd1070, 11'd40);   chk("åŠ åˆ†ç¬é—´åˆ†æ•°=çƒ­åŠ›æ©™", rgb, 24'hFF6B35);
+  look(11'd1070, 11'd40);   chk("¼Ó·ÖË²¼ä·ÖÊı=ÈÈÁ¦³È", rgb, 24'hFF6B35);
   repeat(40) @(posedge Clk);
-  look(11'd1070, 11'd40);   chk("åŠ åˆ†ååˆ†æ•°=ç™½", rgb, `WHITE);
+  look(11'd1070, 11'd40);   chk("¼Ó·Öºó·ÖÊı=°×", rgb, `WHITE);
   release dut.Playfield_inst.score; repeat(40) @(posedge Clk);
   Finalize = 1'b1; repeat(40) @(posedge Clk);
-  look(11'd600, 11'd445);   chk("ç»“æŸä¸‹åˆ’çº¿éé»‘", (rgb !== `BLACK), 1);
+  look(11'd600, 11'd445);   chk("½áÊøÏÂ»®Ïß·ÇºÚ", (rgb !== `BLACK), 1);
   Finalize = 1'b0; repeat(40) @(posedge Clk);
-  $display("=== 18) å®å¿ƒæ–¹å— 2px åœ†è§’ ===");
+  $display("=== 18) ÊµĞÄ·½¿é 2px Ô²½Ç ===");
   duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0;
   dut.state_color[0] = 3'd0;
   dut.Playfield_inst.state[0] = 1'b0;
@@ -534,60 +534,60 @@ initial begin
   force dut.Playfield_inst.Piece = 1'b1;
   force dut.Playfield_inst.type = 3'd2;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("ä¸‹è½å—å·¦ä¸Šè§’=é»‘", rgb, `FLDBG);
+  look(11'd321, 11'd81);   chk("ÏÂÂä¿é×óÉÏ½Ç=ºÚ", rgb, `FLDBG);
   look(11'd322, 11'd82);   chk("corner inner P1 soft", rgb, 24'h6BF0FF);
-  look(11'd323, 11'd81);   chk("ä¸‹è½å—å·¦è¾¹ç¼˜=é»„", rgb, `YELLOW);
-  look(11'd321, 11'd83);   chk("ä¸‹è½å—ä¸Šè¾¹ç¼˜=é»„", rgb, `YELLOW);
-  look(11'd336, 11'd96);   chk("ä¸‹è½å—ä¸­å¿ƒ=é»„", rgb, `YELLOW);
+  look(11'd323, 11'd81);   chk("ÏÂÂä¿é×ó±ßÔµ=»Æ", rgb, `YELLOW);
+  look(11'd321, 11'd83);   chk("ÏÂÂä¿éÉÏ±ßÔµ=»Æ", rgb, `YELLOW);
+  look(11'd336, 11'd96);   chk("ÏÂÂä¿éÖĞĞÄ=»Æ", rgb, `YELLOW);
   force dut.Playfield_inst.Piece = 1'b0;
   force dut.Playfield_inst.Piece2 = 1'b1;
   force dut.Playfield_inst.type2 = 3'd4;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("P2 ä¸‹è½å—è§’=é»‘", rgb, `FLDBG);
-  look(11'd323, 11'd81);   chk("P2 ä¸‹è½å—è¾¹=ç»¿", rgb, 24'h55A630);
+  look(11'd321, 11'd81);   chk("P2 ÏÂÂä¿é½Ç=ºÚ", rgb, `FLDBG);
+  look(11'd323, 11'd81);   chk("P2 ÏÂÂä¿é±ß=ÂÌ", rgb, 24'h55A630);
   force dut.Playfield_inst.Piece2 = 1'b0;
   dut.state_color[0] = 3'd3;
   dut.Playfield_inst.state[0] = 1'b1;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("å·²é”æ ¼è§’=é»‘", rgb, `FLDBG);
-  look(11'd323, 11'd81);   chk("å·²é”æ ¼è¾¹=çº¢", rgb, `RED);
+  look(11'd321, 11'd81);   chk("ÒÑËø¸ñ½Ç=ºÚ", rgb, `FLDBG);
+  look(11'd323, 11'd81);   chk("ÒÑËø¸ñ±ß=ºì", rgb, `RED);
   force dut.Playfield_inst.Piece = 1'b1;
   force dut.Playfield_inst.type = 3'd2;
   force dut.land_we = 1'b1;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("è½é”é—ªç™½è§’=é»‘", rgb, `FLDBG);
-  look(11'd323, 11'd81);   chk("è½é”é—ªç™½è¾¹=ç™½", rgb, 24'hEEEEEE);
+  look(11'd321, 11'd81);   chk("ÂäËøÉÁ°×½Ç=ºÚ", rgb, `FLDBG);
+  look(11'd323, 11'd81);   chk("ÂäËøÉÁ°×±ß=°×", rgb, 24'hEEEEEE);
   release dut.land_we;
   release dut.Playfield_inst.Piece;
   release dut.Playfield_inst.type;
   force dut.clear_t_r = 1'b1;
   force dut.flash_r = 1'b1;
   repeat(4) @(posedge Clk);
-  look(11'd321, 11'd81);   chk("æ¶ˆè¡Œé—ªç™½è§’=é»‘", rgb, `FLDBG);
-  look(11'd323, 11'd81);   chk("æ¶ˆè¡Œé—ªç™½è¾¹=ç™½", rgb, 24'hEEEEEE);
+  look(11'd321, 11'd81);   chk("ÏûĞĞÉÁ°×½Ç=ºÚ", rgb, `FLDBG);
+  look(11'd323, 11'd81);   chk("ÏûĞĞÉÁ°×±ß=°×", rgb, 24'hEEEEEE);
   release dut.clear_t_r;
   release dut.flash_r;
   dut.state_color[0] = 3'd0;
   dut.Playfield_inst.state[0] = 1'b0;
   repeat(4) @(posedge Clk);
-  $display("=== 19) é¢„è§ˆæ–¹å— 1px åœ†è§’ ===");
+  $display("=== 19) Ô¤ÀÀ·½¿é 1px Ô²½Ç ===");
   duo = 1'b1; Playing = 1'b1; choose = 1'b0; Finalize = 1'b0; repeat(40) @(posedge Clk);
   force dut.Playfield_inst.type_t = 3'd2;
   force dut.Playfield_inst.type_t2 = 3'd4;
   repeat(40) @(posedge Clk);
-  look(11'd126, 11'd228);   chk("P1 NEXT é¢„è§ˆè§’=æ§½åº•", rgb, `SLOT_P1);
-  look(11'd128, 11'd228);   chk("P1 NEXT é¢„è§ˆè¾¹=é»„", rgb, `YELLOW);
-  look(11'd126, 11'd230);   chk("P1 NEXT é¢„è§ˆä¸‹è¾¹=é»„", rgb, `YELLOW);
-  look(11'd140, 11'd240);   chk("P1 NEXT é¢„è§ˆä¸­å¿ƒ=é»„", rgb, `YELLOW);
-  look(11'd1153, 11'd228);  chk("P2 NEXT é¢„è§ˆè§’=æ§½åº•", rgb, `SLOT_P2);
-  look(11'd1155, 11'd228);  chk("P2 NEXT é¢„è§ˆè¾¹=ç»¿", rgb, 24'h55A630);
-  look(11'd1167, 11'd240);  chk("P2 NEXT é¢„è§ˆä¸­å¿ƒ=ç»¿", rgb, 24'h55A630);
+  look(11'd126, 11'd228);   chk("P1 NEXT Ô¤ÀÀ½Ç=²Ûµ×", rgb, `SLOT_P1);
+  look(11'd128, 11'd228);   chk("P1 NEXT Ô¤ÀÀ±ß=»Æ", rgb, `YELLOW);
+  look(11'd126, 11'd230);   chk("P1 NEXT Ô¤ÀÀÏÂ±ß=»Æ", rgb, `YELLOW);
+  look(11'd140, 11'd240);   chk("P1 NEXT Ô¤ÀÀÖĞĞÄ=»Æ", rgb, `YELLOW);
+  look(11'd1153, 11'd228);  chk("P2 NEXT Ô¤ÀÀ½Ç=²Ûµ×", rgb, `SLOT_P2);
+  look(11'd1155, 11'd228);  chk("P2 NEXT Ô¤ÀÀ±ß=ÂÌ", rgb, 24'h55A630);
+  look(11'd1167, 11'd240);  chk("P2 NEXT Ô¤ÀÀÖĞĞÄ=ÂÌ", rgb, 24'h55A630);
   force dut.Playfield_inst.hold_type = 3'd3;
   force dut.en_hold = 1'b1;
   repeat(40) @(posedge Clk);
-  look(11'd126, 11'd444);   chk("HOLD é¢„è§ˆè§’=æ§½åº•", rgb, `SLOT_P1);
-  look(11'd128, 11'd444);   chk("HOLD é¢„è§ˆè¾¹=çº¢", rgb, `RED);
-  look(11'd140, 11'd456);   chk("HOLD é¢„è§ˆä¸­å¿ƒ=çº¢", rgb, `RED);
+  look(11'd126, 11'd444);   chk("HOLD Ô¤ÀÀ½Ç=²Ûµ×", rgb, `SLOT_P1);
+  look(11'd128, 11'd444);   chk("HOLD Ô¤ÀÀ±ß=ºì", rgb, `RED);
+  look(11'd140, 11'd456);   chk("HOLD Ô¤ÀÀÖĞĞÄ=ºì", rgb, `RED);
   release dut.Playfield_inst.hold_type;
   release dut.en_hold;
   release dut.Playfield_inst.type_t;

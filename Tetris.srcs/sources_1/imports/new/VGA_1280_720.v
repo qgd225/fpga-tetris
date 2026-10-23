@@ -1,6 +1,6 @@
-ï»¿//============================================================
-// å¯¼å…¥æ¨¡å—ï¼šVGA_1280_720
-// æœ¬å·¥ç¨‹ç”¨é€”ï¼šç”Ÿæˆ 1280x720 æ˜¾ç¤ºæ—¶åºå’Œåƒç´ åæ ‡ã€‚
+//============================================================
+// µ¼ÈëÄ£¿é£ºVGA_1280_720
+// ±¾¹¤³ÌÓÃÍ¾£ºÉú³É 1280x720 ÏÔÊ¾Ê±ĞòºÍÏñËØ×ø±ê¡£
 //============================================================
 module VGA_1280_720(
     Clk_74M,
@@ -29,16 +29,16 @@ module VGA_1280_720(
     reg [10:0]hcounter_r;
     reg [10:0]vcounter_r;
 
-parameter VGA_HS_End   = 39;  // è¡ŒåŒæ­¥ç»“æŸè®¡æ•°
-parameter hdat_begin   = 259;  // æœ‰æ•ˆåƒç´ åŒºèµ·å§‹ï¼ˆå‰ä¸€ä¸ªè®¡æ•°ï¼‰
-parameter hdat_end     = 1539;  // æœ‰æ•ˆåƒç´ åŒºç»“æŸè®¡æ•°
-parameter hpixel_end   = 1649;  // ä¸€è¡Œæ€»è®¡æ•° - 1
-parameter VGA_VS_End   = 4;  // åœºåŒæ­¥ç»“æŸè®¡æ•°
-parameter vdat_begin   = 24;  // æœ‰æ•ˆè¡ŒåŒºèµ·å§‹ï¼ˆå‰ä¸€ä¸ªè®¡æ•°ï¼‰
-parameter vdat_end     = 744;  // æœ‰æ•ˆè¡ŒåŒºç»“æŸè®¡æ•°
-parameter vpixel_end   = 749;  // ä¸€å¸§æ€»è¡Œæ•° - 1
+parameter VGA_HS_End   = 39;  // ĞĞÍ¬²½½áÊø¼ÆÊı
+parameter hdat_begin   = 259;  // ÓĞĞ§ÏñËØÇøÆğÊ¼£¨Ç°Ò»¸ö¼ÆÊı£©
+parameter hdat_end     = 1539;  // ÓĞĞ§ÏñËØÇø½áÊø¼ÆÊı
+parameter hpixel_end   = 1649;  // Ò»ĞĞ×Ü¼ÆÊı - 1
+parameter VGA_VS_End   = 4;  // ³¡Í¬²½½áÊø¼ÆÊı
+parameter vdat_begin   = 24;  // ÓĞĞ§ĞĞÇøÆğÊ¼£¨Ç°Ò»¸ö¼ÆÊı£©
+parameter vdat_end     = 744;  // ÓĞĞ§ĞĞÇø½áÊø¼ÆÊı
+parameter vpixel_end   = 749;  // Ò»Ö¡×ÜĞĞÊı - 1
 
-//    è¡ŒåŒæ­¥è„‰å†²
+//    ĞĞÍ¬²½Âö³å
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     hcounter_r <= 1'd0;
@@ -48,7 +48,7 @@ parameter vpixel_end   = 749;  // ä¸€å¸§æ€»è¡Œæ•° - 1
     hcounter_r <= hcounter_r + 1'd1;
     end
 
-//    åœºåŒæ­¥è„‰å†²
+//    ³¡Í¬²½Âö³å
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     vcounter_r <= 1'd0;
@@ -60,7 +60,7 @@ parameter vpixel_end   = 749;  // ä¸€å¸§æ€»è¡Œæ•° - 1
     end
     end
 
-//    è¡Œæ•°æ®ä¸åœºæ•°æ®
+//    ĞĞÊı¾İÓë³¡Êı¾İ
     assign VGA_CLK = !Clk_74M;
     assign VGA_BLK = ((hcounter_r >= hdat_begin) && (hcounter_r < hdat_end) && (vcounter_r >= vdat_begin) && (vcounter_r < vdat_end))?1'b1:1'b0;
 
