@@ -62,3 +62,6 @@ tools/startup_error.log
 !/bit/
 !/bit/Tetris.bit
 /bit/*.tmp
+
+# 当前构建的临时报告；正式验证记录归档至 docs/reports。
+/hdmi_audio_*.rpt

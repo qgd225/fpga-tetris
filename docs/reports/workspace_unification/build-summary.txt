@@ -1,0 +1,10 @@
+2026-10-24 唯一工作区完整构建
+工程 D:/vivado_project/Tetris/Tetris.xpr，当前 main，功能源码与616113c一致。
+命令 D:/xilinx/Vivado/2018.3/bin/vivado.bat -mode batch -source tools/build_hdmi_audio.tcl
+完整综合、布局布线、比特流生成退出码0；所有14624条可布线网络完成。
+LUT 11815；寄存器4447（12既有锁存器）；BRAM15.5；DSP0；IOB34。
+WNS +0.076 ns；WHS +0.068 ns；TNS/THS=0；总线偏斜余量+5.810 ns。
+现有未约束端点和DRC警告与既有基线对照，未将其描述成所有路径均受约束。
+最新bit SHA256 C68A3F435D9C3BC2A46D7D4866469B17809E21DEF1CF06687B581D713924482E
+与616113c的FPGA配置数据段相同：True（文件头日期/时间可不同）。
+本轮没有新增上板测试；此前音效版已上板成功，降音量听感仍按原记录待确认。

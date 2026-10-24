@@ -2,7 +2,7 @@
 
 ## 比特流存放规则
 
-本机两个开发工作区共用 `D:/vivado_project/Tetris/bit/Tetris.bit`，每次成功生成后覆盖更新。Git 和 GitHub 只收录 `bit/Tetris.bit`，不再收录根目录或构建缓存里的比特流。Vivado 内部 `.runs` 文件保留为构建缓存。
+唯一开发目录为 `D:/vivado_project/Tetris`，本地和 GitHub 只维护 `main`。历史版本保存在 Git 提交中，不再复制工程或保留并行版本目录。最新下载文件为 `bit/Tetris.bit`，成功构建后覆盖更新；Vivado 内部 `.runs` 文件仅作为构建缓存。
 
 当前发布 HDMI 游戏音效降音量版：振幅由 ±4096 调整为 ±1024，为原来的四分之一（约降低 12 dB）。用户已确认调整前 HDMI 音效版上板成功；降音量版重新仿真、构建后发布，听感待再次确认。GitHub 仅发布到 `main`。
 
@@ -11,7 +11,9 @@
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
-## 当前工作区归档（2026-10-24）
+单一工作区的整合、历史恢复入口及验证见[工作区统一记录](docs/workspace-unification.md)。后续故事化改造以[代码与资源实施计划书](docs/CORE-07_故事感实施计划书.md)为准，计划内容尚未实现。
+
+## HDMI 音效开发前历史归档（2026-10-24）
 
 HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模块拆分及中文注释编码调整。归档标签：`baseline-lutram-before-hdmi-audio-20261024`。
 
