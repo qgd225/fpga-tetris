@@ -1,5 +1,12 @@
 # FPGA 俄罗斯方块 (Tetris)
 
+## 比特流存放规则
+
+本机两个开发工作区共用 `D:/vivado_project/Tetris/bit/Tetris.bit`，每次成功生成后覆盖更新。Git 和 GitHub 只收录 `bit/Tetris.bit`，不再收录根目录或构建缓存里的比特流。Vivado 内部 `.runs` 文件保留为构建缓存。
+
+当前集中存放的是 HDMI 音效分支 `e5c1a12` 生成的测试比特流；它尚待实物听音验证。不同分支并行构建时，最后完成发布的版本成为最新文件；下载前请确认本次构建用途。
+
+
 当前分支在场地 LUTRAM 基线上继续优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](docs/optimization-rounds.md)；此前基线见 [LUTRAM 重试](docs/lutram-retry.md)。根目录 `Tetris.bit` 与 `Tetris_lutram.bit` 均保留，最新候选为 `Tetris_lutram_metadata_hint.bit`，尚待上板验收。
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。

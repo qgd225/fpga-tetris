@@ -54,3 +54,9 @@ tools/startup_error.log
 
 # ===== 本地发布压缩包 =====
 /Tetris*.zip
+
+# 比特流仅提交 bit/Tetris.bit
+*.bit
+!/bit/
+!/bit/Tetris.bit
+/bit/*.tmp
