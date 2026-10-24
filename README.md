@@ -1,6 +1,15 @@
 # FPGA 俄罗斯方块 (Tetris)
 
-基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏,画面通过 HDMI (TMDS) 输出,支持音效。
+基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏,画面通过 HDMI (TMDS) 输出,支持蜂鸣器音乐与游戏音效。当前基线的 HDMI 只传输画面。
+
+## 2026-10-24 版本基线
+
+本次归档保存 HDMI 音频开发前的游戏版本，包含单双人模式、智能落点提示、结算面板、分模式排行榜及现有操作音效。源码基线为 `47e7f8c`，归档标签为 `baseline-before-hdmi-audio-20261024`。
+
+- 画面：1280×720，60 Hz，通过现有 DVI/TMDS 编码链路输出。
+- 声音：`music.v` 与 `sound.v` 驱动蜂鸣器，HDMI 暂未携带音频。
+- 后续任务：独立模块实现 PCM 采样和 HDMI 音频发送，复用当前游戏事件；上板听音结果单独记录。
+- 仿真入口：`sim/run_all.bat`，各项说明见 [仿真说明](sim/README.md)。本次归档不新增上板验证结论。
 
 ## 工程信息
 
