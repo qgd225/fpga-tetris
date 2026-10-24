@@ -12,7 +12,9 @@ module VGA_1280_720(
     VGA_VS,
     VGA_BLK,
     VGA_CLK,
-    VGA_DATA
+    VGA_DATA,
+    raw_h,
+    raw_v
     );
 
     input Clk_74M;
@@ -25,6 +27,11 @@ module VGA_1280_720(
     output VGA_BLK;
     output VGA_CLK;
     output [23:0]VGA_DATA;
+
+    output [10:0]raw_h;
+    output [10:0]raw_v;
+    assign raw_h = hcounter_r;
+    assign raw_v = vcounter_r;
 
     reg [10:0]hcounter_r;
     reg [10:0]vcounter_r;

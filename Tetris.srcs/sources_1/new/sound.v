@@ -35,7 +35,8 @@ module sound(
     input blk_rot1,
     input blk_rot2,
 
-    output reg buzz_else
+    output reg buzz_else,
+    output fx_active
     );
 
 //    仿真可覆盖: 1ms 节拍与音高右移量
@@ -453,4 +454,6 @@ module sound(
     end
     end
 
+// PCM 静音标志，使用音符有效状态，方波低半周仍是有效声音。
+    assign fx_active = Reset_n && (en != 5'd0) && (note_q != 18'd0);
 endmodule

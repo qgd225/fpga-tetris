@@ -8,6 +8,16 @@
 
 此基线的 HDMI 只传画面，声音由蜂鸣器播放；后续在独立分支 `codex/hdmi-game-audio` 开发数字音频采样与 HDMI 数据岛发送。下方资源、时序和 `Tetris.bit` 均属于归档版本，不代表后续音频版的验证结果。
 
+## HDMI 游戏音效测试版
+
+开发分支：`codex/hdmi-game-audio`。现有游戏音效通过 HDMI 输出为 **48 kHz、16 位、双声道 LPCM**（左右相同），保留蜂鸣器便于对照。背景音乐仍走原蜂鸣器，本次先验证操作与状态音效。
+
+- 模块划分：`sound` 事件/音符 → `game_audio_pcm` 采样 → `hdmi_audio_packets` FIFO/ACR/InfoFrame → `hdmi_av_encoder` 数据岛/TMDS。
+- 图像仍使用原有 1280×720 坐标，音视频使用同一像素时钟；音频以时钟使能推进，不增加低速时钟域。
+- PLL 实际输出约 74.21875 MHz，采样使能按实际频率生成；ACR 使用 N=6144，并测量 CTS，避免直接套用标称频率。
+- 新版比特流单独命名为 `Tetris_hdmi_audio.bit`。根目录原有 `Tetris.bit` 保持归档版本，不能用它验证 HDMI 音效。
+- 已通过原有九套回归和新增跨帧 HDMI 协议仿真；完整实现结果及上板测试步骤见 [HDMI 音效说明](docs/HDMI音效测试.md)。
+
 ## 工程信息
 
 | 项目 | 值 |
@@ -16,7 +26,7 @@
 | 目标器件 | `xc7a35tfgg484-2`(Artix-7 XC7A35T / FGG484 / 速度等级 -2) |
 | 顶层模块 | `Tetris` |
 | 显示输出 | HDMI TMDS,1280×720 @60Hz(像素时钟 74.25 MHz) |
-| 描述语言 | Verilog HDL |
+| 描述语言 | Verilog HDL / SystemVerilog（HDMI 音频） |
 | 源码编码 | Verilog 为 GB18030 无 BOM；README、Python、BAT 为 UTF-8 |
 
 ## 玩法
@@ -111,7 +121,7 @@ Tetris.srcs/
 
 > Verilog 文件统一使用 GB18030 无 BOM，以匹配 Vivado 2018.3 在中文 Windows 下的源码显示编码。GitHub 网页查看中文注释时可能出现编码显示差异。
 
-## 验证与资源
+## 归档基线的验证与资源
 
 - 九套仿真共 **784 项**：`duo 111 / frame_duo 330 / level 39 / sound 103 / input_route 29 / horizontal_repeat 30 / hold_gesture 27 / solo_hint 59 / rgb_palette 56`，全部通过。
 - Vivado 2018.3 最终从零综合/实现：0 error、0 时序违例、0 未布通网络。
@@ -120,7 +130,7 @@ Tetris.srcs/
 - 实现阶段采用 `opt_design -directive ExploreArea`，在保持全部装饰性 UI 的前提下抑制逻辑复制和 LUT 映射膨胀。
 - 渲染取色采用 7 位命中码寄存一级并统一右移 1 像素，把原 20 余级 24 位优先链拆成“判层 + 取色”两级；背景颜色与命中码同拍寄存，整套画面保持统一相位。
 
-### 本版构建产物
+### 归档基线构建产物
 
 | 项目 | 值 |
 | --- | --- |
