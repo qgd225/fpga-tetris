@@ -4,10 +4,10 @@
 
 本机两个开发工作区共用 `D:/vivado_project/Tetris/bit/Tetris.bit`，每次成功生成后覆盖更新。Git 和 GitHub 只收录 `bit/Tetris.bit`，不再收录根目录或构建缓存里的比特流。Vivado 内部 `.runs` 文件保留为构建缓存。
 
-当前集中存放的是 HDMI 音效分支 `e5c1a12` 生成的测试比特流；它尚待实物听音验证。不同分支并行构建时，最后完成发布的版本成为最新文件；下载前请确认本次构建用途。
+当前发布基线为 `629fd49`：加入 HDMI 音频前的 LUTRAM 优化版，声音仍由蜂鸣器输出。用户于 2026-10-24 确认该版已完成上板验证；`bit/Tetris.bit` 对应原 `Tetris_lutram_metadata_hint.bit`。GitHub 只维护 `main`，后续改动通过提交历史保留；新建分支须先征得用户同意。
 
 
-当前分支在场地 LUTRAM 基线上继续优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](docs/optimization-rounds.md)；此前基线见 [LUTRAM 重试](docs/lutram-retry.md)。根目录 `Tetris.bit` 与 `Tetris_lutram.bit` 均保留，最新候选为 `Tetris_lutram_metadata_hint.bit`，尚待上板验收。
+当前分支在场地 LUTRAM 基线上继续优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](docs/optimization-rounds.md)；此前基线见 [LUTRAM 重试](docs/lutram-retry.md)。发布文件统一为 `bit/Tetris.bit`，该 LUTRAM 优化版已由用户上板验证。
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
@@ -15,7 +15,7 @@
 
 HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模块拆分及中文注释编码调整。归档标签：`baseline-lutram-before-hdmi-audio-20261024`。
 
-本版 HDMI 仍只传画面。当前工作区修改先完整提交并推送，再在独立分支实现 HDMI 音效。本文后面的旧比特流、资源和时序记录属于既有发布版本，不能视为本次工作区或音频版的新验证结果。
+本版 HDMI 仍只传画面，声音由蜂鸣器播放。HDMI 音频开发版仅保留本地，不纳入当前发布。本文后面的旧比特流、资源和时序记录属于既有发布版本，不能视为本次工作区或音频版的新验证结果。
 
 ## 工程信息
 
