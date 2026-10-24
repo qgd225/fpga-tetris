@@ -165,6 +165,8 @@ endtask
 `define SLOT_P2  24'h1E0812
 
 initial begin
+  // 视觉/数值单元测试隔离顶出；真实终局由 sim/story 联合验证。
+  force dut.over_raw=0;
   bad = 0;
   Rst = 0; #200; Rst = 1; repeat(30) @(posedge Clk);
   force dut.Playfield_inst.Drop = 30'd100_000_000;  // 抑制自动下落
@@ -368,7 +370,7 @@ initial begin
   $display("=== 10) level energy bar: bottom-up + cap + frame ===\n");
   duo = 1'b0; repeat(4) @(posedge Clk);
   for(k = 0; k < 8; k = k + 1)begin
-    force dut.Playfield_inst.speed_level = k[2:0];
+    force dut.story_inst.story_speed = k[2:0];
     repeat(40) @(posedge Clk);
     ybar = 88 + (7 - k) * 78 + 40;
     look(11'd293, ybar[10:0]); chk("current body level color", rgb, lvcol(k[2:0]));
@@ -382,7 +384,7 @@ initial begin
       look(11'd293, ybar[10:0]); chk("unlit body dark", rgb, 24'h303030);
     end
   end
-  force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
+  force dut.story_inst.story_speed = 3'd0; repeat(40) @(posedge Clk);
   look(11'd263, 11'd440);   chk("level frame left", rgb, 24'h606060);
   look(11'd257, 11'd440);   chk("outside bar background", rgb, 24'h061017);
   look(11'd268, 11'd440);   chk("bar left inner", rgb, 24'h303030);
@@ -394,14 +396,14 @@ initial begin
   look(11'd240, 11'd72);    chk("LV rule color", rgb, 24'h00E5FF);
   look(11'd240, 11'd74);    chk("LV rule below background", rgb, 24'h29404D);
   look(11'd340, 11'd40);    chk("time still white", rgb, `WHITE);
-  release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
-  force dut.Playfield_inst.speed_level = 3'd5; repeat(40) @(posedge Clk);
+  release dut.story_inst.story_speed; repeat(4) @(posedge Clk);
+  force dut.story_inst.story_speed = 3'd5; repeat(40) @(posedge Clk);
   look(11'd259, 11'd90);    chk("hot pressure tooth", rgb, 24'hF77F24);
   look(11'd307, 11'd90);    chk("hot pressure tooth right", rgb, 24'hF77F24);
-  force dut.Playfield_inst.speed_level = 3'd7; repeat(40) @(posedge Clk);
+  force dut.story_inst.story_speed = 3'd7; repeat(40) @(posedge Clk);
   look(11'd259, 11'd90);    chk("critical pressure tooth", rgb, 24'hE63946);
   look(11'd263, 11'd440);   chk("critical pressure frame", rgb, 24'hE63946);
-  release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
+  release dut.story_inst.story_speed; repeat(4) @(posedge Clk);
   $display("=== 11) 菜单屏: 无框选项 + 青色选中标记 ===");
   Playing = 1'b0; choose = 1'b1; choose_cnt = 4'd0; repeat(4) @(posedge Clk);
   hc = 11'd495; vc = 11'd110; repeat(3) @(posedge Clk);  // 标题第 1 字前 1 像素
@@ -439,10 +441,10 @@ initial begin
   look(11'd95,   11'd90);   chk("duo=0 双人标签位置=外层背景", rgb, 24'h061017);
   look(11'd1077, 11'd90);   chk("duo=0 单人 NEXT 标签", rgb, `GRAY_LBL);
   look(11'd340,  11'd40);   chk("时间数字=白", rgb, `WHITE);
-  force dut.Playfield_inst.speed_level = 3'd0; repeat(40) @(posedge Clk);
+  force dut.story_inst.story_speed = 3'd0; repeat(40) @(posedge Clk);
   look(11'd292,  11'd40);   chk("LV 数字=等级色", rgb, 24'h00E5FF);
   look(11'd240,  11'd40);   chk("LV 标签=等级色", rgb, 24'h00E5FF);
-  release dut.Playfield_inst.speed_level; repeat(4) @(posedge Clk);
+  release dut.story_inst.story_speed; repeat(4) @(posedge Clk);
   Finalize = 1'b1; duo = 1'b1; repeat(4) @(posedge Clk);
   look(11'd113,   11'd90);   chk("Finalize label dim", rgb, `SLOT_BG);
   look(11'd292,   11'd40);   chk("Finalize LV digit kept", rgb, 24'h00E5FF);
@@ -543,11 +545,11 @@ initial begin
   look(11'd100, 11'd123);   chk("落锁瞬间 P1 色线=白", rgb, `WHITE);
   repeat(40) @(posedge Clk);
   look(11'd100, 11'd123);   chk("脉冲后 P1 色线回青", rgb, `CY_MENU);
-  force dut.Playfield_inst.speed_level = 3'd5; repeat(2) @(posedge Clk);
+  force dut.story_inst.story_speed = 3'd5; repeat(2) @(posedge Clk);
   look(11'd293, 11'd280);   chk("升级瞬间当前段=白", rgb, `WHITE);
   repeat(40) @(posedge Clk);
   look(11'd293, 11'd280);   chk("升级后当前段=热力橙红", rgb, 24'hFF6B35);
-  release dut.Playfield_inst.speed_level; repeat(40) @(posedge Clk);
+  release dut.story_inst.story_speed; repeat(40) @(posedge Clk);
   force dut.Playfield_inst.score = 20'd777; repeat(2) @(posedge Clk);
   look(11'd1070, 11'd40);   chk("加分瞬间分数=热力橙", rgb, 24'hFF6B35);
   repeat(40) @(posedge Clk);
@@ -815,7 +817,7 @@ initial begin
   force dut.score_bcd = 24'h012345;
   force dut.lines_bcd = 20'h00128;
   force dut.time_bcd = 16'h0623;
-  force dut.Playfield_inst.speed_level = 3'd6;
+  force dut.story_inst.story_speed = 3'd6;
   repeat(6) @(posedge Clk);
   look(11'd404,11'd468); chk("result SOLO mode cyan", rgb, `CY_MENU);
   look(11'd370,11'd510); chk("result score rule cyan", rgb, `CY_MENU);
@@ -845,7 +847,7 @@ initial begin
   Finalize=0; repeat(6) @(posedge Clk);
   look(11'd404,11'd468); chk("result hidden outside finalize", rgb, `FLDBG);
   release dut.score_bcd; release dut.lines_bcd; release dut.time_bcd;
-  release dut.Playfield_inst.speed_level;
+  release dut.story_inst.story_speed;
   duo=0; Playing=1; Finalize=0; clr_state; repeat(4) @(posedge Clk);
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);

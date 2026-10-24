@@ -100,6 +100,14 @@ module metadata_tb;
         manual=0;
         // 强制搬移事务结束后, 等待棋盘控制器完成剩余操作。
         repeat(30)@(negedge clk);
+        // 前半段人工强制 move_we 会产生无满行的消行沿；恢复合法静止状态，
+        // 再验证真实落锁事务，不能在被暂停的消行动画里强塞新落锁。
+        dut.Playfield_inst.clear_t=0;
+        dut.Playfield_inst.clear_d=0;
+        dut.Playfield_inst.move_active=0;
+        dut.Playfield_inst.batch_active=0;
+        repeat(3)@(negedge clk);
+        check(dut.engine_quiescent,"engine normalized after forced moves");
         force dut.Playfield_inst.counter_c=5'd3;
         force dut.Playfield_inst.counter_r=5'd5;
         force dut.Playfield_inst.counter_c2=5'd15;

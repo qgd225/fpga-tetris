@@ -18,6 +18,8 @@ module Playfield(
     input switch_r_flag,
     input Idle,
     input Playing,
+    input mission_hold,
+    input [2:0] story_speed,
     input hint_enable,
     input Stop,
     input Finalize,
@@ -35,6 +37,10 @@ module Playfield(
     output reg [479:0]state,
     output wire lock_commit1,
     output wire lock_commit2,
+    output wire batch_done,
+    output reg [4:0] batch_n,
+    output reg [2:0] batch_speed,
+    output wire engine_quiescent,
     output wire move_we,
     output wire [4:0]move_row,
     output reg Piece,
@@ -111,35 +117,13 @@ module Playfield(
 //============================================================
     parameter MCNT = 74_250_000;
     parameter MCNT_LAND = 20_000_000;
-    parameter MCNT_Drop = 74_250_000 - 1;  //自动下落时间
+    parameter MCNT_Drop = 74_218_750 - 1;  //自动下落时间
 
-    parameter [19:0]LV1_TH = 20'd4;
-    parameter [19:0]LV2_TH = 20'd15;
-    parameter [19:0]LV3_TH = 20'd35;
-    parameter [19:0]LV4_TH = 20'd70;
-    parameter [19:0]LV5_TH = 20'd150;
-    parameter [19:0]LV6_TH = 20'd300;
-    parameter [19:0]LV7_TH = 20'd600;
-
-    parameter [13:0]TIME_LV1 = 14'd20;
-    parameter [13:0]TIME_LV2 = 14'd60;
-    parameter [13:0]TIME_LV3 = 14'd120;
-    parameter [13:0]TIME_LV4 = 14'd200;
-    parameter [13:0]TIME_LV5 = 14'd300;
-    parameter [13:0]TIME_LV6 = 14'd440;
-    parameter [13:0]TIME_LV7 = 14'd600;
     parameter CLEAR_STEP = 6_311_250;  //85ms
 
     wire [4:0]COL = duo ? 5'd24 : 5'd20;
 
 //    双人模式时间阈值(放宽)
-    parameter [13:0]TIME_LV1_D = 14'd40;
-    parameter [13:0]TIME_LV2_D = 14'd120;
-    parameter [13:0]TIME_LV3_D = 14'd240;
-    parameter [13:0]TIME_LV4_D = 14'd400;
-    parameter [13:0]TIME_LV5_D = 14'd600;
-    parameter [13:0]TIME_LV6_D = 14'd880;
-    parameter [13:0]TIME_LV7_D = 14'd1200;
 
 //    出生列: 单人使用第 9 列, 双人使用 24 列场地的三等分点(第 8、16 列)。
     wire [4:0]SPAWN_C1 = duo ? 5'd8  : 5'd9;
@@ -180,14 +164,14 @@ module Playfield(
     reg clear_d;
     wire [4:0]d_clear = line[0] + line[1] + line[2] + line[3] + line[4] + line[5] + line[6] + line[7] + line[8] +
     line[9] + line[10] + line[11] + line[12] + line[13] + line[14] + line[15] + line[16] + line[17] + line[18] + line[19];
-    reg [3:0]clear_tick;
+    reg [5:0]clear_tick;
     reg [24:0]clear_cnt;
     wire clear_down = (!clear_time) && (clear_d);
     wire [29:0]Drop;
     reg clear_t_d;
-    reg [2:0]cl_tick;
+    reg [4:0]cl_tick;
    reg [19:0]line_d;
-    reg [3:0]cl_stop;
+    reg [5:0]cl_stop;
     wire clear_step;
 
 //    按键与下落
@@ -333,6 +317,19 @@ module Playfield(
     reg [23:0]row_data;
     wire restart_board = (Idle && !idle_d) || (Finalize && switch_r_flag);
     wire board_busy = board_init || move_active || restart_board;
+    wire player_stop = Stop || mission_hold || clear_time;
+    reg batch_active;
+    wire clear_cancel = Idle || restart_board;
+    assign batch_done = clear_down && batch_active;
+    assign engine_quiescent = !board_busy && !lock_we && !lock_we2 &&
+                              !lock_pending2 && !clear_time;
+    always @(posedge Clk_74M or negedge Reset_n) begin
+        if(!Reset_n) begin batch_active<=0; batch_n<=0; batch_speed<=0; end
+        else if(restart_board) begin batch_active<=0; batch_n<=0; batch_speed<=0; end
+        else if(clear_pulse) begin batch_active<=1; batch_n<=d_clear; batch_speed<=story_speed; end
+        else if(batch_done) batch_active<=0;
+    end
+
     wire lock_valid1 = lock_we && cc_t[lock_idx] < COL && rr_t[lock_idx] < 20;
     wire lock_valid2 = duo && lock_we2 && cc_t2[lock_idx2] < COL && rr_t2[lock_idx2] < 20;
     assign lock_commit1 = !board_busy && !Idle && !Finalize && lock_valid1;
@@ -460,23 +457,14 @@ module Playfield(
     );
 
     // 速度控制: 根据分数和时间选择等级, 输出自动下落间隔。
-    Playfield_speed_control #(
-        .MCNT_Drop(MCNT_Drop),
-        .LV1_TH(LV1_TH), .LV2_TH(LV2_TH), .LV3_TH(LV3_TH),
-        .LV4_TH(LV4_TH), .LV5_TH(LV5_TH), .LV6_TH(LV6_TH), .LV7_TH(LV7_TH),
-        .TIME_LV1(TIME_LV1), .TIME_LV2(TIME_LV2), .TIME_LV3(TIME_LV3),
-        .TIME_LV4(TIME_LV4), .TIME_LV5(TIME_LV5), .TIME_LV6(TIME_LV6),
-        .TIME_LV7(TIME_LV7), .TIME_LV1_D(TIME_LV1_D), .TIME_LV2_D(TIME_LV2_D),
-        .TIME_LV3_D(TIME_LV3_D), .TIME_LV4_D(TIME_LV4_D), .TIME_LV5_D(TIME_LV5_D),
-        .TIME_LV6_D(TIME_LV6_D), .TIME_LV7_D(TIME_LV7_D)
-    ) speed_control_inst(
-        .Clk_74M(Clk_74M), .Reset_n(Reset_n), .score(score),
-        .time_sec(time_sec), .duo(duo), .speed_level(speed_level), .Drop(Drop)
+    Playfield_speed_control #(.MCNT_Drop(MCNT_Drop)) speed_control_inst(
+        .Clk_74M(Clk_74M), .Reset_n(Reset_n), .story_speed(story_speed),
+        .speed_level(speed_level), .Drop(Drop)
     );
 
     // Hold 控制: 维护两名玩家的换块状态以及共用的暂存方块。
     Playfield_hold_controller hold_controller_inst(
-        .Clk_74M(Clk_74M), .Reset_n(Reset_n), .Idle(Idle), .Stop(Stop),
+        .Clk_74M(Clk_74M), .Reset_n(Reset_n), .Idle(Idle), .Stop(player_stop),
         .board_busy(board_busy), .Finalize(Finalize), .switch_r_flag(switch_r_flag),
         .hold_p_flag(hold_p_flag), .hold_p_flag2(hold_p_flag2),
         .type(type), .type2(type2),
@@ -612,7 +600,7 @@ module Playfield(
         type <= 3'd0;
         else if(Idle)
         type <= rnd_type_t;
-        else if((land_pulse || hold_up) && Playing)
+        else if((land_pulse || hold_up) && Playing && !player_stop)
         type <= type_t;
     end
 
@@ -624,7 +612,7 @@ module Playfield(
         type_t <= rnd_type_n;
         else if(hold_down)
         type_t <= hold_type;
-        else if(land_pulse && Playing)
+        else if(land_pulse && Playing && !player_stop)
         type_t <= rnd_type_n;
     end
 
@@ -632,7 +620,7 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_d <= 3'd0;
-        else if(land_pulse && Playing)
+        else if(land_pulse && Playing && !player_stop)
         type_d <= type;
     end
 
@@ -669,9 +657,9 @@ module Playfield(
             else
             counter_drop <= counter_drop;
         end
-        else if(Stop || board_busy)
+        else if(player_stop || board_busy)
         counter_drop <= counter_drop;
-        else if(Playing)begin
+        else if(Playing && !player_stop)begin
             if(counter_drop == Drop)
             counter_drop <= 1'd0;
             else
@@ -691,9 +679,9 @@ module Playfield(
             else
             counter_r <= counter_r;
         end
-        else if(Stop || board_busy)
+        else if(player_stop || board_busy)
         counter_r <= counter_r;
-        else if(Playing)begin
+        else if(Playing && !player_stop)begin
             if(land_we)
             counter_r <= counter_r;
             else if(land_pulse || hold_up)  //归位
@@ -721,9 +709,9 @@ module Playfield(
             else
             counter_c <= counter_c;
         end
-        else if(Stop || board_busy)
+        else if(player_stop || board_busy)
         counter_c <= counter_c;
-        else if(Playing)begin
+        else if(Playing && !player_stop)begin
             if(land_we)
             counter_c <= counter_c;
             else if(land_pulse || hold_up)  //归位
@@ -783,9 +771,9 @@ module Playfield(
             else
             rot <= rot;
         end
-        else if(Stop || board_busy)
+        else if(player_stop || board_busy)
         rot <= rot;
-        else if(Playing)begin
+        else if(Playing && !player_stop)begin
             if(land_we)
             rot <= rot;
             else if(en_rotate)
@@ -803,7 +791,8 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_land <= 1'b0;
-        else if(Playing)begin
+        else if(player_stop) counter_land <= counter_land;
+        else if(Playing && !player_stop)begin
             if(land && !lock_we)
             counter_land <= counter_land + 30'd1;
             else
@@ -813,7 +802,7 @@ module Playfield(
         counter_land <= 1'b0;
     end
 
-    wire land_pulse_t = (land) && (counter_land == MCNT_LAND);
+    wire land_pulse_t = Playing && !player_stop && (land) && (counter_land == MCNT_LAND);
 
 //    P1 锁存启动
     always@(posedge Clk_74M or negedge Reset_n)begin
@@ -847,6 +836,7 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_counter <= 2'd0;
+        else if(player_stop) lock_counter <= lock_counter;
         else if(land_pulse_t)
         lock_counter <= 2'd1;
         else if(lock_counter == 5940000)
@@ -856,7 +846,7 @@ module Playfield(
     end
 
     assign land_we = (lock_counter != 0) && (lock_counter != 5940000) && (lock_counter[21]);
-    assign land_pulse = (lock_counter == 5940000) ? 1:0;
+    assign land_pulse = Playing && !player_stop && (lock_counter == 5940000);
 
     assign lock_we  = (lock_t) || (lock_cnt != 2'd0);
     assign lock_idx = (lock_t) ? 2'd0 : lock_cnt;
@@ -915,29 +905,37 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     cl_stop <= 4'd0;
+    else if(clear_cancel)
+    cl_stop <= 6'd0;
     else if(!clear_t)
     cl_stop <= 4'd0;
     else if(clear_tick == 3'd0)
-    cl_stop <= (d_clear << 1) - 4'd1;
+    cl_stop <= ({1'b0,batch_n} << 1) - 6'd1;
     end
 
 //    闪白分频计数
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_cnt <= 0;
+    else if(clear_cancel)
+    clear_cnt <= 0;
     else if(!clear_t)
     clear_cnt <= 0;
+    else if(Stop)
+    clear_cnt <= clear_cnt;
     else if(clear_cnt == CLEAR_STEP)
     clear_cnt <= 0;
     else
     clear_cnt <= clear_cnt + 1;
     end
 
-    assign clear_step = (clear_t) && (clear_cnt == CLEAR_STEP);
+    assign clear_step = !Stop && (clear_t) && (clear_cnt == CLEAR_STEP);
 
 //    闪白标志: 消行动画期间锁住场地
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
+    clear_t <= 1'b0;
+    else if(clear_cancel)
     clear_t <= 1'b0;
     else if(clear_pulse)
     clear_t <= 1'b1;
@@ -949,6 +947,8 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_tick <= 3'd0;
+    else if(clear_cancel)
+    clear_tick <= 6'd0;
     else if(!clear_t)
     clear_tick <= 3'd0;
     else if(clear_step)begin
@@ -963,9 +963,11 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     cl_tick <= 3'd0;
+    else if(clear_cancel)
+    cl_tick <= 5'd0;
     else if(!clear_t)
     cl_tick <= 3'd0;
-    else if(clear_step && cl_tick < d_clear)
+    else if(clear_step && cl_tick < batch_n)
     cl_tick <= cl_tick + 3'd1;
     end
 
@@ -973,13 +975,17 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     clear_t_t <= 1'b0;
+    else if(clear_cancel)
+    clear_t_t <= 1'b0;
     else
-    clear_t_t <= clear_step && (cl_tick < d_clear);
+    clear_t_t <= clear_step && (cl_tick < batch_n);
     end
 
 //    闪白翻转: 亮/暗交替
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
+    clear_flash <= 1'b1;
+    else if(clear_cancel)
     clear_flash <= 1'b1;
     else if(clear_pulse)
     clear_flash <= 1'b1;
@@ -990,6 +996,8 @@ module Playfield(
 //    正在消的行标记
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
+    line_t <= 20'd0;
+    else if(clear_cancel)
     line_t <= 20'd0;
     else if(clear_pulse)
     line_t <= 20'd1 << clear_row;
@@ -1021,6 +1029,8 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         clear_d <= 1'b0;
+    else if(clear_cancel)
+    clear_d <= 1'b0;
         else
         clear_d <= clear_time;
     end
@@ -1031,7 +1041,9 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)
     c_clear <= 5'd0;
-    else if(clear_t_t)
+    else if(clear_cancel)
+    c_clear <= 5'd0;
+    else if(clear_pulse)
     c_clear <= d_clear;
     end
 
@@ -1102,7 +1114,7 @@ module Playfield(
             else
             over <=1'b0;
         end
-        else if((touch_top || (duo && touch_top2)) && Playing && !board_busy && !lock_we && !(duo && lock_we2))
+        else if((touch_top || (duo && touch_top2)) && Playing && !player_stop && !clear_time && !board_busy && !lock_we && !(duo && lock_we2))
         over <= 1'b1;
         else
         over <= 1'b0;
@@ -1148,7 +1160,7 @@ module Playfield(
     assign blk_rot2 = duo && Playing && rotate_p_flag2 && (rot_block2 || lock_we2);
     assign ghost_ev1 = ghost_restart1;
     assign ghost_ev2 = duo && ghost_restart2;
-    assign land_pulse2 = (lock_counter2 == 5940000) ? 1 : 0;
+    assign land_pulse2 = Playing && !player_stop && (lock_counter2 == 5940000);
     assign lock_we2  = (lock_t2) || lock_pending2 || (lock_cnt2 != 2'd0);
     assign lock_idx2 = (lock_t2 || lock_pending2) ? 2'd0 : lock_cnt2;
     assign cc_d2 = {cc_t2[0], cc_t2[1], cc_t2[2], cc_t2[3]};
@@ -1298,7 +1310,7 @@ module Playfield(
         type2 <= 3'd0;
         else if(Idle)
         type2 <= p2_late ? rnd_type_t1 : rnd_type_t;
-        else if((land_pulse2 || hold_up2) && Playing)
+        else if((land_pulse2 || hold_up2) && Playing && !player_stop)
         type2 <= type_t2;
     end
 
@@ -1310,7 +1322,7 @@ module Playfield(
         type_t2 <= p2_late ? rnd_type_n1 : rnd_type_n;
         else if(hold_down2)
         type_t2 <= hold_type;
-        else if(land_pulse2 && Playing)
+        else if(land_pulse2 && Playing && !player_stop)
         type_t2 <= ((land_pulse && land_pulse2) ? rnd_type_n1 : rnd_type_n);
     end
 
@@ -1318,7 +1330,7 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         type_d2 <= 3'd0;
-        else if(land_pulse2 && Playing)
+        else if(land_pulse2 && Playing && !player_stop)
         type_d2 <= type2;
     end
 
@@ -1351,9 +1363,9 @@ module Playfield(
             else
             counter_drop2 <= counter_drop2;
         end
-        else if(Stop || board_busy)
+        else if(player_stop || board_busy)
         counter_drop2 <= counter_drop2;
-        else if(Playing)begin
+        else if(Playing && !player_stop)begin
             if(counter_drop2 == Drop)
             counter_drop2 <= 1'd0;
             else
@@ -1373,9 +1385,9 @@ module Playfield(
             else
             counter_r2 <= counter_r2;
         end
-        else if(Stop || board_busy)
+        else if(player_stop || board_busy)
         counter_r2 <= counter_r2;
-        else if(Playing)begin
+        else if(Playing && !player_stop)begin
             if(land_we2)
             counter_r2 <= counter_r2;
             else if(land_pulse2 || hold_up2)  //归位
@@ -1403,9 +1415,9 @@ module Playfield(
             else
             counter_c2 <= counter_c2;
         end
-        else if(Stop || board_busy)
+        else if(player_stop || board_busy)
         counter_c2 <= counter_c2;
-        else if(Playing)begin
+        else if(Playing && !player_stop)begin
             if(land_we2)
             counter_c2 <= counter_c2;
             else if(land_pulse2 || hold_up2)  //归位
@@ -1448,9 +1460,9 @@ module Playfield(
             else
             rot2 <= rot2;
         end
-        else if(Stop || board_busy)
+        else if(player_stop || board_busy)
         rot2 <= rot2;
-        else if(Playing)begin
+        else if(Playing && !player_stop)begin
             if(land_we2)
             rot2 <= rot2;
             else if(en_rotate2)
@@ -1466,7 +1478,8 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         counter_land2 <= 1'b0;
-        else if(Playing)begin
+        else if(player_stop) counter_land2 <= counter_land2;
+        else if(Playing && !player_stop)begin
             if(land2 && !lock_we2)
             counter_land2 <= counter_land2 + 30'd1;
             else
@@ -1513,6 +1526,7 @@ module Playfield(
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         lock_counter2 <= 2'd0;
+        else if(player_stop) lock_counter2 <= lock_counter2;
         else if(land_pulse_t2)
         lock_counter2 <= 2'd1;
         else if(lock_counter2 == 5940000)

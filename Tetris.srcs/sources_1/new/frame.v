@@ -54,6 +54,10 @@ module frame(
     output blk_rot1,
     output blk_rot2,
     output [2:0]snd_clr_n,
+    output mission_win,
+    output mission_hold,
+    output [1:0] story_phase,
+    output mission_success,
     output [1:0] danger_lvl
     );
     reg [23:0]rgb_c;
@@ -141,66 +145,35 @@ module frame(
     wire [10:0]XP2LBL = duo ? 11'd1123 : 11'd1032;
     wire [10:0]XSCORELBL = duo ? 11'd819 : 11'd688;
 
-    reg [15:0]lines_total;
-
-    always@(posedge Clk_74M or negedge Reset_n)begin
-    if(!Reset_n)
-    lines_total <= 16'd0;
-    else if(Finalize)begin
-        if(switch_r_flag)
-        lines_total <= 16'd0;
-        else
-        lines_total <= lines_total;
-        end
-    else if(Stop)
-    lines_total <= lines_total;
-    else if(Playing)begin
-        if(clear_t_t)
-        lines_total <= lines_total + 16'd1;
-        end
-    else
-    lines_total <= 16'd0;
-    end
+    wire [15:0]lines_total;
+    wire over_raw, batch_done, engine_quiescent;
+    wire [4:0]batch_n;
+    wire [2:0]batch_speed;
+    wire batch_commit;
+    wire finish_pending, result_valid;
+    wire [3:0]core_locked;
+    wire phase_enter, charge_pulse;
+    wire new_run = Idle || choose || (Finalize && switch_r_flag);
+    assign mission_hold = finish_pending || result_valid;
+    assign mission_win = result_valid && mission_success;
+    assign over = result_valid && !mission_success && !Finalize;
+    story_controller story_inst(
+        .clk(Clk_74M),.reset_n(Reset_n),.new_run(new_run),
+        .playing(Playing),.paused(Stop),.duo(duo),
+        .row_credit(clear_t_t),.batch_done(batch_done),
+        .engine_quiescent(engine_quiescent),.over_raw(over_raw),
+        .lines_total(lines_total),.story_speed(speed_level),
+        .story_phase(story_phase),.core_locked(core_locked),
+        .phase_enter(phase_enter),.charge_pulse(charge_pulse),.batch_commit(batch_commit),
+        .finish_pending(finish_pending),.result_valid(result_valid),
+        .result_success(mission_success)
+    );
 
     assign lines = lines_total;
 
-    reg [19:0]lines_bcd;
-    always@(posedge Clk_74M or negedge Reset_n)begin
-    if(!Reset_n)
-    lines_bcd <= 20'd0;
-    else if(Finalize)begin
-        if(switch_r_flag)
-        lines_bcd <= 20'd0;
-    end
-    else if(Stop)
-    lines_bcd <= lines_bcd;
-    else if(Playing && clear_t_t)begin
-        if(lines_bcd[3:0] != 4'd9)
-        lines_bcd[3:0] <= lines_bcd[3:0] + 4'd1;
-        else begin
-        lines_bcd[3:0] <= 4'd0;
-        if(lines_bcd[7:4] != 4'd9)
-            lines_bcd[7:4] <= lines_bcd[7:4] + 4'd1;
-        else begin
-            lines_bcd[7:4] <= 4'd0;
-            if(lines_bcd[11:8] != 4'd9)
-                lines_bcd[11:8] <= lines_bcd[11:8] + 4'd1;
-            else begin
-                lines_bcd[11:8] <= 4'd0;
-                if(lines_bcd[15:12] != 4'd9)
-                    lines_bcd[15:12] <= lines_bcd[15:12] + 4'd1;
-                else begin
-                    lines_bcd[15:12] <= 4'd0;
-                    if(lines_bcd[19:16] != 4'd9)
-                        lines_bcd[19:16] <= lines_bcd[19:16] + 4'd1;
-                end
-            end
-        end
-        end
-    end
-    else if(!Playing)
-    lines_bcd <= 20'd0;
-    end
+    wire [19:0]lines_bcd;
+    bin_to_bcd line_digits(.clk(Clk_74M),.reset_n(Reset_n),
+                          .value(lines_total),.bcd(lines_bcd));
 
     wire [4:0]cc_t [0:3];
     wire [4:0]rr_t [0:3];
@@ -254,6 +227,8 @@ module frame(
 
     Playfield Playfield_inst(
     .lock_commit1(lock_commit1), .lock_commit2(lock_commit2),
+    .mission_hold(mission_hold), .story_speed(speed_level),
+    .batch_done(batch_done), .batch_n(batch_n), .batch_speed(batch_speed), .engine_quiescent(engine_quiescent),
     .move_we(move_we), .move_row(move_row),
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -286,7 +261,7 @@ module frame(
     .ghost(ghost),
     .C_num(C_num),
     .R_num(R_num),
-    .over(over),
+    .over(over_raw),
     .clear_time(clear_time),
     .clear_t(clear_t),
     .clear_pulse(clear_pulse),
@@ -305,7 +280,7 @@ module frame(
     .en_hold(en_hold),
     .en_hold2(en_hold2),
     .hold_type(hold_type),
-    .speed_level(speed_level),
+    .speed_level(),
     .land_we(land_we),
     .line_t(line_t),
     .clear_flash(clear_flash),
@@ -367,7 +342,7 @@ module frame(
     .switch_r_flag(switch_r_flag),
     .Idle(Idle),
     .Playing(Playing),
-    .Stop(Stop),
+    .Stop(Stop || mission_hold),
     .Finalize(Finalize),
 
     .lit(time_lit),
@@ -388,9 +363,9 @@ module frame(
     .Playing(Playing),
     .Stop(Stop),
     .Finalize(Finalize),
-    .clear_t_t(clear_t_t),
-    .c_clear(c_clear),
-    .speed_level(speed_level),
+    .clear_t_t(batch_commit),
+    .c_clear(batch_n),
+    .speed_level(batch_speed),
     .duo(duo),
 
     .counter(score),
@@ -475,6 +450,7 @@ module frame(
     .hcounter(hcounter),
     .vcounter(vcounter),
     .Finalize(Finalize),
+    .success(mission_success),
 
     .lit(over_lit),
     .tick(tick),
@@ -622,11 +598,11 @@ module frame(
     end
     if(Finalize)begin
         for(li = 0; li < 11; li = li + 1)begin
-            if((hcounter >= (XBREACH + li*24)) && (hcounter < (XBREACH + li*24 + 11'd20)) &&
+            if(!mission_success && (hcounter >= (XBREACH + li*24)) && (hcounter < (XBREACH + li*24 + 11'd20)) &&
                (vcounter >= YBREACH) && (vcounter < (YBREACH + 11'd32)))begin
                 lb_ena = 1'b1; lb_X = XBREACH + li*24; lb_Y = YBREACH; lb_breach = 1'b1;
             end
-            if((lb_hn >= (XBREACH + li*24 - 11'd1)) && (lb_hn < (XBREACH + li*24 + 11'd20)) &&
+            if(!mission_success && (lb_hn >= (XBREACH + li*24 - 11'd1)) && (lb_hn < (XBREACH + li*24 + 11'd20)) &&
                (vcounter >= YBREACH) && (vcounter < (YBREACH + 11'd32)))begin
                 lb_ena_n = 1'b1; lb_Y = YBREACH;
                 case(li)

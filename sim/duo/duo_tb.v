@@ -14,6 +14,7 @@ module weiyibiao(input clka, input [4:0] addra, output [7:0] douta);
 endmodule
 
 module duo_tb;
+reg [2:0] test_story_speed=0;
 reg Clk_74M=0, Rst=0;
 reg [10:0] hc=0, vc=0;
 reg left1=0, right1=0, drop1=0, drop_en1=0, rot1=0, sw1=0, hold1=0;
@@ -40,6 +41,7 @@ wire blk_l2, blk_rot2;
 always #6.734 Clk_74M = ~Clk_74M;
 
 Playfield dut(
+  .mission_hold(1'b0), .story_speed(test_story_speed),
   .Clk_74M(Clk_74M), .Reset_n(Rst), .hcounter(hc), .vcounter(vc),
   .left_p_flag(left1), .right_p_flag(right1), .drop_r_flag(drop1), .drop_en(drop_en1),
   .rotate_p_flag(rot1), .switch_r_flag(sw1), .hold_p_flag(hold1),
@@ -354,22 +356,20 @@ initial begin
   $display("=== 13) 双人时间阈值(40/120/240/400/600/880/1200) ===");
   score = 20'd0;
   duo = 1'b1;
-  time_sec = 14'd39;  repeat(4) @(posedge Clk_74M); chk("duo 39s",  speed_level, 0);
-  time_sec = 14'd40;  repeat(4) @(posedge Clk_74M); chk("duo 40s",  speed_level, 1);
-  time_sec = 14'd120; repeat(4) @(posedge Clk_74M); chk("duo 120s", speed_level, 2);
-  time_sec = 14'd240; repeat(4) @(posedge Clk_74M); chk("duo 240s", speed_level, 3);
-  time_sec = 14'd400; repeat(4) @(posedge Clk_74M); chk("duo 400s", speed_level, 4);
-  time_sec = 14'd600; repeat(4) @(posedge Clk_74M); chk("duo 600s", speed_level, 5);
-  time_sec = 14'd880; repeat(4) @(posedge Clk_74M); chk("duo 880s", speed_level, 6);
-  time_sec = 14'd1200;repeat(4) @(posedge Clk_74M); chk("duo 1200s", speed_level, 7);
-  score = 20'd4; time_sec = 14'd0;
-  repeat(4) @(posedge Clk_74M); chk("duo 分数等级仍生效", speed_level, 1);
+  time_sec=14'd1200; score=20'd99999;
+  repeat(4) @(posedge Clk_74M); chk("time and score cannot accelerate",speed_level,0);
+  for(integer sp=0;sp<8;sp=sp+1)begin
+    test_story_speed=sp; repeat(4) @(posedge Clk_74M);
+    chk("mission speed forwarded",speed_level,sp);
+  end
+  test_story_speed=0; time_sec=0; score=0;
+
   $display("=== 14) 单机时间阈值回归(20/60/...) ===");
   duo = 1'b0; score = 20'd0;
   time_sec = 14'd19;  repeat(4) @(posedge Clk_74M); chk("solo 19s", speed_level, 0);
-  time_sec = 14'd20;  repeat(4) @(posedge Clk_74M); chk("solo 20s", speed_level, 1);
-  time_sec = 14'd60;  repeat(4) @(posedge Clk_74M); chk("solo 60s", speed_level, 2);
-  time_sec = 14'd600; repeat(4) @(posedge Clk_74M); chk("solo 600s", speed_level, 7);
+  time_sec = 14'd20;  repeat(4) @(posedge Clk_74M); chk("solo time does not accelerate", speed_level, 0);
+  time_sec = 14'd60;  repeat(4) @(posedge Clk_74M); chk("solo time does not accelerate", speed_level, 0);
+  time_sec = 14'd600; repeat(4) @(posedge Clk_74M); chk("solo time does not accelerate", speed_level, 0);
   duo = 1'b1; time_sec = 14'd0; repeat(4) @(posedge Clk_74M);
 
   $display("=== 17) 幽灵: 场地变化后要重算, 且不能跑到方块上方 ===");

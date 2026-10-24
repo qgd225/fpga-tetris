@@ -30,6 +30,40 @@ module scoring(
     wire [10:0]XBASE = duo ? 11'd1065 : 11'd930;
 
     integer i;
+    function [8:0] square_lines;
+    input [4:0] n;
+    begin
+      case(n)
+        5'd0:square_lines=9'd0;
+        5'd1:square_lines=9'd1;
+        5'd2:square_lines=9'd4;
+        5'd3:square_lines=9'd9;
+        5'd4:square_lines=9'd16;
+        5'd5:square_lines=9'd25;
+        5'd6:square_lines=9'd36;
+        5'd7:square_lines=9'd49;
+        5'd8:square_lines=9'd64;
+        5'd9:square_lines=9'd81;
+        5'd10:square_lines=9'd100;
+        5'd11:square_lines=9'd121;
+        5'd12:square_lines=9'd144;
+        5'd13:square_lines=9'd169;
+        5'd14:square_lines=9'd196;
+        5'd15:square_lines=9'd225;
+        5'd16:square_lines=9'd256;
+        5'd17:square_lines=9'd289;
+        5'd18:square_lines=9'd324;
+        5'd19:square_lines=9'd361;
+        5'd20:square_lines=9'd400;
+        default:square_lines=9'd0;
+      endcase
+    end
+    endfunction
+    wire [19:0] score_base = square_lines(c_clear)*SCORE_UNIT;
+    wire [19:0] score_gain = score_base + (speed_level[0] ? score_base : 20'd0) +
+                            (speed_level[1] ? score_base<<1 : 20'd0) +
+                            (speed_level[2] ? score_base<<2 : 20'd0);
+
 
     reg [3:0]counter0;
     reg [3:0]counter1;
@@ -54,13 +88,7 @@ module scoring(
     counter <= counter;
     else if(Playing)begin
         if(clear_t_t)
-        case(c_clear)
-        1:counter <= counter + ( (speed_level + 1)*SCORE_UNIT)*1;
-        2:counter <= counter + ( (speed_level + 1)*SCORE_UNIT)*2;
-        3:counter <= counter + ( (speed_level + 1)*SCORE_UNIT)*3;
-        4:counter <= counter + ( (speed_level + 1)*SCORE_UNIT)*4;
-        default:counter <= counter;
-        endcase
+        counter <= counter + score_gain;
         end
     else
     counter <= 20'd0;

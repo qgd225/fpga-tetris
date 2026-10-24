@@ -10,6 +10,7 @@ module game_over(
     input [10:0]hcounter,
     input [10:0]vcounter,
     input Finalize,
+    input success,
 
     output lit,
     output reg tick,
@@ -44,9 +45,9 @@ module game_over(
                     ena_n = 1'b1;
                     case(i)
                     0:cnt = 4;
-                    1:cnt = 12;
-                    2:cnt = 0;
-                    3:cnt = 6;
+                    1:cnt = success ? 17 : 12;
+                    2:cnt = success ? 14 : 0;
+                    3:cnt = success ? 2 : 6;
                     default:cnt = 4'd0;
                     endcase
                 end
@@ -59,11 +60,11 @@ module game_over(
                     (vcounter >= 352) && (vcounter < 352 + 32*2) )begin
                     ena_n = 1'b1;
                     case(i)
-                    0:cnt = 17;
-                    1:cnt = 4;
-                    2:cnt = 21;
-                    3:cnt = 14;
-                    default:cnt = 4'd0;
+                    0:cnt = success ? 4 : 17;
+                    1:cnt = success ? 21 : 4;
+                    2:cnt = success ? 8 : 21;
+                    3:cnt = success ? 11 : 14;
+                    default:cnt = 5'd26;
                     endcase
                 end
             end

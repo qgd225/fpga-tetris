@@ -158,6 +158,8 @@ wire solo_hold_long;
     wire Stop;
     wire Finalize;
     wire over;
+    wire mission_win, mission_hold, mission_success;
+    wire [1:0]story_phase;
     wire choose;
     wire [3:0]choose_cnt;
     wire duo = (choose_cnt == 4'd1);
@@ -217,7 +219,7 @@ control_route control_route_inst(
     .right_p(right_p_menu),
     .switch_r_flag(switch_r_f),
     .switch_en(switch_e),
-    .over(over),
+    .over(over | mission_win),
 
     .sw_short(sw_short),
     .sw_long(sw_long),
@@ -377,7 +379,9 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .blk_rot1(blk_rot1),
     .blk_rot2(blk_rot2),
     .snd_clr_n(snd_clr_n),
-    .danger_lvl(danger_lvl)
+    .danger_lvl(danger_lvl),
+    .mission_win(mission_win), .mission_hold(mission_hold),
+    .story_phase(story_phase), .mission_success(mission_success)
     );
 
     music music_inst(

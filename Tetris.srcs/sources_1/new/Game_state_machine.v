@@ -94,12 +94,12 @@ module Game_state_machine(
                 state <= Choose_en;
                 else if(short_press)
                 state <= Playing_en;
-    Playing_en: if(hold_pulse)
+    Playing_en: if(over)
+                state <= Finalize_en;
+                else if(hold_pulse)
                 state <= Idle_en;
                 else if(short_press)
                 state <= Stop_en;
-                else if(over)
-                state <= Finalize_en;
     Stop_en:    if(hold_pulse)
                 state <= Idle_en;
                 else if(short_press)

@@ -25,7 +25,7 @@ reg left_p=0, right_p=0, drop_r=0, drop_en=0, rotate_p=0, switch_r=0, hold_p=0;
 reg Idle=0, Playing=1, Stop=0, Finalize=0;
 wire [23:0] rgb; wire over, clear; wire [2:0] speed_level;
 wire [19:0] score; wire [15:0] lines; wire [13:0] time_sec;
-integer bad, m;
+integer bad, m, sp;
 
 always #6.734 Clk_74M = ~Clk_74M;
 
@@ -88,76 +88,59 @@ task add_clear;
 input [4:0] k;
 input integer n;
 begin
-  force dut.Playfield_inst.c_clear = k;
+  force dut.batch_n = k;
+  force dut.batch_speed = dut.story_inst.story_speed;
   for(m=0; m<n; m=m+1)begin
-    @(posedge Clk_74M);
-    force dut.Playfield_inst.clear_t_t = 1'b1;
-    @(posedge Clk_74M);
-    release dut.Playfield_inst.clear_t_t;
+    @(negedge Clk_74M);
+    force dut.batch_commit = 1'b1;
+    @(negedge Clk_74M);
+    release dut.batch_commit;
     @(posedge Clk_74M);
   end
-  release dut.Playfield_inst.c_clear;
+  release dut.batch_n; release dut.batch_speed;
   repeat(8) @(posedge Clk_74M);
 end
 endtask
 
 initial begin
+  // 视觉/数值单元测试隔离顶出；真实终局由 sim/story 联合验证。
+  force dut.over_raw=0;
   bad = 0;
   Rst = 0; #200; Rst = 1;
   repeat(20) @(posedge Clk_74M);
 
-  $display("=== 1) 加分 x2 (等级0) ===");
-  set_score(20'd0); rel_score;
-  add_clear(5'd1, 1);
-  chk("1个脉冲 c_clear=1", score, 2);
-  set_score(20'd0); rel_score;
-  add_clear(5'd1, 2);
-  chk("2个脉冲 c_clear=1 (等级仍0)", score, 4);
-  set_score(20'd0); rel_score;
-  add_clear(5'd4, 1);
-  chk("1个脉冲 c_clear=4", score, 8);
-
-  $display("=== 2) 分数等级(4/15/35/70/150/300/600) ===");
-  set_time(0);
-  set_score(20'd3);    chk("score=3",   speed_level, 0);
-  set_score(20'd4);    chk("score=4",   speed_level, 1);
-  set_score(20'd14);   chk("score=14",  speed_level, 1);
-  set_score(20'd15);   chk("score=15",  speed_level, 2);
-  set_score(20'd299);  chk("score=299", speed_level, 5);
-  set_score(20'd300);  chk("score=300", speed_level, 6);
-  set_score(20'd599);  chk("score=599", speed_level, 6);
-  set_score(20'd600);  chk("score=600", speed_level, 7);
-  set_score(20'd1000); chk("score=1000",speed_level, 7);
-
-  $display("=== 3) 时间等级(20/60/120/200/300/440/600 秒) ===");
-  set_score(20'd0);
-  set_time(19);   chk("19s",  speed_level, 0);
-  set_time(20);   chk("20s",  speed_level, 1);
-  set_time(60);   chk("60s",  speed_level, 2);
-  set_time(120);  chk("120s", speed_level, 3);
-  set_time(440);  chk("440s", speed_level, 6);
-  set_time(599);  chk("599s", speed_level, 6);
-  set_time(600);  chk("600s", speed_level, 7);
-
-  $display("=== 4) 取较大者 ===");
-  set_score(20'd3);   set_time(60);  chk("分数0+时间2", speed_level, 2);
-  set_score(20'd300); set_time(20);  chk("分数6+时间1", speed_level, 6);
-  set_score(20'd3);   set_time(600); chk("分数0+时间7", speed_level, 7);
-  set_score(20'd600); set_time(0);   chk("分数7+时间0", speed_level, 7);
-
-  $display("=== 5) 清零回落 ===");
-  rel_score; rel_time;
-  set_score(20'd0); set_time(0);
-  repeat(8) @(posedge Clk_74M);
-  chk("都清零", speed_level, 0);
-
-  $display("=== 6) 落速表回归 ===");
-  repeat(4) @(posedge Clk_74M);
-  chk("level0 Drop", dut.Playfield_inst.Drop, (64'd74_249_999*64'd80)/64'd100);
-  set_score(20'd600);
-  repeat(8) @(posedge Clk_74M);
-  chk("level7 Drop", dut.Playfield_inst.Drop, (64'd74_249_999*64'd21)/64'd100);
-  rel_score; rel_time;
+  $display("=== batch scoring and mission-only speed ===");
+  set_score(20'd0); rel_score;add_clear(1,1);chk("one line batch",score,2);
+  set_score(20'd0); rel_score;add_clear(1,2);chk("two separate batches",score,4);
+  set_score(20'd0); rel_score;add_clear(4,1);chk("four-line batch once",score,32);
+  force dut.story_inst.story_speed=3'd3;
+  set_score(20'd0);rel_score;add_clear(2,1);chk("captured batch multiplier",score,32);
+  force dut.story_inst.story_speed=0;
+  release dut.story_inst.story_speed;
+  set_score(20'd999999);set_time(999);
+  chk("time and score cannot override mission",speed_level,0);
+  rel_score;rel_time;
+  for(sp=0;sp<8;sp=sp+1)begin
+    force dut.story_inst.story_speed=sp[2:0];repeat(4)@(negedge Clk_74M);
+    case(sp)
+      0:chk("Drop0",dut.Playfield_inst.Drop,(64'd74218749*80)/100);
+      1:chk("Drop1",dut.Playfield_inst.Drop,(64'd74218749*71)/100);
+      2:chk("Drop2",dut.Playfield_inst.Drop,(64'd74218749*63)/100);
+      3:chk("Drop3",dut.Playfield_inst.Drop,(64'd74218749*55)/100);
+      4:chk("Drop4",dut.Playfield_inst.Drop,(64'd74218749*46)/100);
+      5:chk("Drop5",dut.Playfield_inst.Drop,(64'd74218749*38)/100);
+      6:chk("Drop6",dut.Playfield_inst.Drop,(64'd74218749*30)/100);
+      7:chk("Drop7",dut.Playfield_inst.Drop,(64'd74218749*21)/100);
+    endcase
+  end
+  release dut.story_inst.story_speed;
+  @(negedge Clk_74M);Stop=1;
+  dut.timer_inst.counter=74218749;
+  dut.timer_inst.counter0=0;dut.timer_inst.counter1=0;
+  dut.timer_inst.counter2=0;dut.timer_inst.counter3=0;
+  repeat(4)@(negedge Clk_74M);chk("pause at exact second does not carry",time_sec,0);
+  Stop=0;@(negedge Clk_74M);chk("resume carries once",time_sec,1);
+  repeat(4)@(negedge Clk_74M);chk("second boundary not repeated",time_sec,1);
 
   $display("=== 7) 分数 BCD(串行转换)与十进制逐位一致 ===");
   begin : bcd_chk
@@ -174,7 +157,7 @@ initial begin
       default: v = 999999;
       endcase
       force dut.scoring_inst.counter = v[19:0];
-      repeat(40) @(posedge Clk_74M);
+      repeat(44) @(posedge Clk_74M);
       e0 = v % 10;
       e1 = (v / 10) % 10;
       e2 = (v / 100) % 10;
@@ -197,7 +180,7 @@ initial begin
 
   $display("=== 8) level energy bar geometry ===");
   begin : level_geom
-    force dut.Playfield_inst.speed_level = 3'd3;
+    force dut.story_inst.story_speed = 3'd3;
     repeat(4) @(posedge Clk_74M);
     hc = 11'd293; vc = 11'd400; #1;
     chk("segment margin", dut.level_inst.margin, 1);
@@ -220,7 +203,7 @@ initial begin
     chk("width ends 301", dut.level_inst.inner, 1);
     hc = 11'd302; #1;
     chk("outside right", dut.level_inst.inner, 0);
-    release dut.Playfield_inst.speed_level;
+    release dut.story_inst.story_speed;
     hc = 11'd0; vc = 11'd0;
   end
   if(bad == 0) $display("=== ALL PASS ===");

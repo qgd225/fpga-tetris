@@ -28,7 +28,9 @@ module timer(
     wire lit_minute_units;
     wire lit_minute_tens;
 
+    parameter SECOND_CYCLES = 74_218_750;
     reg [26:0]counter;
+    wire sec_tick = Playing && !Stop && !Finalize && (counter == SECOND_CYCLES-1);
     reg [3:0]counter0;
     reg [3:0]counter1;
     reg [3:0]counter2;
@@ -46,7 +48,7 @@ module timer(
     counter <= counter;
     end
     else if(Playing)begin
-    if(counter == 74_250_000 - 1)
+    if(counter == SECOND_CYCLES-1)
     counter <= 0;
     else
     counter <= counter + 1;
@@ -62,7 +64,7 @@ module timer(
     counter0 <= 0;
     else if(Finalize && switch_r_flag)
     counter0 <= 0;
-    else if(counter == 74_250_000 - 1)begin
+    else if(sec_tick)begin
     if(counter0 == 9)
     counter0 <= 0;
     else
@@ -77,7 +79,7 @@ module timer(
     counter1 <= 0;
     else if(Finalize && switch_r_flag)
     counter1 <= 0;
-    else if( (counter0 == 9) && (counter == 74_250_000 - 1) )begin
+    else if( (counter0 == 9) && (sec_tick) )begin
     if(counter1 == 5)
     counter1 <= 0;
     else
@@ -92,7 +94,7 @@ module timer(
     counter2 <= 0;
     else if(Finalize && switch_r_flag)
     counter2 <= 0;
-    else if( (counter1 == 5) && (counter0 == 9) && (counter == 74_250_000 - 1) )begin
+    else if( (counter1 == 5) && (counter0 == 9) && (sec_tick) )begin
     if(counter2 == 9)
     counter2 <= 0;
     else
@@ -107,7 +109,7 @@ module timer(
     counter3 <= 0;
     else if(Finalize && switch_r_flag)
     counter3 <= 0;
-    else if( (counter2 == 9) && (counter1 == 5) && (counter0 == 9) && (counter == 74_250_000 - 1) )begin
+    else if( (counter2 == 9) && (counter1 == 5) && (counter0 == 9) && (sec_tick) )begin
     if(counter3 == 9)
     counter3 <= 0;
     else
