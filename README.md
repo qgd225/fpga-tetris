@@ -4,7 +4,7 @@
 
 唯一开发目录为 `D:/vivado_project/Tetris`，本地和 GitHub 只维护 `main`。历史版本保存在 Git 提交中，不再复制工程或保留并行版本目录。最新下载文件为 `bit/Tetris.bit`，成功构建后覆盖更新；Vivado 内部 `.runs` 文件仅作为构建缓存。
 
-当前发布为故事化第 1 轮任务闭环版本 `81e75a1`：单人 32 行、双人 40 行通关，四段八档任务驱动，批次计分与安全冻结已实现。14 套回归和完整实现通过，尚未上板；LUT **11,922**、寄存器 **4,525**、BRAM **15.5 tile**，WNS **+0.023 ns** / WHS **+0.061 ns**。建立余量低于 +0.050 ns 目标，后续视觉轮先改善时序。报告见[第一轮构建摘要](<D:/vivado_project/Tetris/docs/reports/story_r1/build-summary.txt>)。
+当前发布为故事化 2A 的时序基础版本：保留第 1 轮单人 32 行、双人 40 行通关和四段八档任务；静态标签改行掩码查询。15 套完整回归通过，尚未上板。布线后 LUT **11,786**（较任务轮减少 136）、寄存器 **4,525**、BRAM **15.5 tile**，WNS **+0.138 ns** / WHS **+0.107 ns**。布局仍为旧坐标；24 格距 mapper 仅完成独立验证，新字库尚未替换。报告见[2A 构建摘要](<D:/vivado_project/Tetris/docs/reports/story_r2a_labels/build-summary.txt>)。
 
 当前操作音已通过 HDMI，维持 ±1024 的低振幅；背景音乐仍走蜂鸣器，统一 HDMI 的阶段配乐与配音尚待实施。用户曾确认较早 HDMI 音效版上板成功，不等于本轮已上板。
 
@@ -12,7 +12,7 @@
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
-单一工作区的整合、历史恢复入口及验证见[工作区统一记录](<D:/vivado_project/Tetris/docs/workspace-unification.md>)。后续故事化改造以[代码与资源实施计划书](<D:/vivado_project/Tetris/docs/CORE-07_故事感实施计划书.md>)为准，第 1 轮任务闭环已实现，视觉、阶段配乐和配音仍待实施；2026-10-25 修订加入[执行门禁](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)与[建议评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
+单一工作区的整合、历史恢复入口及验证见[工作区统一记录](<D:/vivado_project/Tetris/docs/workspace-unification.md>)。后续故事化改造以[代码与资源实施计划书](<D:/vivado_project/Tetris/docs/CORE-07_故事感实施计划书.md>)为准，第 1 轮任务闭环和 2A 时序基础已实现，新布局、阶段画面、配乐和配音仍在实施；2026-10-25 修订加入[执行门禁](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)与[建议评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
 
 ## HDMI 音效开发前历史归档（2026-10-24）
 

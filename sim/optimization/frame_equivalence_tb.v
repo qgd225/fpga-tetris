@@ -27,7 +27,7 @@ module frame_equivalence_tb;
             checks=checks+1;
             if(condition !== 1'b1)begin
                 failures=failures+1;
-                if(failures<20)$display("FAIL %0s psel=%0d x=%0d y=%0d",name,selector,hc,vc);
+                if(failures<20)$display("FAIL %0s selector=%0d x=%0d y=%0d dut=%0d reference=%0d",name,selector,hc,vc,dut.psel,reference_dut.psel);
             end
         end
     endtask
@@ -92,6 +92,18 @@ module frame_equivalence_tb;
                     end
                 end
                 $display("Frame mode %0d completed",mode);
+            end
+        end
+        if($test$plusargs("r1_reference"))begin
+            // 真实时钟逐像素推进，检查最终 RGB 与 R1 相位一致；包含行首尾和 UI 切换。
+            for(mode=0;mode<3;mode=mode+1)begin
+                choose=mode==1;finalize=mode==2;
+                for(y=0;y<720;y=y+59)begin
+                    for(x=0;x<1280;x=x+1)begin
+                        @(negedge clk); hc=x; vc=y;
+                        #1;check(dut.rgb===reference_dut.rgb,"clocked RGB phase");
+                    end
+                end
             end
         end
         $display("Frame equivalence checks: %0d",checks);

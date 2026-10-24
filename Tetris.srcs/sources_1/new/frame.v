@@ -1434,102 +1434,101 @@ module frame(
     endcase
     end
 
-    function [4:0] mf_glyph;
-    input [4:0] ch;
-    input [2:0] row;
-    begin
-        case(ch)
-        5'd0: case(row) 0:mf_glyph=5'b11110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b11110; 4:mf_glyph=5'b10000; 5:mf_glyph=5'b10000; default:mf_glyph=5'b10000; endcase
-        5'd1: case(row) 0:mf_glyph=5'b00100; 1:mf_glyph=5'b01100; 2:mf_glyph=5'b00100; 3:mf_glyph=5'b00100; 4:mf_glyph=5'b00100; 5:mf_glyph=5'b00100; default:mf_glyph=5'b01110; endcase
-        5'd2: case(row) 0:mf_glyph=5'b01110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b00001; 3:mf_glyph=5'b00010; 4:mf_glyph=5'b00100; 5:mf_glyph=5'b01000; default:mf_glyph=5'b11111; endcase
-        5'd3: case(row) 0:mf_glyph=5'b01111; 1:mf_glyph=5'b10000; 2:mf_glyph=5'b10000; 3:mf_glyph=5'b01110; 4:mf_glyph=5'b00001; 5:mf_glyph=5'b00001; default:mf_glyph=5'b11110; endcase
-        5'd4: case(row) 0:mf_glyph=5'b01111; 1:mf_glyph=5'b10000; 2:mf_glyph=5'b10000; 3:mf_glyph=5'b10000; 4:mf_glyph=5'b10000; 5:mf_glyph=5'b10000; default:mf_glyph=5'b01111; endcase
-        5'd5: case(row) 0:mf_glyph=5'b01110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b10001; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b01110; endcase
-        5'd6: case(row) 0:mf_glyph=5'b11110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b11110; 4:mf_glyph=5'b10100; 5:mf_glyph=5'b10010; default:mf_glyph=5'b10001; endcase
-        5'd7: case(row) 0:mf_glyph=5'b11111; 1:mf_glyph=5'b10000; 2:mf_glyph=5'b10000; 3:mf_glyph=5'b11110; 4:mf_glyph=5'b10000; 5:mf_glyph=5'b10000; default:mf_glyph=5'b11111; endcase
-        5'd8: case(row) 0:mf_glyph=5'b11110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b10001; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b11110; endcase
-        5'd9: case(row) 0:mf_glyph=5'b10001; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b10001; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b01110; endcase
-        5'd10:case(row) 0:mf_glyph=5'b01110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10011; 3:mf_glyph=5'b10101; 4:mf_glyph=5'b11001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b01110; endcase
-        5'd11:case(row) 0:mf_glyph=5'b11111; 1:mf_glyph=5'b00001; 2:mf_glyph=5'b00010; 3:mf_glyph=5'b00100; 4:mf_glyph=5'b01000; 5:mf_glyph=5'b01000; default:mf_glyph=5'b01000; endcase
-        5'd12:case(row) 0:mf_glyph=5'b10001; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b11111; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b10001; endcase
-        5'd13:case(row) 0:mf_glyph=5'b01110; 1:mf_glyph=5'b10001; 2:mf_glyph=5'b10001; 3:mf_glyph=5'b11111; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b10001; endcase
-        5'd14:case(row) 0:mf_glyph=5'b10001; 1:mf_glyph=5'b11001; 2:mf_glyph=5'b10101; 3:mf_glyph=5'b10011; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b10001; endcase
-        5'd15:case(row) 0:mf_glyph=5'b11111; 1:mf_glyph=5'b00100; 2:mf_glyph=5'b00100; 3:mf_glyph=5'b00100; 4:mf_glyph=5'b00100; 5:mf_glyph=5'b00100; default:mf_glyph=5'b00100; endcase
-        5'd16:case(row) 0:mf_glyph=5'b11111; 1:mf_glyph=5'b00100; 2:mf_glyph=5'b00100; 3:mf_glyph=5'b00100; 4:mf_glyph=5'b00100; 5:mf_glyph=5'b00100; default:mf_glyph=5'b11111; endcase
-        5'd17:case(row) 0:mf_glyph=5'b10001; 1:mf_glyph=5'b11011; 2:mf_glyph=5'b10101; 3:mf_glyph=5'b10101; 4:mf_glyph=5'b10001; 5:mf_glyph=5'b10001; default:mf_glyph=5'b10001; endcase
-        default:mf_glyph=5'd0;
-        endcase
-    end
-    endfunction
-
-    function [4:0] mf_text_char;
-    input [2:0] text_id;
-    input [3:0] idx;
-    begin
-        mf_text_char=5'd0;
-        case(text_id)
-        0:case(idx) 0:mf_text_char=5'd0; 1:mf_text_char=5'd1; default:mf_text_char=5'd0; endcase
-        1:case(idx) 0:mf_text_char=5'd0; 1:mf_text_char=5'd2; default:mf_text_char=5'd0; endcase
-        2:case(idx) 0:mf_text_char=5'd3; 1:mf_text_char=5'd4; 2:mf_text_char=5'd5; 3:mf_text_char=5'd6; default:mf_text_char=5'd7; endcase
-        3:case(idx) 0:mf_text_char=5'd8; 1:mf_text_char=5'd9; default:mf_text_char=5'd5; endcase
-        4:case(idx) 0:mf_text_char=5'd4; 1:mf_text_char=5'd5; 2:mf_text_char=5'd6; 3:mf_text_char=5'd7; 4:mf_text_char=5'd10; default:mf_text_char=5'd11; endcase
-        5:case(idx) 0:mf_text_char=5'd3; 1:mf_text_char=5'd12; 2:mf_text_char=5'd13; 3:mf_text_char=5'd6; 4:mf_text_char=5'd7; default:mf_text_char=5'd8; endcase
-        6:case(idx)
-          0:mf_text_char=5'd4; 1:mf_text_char=5'd5; 2:mf_text_char=5'd14; 3:mf_text_char=5'd15; 4:mf_text_char=5'd13; 5:mf_text_char=5'd14;
-          6:mf_text_char=5'd16; 7:mf_text_char=5'd14; 8:mf_text_char=5'd17; 9:mf_text_char=5'd7; 10:mf_text_char=5'd14; default:mf_text_char=5'd15;
-          endcase
-        default:mf_text_char=5'd0;
-        endcase
-    end
-    endfunction
-
+    // 静态标签行掩码由 81e75a1 的字形真值导出；避免字符/行/列三级串行解码。
     function mf_text_px;
     input [2:0] text_id;
     input [5:0] lx;
     input [3:0] ly;
-    reg scaled;
-    reg [5:0] rem;
-    reg [3:0] idx;
-    reg [3:0] row;
-    reg [2:0] col;
-    reg [4:0] pattern;
+    reg [63:0] pattern;
     begin
-        rem=lx;
-        idx=4'd0;
-        scaled=(text_id<3'd4);
-        if(scaled)begin
-            if(lx>=6'd44)begin idx=4'd4; rem=lx-6'd44; end
-            else if(lx>=6'd33)begin idx=4'd3; rem=lx-6'd33; end
-            else if(lx>=6'd22)begin idx=4'd2; rem=lx-6'd22; end
-            else if(lx>=6'd11)begin idx=4'd1; rem=lx-6'd11; end
-            row={1'b0,ly[3:1]};
-            col=rem[3:1];
-            if(rem>=6'd10)col=3'd7;
-            if(ly>4'd13)col=3'd7;
-        end
-        else begin
-            if(lx>=6'd60)begin idx=4'd10; rem=lx-6'd60; end
-            else if(lx>=6'd54)begin idx=4'd9; rem=lx-6'd54; end
-            else if(lx>=6'd48)begin idx=4'd8; rem=lx-6'd48; end
-            else if(lx>=6'd42)begin idx=4'd7; rem=lx-6'd42; end
-            else if(lx>=6'd36)begin idx=4'd6; rem=lx-6'd36; end
-            else if(lx>=6'd30)begin idx=4'd5; rem=lx-6'd30; end
-            else if(lx>=6'd24)begin idx=4'd4; rem=lx-6'd24; end
-            else if(lx>=6'd18)begin idx=4'd3; rem=lx-6'd18; end
-            else if(lx>=6'd12)begin idx=4'd2; rem=lx-6'd12; end
-            else if(lx>=6'd6)begin idx=4'd1; rem=lx-6'd6; end
-            row={1'b0,ly[2:0]};
-            col=rem[2:0];
-            if(rem>=6'd5)col=3'd7;
-            if(ly>4'd6)col=3'd7;
-        end
-        if(idx>((text_id==3'd0||text_id==3'd1)?4'd1:(text_id==3'd2)?4'd4:(text_id==3'd3)?4'd2:(text_id==3'd4||text_id==3'd5)?4'd5:4'd10))col=3'd7;
-        if((col<3'd5)&&(row<4'd7))begin
-            pattern=mf_glyph(mf_text_char(text_id,idx),row[2:0]);
-            mf_text_px=pattern[4-col];
-        end
-        else
-            mf_text_px=1'b0;
+        case({text_id,ly})
+        7'd0: pattern=64'h00000000000180ff;
+        7'd1: pattern=64'h00000000000180ff;
+        7'd2: pattern=64'h000000000001e303;
+        7'd3: pattern=64'h000000000001e303;
+        7'd4: pattern=64'h0000000000018303;
+        7'd5: pattern=64'h0000000000018303;
+        7'd6: pattern=64'h00000000000180ff;
+        7'd7: pattern=64'h00000000000180ff;
+        7'd8: pattern=64'h0000000000018003;
+        7'd9: pattern=64'h0000000000018003;
+        7'd10: pattern=64'h0000000000018003;
+        7'd11: pattern=64'h0000000000018003;
+        7'd12: pattern=64'h000000000007e003;
+        7'd13: pattern=64'h000000000007e003;
+        7'd16: pattern=64'h000000000007e0ff;
+        7'd17: pattern=64'h000000000007e0ff;
+        7'd18: pattern=64'h0000000000181b03;
+        7'd19: pattern=64'h0000000000181b03;
+        7'd20: pattern=64'h0000000000180303;
+        7'd21: pattern=64'h0000000000180303;
+        7'd22: pattern=64'h00000000000600ff;
+        7'd23: pattern=64'h00000000000600ff;
+        7'd24: pattern=64'h0000000000018003;
+        7'd25: pattern=64'h0000000000018003;
+        7'd26: pattern=64'h0000000000006003;
+        7'd27: pattern=64'h0000000000006003;
+        7'd28: pattern=64'h00000000001ff803;
+        7'd29: pattern=64'h00000000001ff803;
+        7'd32: pattern=64'h003ff1fe3f1fe3fc;
+        7'd33: pattern=64'h003ff1fe3f1fe3fc;
+        7'd34: pattern=64'h00003606c0c01803;
+        7'd35: pattern=64'h00003606c0c01803;
+        7'd36: pattern=64'h00003606c0c01803;
+        7'd37: pattern=64'h00003606c0c01803;
+        7'd38: pattern=64'h000ff1fec0c018fc;
+        7'd39: pattern=64'h000ff1fec0c018fc;
+        7'd40: pattern=64'h00003066c0c01b00;
+        7'd41: pattern=64'h00003066c0c01b00;
+        7'd42: pattern=64'h00003186c0c01b00;
+        7'd43: pattern=64'h00003186c0c01b00;
+        7'd44: pattern=64'h003ff6063f1fe0ff;
+        7'd45: pattern=64'h003ff6063f1fe0ff;
+        7'd48: pattern=64'h000000003f1818ff;
+        7'd49: pattern=64'h000000003f1818ff;
+        7'd50: pattern=64'h00000000c0d81b03;
+        7'd51: pattern=64'h00000000c0d81b03;
+        7'd52: pattern=64'h00000000c0d81b03;
+        7'd53: pattern=64'h00000000c0d81b03;
+        7'd54: pattern=64'h00000000c0d81b03;
+        7'd55: pattern=64'h00000000c0d81b03;
+        7'd56: pattern=64'h00000000c0d81b03;
+        7'd57: pattern=64'h00000000c0d81b03;
+        7'd58: pattern=64'h00000000c0d81b03;
+        7'd59: pattern=64'h00000000c0d81b03;
+        7'd60: pattern=64'h000000003f07e0ff;
+        7'd61: pattern=64'h000000003f07e0ff;
+        7'd64: pattern=64'h00000007ce7cf39e;
+        7'd65: pattern=64'h0000000411051441;
+        7'd66: pattern=64'h0000000219051441;
+        7'd67: pattern=64'h00000001153cf441;
+        7'd68: pattern=64'h0000000093045441;
+        7'd69: pattern=64'h0000000091049441;
+        7'd70: pattern=64'h000000008e7d139e;
+        7'd80: pattern=64'h00000003df3ce45e;
+        7'd81: pattern=64'h0000000441451441;
+        7'd82: pattern=64'h0000000441451441;
+        7'd83: pattern=64'h000000044f3df7ce;
+        7'd84: pattern=64'h0000000441151450;
+        7'd85: pattern=64'h0000000441251450;
+        7'd86: pattern=64'h00000003df45144f;
+        7'd96: pattern=64'h17d145f44e7d139e;
+        7'd97: pattern=64'h305b4c44d1113441;
+        7'd98: pattern=64'h5055544551115441;
+        7'd99: pattern=64'h93d564465f119441;
+        7'd100: pattern=64'h1051444451111441;
+        7'd101: pattern=64'h1051444451111441;
+        7'd102: pattern=64'h17d145f45111139e;
+        7'd112: pattern=64'hf3cf3cf3cf3cf3cf;
+        7'd113: pattern=64'h1451451451451451;
+        7'd114: pattern=64'h1451451451451451;
+        7'd115: pattern=64'hf3cf3cf3cf3cf3cf;
+        7'd116: pattern=64'h1041041041041041;
+        7'd117: pattern=64'h1041041041041041;
+        7'd118: pattern=64'h1041041041041041;
+        default: pattern=64'd0;
+        endcase
+        mf_text_px=pattern[lx];
     end
     endfunction
 

@@ -1,6 +1,6 @@
 # CORE-07 舱外核心修复：“故事感”实施计划书
 
-初稿：2026-10-24；修订：2026-10-25（二次审阅）。状态：第 1 轮任务闭环已在 `81e75a1` 实现并验证；视觉、配乐与配音仍待实施。本次修订仅修改文档，保留第 1 轮源码与发布 bit。
+初稿：2026-10-24；修订：2026-10-25（二次审阅）。状态：第 1 轮任务闭环已在 `81e75a1` 验证；2A 标签查表基础也已通过完整回归与实现并发布。新布局、共享字体替换、阶段画面、配乐与配音仍待实施。
 
 执行先看[逐轮门禁清单](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)；建议的采纳、改造与暂缓理由见[本次评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
 
@@ -31,7 +31,7 @@
 
 ### 2.2 总资源与时序
 
-| 项目 | 实施前 `68aa688` | 当前第 1 轮 `81e75a1` | 后续要求 |
+| 项目 | 实施前 `68aa688` | 任务轮 `81e75a1` | 后续要求 |
 | --- | ---: | ---: | --- |
 | Slice LUT | 11,815 | **11,922**，净增 107 | 器件共 20,800；含 LUTRAM，不重复加减 |
 | 寄存器 | 4,447 | **4,525**，净增 78 | 既有锁存器仍 12，不新增 |
@@ -41,9 +41,11 @@
 | WNS / WHS | +0.076 / +0.068 ns | **+0.023 / +0.061 ns** | TNS/THS=0；后续限额以门禁 T1 为准 |
 | 完整回归 | 13 套 | **14 套** | 任务专项 337 项继续保留 |
 
-当前完整实现报告见 [story_r1](<D:/vivado_project/Tetris/docs/reports/story_r1/build-summary.txt>)；实施前记录见[HDMI 音效测试](<D:/vivado_project/Tetris/docs/HDMI音效测试.md>)。第 1 轮仅达到非负 slack 的硬线，未达到建立时序余量目标，尚未上板。不得把音效开发前的 11,525 LUT 当当前基线。
+任务轮报告见 [story_r1](<D:/vivado_project/Tetris/docs/reports/story_r1/build-summary.txt>)，它当时未达到余量目标；实施前记录见[HDMI 音效测试](<D:/vivado_project/Tetris/docs/HDMI音效测试.md>)。预算仍以这两份历史基点核算，不替换为随轮次变化的基线。
 
-当前发布 `bit/Tetris.bit` 的 SHA256 为 `9E3CD2267A95F73CBF9B7B13AAFB603255F426DE160FEF5A2CFA2610DDA359D1`。后续每轮对照原有未约束端点、DRC 和锁存器集合；不能只看 WNS 为正。
+**当前 2A 基础实测：11,786 LUT、4,525 寄存器、15.5 BRAM、0 DSP；WNS +0.138 ns / WHS +0.107 ns，15 套回归和完整布线通过，尚未上板。** 第一种并行互斥优先选择虽省 LUT 却违反时序，已弃用；保留的是原优先链加静态标签行掩码。24 格距只通过独立 mapper 初筛，不能宣称 G2 布局已冻结。详见 [2A 摘要](<D:/vivado_project/Tetris/docs/reports/story_r2a_labels/build-summary.txt>)。
+
+当前唯一 `bit/Tetris.bit` 的 SHA256 为 `B5E7D558347E6DE59BD1261F81E67CF19C4F9D7791C0EEC6AB5F233FFC49E695`。后续仍对照既有未约束端点、DRC 和锁存器集合，不能仅看正 slack。
 
 ### 2.3 实施前只读网表核查：可以回收的 BRAM
 
@@ -451,13 +453,13 @@ M1/M2 是同一 main 的提交检查点，不是两套工程、分支或并存 b
 
 ## 15. 构建、报告与发布控制
 
-第 1 轮已新增 `tools/build_story.tcl`，直接构建唯一工程，临时关闭 `STEPS.WRITE_BITSTREAM.TCL.POST`，完成资源/时序/LUTRAM 检查后才更新 `bit/Tetris.bit`，结束恢复原 hook。报告保存在 `docs/reports/story_rN`。不再计划复制工程或新建另一个 candidate 脚本。
+`tools/build_story.tcl` 直接构建唯一工程，临时关闭 `STEPS.WRITE_BITSTREAM.TCL.POST`，结束恢复 hook。2A 起默认只输出候选，只有显式 publish 且时序/预算通过才允许脚本发布；发布前还需本轮完整回归通过。当前 2A 是先构建候选，核对全部报告、回归和构建输入指纹后才将缓存 bit 提升为正式最新版。报告保存在 `docs/reports/story_rN`。不再计划复制工程或新建另一个 candidate 脚本。
 
-调用形态为 `vivado.bat -mode batch -log <日志> -journal <日志> -source tools/build_story.tcl -tclargs story_rN`，`-tclargs` 放最后。当前脚本自动检查非负 slack；下一轮需补资源/时序/字体回收的机器可读门禁（数值唯一来源见门禁表），在补完前由清单人工核对，不虚称已有自动检查。
+调用形态为 `vivado.bat -mode batch -log <日志> -journal <日志> -source tools/build_story.tcl -tclargs story_rN`，`-tclargs` 放最后。当前脚本已从门禁表读取时序和资源限额，输出目标/硬线/视觉预算状态；构建前后核对 HDL、约束、构建工具及门禁文件指纹。字体回收与具体交互/实屏验收仍未自动化，必须另核，不虚称全部已有自动检查。
 
 每轮账包括：提交与差异、策略、LUT Logic/Memory、FF/锁存器、RAMB36/RAMB18、DSP、WNS/WHS/TNS/THS、DRC/未约束差异、存储连接、完整回归、截图/试听与取舍。全工程同口径值相减；模块报告只用于解释。
 
-只有该轮门禁通过才发布匹配源码的唯一最新版 bit，并中文提交验证记录。未上板只写仿真/实现通过。仅修改文档不需重构建，保留已验证 bit 及其来源；本次不改 RTL/IP/约束，不改变第 1 轮 bit。
+只有该轮门禁通过才发布匹配源码的唯一最新版 bit，并中文提交验证记录。未上板只写仿真/实现通过。仅修改文档不需重构建，保留已验证 bit 及其来源；文档改动不重复构建，功能改动则保持源码、构建指纹与唯一 bit 对应。
 
 ## 16. 第一版完成的判据
 
