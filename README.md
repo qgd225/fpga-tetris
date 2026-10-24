@@ -4,10 +4,10 @@
 
 本机两个开发工作区共用 `D:/vivado_project/Tetris/bit/Tetris.bit`，每次成功生成后覆盖更新。Git 和 GitHub 只收录 `bit/Tetris.bit`，不再收录根目录或构建缓存里的比特流。Vivado 内部 `.runs` 文件保留为构建缓存。
 
-当前集中存放的是 HDMI 音效分支 `e5c1a12` 生成的测试比特流；它尚待实物听音验证。不同分支并行构建时，最后完成发布的版本成为最新文件；下载前请确认本次构建用途。
+当前发布 HDMI 游戏音效降音量版：振幅由 ±4096 调整为 ±1024，为原来的四分之一（约降低 12 dB）。用户已确认调整前 HDMI 音效版上板成功；降音量版重新仿真、构建后发布，听感待再次确认。GitHub 仅发布到 `main`。
 
 
-音效开发前基线在场地 LUTRAM 上优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](docs/optimization-rounds.md)；此前基线见 [LUTRAM 重试](docs/lutram-retry.md)。根目录 `Tetris.bit` 与 `Tetris_lutram.bit` 均保留，最新候选为 `Tetris_lutram_metadata_hint.bit`，尚待上板验收。
+音效开发前基线在场地 LUTRAM 上优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](docs/optimization-rounds.md)；此前基线见 [LUTRAM 重试](docs/lutram-retry.md)。该音频加入前的参考版本已上板验证，历史版本通过 Git 提交保留。
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
@@ -15,17 +15,17 @@
 
 HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模块拆分及中文注释编码调整。归档标签：`baseline-lutram-before-hdmi-audio-20261024`。
 
-本版 HDMI 仍只传画面。当前工作区修改先完整提交并推送，再在独立分支实现 HDMI 音效。本文后面的旧比特流、资源和时序记录属于既有发布版本，不能视为本次工作区或音频版的新验证结果。
+该历史归档的 HDMI 只传画面，随后加入了 HDMI 音效。当前发布内容见下方 HDMI 音效说明，历史资源与比特流记录保留用于追溯。
 
 ## HDMI 游戏音效测试版
 
-开发分支：`codex/hdmi-game-audio`。现有游戏音效通过 HDMI 输出为 **48 kHz、16 位、双声道 LPCM**（左右相同），保留蜂鸣器便于对照。背景音乐仍走原蜂鸣器，本次先验证操作与状态音效。
+发布分支：`main`。现有游戏音效通过 HDMI 输出为 **48 kHz、16 位、双声道 LPCM**（左右相同），保留蜂鸣器便于对照。背景音乐仍走原蜂鸣器，本次先验证操作与状态音效。
 
 - 模块划分：`sound` 事件/音符 → `game_audio_pcm` 采样 → `hdmi_audio_packets` FIFO/ACR/InfoFrame → `hdmi_av_encoder` 数据岛/TMDS。
 - 图像仍使用原有 1280×720 坐标，音视频使用同一像素时钟；音频以时钟使能推进，不增加低速时钟域。
 - PLL 实际输出约 74.21875 MHz，采样使能按实际频率生成；ACR 使用 N=6144，并测量 CTS，避免直接套用标称频率。
-- 新版比特流已生成并随功能分支提供，单独命名为 `Tetris_hdmi_audio.bit`。根目录原有 `Tetris.bit` 保持归档版本，不能用它验证 HDMI 音效。
-- 已通过当前优化基线的 13 个回归入口及新增跨帧 HDMI 协议仿真；实现通过，LUT 11,794（56.70%）、WNS +0.166 ns、WHS +0.071 ns；完整结果及上板测试步骤见 [HDMI 音效说明](docs/HDMI音效测试.md)。
+- 最新发布比特流统一为 `bit/Tetris.bit`，本机下载路径为 `D:/vivado_project/Tetris/bit/Tetris.bit`。
+- 已通过当前优化基线的 13 个回归入口及新增跨帧 HDMI 协议仿真；实现通过，LUT 11,815（56.80%）、WNS +0.076 ns、WHS +0.068 ns；完整结果及上板测试步骤见 [HDMI 音效说明](docs/HDMI音效测试.md)。
 
 ## 工程信息
 
@@ -129,13 +129,13 @@ Tetris.srcs/
 1. 克隆本仓库。
 2. 用 **Vivado 2018.3** 打开 `Tetris.xpr`。
 3. 直接 Run Synthesis / Implementation。首次综合时 Vivado 会依据 IP 目录下的 `.xci` 配置文件**自动重新生成** IP 输出产物(仓库中未提交任何生成物,属正常现象)。
-4. 可直接使用仓库根目录提供的 `Tetris.bit` 下载到器件，也可以重新综合生成。
+4. 可直接使用仓库提供的 `bit/Tetris.bit` 下载到器件，也可以重新综合生成。
 
-> 本仓库包含源码、IP 配置和根目录比特流 `Tetris.bit`。Vivado 的编译产物(`.runs/`、`.cache/`、`.hw/`、`.ip_user_files/`、`.sim/`)以及 IP 生成的 HDL 均已由 `.gitignore` 排除。
+> 本仓库包含源码、IP 配置和发布比特流 `bit/Tetris.bit`。Vivado 的编译产物(`.runs/`、`.cache/`、`.hw/`、`.ip_user_files/`、`.sim/`)以及 IP 生成的 HDL 均已由 `.gitignore` 排除。
 
 > 手写 RTL 工作区统一为 GBK 无 BOM，Git 提交转换为 UTF-8，编码规则与源码一起归档，详见 `docs/source-encoding.md`。
 
-## 验证与资源
+## 历史发布版验证与资源
 
 - 九套仿真共 **784 项**：`duo 111 / frame_duo 330 / level 39 / sound 103 / input_route 29 / horizontal_repeat 30 / hold_gesture 27 / solo_hint 59 / rgb_palette 56`，全部通过。
 - Vivado 2018.3 最终从零综合/实现：0 error、0 时序违例、0 未布通网络。
@@ -144,7 +144,7 @@ Tetris.srcs/
 - 实现阶段采用 `opt_design -directive ExploreArea`，在保持全部装饰性 UI 的前提下抑制逻辑复制和 LUT 映射膨胀。
 - 渲染取色采用 7 位命中码寄存一级并统一右移 1 像素，把原 20 余级 24 位优先链拆成“判层 + 取色”两级；背景颜色与命中码同拍寄存，整套画面保持统一相位。
 
-### 本版构建产物
+### 历史发布版构建产物
 
 | 项目 | 值 |
 | --- | --- |
@@ -154,7 +154,7 @@ Tetris.srcs/
 | 大小 | 2,192,114 字节 |
 | SHA256 | `962B9E741856CA2D7ECA53CAB7214B29DF2794A3AA7C38C37A8F2159BE556097` |
 
-> 根目录 `Tetris.bit` 与 Vivado 实现目录中的比特流内容完全一致，可直接下载和烧录。
+> 上表记录历史构建信息；当前发布文件统一为 `bit/Tetris.bit`，当前校验值见 HDMI 音效说明。
 
 ## 备注
 

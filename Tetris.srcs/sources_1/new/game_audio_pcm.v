@@ -4,7 +4,8 @@
 module game_audio_pcm #(
     parameter integer PIXEL_HZ = 74218750,
     parameter integer SAMPLE_HZ = 48000,
-    parameter signed [15:0] VOLUME = 16'sd4096
+    // 上板反馈偏响，默认振幅降为原来的四分之一，约降低 12 dB。
+    parameter signed [15:0] VOLUME = 16'sd1024
 )(
     input clk, input reset_n,
     input fx_wave, input fx_active,

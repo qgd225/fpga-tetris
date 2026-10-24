@@ -93,7 +93,7 @@ module hdmi_audio_tb;
             else if(pcm<0) negative_samples=negative_samples+1;
             else silent_samples=silent_samples+1;
             if(!active) check(pcm==0,"silence PCM");
-            else check(pcm==(wave?16'sd4096:-16'sd4096),"bipolar PCM");
+            else check(pcm==(wave?16'sd1024:-16'sd1024),"bipolar PCM");
         end
         check(!dut.overflow,"FIFO overflow");
         if(de3) begin
@@ -136,7 +136,7 @@ module hdmi_audio_tb;
                         for(j=0;j<4;j=j+1) begin
                             check(sb[j][23:0]==sb[j][47:24],"stereo duplicate");
                             check(sb[j][7:0]==0,"16-bit alignment");
-                            check(sb[j][23:8]==0 || sb[j][23:8]==16'h1000 || sb[j][23:8]==16'hf000,"PCM values");
+                            check(sb[j][23:8]==0 || sb[j][23:8]==16'h0400 || sb[j][23:8]==16'hfc00,"PCM values");
                             check(((^sb[j][23:0]) ^ (^sb[j][51:48])) == 0,"left IEC parity");
                             check(((^sb[j][47:24]) ^ (^sb[j][55:52])) == 0,"right IEC parity");
                         end
