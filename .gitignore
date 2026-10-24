@@ -58,3 +58,9 @@ tools/startup_error.log
 # HDMI 测试交付比特流保留，重复生成的根目录报告排除
 !/Tetris_hdmi_audio.bit
 /hdmi_audio_*.rpt
+
+# 比特流仅提交 bit/Tetris.bit
+*.bit
+!/bit/
+!/bit/Tetris.bit
+/bit/*.tmp

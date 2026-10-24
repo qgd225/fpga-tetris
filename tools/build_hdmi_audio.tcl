@@ -19,5 +19,6 @@ report_route_status -file hdmi_audio_route.rpt
 report_drc -file hdmi_audio_drc.rpt
 if {[llength [get_timing_paths -quiet -slack_lesser_than 0 -delay_type max]] > 0} { error "Setup timing failed" }
 if {[llength [get_timing_paths -quiet -slack_lesser_than 0 -delay_type min]] > 0} { error "Hold timing failed" }
-file copy -force Tetris.runs/impl_1/Tetris.bit Tetris_hdmi_audio.bit
+source [file join $root tools publish_bitstream.tcl]
+publish_bitstream [file join $root Tetris.runs impl_1 Tetris.bit] $root
 close_project
