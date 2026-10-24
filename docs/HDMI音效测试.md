@@ -1,5 +1,7 @@
 # HDMI 游戏音效测试
 
+本文保留 HDMI 独立功能开发时的历史基线与测试步骤。2026-10-25 当前源码和唯一发布 bit 已包含第 1 轮故事化任务（`81e75a1`）；最新资源、时序与哈希见[第一轮构建摘要](<D:/vivado_project/Tetris/docs/reports/story_r1/build-summary.txt>)。背景音乐仍是蜂鸣器，统一 HDMI 音乐尚待后续实施；下文历史资源和哈希不作为当前发布值。
+
 ## 版本与范围
 
 - 开发前归档：`1d7d8d7`（当前工作区快照），合并归档文档提交 `629fd49`，标签 `baseline-lutram-before-hdmi-audio-20261024`，已推送到 GitHub 主分支。
@@ -62,7 +64,7 @@ D:/xilinx/Vivado/2018.3/bin/vivado.bat -mode batch -source tools/build_hdmi_audi
 | 测试比特流 | `bit/Tetris.bit`，2,192,114 字节 |
 | SHA256 | `C68A3F435D9C3BC2A46D7D4866469B17809E21DEF1CF06687B581D713924482E` |
 
-本次统一目录后的报告与 13 套回归摘要保存在 [当前验证报告目录](reports/workspace_unification)，整合前报告保存在 [HDMI 初版与降音量验证记录](reports/hdmi_audio)。新 bit 的 FPGA 配置数据段与 `616113c` 相同，文件头日期/时间更新；原归档 bit 的 SHA256 为 `E9C027E536C1E06B77197FFE08F7217F6952264397D10DDAB1C39317FE6F3790`。时序通过指已定义约束的路径；报告仍包含与原优化基线一致的 102 个未约束内部引脚及部分未定义输入/输出延迟。默认 DRC 共 48 条 warning，涉及既有门控/锁存、BRAM 异步控制及 PHY 时钟放置等，详细内容保留在报告中。
+本次统一目录后的报告与 13 套回归摘要保存在 [当前验证报告目录](<D:/vivado_project/Tetris/docs/reports/workspace_unification>)，整合前报告保存在 [HDMI 初版与降音量验证记录](<D:/vivado_project/Tetris/docs/reports/hdmi_audio>)。新 bit 的 FPGA 配置数据段与 `616113c` 相同，文件头日期/时间更新；原归档 bit 的 SHA256 为 `E9C027E536C1E06B77197FFE08F7217F6952264397D10DDAB1C39317FE6F3790`。时序通过指已定义约束的路径；报告仍包含与原优化基线一致的 102 个未约束内部引脚及部分未定义输入/输出延迟。默认 DRC 共 48 条 warning，涉及既有门控/锁存、BRAM 异步控制及 PHY 时钟放置等，详细内容保留在报告中。
 
 ## 上板测试步骤
 

@@ -4,14 +4,15 @@
 
 唯一开发目录为 `D:/vivado_project/Tetris`，本地和 GitHub 只维护 `main`。历史版本保存在 Git 提交中，不再复制工程或保留并行版本目录。最新下载文件为 `bit/Tetris.bit`，成功构建后覆盖更新；Vivado 内部 `.runs` 文件仅作为构建缓存。
 
-当前发布 HDMI 游戏音效降音量版：振幅由 ±4096 调整为 ±1024，为原来的四分之一（约降低 12 dB）。用户已确认调整前 HDMI 音效版上板成功；降音量版重新仿真、构建后发布，听感待再次确认。GitHub 仅发布到 `main`。
+当前发布为故事化第 1 轮任务闭环版本 `81e75a1`：单人 32 行、双人 40 行通关，四段八档任务驱动，批次计分与安全冻结已实现。14 套回归和完整实现通过，尚未上板；LUT **11,922**、寄存器 **4,525**、BRAM **15.5 tile**，WNS **+0.023 ns** / WHS **+0.061 ns**。建立余量低于 +0.050 ns 目标，后续视觉轮先改善时序。报告见[第一轮构建摘要](<D:/vivado_project/Tetris/docs/reports/story_r1/build-summary.txt>)。
 
+当前操作音已通过 HDMI，维持 ±1024 的低振幅；背景音乐仍走蜂鸣器，统一 HDMI 的阶段配乐与配音尚待实施。用户曾确认较早 HDMI 音效版上板成功，不等于本轮已上板。
 
-音效开发前基线在场地 LUTRAM 上优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](docs/optimization-rounds.md)；此前基线见 [LUTRAM 重试](docs/lutram-retry.md)。该音频加入前的参考版本已上板验证，历史版本通过 Git 提交保留。
+音效开发前基线在场地 LUTRAM 上优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](<D:/vivado_project/Tetris/docs/optimization-rounds.md>)；此前基线见 [LUTRAM 重试](<D:/vivado_project/Tetris/docs/lutram-retry.md>)。该音频加入前的参考版本已上板验证，历史版本通过 Git 提交保留。
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
-单一工作区的整合、历史恢复入口及验证见[工作区统一记录](docs/workspace-unification.md)。后续故事化改造以[代码与资源实施计划书](docs/CORE-07_故事感实施计划书.md)为准，计划内容尚未实现。
+单一工作区的整合、历史恢复入口及验证见[工作区统一记录](<D:/vivado_project/Tetris/docs/workspace-unification.md>)。后续故事化改造以[代码与资源实施计划书](<D:/vivado_project/Tetris/docs/CORE-07_故事感实施计划书.md>)为准，第 1 轮任务闭环已实现，视觉、阶段配乐和配音仍待实施；2026-10-25 修订加入[执行门禁](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)与[建议评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
 
 ## HDMI 音效开发前历史归档（2026-10-24）
 
@@ -19,7 +20,7 @@ HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模�
 
 该历史归档的 HDMI 只传画面，随后加入了 HDMI 音效。当前发布内容见下方 HDMI 音效说明，历史资源与比特流记录保留用于追溯。
 
-## HDMI 游戏音效测试版
+## HDMI 游戏音效功能与历史测试基线
 
 发布分支：`main`。现有游戏音效通过 HDMI 输出为 **48 kHz、16 位、双声道 LPCM**（左右相同），保留蜂鸣器便于对照。背景音乐仍走原蜂鸣器，本次先验证操作与状态音效。
 
@@ -27,7 +28,7 @@ HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模�
 - 图像仍使用原有 1280×720 坐标，音视频使用同一像素时钟；音频以时钟使能推进，不增加低速时钟域。
 - PLL 实际输出约 74.21875 MHz，采样使能按实际频率生成；ACR 使用 N=6144，并测量 CTS，避免直接套用标称频率。
 - 最新发布比特流统一为 `bit/Tetris.bit`，本机下载路径为 `D:/vivado_project/Tetris/bit/Tetris.bit`。
-- 已通过当前优化基线的 13 个回归入口及新增跨帧 HDMI 协议仿真；实现通过，LUT 11,815（56.80%）、WNS +0.076 ns、WHS +0.068 ns；完整结果及上板测试步骤见 [HDMI 音效说明](docs/HDMI音效测试.md)。
+- 故事化实施前 HDMI 基线通过 13 个回归入口及跨帧 HDMI 协议仿真；当时 LUT 11,815（56.80%）、WNS +0.076 ns、WHS +0.068 ns。当前第 1 轮数值见本文开头；历史结果及上板测试步骤见 [HDMI 音效说明](<D:/vivado_project/Tetris/docs/HDMI音效测试.md>)。
 
 ## 工程信息
 
@@ -38,7 +39,7 @@ HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模�
 | 顶层模块 | `Tetris` |
 | 显示输出 | HDMI TMDS,1280×720 @60Hz(像素时钟 74.25 MHz) |
 | 描述语言 | Verilog HDL / SystemVerilog（HDMI 音频） |
-| 源码编码 | 全部 RTL 工作区为 GBK 无 BOM，Git 提交为 UTF-8；详见[源码编码与中文注释](docs/source-encoding.md) |
+| 源码编码 | 全部 RTL 工作区为 GBK 无 BOM，Git 提交为 UTF-8；详见[源码编码与中文注释](<D:/vivado_project/Tetris/docs/source-encoding.md>) |
 
 ## 玩法
 
