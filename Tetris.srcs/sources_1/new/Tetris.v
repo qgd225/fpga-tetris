@@ -67,6 +67,13 @@ module Tetris(
     wire hdmi_de;
     wire Clk_74M;
 
+    wire fx_active;
+    wire audio_sample_ce;
+    wire signed [15:0] audio_pcm;
+    // 此版先传游戏音效，保留蜂鸣器用于对照。
+    game_audio_pcm pcm_inst(.clk(Clk_74M), .reset_n(Reset_n),
+        .fx_wave(buzz_else), .fx_active(fx_active),
+        .sample_ce(audio_sample_ce), .pcm(audio_pcm));
     hdmi hdmi_inst(
     .Clk(Clk),
     .Clk_74M(Clk_74M),
@@ -77,6 +84,8 @@ module Tetris(
     .hdmi_data_n(hdmi_data_n),
     .hdmi_oe(hdmi_oe),
     .rgb(rgb),
+    .audio_sample_ce(audio_sample_ce),
+    .audio_pcm(audio_pcm),
 
     .hcounter(hcounter),
     .vcounter(vcounter),
@@ -412,7 +421,8 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .danger1(danger1_pulse),
     .danger2(danger2_pulse),
 
-    .buzz_else(buzz_else)
+    .buzz_else(buzz_else),
+    .fx_active(fx_active)
     );
 
 //    以太网：UDP 画面/调色板与 PC 键盘输入

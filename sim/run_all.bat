@@ -13,9 +13,10 @@ cmd /d /c call "%~dp0solo_hint\run.bat" > "%~dp0logs\solo_hint.log" 2>&1
 cmd /d /c call "%~dp0rgb_palette\run.bat" > "%~dp0logs\rgb_palette.log" 2>&1
 cmd /d /c call "%~dp0lutram\run.bat" > "%~dp0logs\lutram.log" 2>&1
 cmd /d /c call "%~dp0optimization\run.bat" > "%~dp0logs\optimization.log" 2>&1
+call "%~dp0hdmi_audio\run.bat" > "%~dp0logs\hdmi_audio.log" 2>&1
 echo ===== SUMMARY =====
 set failures=0
-for %%f in (duo frame_duo level sound input_route net_keyboard horizontal_repeat hold_gesture solo_hint rgb_palette lutram optimization) do (
+for %%f in (duo frame_duo level sound input_route net_keyboard horizontal_repeat hold_gesture solo_hint rgb_palette lutram optimization hdmi_audio) do (
   echo --- %%f ---
   findstr /C:"ALL PASS" /C:"FAILED" "%~dp0logs\%%f.log"
   findstr /C:"ALL PASS" "%~dp0logs\%%f.log" >nul

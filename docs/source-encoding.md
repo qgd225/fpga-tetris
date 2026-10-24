@@ -21,3 +21,6 @@ Markdown、Python、Tcl、工程 XML 等非 RTL 文件维持各自原有编码�
 本次编码规则迁移随 HDMI 开发前基线一起归档，旧提交内的 GBK 内容不会自动改变。维护此规则时，需要把编码规则和全部 RTL 一起纳入提交；可先执行 `git add --renormalize -- Tetris.srcs sim`，再正常添加新增 RTL 文件、`.gitattributes` 和相关说明。该命令只处理已跟踪文件，不会添加新文件。
 
 GitHub 正常展示依赖这些转换后的文件已经提交并推送。直接从 GitHub 下载原始文件或 ZIP 得到的是提交中的 UTF-8，使用 Vivado 前需转为 GBK；通过支持编码属性的 Git 克隆则自动转换。
+
+
+第三方 HDMI 协议模块位于 `third_party/hdl_util_hdmi/src`，保持上游 UTF-8 原样，已在 `.gitattributes` 中单独覆盖编码属性；这不改变手写 RTL 的 GBK 规则。

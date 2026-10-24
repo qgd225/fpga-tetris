@@ -1,6 +1,6 @@
 # FPGA 俄罗斯方块 (Tetris)
 
-当前分支在场地 LUTRAM 基线上继续优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](docs/optimization-rounds.md)；此前基线见 [LUTRAM 重试](docs/lutram-retry.md)。根目录 `Tetris.bit` 与 `Tetris_lutram.bit` 均保留，最新候选为 `Tetris_lutram_metadata_hint.bit`，尚待上板验收。
+音效开发前基线在场地 LUTRAM 上优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](docs/optimization-rounds.md)；此前基线见 [LUTRAM 重试](docs/lutram-retry.md)。根目录 `Tetris.bit` 与 `Tetris_lutram.bit` 均保留，最新候选为 `Tetris_lutram_metadata_hint.bit`，尚待上板验收。
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
@@ -10,6 +10,16 @@ HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模�
 
 本版 HDMI 仍只传画面。当前工作区修改先完整提交并推送，再在独立分支实现 HDMI 音效。本文后面的旧比特流、资源和时序记录属于既有发布版本，不能视为本次工作区或音频版的新验证结果。
 
+## HDMI 游戏音效测试版
+
+开发分支：`codex/hdmi-game-audio`。现有游戏音效通过 HDMI 输出为 **48 kHz、16 位、双声道 LPCM**（左右相同），保留蜂鸣器便于对照。背景音乐仍走原蜂鸣器，本次先验证操作与状态音效。
+
+- 模块划分：`sound` 事件/音符 → `game_audio_pcm` 采样 → `hdmi_audio_packets` FIFO/ACR/InfoFrame → `hdmi_av_encoder` 数据岛/TMDS。
+- 图像仍使用原有 1280×720 坐标，音视频使用同一像素时钟；音频以时钟使能推进，不增加低速时钟域。
+- PLL 实际输出约 74.21875 MHz，采样使能按实际频率生成；ACR 使用 N=6144，并测量 CTS，避免直接套用标称频率。
+- 新版比特流单独命名为 `Tetris_hdmi_audio.bit`。根目录原有 `Tetris.bit` 保持归档版本，不能用它验证 HDMI 音效。
+- 已通过新增跨帧 HDMI 协议仿真，当前优化基线回归正在重跑；完整实现结果及上板测试步骤见 [HDMI 音效说明](docs/HDMI音效测试.md)。
+
 ## 工程信息
 
 | 项目 | 值 |
@@ -18,7 +28,7 @@ HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模�
 | 目标器件 | `xc7a35tfgg484-2`(Artix-7 XC7A35T / FGG484 / 速度等级 -2) |
 | 顶层模块 | `Tetris` |
 | 显示输出 | HDMI TMDS,1280×720 @60Hz(像素时钟 74.25 MHz) |
-| 描述语言 | Verilog HDL |
+| 描述语言 | Verilog HDL / SystemVerilog（HDMI 音频） |
 | 源码编码 | 全部 RTL 工作区为 GBK 无 BOM，Git 提交为 UTF-8；详见[源码编码与中文注释](docs/source-encoding.md) |
 
 ## 玩法
