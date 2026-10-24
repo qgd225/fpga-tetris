@@ -1,7 +1,8 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 //============================================================
-// Ä£¿é£ºTetris
-// ×÷ÓÃ£º¶¥²ã¼¯³É£º°´¼ü¡¢ÓÎÏ·×´Ì¬¡¢³¡µØ¡¢»­Ãæ¡¢ÒôÆµÓëÒÔÌ«Íø½Ó¿Ú¡£
-// Ê±ÖÓ/¸´Î»£ºClk£»Reset_key
+// æ¨¡å—ï¼šTetris
+// ä½œç”¨ï¼šé¡¶å±‚é›†æˆï¼šæŒ‰é”®ã€æ¸¸æˆçŠ¶æ€ã€åœºåœ°ã€ç”»é¢ã€éŸ³é¢‘ä¸ä»¥å¤ªç½‘æ¥å£ã€‚
+// æ—¶é’Ÿ/å¤ä½ï¼šClkï¼›Reset_key
 //============================================================
 module Tetris(
     input Clk,
@@ -32,7 +33,7 @@ module Tetris(
     output        eth_mdio
     );
 
-//ÉÏµç¸´Î»
+//ä¸Šç”µå¤ä½
     reg [19:0]por_cnt = 20'd0;
 
     always@(posedge Clk)begin
@@ -59,7 +60,7 @@ module Tetris(
 
     wire Reset_n = (por_n) && (!rst_key_en) && (!kb_reset_en);
 
-//    VGA×ªHDMI¼°Êä³ö·ÖÆµ
+//    VGAè½¬HDMIåŠè¾“å‡ºåˆ†é¢‘
     wire [10:0]hcounter;
     wire [10:0]vcounter;
     wire [23:0]rgb;
@@ -82,7 +83,7 @@ module Tetris(
     .de(hdmi_de)
     );
 
-//    °´¼üÊäÈë¼°Ïû¶¶
+//    æŒ‰é”®è¾“å…¥åŠæ¶ˆæŠ–
     wire switch_r_flag;
     wire switch_en;
     wire left_p_flag;
@@ -142,7 +143,7 @@ wire hold_route = p1_hold;
 wire solo_hold_short;
 wire solo_hold_long;
 
-//    ÓÎÏ·×´Ì¬»ú
+//    æ¸¸æˆçŠ¶æ€æœº
     wire Idle;
     wire Playing;
     wire Stop;
@@ -160,7 +161,7 @@ hold_gesture hold_gesture_inst(
 );
 wire hold_p = duo ? hold_route : solo_hold_short;
 
-//    µ¥ÈË: PC + °åÔØ¼ü¶¼¿ØÖÆ P1; Ë«ÈË: °åÔØ P1, PC P2
+//    å•äºº: PC + æ¿è½½é”®éƒ½æ§åˆ¶ P1; åŒäºº: æ¿è½½ P1, PC P2
 control_route control_route_inst(
 .duo(duo),
 .btn_left(left_p_flag),
@@ -220,7 +221,7 @@ control_route control_route_inst(
     .choose_cnt(choose_cnt)
     );
 
-//    ºáÏòÁ¬·¢£ºÊ×ÒÆÖ±Í¨£¬DAS 220ms£¬ARR 80ms
+//    æ¨ªå‘è¿å‘ï¼šé¦–ç§»ç›´é€šï¼ŒDAS 220msï¼ŒARR 80ms
     horizontal_repeat p1_horizontal_repeat(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -245,7 +246,7 @@ control_route control_route_inst(
     .right_out(p2_right_move)
     );
 
-//    »­ÃæÊä³ö
+//    ç”»é¢è¾“å‡º
     wire clear;
     wire [2:0]speed_level;
     wire [19:0]score;
@@ -273,7 +274,7 @@ control_route control_route_inst(
     reg [2:0]lvl_d;
     reg lvl_up;
 
-//    Éı¼¶¼ì²â: speed_level ±ä»¯²úÉú 1 ÅÄÂö³å(¸øÒôĞ§)
+//    å‡çº§æ£€æµ‹: speed_level å˜åŒ–äº§ç”Ÿ 1 æ‹è„‰å†²(ç»™éŸ³æ•ˆ)
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     lvl_d <= 3'd0;
@@ -285,7 +286,7 @@ control_route control_route_inst(
     end
     end
 
-//    Î£ÏÕµÈ¼¶ÉÏÉıÑØ£º0->1 ¾¯±¨£¬0/1->2 ½ô¼±¾¯±¨
+//    å±é™©ç­‰çº§ä¸Šå‡æ²¿ï¼š0->1 è­¦æŠ¥ï¼Œ0/1->2 ç´§æ€¥è­¦æŠ¥
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     danger_d <= 2'd0;
@@ -299,7 +300,7 @@ control_route control_route_inst(
     end
     end
 
-//    ³¤°´¿ª¹ØÌáÊ¾: µÚÒ»´Î³¤°´³£ÁÁ, ÔÙ´Î³¤°´ÊÕÆğ
+//    é•¿æŒ‰å¼€å…³æç¤º: ç¬¬ä¸€æ¬¡é•¿æŒ‰å¸¸äº®, å†æ¬¡é•¿æŒ‰æ”¶èµ·
 reg solo_hint_latched;
 reg solo_hold_long_d;
 always@(posedge Clk_74M or negedge Reset_n)begin
@@ -317,7 +318,7 @@ end
 end
 wire solo_hint_show = !duo && solo_hint_latched;
 
-//    ÏñËØºÏ³É£º³¡µØ/HUD/²Ëµ¥/½áËãÒ³/UI ÌØĞ§Óëµ÷É«°å
+//    åƒç´ åˆæˆï¼šåœºåœ°/HUD/èœå•/ç»“ç®—é¡µ/UI ç‰¹æ•ˆä¸è°ƒè‰²æ¿
    frame frame_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -414,7 +415,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .buzz_else(buzz_else)
     );
 
-//    ÒÔÌ«Íø£ºUDP »­Ãæ/µ÷É«°åÓë PC ¼üÅÌÊäÈë
+//    ä»¥å¤ªç½‘ï¼šUDP ç”»é¢/è°ƒè‰²æ¿ä¸ PC é”®ç›˜è¾“å…¥
     net_screen_tx net_screen_tx_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),

@@ -1,7 +1,8 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 //============================================================
-// Ä£¿é£ºsound
-// ×÷ÓÃ£ºÒôĞ§ĞòÁĞÆ÷£ºÊÂ¼şÓÅÏÈ¼¶¡¢Òô¸ß/Ê±³¤²é±íºÍË«·äÃùÆ÷Êä³ö¡£
-// Ê±ÖÓ/¸´Î»£ºClk_74M£»Reset_n µÍÓĞĞ§
+// æ¨¡å—ï¼šsound
+// ä½œç”¨ï¼šéŸ³æ•ˆåºåˆ—å™¨ï¼šäº‹ä»¶ä¼˜å…ˆçº§ã€éŸ³é«˜/æ—¶é•¿æŸ¥è¡¨å’ŒåŒèœ‚é¸£å™¨è¾“å‡ºã€‚
+// æ—¶é’Ÿ/å¤ä½ï¼šClk_74Mï¼›Reset_n ä½æœ‰æ•ˆ
 //============================================================
 module sound(
     input Clk_74M,
@@ -38,11 +39,11 @@ module sound(
     output reg buzz_else
     );
 
-//    ·ÂÕæ¿É¸²¸Ç: 1ms ½ÚÅÄÓëÒô¸ßÓÒÒÆÁ¿
+//    ä»¿çœŸå¯è¦†ç›–: 1ms èŠ‚æ‹ä¸éŸ³é«˜å³ç§»é‡
     parameter [16:0]MS_MAX = 17'd74249;
     parameter [3:0]NOTE_SH = 4'd0;
 
-//    Òô¸ß±í: °ëÖÜÆÚ(74.25MHz / (2*f))
+//    éŸ³é«˜è¡¨: åŠå‘¨æœŸ(74.25MHz / (2*f))
     parameter [17:0]N_G4 = 18'd94707;
     parameter [17:0]N_B4 = 18'd75188;
     parameter [17:0]N_C5 = 18'd70985;
@@ -74,7 +75,7 @@ module sound(
     reg [3:0]st;
     reg [3:0]st_last;
 
-//    1ms ½ÚÅÄ: Ö»ÔÚ²¥·ÅÊ±¼ÆÊı
+//    1ms èŠ‚æ‹: åªåœ¨æ’­æ”¾æ—¶è®¡æ•°
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     ms_cnt <= 17'd0;
@@ -96,7 +97,7 @@ module sound(
     end
     end
 
-//    ÊÂ¼şÓÅÏÈÁ´: ²¥·ÅÖĞ²»½ÓÊÕĞÂÊÂ¼ş; Í¬¶¯×÷ P1 ÏÈÓÚ P2
+//    äº‹ä»¶ä¼˜å…ˆé“¾: æ’­æ”¾ä¸­ä¸æ¥æ”¶æ–°äº‹ä»¶; åŒåŠ¨ä½œ P1 å…ˆäº P2
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     en <= 5'd0;
@@ -167,7 +168,7 @@ module sound(
     end
     end
 
-//    Ã¿ÌõÒôĞ§µÄÄ©Òô·û±àºÅ
+//    æ¯æ¡éŸ³æ•ˆçš„æœ«éŸ³ç¬¦ç¼–å·
     always@(*)begin
     case(en)
     5'd17: st_last = 4'd1;
@@ -193,7 +194,7 @@ module sound(
     endcase
     end
 
-//    Òô·û²é±í: (en, st) -> °ëÖÜÆÚ
+//    éŸ³ç¬¦æŸ¥è¡¨: (en, st) -> åŠå‘¨æœŸ
     always@(*)begin
     note = 18'd0;
     case(en)
@@ -294,7 +295,7 @@ module sound(
     endcase
     end
 
-//    Ê±³¤²é±í: (en, st) -> ms
+//    æ—¶é•¿æŸ¥è¡¨: (en, st) -> ms
     always@(*)begin
     cnt = 9'd0;
     case(en)
@@ -395,7 +396,7 @@ module sound(
     endcase
     end
 
-//    ·ÂÕæËõ·Å: Ö»Ëõ¶Ì°ëÖÜÆÚ, ²»¸ÄÒô·û/Ê±³¤±í
+//    ä»¿çœŸç¼©æ”¾: åªç¼©çŸ­åŠå‘¨æœŸ, ä¸æ”¹éŸ³ç¬¦/æ—¶é•¿è¡¨
     always@(*)begin
     if(note == 18'd0)
     note_q = 18'd0;
@@ -403,7 +404,7 @@ module sound(
     note_q = note >> NOTE_SH;
     end
 
-//    ·½²¨·­×ª: Ã¿ note_q ÅÄ·­×ªÒ»´Î
+//    æ–¹æ³¢ç¿»è½¬: æ¯ note_q æ‹ç¿»è½¬ä¸€æ¬¡
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     buzz_else <= 1'b0;
@@ -423,7 +424,7 @@ module sound(
     end
     end
 
-//    Òô·ûĞòÁĞÍÆ½ø: °´ ms_tick ÇĞµ½ÏÂÒ»Òô, Ä©Òô½áÊø¸ø tick
+//    éŸ³ç¬¦åºåˆ—æ¨è¿›: æŒ‰ ms_tick åˆ‡åˆ°ä¸‹ä¸€éŸ³, æœ«éŸ³ç»“æŸç»™ tick
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
     st <= 4'd0;

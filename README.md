@@ -4,6 +4,12 @@
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
+## 当前工作区归档（2026-10-24）
+
+HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模块拆分及中文注释编码调整。归档标签：`baseline-lutram-before-hdmi-audio-20261024`。
+
+本版 HDMI 仍只传画面。当前工作区修改先完整提交并推送，再在独立分支实现 HDMI 音效。本文后面的旧比特流、资源和时序记录属于既有发布版本，不能视为本次工作区或音频版的新验证结果。
+
 ## 工程信息
 
 | 项目 | 值 |
@@ -13,7 +19,7 @@
 | 顶层模块 | `Tetris` |
 | 显示输出 | HDMI TMDS,1280×720 @60Hz(像素时钟 74.25 MHz) |
 | 描述语言 | Verilog HDL |
-| 源码编码 | Verilog 为 GB18030 无 BOM；README、Python、BAT 为 UTF-8 |
+| 源码编码 | 全部 RTL 工作区为 GBK 无 BOM，Git 提交为 UTF-8；详见[源码编码与中文注释](docs/source-encoding.md) |
 
 ## 玩法
 
@@ -105,7 +111,7 @@ Tetris.srcs/
 
 > 本仓库包含源码、IP 配置和根目录比特流 `Tetris.bit`。Vivado 的编译产物(`.runs/`、`.cache/`、`.hw/`、`.ip_user_files/`、`.sim/`)以及 IP 生成的 HDL 均已由 `.gitignore` 排除。
 
-> Verilog 文件统一使用 GB18030 无 BOM，以匹配 Vivado 2018.3 在中文 Windows 下的源码显示编码。GitHub 网页查看中文注释时可能出现编码显示差异。
+> 手写 RTL 工作区统一为 GBK 无 BOM，Git 提交转换为 UTF-8，编码规则与源码一起归档，详见 `docs/source-encoding.md`。
 
 ## 验证与资源
 

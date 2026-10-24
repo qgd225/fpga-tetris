@@ -1,8 +1,9 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 `timescale 1ns/1ps
 
 //============================================================
-// ²âÊÔÌ¨£ºhold_gesture_tb
-// ²âÊÔÄ¿±ê£ºHold ¶Ì°´»»¿éÓë³¤°´ÖÇÄÜÌáÊ¾ÊÖÊÆ»Ø¹é¡£
+// æµ‹è¯•å°ï¼šhold_gesture_tb
+// æµ‹è¯•ç›®æ ‡ï¼šHold çŸ­æŒ‰æ¢å—ä¸é•¿æŒ‰æ™ºèƒ½æç¤ºæ‰‹åŠ¿å›å½’ã€‚
 //============================================================
 module hold_gesture_tb;
 reg Clk=0, Rst=0;
@@ -19,7 +20,7 @@ hold_gesture #(.HOLD_LONG_CNT(25'd300)) dut(
 .short_pulse(short_pulse), .long_level(long_level)
 );
 
-// Óë Tetris ¶¥²ãÏàÍ¬: µÚÒ»´Î³¤°´´ò¿ªÌáÊ¾, ÔÙ´Î³¤°´¹Ø±Õ
+// ä¸ Tetris é¡¶å±‚ç›¸åŒ: ç¬¬ä¸€æ¬¡é•¿æŒ‰æ‰“å¼€æç¤º, å†æ¬¡é•¿æŒ‰å…³é—­
 assign routed_hold = duo ? legacy_hold : short_pulse;
 assign hint_show = !duo && hint_latched;
 always@(posedge Clk or negedge Rst)begin
@@ -81,7 +82,7 @@ end
 endtask
 
 initial begin
-  $display("=== hold_gesture: 299/300 ÖÜÆÚ¡¢³¤°´¿ª¹ØÓë°åÔØ/PC ºÏ²¢ ===");
+  $display("=== hold_gesture: 299/300 å‘¨æœŸã€é•¿æŒ‰å¼€å…³ä¸æ¿è½½/PC åˆå¹¶ ===");
   reset_dut;
   board_hold=1;
   hold_cycles(299);

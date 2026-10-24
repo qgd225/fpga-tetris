@@ -1,6 +1,7 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 //============================================================
-// µ¼ÈëÄ£¿é£ºeth_udp_rx_gmii
-// ±¾¹¤³ÌÓÃÍ¾£ºUDP ½ÓÊÕ¡¢¼üÅÌ±¨ÎÄ½âÎöÓëÊäÈëÂö³åÊä³ö¡£
+// å¯¼å…¥æ¨¡å—ï¼šeth_udp_rx_gmii
+// æœ¬å·¥ç¨‹ç”¨é€”ï¼šUDP æ¥æ”¶ã€é”®ç›˜æŠ¥æ–‡è§£æä¸è¾“å…¥è„‰å†²è¾“å‡ºã€‚
 //============================================================
 module eth_udp_rx_gmii(
   reset_p,
@@ -128,7 +129,7 @@ module eth_udp_rx_gmii(
     .I(gmii_rx_clk    )  // 1-bit input: Clock input
   );
 
-//½«±¾µØMAC¡¢IP¡¢PORT¼Ä´æ
+//å°†æœ¬åœ°MACã€IPã€PORTå¯„å­˜
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -143,7 +144,7 @@ module eth_udp_rx_gmii(
     local_port_reg <= local_port;
   end
 
-//½«ÒÔÌ«ÍøÊäÈëµÄ½ÓÊÕĞÅºÅ¼Ä´æ
+//å°†ä»¥å¤ªç½‘è¾“å…¥çš„æ¥æ”¶ä¿¡å·å¯„å­˜
   always@(posedge clk125m or posedge reset_p)
   if(reset_p)
   begin
@@ -156,7 +157,7 @@ module eth_udp_rx_gmii(
     reg_gmii_rxdv <= gmii_rxdv;
   end
 
-//½«ÒÔÌ«ÍøÊäÈëµÄ½ÓÊÕĞÅºÅ¼Ä´æºó´òÅÄ
+//å°†ä»¥å¤ªç½‘è¾“å…¥çš„æ¥æ”¶ä¿¡å·å¯„å­˜åæ‰“æ‹
   always@(posedge clk125m)
   begin
     rx_data_dly1  <= reg_gmii_rxd;

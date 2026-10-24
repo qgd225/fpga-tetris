@@ -1,10 +1,11 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 `timescale 1ns/1ps
 
 //============================================================
-// ²âÊÔÌ¨£ºinput_route_tb
-// ²âÊÔÄ¿±ê£ºµ¥ÈË/Ë«ÈË°åÔØ¼üÓë PC ¼üÊäÈëÂ·ÓÉ»Ø¹é¡£
+// æµ‹è¯•å°ï¼šinput_route_tb
+// æµ‹è¯•ç›®æ ‡ï¼šå•äºº/åŒäººæ¿è½½é”®ä¸Ž PC é”®è¾“å…¥è·¯ç”±å›žå½’ã€‚
 //============================================================
-//===== ÊäÈëÂ·ÓÉ»Ø¹é: µ¥ÈË P1 ºÏ²¢, Ë«ÈË P1/P2 ·ÖÀë =====
+//===== è¾“å…¥è·¯ç”±å›žå½’: å•äºº P1 åˆå¹¶, åŒäºº P1/P2 åˆ†ç¦» =====
 module input_route_tb;
 reg duo = 0;
 reg btn_left=0, btn_right=0, btn_drop_r=0, btn_drop_en=0, btn_rotate=0, btn_hold=0;
@@ -62,7 +63,7 @@ end
 endtask
 
 initial begin
-  $display("=== input_route ÊäÈëÂ·ÓÉ ===");
+  $display("=== input_route è¾“å…¥è·¯ç”± ===");
   clear_all; duo=0; btn_left=1; #1;
   chk("solo btn left -> P1", p1_left, 1);
   chk("solo btn left -> no P2", p2_left, 0);

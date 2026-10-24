@@ -1,3 +1,4 @@
+// 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
 `timescale 1ns/1ps
 module Tetromino(input clka, input [4:0]addra, output reg [31:0]douta);
     reg [31:0]memory[0:31];
@@ -100,7 +101,7 @@ module playfield_equivalence_tb;
         #100;rst=1;
         repeat(25)@(negedge clk);
         for(n=0;n<20;n=n+1)write_row(n,$random(seed)&24'h7FFFFF);
-        // Exercise real ROM shapes, negative offsets, walls, and both modes.
+        // 覆盖实际 ROM 形状、负偏移、场地边界以及单双人模式。
         for(n=0;n<3000;n=n+1)begin
             @(negedge clk);#1;
             c1=$random(seed);r1=$random(seed);
@@ -113,7 +114,7 @@ module playfield_equivalence_tb;
             repeat(4)@(negedge clk);
         end
         duo=1;
-        // Random simultaneous and staggered commits must match the old writer.
+        // 随机生成同时和错拍的落锁提交, 结果必须与旧版写口一致。
         for(n=0;n<128;n=n+1)begin
             @(negedge clk);#1;
             c1=3+(($random(seed)&32'h7FFFFFFF)%15);

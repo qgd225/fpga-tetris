@@ -1,3 +1,4 @@
+// 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
 `timescale 1ns/1ps
 module rgb_palette_tb;
   reg Clk;

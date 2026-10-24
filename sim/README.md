@@ -1,6 +1,6 @@
 # 仿真台（可复现）
 
-十一套自测编译 `../Tetris.srcs/sources_1/new/` 下的实时 RTL；其中优化对照还从 Git 提交 `0a9b368` 读取旧版参考。仿真产物写入各自的 `build/`，日志写入 `logs/`，均不纳入 Git。
+十二套自测编译 `../Tetris.srcs/sources_1/new/` 下的实时 RTL；其中优化对照还从 Git 提交 `0a9b368` 读取旧版参考。仿真产物写入各自的 `build/`，日志写入 `logs/`，均不纳入 Git。
 
 ## 一键跑全部
 
@@ -10,7 +10,7 @@ sim\run_all.bat
 
 最终输出逐套显示 `=== ALL PASS ===` 或 `=== FAILED n ===`。
 
-## 十一套测试说明
+## 十二套测试说明
 
 | 套 | 顶层 | 覆盖内容 | 项数 |
 | --- | --- | --- | ---: |
@@ -19,6 +19,7 @@ sim\run_all.bat
 | `sim/level` | `net_level_tb` | 34px 压力柱、八级 `seg`、顶帽/热力色、消行加分、等级阈值和自动下落速度 | 39 |
 | `sim/sound` | `sound_tb` | 20 类音效、查表音高/时长、危险警报、P1 优先、消行音阶和蜂鸣器翻转 | 103 |
 | `sim/input_route` | `input_route_tb` | 单人板载+PC 合并、双人板载 P1/PC P2 的输入路由与按住电平 | 29 |
+| `sim/net_keyboard` | `net_keyboard_tb` | 网络按键帧解析、按键沿与持续状态、超时释放和定时复位 | 8 |
 | `sim/horizontal_repeat` | `horizontal_repeat_tb` | 首移直通、DAS/ARR、方向切换及暂停/结束复位 | 30 |
 | `sim/hold_gesture` | `hold_gesture_tb` | Hold 短按换块、长按提示切换和 PC/板载输入 | 27 |
 | `sim/solo_hint` | `solo_hint_tb` | 4 旋转 x 20 列搜索、评分、空洞/悬空约束和类型切换 | 59 |
@@ -26,7 +27,7 @@ sim\run_all.bat
 | `sim/lutram` | `board_lutram_tb`、`frame_storage_tb` | 32 个独立读口、镜像一致性、双人锁定排队与抢占、重开及连续消行；联合检查占用、颜色与归属 | 每种场地模型 21536 次读出比较及定向断言，另含显示存储联合断言 |
 | `sim/optimization` | 场地、画面、提示、元数据及存储对照 | 基线与候选对照；元数据 RTL/UNISIM 双模型；UNISIM 显示及消行联合验证 | 场地 74,497；画面快速 24,576；提示 1,399,517；元数据每模型 29,768；另含两套联合回归 |
 
-原有九套共 **784 项**，另加 LUTRAM 专项验证。完整结构和构建结果见 [LUTRAM 重试](../docs/lutram-retry.md)。
+原有十套共 **792 项**，另加 LUTRAM 专项验证和优化对照。完整结构和构建结果见 [LUTRAM 重试](../docs/lutram-retry.md)。
 
 优化入口默认执行画面快速对照。完整三模式逐像素优先级扫描可单独运行：
 

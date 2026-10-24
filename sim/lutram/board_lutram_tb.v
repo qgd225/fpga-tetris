@@ -1,6 +1,7 @@
+// 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
 `timescale 1ns/1ps
 module Tetromino(input clka, input [4:0]addra, output [31:0]douta);
-    // Four distinct rows exercise every parallel read address.
+    // 使用四个不同的行地址, 覆盖各个并行读口。
     assign douta = addra[1:0] == 0 ? 32'h00010203 : 32'h0F001F10;
 endmodule
 module weiyibiao(input clka, input [4:0]addra, output [7:0]douta);
@@ -49,7 +50,7 @@ module board_lutram_tb;
         end
     endfunction
 
-    // Check observable outputs, so the same test also runs against UNISIM RAMs.
+    // 检查可观测输出, 同一测试同时适用于行为模型和 UNISIM 存储原语。
     genvar lane;
     generate for(lane=0;lane<4;lane=lane+1)begin : monitor
         always@(negedge clk)begin
@@ -106,7 +107,7 @@ module board_lutram_tb;
 
     initial begin
         #100; reset_board;
-        // Random row patterns and four independently changing row addresses.
+        // 随机行数据配合四个独立变化的读地址, 检查读写一致性。
         force dut.counter_r=test_addr;
         force dut.counter_r2=test_addr;
         force dut.ghost_scan_r=test_addr;
@@ -132,7 +133,7 @@ module board_lutram_tb;
         release dut.counter_r; release dut.type; release dut.rot;
         reset_board;
 
-        // Both locks begin together, with four different rows in each piece.
+        // 两名玩家同时开始落锁, 每个方块的四个格子位于不同的行。
         @(negedge clk);
         force dut.counter_c=5'd3; force dut.counter_r=5'd5;
         force dut.counter_c2=5'd15; force dut.counter_r2=5'd8;
@@ -153,7 +154,7 @@ module board_lutram_tb;
         release dut.counter_c2; release dut.counter_r2;
         release dut.type; release dut.rot; release dut.type2; release dut.rot2;
 
-        // P1 can preempt a P2 sequence after its first cells were committed.
+        // P2 已写入部分格子时, P1 可抢占公共写口。
         reset_board;
         writes1=0; writes2=0;
         force dut.counter_c=5'd3; force dut.counter_r=5'd5;
@@ -176,14 +177,14 @@ module board_lutram_tb;
         release dut.counter_c2; release dut.counter_r2;
         release dut.type; release dut.rot; release dut.type2; release dut.rot2;
 
-        // Restart is a real input, not a forced mirror reset.
+        // 通过实际重开输入清场, 不直接强制修改棋盘镜像。
         @(negedge clk);finalize=1;switch_key=1;
         @(negedge clk);switch_key=0;
         repeat(25)@(negedge clk);
         check("restart cleared all rows",board===480'd0);
         finalize=0;
 
-        // A full row must move once, from bottom to top, without losing cells.
+        // 满行消除后自下向上逐行搬移, 检查每行只搬移一次且不丢格子。
         write_row(5,24'h000008);
         write_row(6,24'hFFFFFF);
         force dut.clear_t=1'b0;
@@ -202,7 +203,7 @@ module board_lutram_tb;
         check("two-line upper row cleared",expected_row(9)==24'd0);
         check("clear pipeline completed",!dut.clear_time);
 
-        // Idle may be only one clock long; initialization must still finish.
+        // 即使 Idle 只持续一个时钟周期, 清场初始化也必须完成。
         @(negedge clk);idle=1;
         @(negedge clk);idle=0;
         repeat(25)@(negedge clk);

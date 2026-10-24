@@ -1,5 +1,6 @@
+// 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
 `timescale 1ns/1ps
-// Match the clocked shape ROM interface used by the hardware.
+// 形状 ROM 使用与硬件一致的时钟接口。
 module Tetromino(input clka, input [4:0]addra, output reg [31:0]douta);
     always@(posedge clka) douta <= addra[1:0] == 0 ? 32'h00010203 : 32'h0F001F10;
 endmodule
@@ -85,7 +86,7 @@ module frame_storage_tb;
         end
     endtask
     initial begin
-        // Preview geometry is outside this storage test; use the display regression's zero-offset fixture.
+        // 本测试聚焦存储, 预览几何使用显示回归中的零偏移测试模型。
         force dut.Next_piece_inst.Tetromino_dout=32'd0;
         force dut.Next_piece_inst.Tetromino_dout2=32'd0;
         $display("FRAME storage test starting");

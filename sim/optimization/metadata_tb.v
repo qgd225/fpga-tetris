@@ -1,3 +1,4 @@
+// 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
 `timescale 1ns/1ps
 module Tetromino(input clka,input [4:0]addra,output reg [31:0]douta);
     always@(posedge clka)douta<=32'h00010203;
@@ -48,7 +49,7 @@ module metadata_tb;
                 end
         end
     endtask
-    // Golden update follows the original frame storage contract.
+    // 参考模型按原有画面存储接口更新颜色和归属。
     always@(posedge clk)if(rst && !manual)begin
         if(dut.lock_commit1)begin
             $display("COMMIT P1 c=%0d r=%0d type=%0d",dut.cc_t[dut.lock_idx],dut.rr_t[dut.lock_idx],dut.type_d);
@@ -97,7 +98,7 @@ module metadata_tb;
         release dut.meta_is_lock;release dut.meta_lock_col;
         release dut.meta_lock_data;release dut.move_we;release dut.move_row;
         manual=0;
-        // Drain the board controller after the forced compaction transactions.
+        // 强制搬移事务结束后, 等待棋盘控制器完成剩余操作。
         repeat(30)@(negedge clk);
         force dut.Playfield_inst.counter_c=5'd3;
         force dut.Playfield_inst.counter_r=5'd5;

@@ -1,6 +1,7 @@
+// 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
 //============================================================
-// ����ģ�飺encode
-// ��������;����ͨ�� 8b/10b TMDS ���롣
+// 导入模块：encode
+// 本工程用途：单通道 8b/10b TMDS 编码。
 //============================================================
 `timescale 1 ps / 1ps
 `define D #1
@@ -77,7 +78,7 @@ module encode(
       dout <= 10'h0;
       cnt <= 5'd0;
     end else begin
-      if (de_reg[1]) begin  // �������ڣ����Ͷ�Ӧ���������
+      if (de_reg[1]) begin  // 数据周期：发送对应编码的数据
         if (decision2) begin
           dout[9]   <= `D ~q_m_reg[8];
           dout[8]   <= `D q_m_reg[8];
@@ -95,7 +96,7 @@ module encode(
             cnt <= `D cnt - {~q_m_reg[8], 1'b0} + (n1q_m - n0q_m);
           end
         end
-      end else begin  // ��������:���Ϳ����ź�
+      end else begin  // 控制周期:发送控制信号
         cnt <=  `D 5'd0;
         case ({c1_reg[1], c0_reg[1]})
           2'b00:   dout <= `D CTL0;

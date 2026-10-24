@@ -1,15 +1,16 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 `timescale 1ns/1ps
 
 //============================================================
-// ²âÊÔÌ¨£ºduo_tb
-// ²âÊÔÄ¿±ê£ºPlayfield Ë«ÈËÄ£Ê½»Ø¹é£º³öÉú¡¢»¥×²¡¢Ëø´æ¡¢Hold¡¢ÏûĞĞ¡¢ÓÄÁéºÍÒôĞ§ÃÅ¿Ø¡£
+// æµ‹è¯•å°ï¼šduo_tb
+// æµ‹è¯•ç›®æ ‡ï¼šPlayfield åŒäººæ¨¡å¼å›å½’ï¼šå‡ºç”Ÿã€äº’æ’ã€é”å­˜ã€Holdã€æ¶ˆè¡Œã€å¹½çµå’ŒéŸ³æ•ˆé—¨æ§ã€‚
 //============================================================
-//===== Playfield Duo ×¨Ïî²âÊÔ: »¥×²/¶¥×¡/ÓÄÁé/¹²ÓÃHold/³öÉúÁĞ/Ê±¼äãĞÖµ/ÏûĞĞ =====
+//===== Playfield Duo ä¸“é¡¹æµ‹è¯•: äº’æ’/é¡¶ä½/å¹½çµ/å…±ç”¨Hold/å‡ºç”Ÿåˆ—/æ—¶é—´é˜ˆå€¼/æ¶ˆè¡Œ =====
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
-  assign douta = duo_tb.shape_val;  // ×®: Ä¬ÈÏ 0 -> µ¥¸ñ; Ğı×ª²âÊÔÊ±ÓÉ tb ¸³ºÏ³ÉĞÎ×´
+  assign douta = duo_tb.shape_val;  // æ¡©: é»˜è®¤ 0 -> å•æ ¼; æ—‹è½¬æµ‹è¯•æ—¶ç”± tb èµ‹åˆæˆå½¢çŠ¶
 endmodule
 module weiyibiao(input clka, input [4:0] addra, output [7:0] douta);
-  assign douta = 8'h00;  // ×®: Ğı×ªÆ«ÒÆ 0
+  assign douta = 8'h00;  // æ¡©: æ—‹è½¬åç§» 0
 endmodule
 
 module duo_tb;
@@ -22,7 +23,7 @@ reg [19:0] score=0;
 reg [13:0] time_sec=0;
 reg duo=1;
 reg duu=1;
-reg [31:0] shape_val = 32'h0;  // ºÏ³ÉĞÎ×´(Ä¬ÈÏÍË»¯µ¥¸ñ)
+reg [31:0] shape_val = 32'h0;  // åˆæˆå½¢çŠ¶(é»˜è®¤é€€åŒ–å•æ ¼)
 
 wire [479:0] state;
 wire Piece, ghost, Piece2, ghost2, over, clear, clear_time, clear_pulse, clear_t_t, clear_t;
@@ -71,12 +72,12 @@ endtask
 task chk_no_x;
 input [8*32-1:0] name; input [4:0] sig;
 begin
-  if((^sig) === 1'bx)begin $display("  FAIL %0s ³öÏÖ X", name); bad = bad + 1; end
-  else $display("  ok   %0s ÎŞ X (=%0d)", name, sig);
+  if((^sig) === 1'bx)begin $display("  FAIL %0s å‡ºç° X", name); bad = bad + 1; end
+  else $display("  ok   %0s æ—  X (=%0d)", name, sig);
 end
 endtask
 
-// µ¥ÅÄÂö³å(Ê±ÖÓµÍµçÆ½ÆÚ¶¯×÷, ±ÜÃâ¾ºÕù)
+// å•æ‹è„‰å†²(æ—¶é’Ÿä½ç”µå¹³æœŸåŠ¨ä½œ, é¿å…ç«äº‰)
 task p_left1;  begin @(negedge Clk_74M); left1 =1'b1; @(posedge Clk_74M); @(negedge Clk_74M); left1 =1'b0; @(posedge Clk_74M); end endtask
 task p_right1; begin @(negedge Clk_74M); right1=1'b1; @(posedge Clk_74M); @(negedge Clk_74M); right1=1'b0; @(posedge Clk_74M); end endtask
 task p_drop1;  begin @(negedge Clk_74M); drop1 =1'b1; @(posedge Clk_74M); @(negedge Clk_74M); drop1 =1'b0; @(posedge Clk_74M); end endtask
@@ -90,7 +91,7 @@ task p_hold2;  begin @(negedge Clk_74M); hold2 =1'b1; @(posedge Clk_74M); @(nege
 
 task settle; begin repeat(40) @(posedge Clk_74M); end endtask
 
-// P1 Ó²½µ(³¤°´ drop_en)
+// P1 ç¡¬é™(é•¿æŒ‰ drop_en)
 task hard1;
 begin
   force dut.counter = 27'd74_250_000;
@@ -112,7 +113,7 @@ begin
 end
 endtask
 
-// ´¥·¢Ò»´ÎËø´æ(°ÑÁ½¸ö¼ÆÊ±Æ÷Ö±½ÓÍÆµ½ãĞÖµ)
+// è§¦å‘ä¸€æ¬¡é”å­˜(æŠŠä¸¤ä¸ªè®¡æ—¶å™¨ç›´æ¥æ¨åˆ°é˜ˆå€¼)
 task lock1;
 begin
   force dut.counter_land = 25'd20_000_000;
@@ -141,7 +142,7 @@ endtask
 reg [4:0]test_row;
 task clr_state;
 begin
-  // Exercise the shared writer so all physical replicas are cleared as well.
+  // é€šè¿‡å…¬å…±å†™å£æ¸…åœº, ä¿è¯å…¨éƒ¨ç‰©ç†å­˜å‚¨å‰¯æœ¬åŒæ­¥æ¸…é›¶ã€‚
   @(negedge Clk_74M);
   force dut.row_we = 1'b1;
   force dut.row_data = 24'd0;
@@ -162,153 +163,153 @@ initial begin
   bad = 0;
   Rst = 0; #200; Rst = 1; repeat(30) @(posedge Clk_74M);
 
-  $display("=== 1) ³öÉúÁĞ(Ë«ÈË = 24 ÁĞÈıµÈ·Öµã) ===");
-  chk("duo=1 P1 ³öÉúÁĞ", dut.counter_c, 8);
-  chk("duo=1 P2 ³öÉúÁĞ", dut.counter_c2, 16);
+  $display("=== 1) å‡ºç”Ÿåˆ—(åŒäºº = 24 åˆ—ä¸‰ç­‰åˆ†ç‚¹) ===");
+  chk("duo=1 P1 å‡ºç”Ÿåˆ—", dut.counter_c, 8);
+  chk("duo=1 P2 å‡ºç”Ÿåˆ—", dut.counter_c2, 16);
   duo = 1'b0; Rst = 0; #200; Rst = 1; repeat(30) @(posedge Clk_74M);
-  chk("duo=0 P1 ³öÉúÁĞ", dut.counter_c, 9);
-  chk("duo=0 P2 ³öÉúÁĞ", dut.counter_c2, 9);
+  chk("duo=0 P1 å‡ºç”Ÿåˆ—", dut.counter_c, 9);
+  chk("duo=0 P2 å‡ºç”Ÿåˆ—", dut.counter_c2, 9);
   duo = 1'b1; Rst = 0; #200; Rst = 1; repeat(30) @(posedge Clk_74M);
-  force dut.Drop = 30'd100_000_000;  // ¹Ø±Õ×Ô¶¯ÏÂÂä, ±ãÓÚ¾«È·²âÊÔ
+  force dut.Drop = 30'd100_000_000;  // å…³é—­è‡ªåŠ¨ä¸‹è½, ä¾¿äºç²¾ç¡®æµ‹è¯•
 
-  $display("=== 2) Ñ¹ÔÚ¶Ô·½ÔË¶¯·½¿éÉÏ: Í£×¡µ«²»¿ªÊ¼Ëø´æ ===");
+  $display("=== 2) å‹åœ¨å¯¹æ–¹è¿åŠ¨æ–¹å—ä¸Š: åœä½ä½†ä¸å¼€å§‹é”å­˜ ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
   repeat(4) @(posedge Clk_74M);
-  chk("ÏÂĞĞ±»¶Ô·½¶¥×¡", dut.other_down_hold, 1);
-  chk("¶¥×¡Ê±²»ÖÃ land", dut.land, 0);
-  chk("¶¥×¡Ê±²»Ëø´æ¼ÆÊ±", dut.counter_land, 0);
+  chk("ä¸‹è¡Œè¢«å¯¹æ–¹é¡¶ä½", dut.other_down_hold, 1);
+  chk("é¡¶ä½æ—¶ä¸ç½® land", dut.land, 0);
+  chk("é¡¶ä½æ—¶ä¸é”å­˜è®¡æ—¶", dut.counter_land, 0);
   p_drop1;
-  chk("¶¥×¡Ê±Èí½µÎŞĞ§", dut.counter_r, 10);
+  chk("é¡¶ä½æ—¶è½¯é™æ— æ•ˆ", dut.counter_r, 10);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   repeat(4) @(posedge Clk_74M);
 
-  $display("=== 3) ¶Ô·½Ëø½ø state ºó: Á¢¿ÌÂú×ãÂäµ×²¢Õı³£¼ÆÊ±Ëø´æ ===");
+  $display("=== 3) å¯¹æ–¹é”è¿› state å: ç«‹åˆ»æ»¡è¶³è½åº•å¹¶æ­£å¸¸è®¡æ—¶é”å­˜ ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
-  lock2;  // P2 Ëø´æµ½ (8,11)
-  chk("P2 ÒÑËø½øµØÍ¼", dut.state[8*20 + 11], 1);
-  chk("ÉÏ·½·½¿é land=1", dut.land, 1);
+  lock2;  // P2 é”å­˜åˆ° (8,11)
+  chk("P2 å·²é”è¿›åœ°å›¾", dut.state[8*20 + 11], 1);
+  chk("ä¸Šæ–¹æ–¹å— land=1", dut.land, 1);
   repeat(6) @(posedge Clk_74M);
-  chk("Ëø´æ¼ÆÊ±ÔÚ×ß", (dut.counter_land > 0), 1);
-  lock1;  // ´¥·¢ P1 Ëø´æµ½ (8,10)
-  chk("P1 Ëø´æµ½µØÍ¼", dut.state[8*20 + 10], 1);
+  chk("é”å­˜è®¡æ—¶åœ¨èµ°", (dut.counter_land > 0), 1);
+  lock1;  // è§¦å‘ P1 é”å­˜åˆ° (8,10)
+  chk("P1 é”å­˜åˆ°åœ°å›¾", dut.state[8*20 + 10], 1);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 4) ¶Ô·½»¬×ß -> »Ö¸´ÏÂÂä ===");
+  $display("=== 4) å¯¹æ–¹æ»‘èµ° -> æ¢å¤ä¸‹è½ ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
   repeat(4) @(posedge Clk_74M);
-  chk("±»¶¥×¡Ê±²»Âä", dut.other_down_hold, 1);
-  release dut.counter_c2; force dut.counter_c2 = 5'd12;  // ¶Ô·½»¬×ß
+  chk("è¢«é¡¶ä½æ—¶ä¸è½", dut.other_down_hold, 1);
+  release dut.counter_c2; force dut.counter_c2 = 5'd12;  // å¯¹æ–¹æ»‘èµ°
   repeat(4) @(posedge Clk_74M);
-  chk("»¬×ßºó²»ÔÙ±»¶¥×¡", dut.other_down_hold, 0);
+  chk("æ»‘èµ°åä¸å†è¢«é¡¶ä½", dut.other_down_hold, 0);
   release dut.counter_r;
   repeat(4) @(posedge Clk_74M);
-  chk("»¬×ßºóÒÑ½â³ı¶¥×¡(land ÈÔÎª0)", dut.land, 0);
+  chk("æ»‘èµ°åå·²è§£é™¤é¡¶ä½(land ä»ä¸º0)", dut.land, 0);
   p_drop1;
-  chk("»¬×ßºó»Ö¸´ÏÂÂä", (dut.counter_r > 10), 1);
+  chk("æ»‘èµ°åæ¢å¤ä¸‹è½", (dut.counter_r > 10), 1);
   release dut.counter_c; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 5) ×óÓÒ±»¶Ô·½µ²×¡ ===");
+  $display("=== 5) å·¦å³è¢«å¯¹æ–¹æŒ¡ä½ ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd9;  force dut.counter_r2 = 5'd10;
   repeat(4) @(posedge Clk_74M);
   p_right1;
-  chk("ÓÒÒÆ±»¶Ô·½µ²×¡", dut.counter_c, 8);
+  chk("å³ç§»è¢«å¯¹æ–¹æŒ¡ä½", dut.counter_c, 8);
   release dut.counter_c2; force dut.counter_c2 = 5'd12;
   repeat(4) @(posedge Clk_74M);
   release dut.counter_c;
   repeat(2) @(posedge Clk_74M);
   p_right1;
-  chk("¶Ô·½ÈÃ¿ªºó¿ÉÒÔÓÒÒÆ", dut.counter_c, 9);
+  chk("å¯¹æ–¹è®©å¼€åå¯ä»¥å³ç§»", dut.counter_c, 9);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 6) Ó²½µÍ£ÔÚ¶Ô·½·½¿éÉÏ + ÓÄÁé²»ÏÔÊ¾ ===");
+  $display("=== 6) ç¡¬é™åœåœ¨å¯¹æ–¹æ–¹å—ä¸Š + å¹½çµä¸æ˜¾ç¤º ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd0;
   force dut.counter_c2 = 5'd8;  force dut.counter_r2 = 5'd11;
   settle;
-  chk("ÓÄÁéÂäµã=¶Ô·½·½¿éÉÏÒ»ĞĞ", dut.counter_ghost_r_t, 10);
-  chk("ÓÄÁé±»¶Ô·½µ²×¡±êÖ¾", dut.ghost_blk_oth, 1);
-  hc = 11'd577; vc = 11'd337;  // µÚ8ÁĞ µÚ11ĞĞ
+  chk("å¹½çµè½ç‚¹=å¯¹æ–¹æ–¹å—ä¸Šä¸€è¡Œ", dut.counter_ghost_r_t, 10);
+  chk("å¹½çµè¢«å¯¹æ–¹æŒ¡ä½æ ‡å¿—", dut.ghost_blk_oth, 1);
+  hc = 11'd577; vc = 11'd337;  // ç¬¬8åˆ— ç¬¬11è¡Œ
   repeat(2) @(posedge Clk_74M);
-  chk("±»¶Ô·½µ²×¡Ê±²»»­ÓÄÁé", ghost, 0);
+  chk("è¢«å¯¹æ–¹æŒ¡ä½æ—¶ä¸ç”»å¹½çµ", ghost, 0);
   release dut.counter_r;
   repeat(2) @(posedge Clk_74M);
   hard1;
-  chk("Ó²½µÍ£ÔÚ¶Ô·½·½¿éÉÏ(ĞĞ10)", dut.counter_r, 10);
-  chk("Í£ÔÚ¶Ô·½ÉíÉÏÊ±²»Ëø´æ¼ÆÊ±", dut.counter_land, 0);
+  chk("ç¡¬é™åœåœ¨å¯¹æ–¹æ–¹å—ä¸Š(è¡Œ10)", dut.counter_r, 10);
+  chk("åœåœ¨å¯¹æ–¹èº«ä¸Šæ—¶ä¸é”å­˜è®¡æ—¶", dut.counter_land, 0);
   hc = 11'd0; vc = 11'd0; repeat(2) @(posedge Clk_74M);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 7) ÓÄÁéÕı³£ÏÔÊ¾(¿Õ³¡µØÂäµ½µ×) ===");
+  $display("=== 7) å¹½çµæ­£å¸¸æ˜¾ç¤º(ç©ºåœºåœ°è½åˆ°åº•) ===");
   force dut.counter_c  = 5'd8;  force dut.counter_r  = 5'd0;
   force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd0;
   settle;
-  chk("ÓÄÁéÂäµã=µØ°å", dut.counter_ghost_r_t, 19);
-  chk("Î´±»¶Ô·½µ²×¡", dut.ghost_blk_oth, 0);
-  hc = 11'd577; vc = 11'd689;  // µÚ8ÁĞ µÚ19ĞĞ
+  chk("å¹½çµè½ç‚¹=åœ°æ¿", dut.counter_ghost_r_t, 19);
+  chk("æœªè¢«å¯¹æ–¹æŒ¡ä½", dut.ghost_blk_oth, 0);
+  hc = 11'd577; vc = 11'd689;  // ç¬¬8åˆ— ç¬¬19è¡Œ
   repeat(2) @(posedge Clk_74M);
-  chk("ÓÄÁéÏñËØÏÔÊ¾", ghost, 1);
+  chk("å¹½çµåƒç´ æ˜¾ç¤º", ghost, 1);
   hc = 11'd0; vc = 11'd0; repeat(2) @(posedge Clk_74M);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
 
-  $display("=== 8) P2 ¿¿ÓÒÁĞ(22/23)ÓÄÁé²»³öÏÖ X ===");
+  $display("=== 8) P2 é å³åˆ—(22/23)å¹½çµä¸å‡ºç° X ===");
   force dut.counter_c2 = 5'd22; force dut.counter_r2 = 5'd0;
   force dut.counter_c  = 5'd1;  force dut.counter_r  = 5'd0;
   settle;
-  chk_no_x("P2 ÓÄÁéÂäµã", dut.counter_ghost_r_t2);
-  chk("P2 ÓÄÁéÂäµã=µØ°å", dut.counter_ghost_r_t2, 19);
+  chk_no_x("P2 å¹½çµè½ç‚¹", dut.counter_ghost_r_t2);
+  chk("P2 å¹½çµè½ç‚¹=åœ°æ¿", dut.counter_ghost_r_t2, 19);
   force dut.counter_c2 = 5'd23;
   settle;
-  chk_no_x("P2 µÚ23ÁĞÓÄÁéÂäµã", dut.counter_ghost_r_t2);
+  chk_no_x("P2 ç¬¬23åˆ—å¹½çµè½ç‚¹", dut.counter_ghost_r_t2);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
 
-  $display("=== 9) ¶¥²¿Ğı×ª(¸ñ×ÓÉì³ö³¡µØ¶¥²¿)ÓëÔ½½ç×èµ² ===");
+  $display("=== 9) é¡¶éƒ¨æ—‹è½¬(æ ¼å­ä¼¸å‡ºåœºåœ°é¡¶éƒ¨)ä¸è¶Šç•Œé˜»æŒ¡ ===");
   force dut.counter_c = 5'd8; force dut.counter_r = 5'd0;
   force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd0;
   force dut.rot = 2'd0;
-  shape_val = 32'h0F0F0F0F;  // Ã¿¸ñ: ÁĞÆ«ÒÆ 0, ĞĞÆ«ÒÆ -1(¶¥²¿Ö®Íâ)
+  shape_val = 32'h0F0F0F0F;  // æ¯æ ¼: åˆ—åç§» 0, è¡Œåç§» -1(é¡¶éƒ¨ä¹‹å¤–)
   repeat(4) @(posedge Clk_74M);
   release dut.rot;
   repeat(2) @(posedge Clk_74M);
   p_rot1; repeat(2) @(posedge Clk_74M);
-  chk("¶¥²¿(ĞĞ -1)Ğı×ª±»ÔÊĞí", dut.rot, 1);
-  chk_no_x("Ğı×ªºóĞĞºÅ", dut.rr_r);
-  chk("Ğı×ªºóĞĞºÅÎª¸º(bit5=1)", dut.rr_r[5], 1);
-  shape_val = 32'h04040404;  // ĞĞÆ«ÒÆ +4
-  force dut.counter_r = 5'd16;  // 16+4 = 20 ĞĞ = µØ°åÒÔÏÂ
+  chk("é¡¶éƒ¨(è¡Œ -1)æ—‹è½¬è¢«å…è®¸", dut.rot, 1);
+  chk_no_x("æ—‹è½¬åè¡Œå·", dut.rr_r);
+  chk("æ—‹è½¬åè¡Œå·ä¸ºè´Ÿ(bit5=1)", dut.rr_r[5], 1);
+  shape_val = 32'h04040404;  // è¡Œåç§» +4
+  force dut.counter_r = 5'd16;  // 16+4 = 20 è¡Œ = åœ°æ¿ä»¥ä¸‹
   repeat(4) @(posedge Clk_74M);
   p_rot1; repeat(2) @(posedge Clk_74M);
-  chk("Ğı×ªµ½µØ°åÒÔÏÂ±»×èµ²", dut.rot, 1);
-  shape_val = 32'h50505050;  // ÁĞÆ«ÒÆ +5(¸ß°ë×Ö½Ú)
+  chk("æ—‹è½¬åˆ°åœ°æ¿ä»¥ä¸‹è¢«é˜»æŒ¡", dut.rot, 1);
+  shape_val = 32'h50505050;  // åˆ—åç§» +5(é«˜åŠå­—èŠ‚)
   force dut.counter_r = 5'd0; force dut.counter_c = 5'd20;  // 20+5 = 25 > 23
   repeat(4) @(posedge Clk_74M);
   p_rot1; repeat(2) @(posedge Clk_74M);
-  chk("Ğı×ªÉì³öÓÒÇ½±»×èµ²", dut.rot, 1);
+  chk("æ—‹è½¬ä¼¸å‡ºå³å¢™è¢«é˜»æŒ¡", dut.rot, 1);
   shape_val = 32'h0;
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   clr_state;
 
-  $display("=== 10) Á½ÈË¹²ÓÃÒ»¸ö Hold ²Û ===");
+  $display("=== 10) ä¸¤äººå…±ç”¨ä¸€ä¸ª Hold æ§½ ===");
   force dut.type  = 3'd3;  force dut.type2 = 3'd5;
   repeat(4) @(posedge Clk_74M);
   p_hold1; repeat(2) @(posedge Clk_74M);
-  chk("P1 ´æ -> ²Û=P1 µÄ¿é", dut.hold_type, 3);
+  chk("P1 å­˜ -> æ§½=P1 çš„å—", dut.hold_type, 3);
   p_hold2; repeat(2) @(posedge Clk_74M);
-  chk("P2 ´æ -> ²Û=P2 µÄ¿é", dut.hold_type, 5);
+  chk("P2 å­˜ -> æ§½=P2 çš„å—", dut.hold_type, 5);
   p_hold2; repeat(2) @(posedge Clk_74M);
-  chk("P2 È¡ -> ²Û½øÈë P2 ÏÂÒ»¿é", dut.type_t2, 5);
+  chk("P2 å– -> æ§½è¿›å…¥ P2 ä¸‹ä¸€å—", dut.type_t2, 5);
   p_hold1; repeat(2) @(posedge Clk_74M);
-  chk("P1 È¡ -> ²Û½øÈë P1 ÏÂÒ»¿é", dut.type_t, 5);
+  chk("P1 å– -> æ§½è¿›å…¥ P1 ä¸‹ä¸€å—", dut.type_t, 5);
   release dut.type; release dut.type2;
   repeat(4) @(posedge Clk_74M);
 
-  $display("=== 11) ¹²ÓÃÒ»ÌõËæ»úÁ÷: ¸÷×ÔÈ¡¿é»¥²»×èÈû ===");
+  $display("=== 11) å…±ç”¨ä¸€æ¡éšæœºæµ: å„è‡ªå–å—äº’ä¸é˜»å¡ ===");
   begin : rnd_loop
     integer t0, n_chg;
     n_chg = 0;
@@ -321,8 +322,8 @@ initial begin
       t0 = dut.type;
       if(dut.type > 6) bad = bad + 1;
     end
-    chk("P1 Á¬ĞøÈ¡¿éÓĞ±ä»¯(Á÷ÔÚÍÆ½ø)", (n_chg > 0), 1);
-    chk("P1 È¡µÄ¿éºÏ·¨", (dut.type <= 6), 1);
+    chk("P1 è¿ç»­å–å—æœ‰å˜åŒ–(æµåœ¨æ¨è¿›)", (n_chg > 0), 1);
+    chk("P1 å–çš„å—åˆæ³•", (dut.type <= 6), 1);
     release dut.counter_c; release dut.counter_r;
     clr_state;
     force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd2;
@@ -333,24 +334,24 @@ initial begin
       if(dut.type2 !== t0) n_chg = n_chg + 1;
       t0 = dut.type2;
     end
-    chk("P2 Á¬ĞøÈ¡¿éÓĞ±ä»¯(Á÷ÔÚÍÆ½ø)", (n_chg > 0), 1);
-    chk("P2 È¡µÄ¿éºÏ·¨", (dut.type2 <= 6), 1);
+    chk("P2 è¿ç»­å–å—æœ‰å˜åŒ–(æµåœ¨æ¨è¿›)", (n_chg > 0), 1);
+    chk("P2 å–çš„å—åˆæ³•", (dut.type2 <= 6), 1);
     release dut.counter_c2; release dut.counter_r2;
     clr_state;
   end
 
-  $display("=== 12) µ¥»ú²»ÊÜ P2 Ó°Ïì(»¥×²¹Ø±Õ) ===");
+  $display("=== 12) å•æœºä¸å— P2 å½±å“(äº’æ’å…³é—­) ===");
   duo = 1'b0; repeat(4) @(posedge Clk_74M);
   force dut.counter_c  = 5'd8; force dut.counter_r  = 5'd10;
   force dut.counter_c2 = 5'd8; force dut.counter_r2 = 5'd11;
   repeat(4) @(posedge Clk_74M);
-  chk("µ¥»ú²»ÅĞ¶¥×¡", dut.other_down_hold, 0);
-  chk("µ¥»ú land Ö»¿´µØÍ¼/µØ°å", dut.land, 0);
+  chk("å•æœºä¸åˆ¤é¡¶ä½", dut.other_down_hold, 0);
+  chk("å•æœº land åªçœ‹åœ°å›¾/åœ°æ¿", dut.land, 0);
   release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   duo = 1'b1; repeat(4) @(posedge Clk_74M);
   clr_state;
 
-  $display("=== 13) Ë«ÈËÊ±¼äãĞÖµ(40/120/240/400/600/880/1200) ===");
+  $display("=== 13) åŒäººæ—¶é—´é˜ˆå€¼(40/120/240/400/600/880/1200) ===");
   score = 20'd0;
   duo = 1'b1;
   time_sec = 14'd39;  repeat(4) @(posedge Clk_74M); chk("duo 39s",  speed_level, 0);
@@ -362,8 +363,8 @@ initial begin
   time_sec = 14'd880; repeat(4) @(posedge Clk_74M); chk("duo 880s", speed_level, 6);
   time_sec = 14'd1200;repeat(4) @(posedge Clk_74M); chk("duo 1200s", speed_level, 7);
   score = 20'd4; time_sec = 14'd0;
-  repeat(4) @(posedge Clk_74M); chk("duo ·ÖÊıµÈ¼¶ÈÔÉúĞ§", speed_level, 1);
-  $display("=== 14) µ¥»úÊ±¼äãĞÖµ»Ø¹é(20/60/...) ===");
+  repeat(4) @(posedge Clk_74M); chk("duo åˆ†æ•°ç­‰çº§ä»ç”Ÿæ•ˆ", speed_level, 1);
+  $display("=== 14) å•æœºæ—¶é—´é˜ˆå€¼å›å½’(20/60/...) ===");
   duo = 1'b0; score = 20'd0;
   time_sec = 14'd19;  repeat(4) @(posedge Clk_74M); chk("solo 19s", speed_level, 0);
   time_sec = 14'd20;  repeat(4) @(posedge Clk_74M); chk("solo 20s", speed_level, 1);
@@ -371,57 +372,57 @@ initial begin
   time_sec = 14'd600; repeat(4) @(posedge Clk_74M); chk("solo 600s", speed_level, 7);
   duo = 1'b1; time_sec = 14'd0; repeat(4) @(posedge Clk_74M);
 
-  $display("=== 17) ÓÄÁé: ³¡µØ±ä»¯ºóÒªÖØËã, ÇÒ²»ÄÜÅÜµ½·½¿éÉÏ·½ ===");
+  $display("=== 17) å¹½çµ: åœºåœ°å˜åŒ–åè¦é‡ç®—, ä¸”ä¸èƒ½è·‘åˆ°æ–¹å—ä¸Šæ–¹ ===");
   begin : ghost_chk
     clr_state;
     duo = 1'b1; repeat(4) @(posedge Clk_74M);
 
-// (a) ¿Õ³¡µØ: ÓÄÁéÓ¦ÔÚµØ°å(19)
+// (a) ç©ºåœºåœ°: å¹½çµåº”åœ¨åœ°æ¿(19)
     force dut.counter_c = 5'd8;  force dut.counter_r = 5'd0;
     force dut.counter_c2 = 5'd20; force dut.counter_r2 = 5'd0;
     settle;
-    chk("¿Õ³¡µØÓÄÁé=19", dut.counter_ghost_r_t, 19);
+    chk("ç©ºåœºåœ°å¹½çµ=19", dut.counter_ghost_r_t, 19);
 
-// (b) ¶Ô·½·½¿éÑ¹ÔÚÏÂ·½(ÔË¶¯·½¿é): ÓÄÁéÇ¯Î»µ½"·½¿éÉÏÒ»ĞĞ", ÇÒ±ê¼Ç±»¶Ô·½µ²×¡
+// (b) å¯¹æ–¹æ–¹å—å‹åœ¨ä¸‹æ–¹(è¿åŠ¨æ–¹å—): å¹½çµé’³ä½åˆ°"æ–¹å—ä¸Šä¸€è¡Œ", ä¸”æ ‡è®°è¢«å¯¹æ–¹æŒ¡ä½
     release dut.counter_c2; force dut.counter_c2 = 5'd8; force dut.counter_r2 = 5'd11;
     settle;
-    chk("±»¶Ô·½ÔË¶¯·½¿éµ²×¡Ê±ÓÄÁé=10", dut.counter_ghost_r_t, 10);
-    chk("´ËÊ±ÓÄÁéÒş²Ø±ê¼Ç=1", dut.ghost_blk_oth, 1);
+    chk("è¢«å¯¹æ–¹è¿åŠ¨æ–¹å—æŒ¡ä½æ—¶å¹½çµ=10", dut.counter_ghost_r_t, 10);
+    chk("æ­¤æ—¶å¹½çµéšè—æ ‡è®°=1", dut.ghost_blk_oth, 1);
 
-// (c) ¶Ô·½Ëø½ø³¡µØ: ³¡µØ±ä»¯±ØĞë´¥·¢ÖØËã -> ÓÄÁéÈÔÔÚ10, µ«¸ÄÎª"ÂäÔÚÒÑÂä¸ñÉÏ"(ÒªÏÔÊ¾)
+// (c) å¯¹æ–¹é”è¿›åœºåœ°: åœºåœ°å˜åŒ–å¿…é¡»è§¦å‘é‡ç®— -> å¹½çµä»åœ¨10, ä½†æ”¹ä¸º"è½åœ¨å·²è½æ ¼ä¸Š"(è¦æ˜¾ç¤º)
     lock2;
     repeat(6) @(posedge Clk_74M);
-    chk("¶Ô·½Âä¸ñºóÓÄÁé=10", dut.counter_ghost_r_t, 10);
-    chk("¶Ô·½Âä¸ñºóÓÄÁéÏÔÊ¾(²»ÔÙÊÇ¶Ô·½·½¿é)", dut.ghost_blk_oth, 0);
+    chk("å¯¹æ–¹è½æ ¼åå¹½çµ=10", dut.counter_ghost_r_t, 10);
+    chk("å¯¹æ–¹è½æ ¼åå¹½çµæ˜¾ç¤º(ä¸å†æ˜¯å¯¹æ–¹æ–¹å—)", dut.ghost_blk_oth, 0);
 
-// (d) ·½¿é±¾Éí¾ÍÔÚ±»µ²µÄĞĞ(ÖØµş): ÓÄÁé²»ÄÜÅÜµ½·½¿éÉÏ·½
+// (d) æ–¹å—æœ¬èº«å°±åœ¨è¢«æŒ¡çš„è¡Œ(é‡å ): å¹½çµä¸èƒ½è·‘åˆ°æ–¹å—ä¸Šæ–¹
     force dut.counter_r = 5'd11;
     settle;
-    chk("Æğµã±»µ²Ê±ÓÄÁéÇ¯Î»>=·½¿éĞĞ", (dut.counter_ghost_r_t >= dut.counter_r), 1);
+    chk("èµ·ç‚¹è¢«æŒ¡æ—¶å¹½çµé’³ä½>=æ–¹å—è¡Œ", (dut.counter_ghost_r_t >= dut.counter_r), 1);
     release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
     clr_state;
   end
 
-  $display("=== 15) ÏûĞĞ: ÕûĞĞ 24 ¸ñ²ÅÏû ===");
+  $display("=== 15) æ¶ˆè¡Œ: æ•´è¡Œ 24 æ ¼æ‰æ¶ˆ ===");
   clr_state;
   for(integer c1 = 0; c1 < 12; c1 = c1 + 1) dut.state[c1*20 + 5] = 1'b1;
   repeat(2) @(posedge Clk_74M);
-  chk("Ö»Ìî 12 ¸ñ²»ÏûĞĞ", clear, 0);
+  chk("åªå¡« 12 æ ¼ä¸æ¶ˆè¡Œ", clear, 0);
   clr_state;
   for(integer c2 = 0; c2 < 24; c2 = c2 + 1) dut.state[c2*20 + 5] = 1'b1;
   repeat(2) @(posedge Clk_74M);
-  chk("ÌîÂú 24 ¸ñÏûĞĞ", clear, 1);
+  chk("å¡«æ»¡ 24 æ ¼æ¶ˆè¡Œ", clear, 1);
   clr_state;
   for(integer c3 = 0; c3 < 24; c3 = c3 + 1)begin
     dut.state[c3*20 + 5] = 1'b1;
     dut.state[c3*20 + 7] = 1'b1;
   end
   repeat(3) @(posedge Clk_74M);
-  chk("Á½ĞĞÍ¬Ê±Âú clear=1", clear, 1);
+  chk("ä¸¤è¡ŒåŒæ—¶æ»¡ clear=1", clear, 1);
   chk("d_clear=2", dut.d_clear, 2);
   clr_state;
 
-  $display("=== 16) Ëæ»úÈ¡Ñù: Ê±¼ä²ÉÑù / Í¬ÅÄ·ÖÅä / Idle ½Á¶¯ ===");
+  $display("=== 16) éšæœºå–æ ·: æ—¶é—´é‡‡æ · / åŒæ‹åˆ†é… / Idle æ…åŠ¨ ===");
   begin : rnd_chk
     reg [2:0] t_a;
     reg [31:0] exp_ns;
@@ -437,14 +438,14 @@ initial begin
       if(dut.rnd_type_t !== t_a) d3 = d3 + 1;
       t_a = dut.rnd_type_t;
     end
-    chk("Playing ÎŞÈ¡¿éÊ±È¡ÑùÖµËæÊ±¼ä±ä»¯", (d3 > 0), 1);
+    chk("Playing æ— å–å—æ—¶å–æ ·å€¼éšæ—¶é—´å˜åŒ–", (d3 > 0), 1);
     d2 = 0;
     for(q = 0; q < 8; q = q + 1)begin
       exp_ns = {dut.rnd[30:0], dut.rnd[31]^dut.rnd[21]^dut.rnd[1]^dut.rnd[0]};
       @(posedge Clk_74M);
       if(dut.rnd !== exp_ns) d2 = d2 + 1;
     end
-    chk("Playing Ê±²»¼Ó½Á¶¯", d2, 0);
+    chk("Playing æ—¶ä¸åŠ æ…åŠ¨", d2, 0);
     Idle = 1'b1; Playing = 1'b0; repeat(4) @(posedge Clk_74M);
     d1 = 0;
     for(q = 0; q < 8; q = q + 1)begin
@@ -452,7 +453,7 @@ initial begin
       @(posedge Clk_74M);
       if(dut.rnd !== exp_ns) d1 = d1 + 1;
     end
-    chk("Idle ½Á¶¯ÉúĞ§", (d1 > 0), 1);
+    chk("Idle æ…åŠ¨ç”Ÿæ•ˆ", (d1 > 0), 1);
     Idle = 1'b0; Playing = 1'b1; repeat(2) @(posedge Clk_74M);
     force dut.rnd = 32'h000000F0; force dut.rnd_cnt = 16'h0000;
     repeat(2) @(posedge Clk_74M);
@@ -461,42 +462,42 @@ initial begin
     release dut.land_pulse; release dut.land_pulse2;
     repeat(2) @(posedge Clk_74M);
     t1 = dut.type_t; t2 = dut.type_t2;
-    $display("  [info] Í¬ÅÄÈ¡¿é(¶¨Ì¬): P1 next=%0d, P2 next=%0d", t1, t2);
-    chk("Í¬ÅÄÁ½ÈËÄÃµ½²»Í¬¿é", (t1 !== t2), 1);
+    $display("  [info] åŒæ‹å–å—(å®šæ€): P1 next=%0d, P2 next=%0d", t1, t2);
+    chk("åŒæ‹ä¸¤äººæ‹¿åˆ°ä¸åŒå—", (t1 !== t2), 1);
     release dut.rnd; release dut.rnd_cnt;
     release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
   end
 
-  $display("=== 20) ÓÄÁéÂäµã: É¨µ½ĞĞÉÏÏŞÒ²Òª¸üĞÂ(²»ÄÜÍ£¾ÉÖµ) ===");
+  $display("=== 20) å¹½çµè½ç‚¹: æ‰«åˆ°è¡Œä¸Šé™ä¹Ÿè¦æ›´æ–°(ä¸èƒ½åœæ—§å€¼) ===");
   begin : ghost_row_chk
     clr_state;
     duo = 1'b0; repeat(4) @(posedge Clk_74M);
-    force dut.clear_t = 1'b0;  // Ç°Ãæ²âÊÔÁôÏÂµÄÉÁ°×»áµ²×¡ÓÄÁéÏÔÊ¾
+    force dut.clear_t = 1'b0;  // å‰é¢æµ‹è¯•ç•™ä¸‹çš„é—ªç™½ä¼šæŒ¡ä½å¹½çµæ˜¾ç¤º
     force dut.counter_land = 25'd0; force dut.lock_counter = 25'd0;
     force dut.lock_t = 1'b0; force dut.lock_cnt = 2'd0;
     force dut.drop_r_t = 1'b1;
     force dut.counter_c = 5'd5; force dut.counter_r = 5'd5;
-    shape_val = 32'h30201000;  // 4 ¸ñÍ¬ĞĞ(ĞĞÆ«ÒÆÈ« 0): Ãªµã×î¶àµ½ 19
+    shape_val = 32'h30201000;  // 4 æ ¼åŒè¡Œ(è¡Œåç§»å…¨ 0): é”šç‚¹æœ€å¤šåˆ° 19
     p_rot1; repeat(20) @(posedge Clk_74M);
-    chk("ĞĞÆ«ÒÆÈ« 0: Âäµã=19", dut.counter_ghost_r_t, 19);
-    shape_val = 32'h1F0FFFFE;  // ĞĞÆ«ÒÆ -1/-2(Ã»ÓĞ 0): Ãªµã±ØĞëµ½ 20
+    chk("è¡Œåç§»å…¨ 0: è½ç‚¹=19", dut.counter_ghost_r_t, 19);
+    shape_val = 32'h1F0FFFFE;  // è¡Œåç§» -1/-2(æ²¡æœ‰ 0): é”šç‚¹å¿…é¡»åˆ° 20
     p_rot1; repeat(30) @(posedge Clk_74M);
-    chk("ĞĞÆ«ÒÆ -1/-2: Âäµã=20", dut.counter_ghost_r_t, 20);
-    hc = 11'd481; vc = 11'd689;  // µÚ5ÁĞ µÚ19ĞĞ, ¿Õ³¡µØ: ÓÄÁéÓ¦ÔÚÕâÀï
+    chk("è¡Œåç§» -1/-2: è½ç‚¹=20", dut.counter_ghost_r_t, 20);
+    hc = 11'd481; vc = 11'd689;  // ç¬¬5åˆ— ç¬¬19è¡Œ, ç©ºåœºåœ°: å¹½çµåº”åœ¨è¿™é‡Œ
     repeat(2) @(posedge Clk_74M);
-    chk("ÓÄÁé»­ÔÚµÚ19ĞĞ(²»Ğü¿Õ)", ghost, 1);
+    chk("å¹½çµç”»åœ¨ç¬¬19è¡Œ(ä¸æ‚¬ç©º)", ghost, 1);
     hc = 11'd0; vc = 11'd0; repeat(2) @(posedge Clk_74M);
     release dut.counter_c; release dut.counter_r;
-    hard1;  // Ó²½µÒªÍ£ÔÚÂäµã
-    chk("Ó²½µÍ£ÔÚÂäµã(20)", dut.counter_r, 20);
-    chk("Í£ÔÚÂäµãÊ±ÒÑÂú×ãÂäµ×", dut.land, 1);
+    hard1;  // ç¡¬é™è¦åœåœ¨è½ç‚¹
+    chk("ç¡¬é™åœåœ¨è½ç‚¹(20)", dut.counter_r, 20);
+    chk("åœåœ¨è½ç‚¹æ—¶å·²æ»¡è¶³è½åº•", dut.land, 1);
     release dut.counter_land; release dut.lock_counter;
     release dut.lock_t; release dut.lock_cnt; release dut.drop_r_t; release dut.clear_t;
     shape_val = 32'h0;
     clr_state;
   end
 
-  $display("=== 21) ÓÄÁé²»ÄÜÑ¹ÔÚ¶Ô·½ÔË¶¯·½¿éÉÏ ===");
+  $display("=== 21) å¹½çµä¸èƒ½å‹åœ¨å¯¹æ–¹è¿åŠ¨æ–¹å—ä¸Š ===");
   begin : ghost_oth_chk
     clr_state;
     duo = 1'b1; repeat(4) @(posedge Clk_74M);
@@ -504,17 +505,17 @@ initial begin
     force dut.counter_c  = 5'd16; force dut.counter_r  = 5'd19;  // P1: (15,17)(15,18)(16,18)(16,19)
     force dut.counter_c2 = 5'd16; force dut.counter_r2 = 5'd4;  // P2: (15,2)(15,3)(16,3)(16,4)
     p_rot1; p_rot2; repeat(40) @(posedge Clk_74M);
-    chk("P2 ÓÄÁéÂäÔÚ P1 ·½¿éÉÏ·½(=17)", dut.counter_ghost_r_t2, 17);
-    chk("±»¶Ô·½·½¿éµ²×¡Òª±ê¼Ç", dut.ghost_blk_oth2, 1);
-    chk("P1 ÓÄÁéÂäÔÚµ×°å(=19)", dut.counter_ghost_r_t, 19);
+    chk("P2 å¹½çµè½åœ¨ P1 æ–¹å—ä¸Šæ–¹(=17)", dut.counter_ghost_r_t2, 17);
+    chk("è¢«å¯¹æ–¹æ–¹å—æŒ¡ä½è¦æ ‡è®°", dut.ghost_blk_oth2, 1);
+    chk("P1 å¹½çµè½åœ¨åº•æ¿(=19)", dut.counter_ghost_r_t, 19);
     release dut.counter_c; release dut.counter_r; release dut.counter_c2; release dut.counter_r2;
-    hard2;  // Ó²½µÒªÍ£ÔÚ¶Ô·½·½¿éÉÏ
-    chk("P2 Ó²½µÍ£ÔÚ¶Ô·½·½¿éÉÏ(17)", dut.counter_r2, 17);
+    hard2;  // ç¡¬é™è¦åœåœ¨å¯¹æ–¹æ–¹å—ä¸Š
+    chk("P2 ç¡¬é™åœåœ¨å¯¹æ–¹æ–¹å—ä¸Š(17)", dut.counter_r2, 17);
     shape_val = 32'h0;
     clr_state;
   end
 
-  $display("=== 22) C_num/R_num ±àºÅ: ÓëÔ­À´Öğ¸ñ±È½ÏÖğÎ»µÈ¼Û ===");
+  $display("=== 22) C_num/R_num ç¼–å·: ä¸åŸæ¥é€æ ¼æ¯”è¾ƒé€ä½ç­‰ä»· ===");
   begin : num_chk
     integer hc2, vc2, bad_c, bad_r, c_exp, r_exp, o2, p2, col_now;
     bad_c = 0; bad_r = 0;
@@ -527,7 +528,7 @@ initial begin
       if((o2 < col_now) && (hc2 >= (321 + 32*o2)) && (hc2 < (351 + 32*o2))) c_exp = o2;
       if(C_num !== c_exp[4:0]) bad_c = bad_c + 1;
     end
-    chk("duo=1 ÁĞ±àºÅÖğµãÒ»ÖÂ(801 µã)", bad_c, 0);
+    chk("duo=1 åˆ—ç¼–å·é€ç‚¹ä¸€è‡´(801 ç‚¹)", bad_c, 0);
     for(vc2 = 60; vc2 <= 740; vc2 = vc2 + 1)begin
       hc = 11'd577; vc = vc2[10:0];
       #1;
@@ -536,7 +537,7 @@ initial begin
       if((vc2 >= (81 + 32*p2)) && (vc2 < (111 + 32*p2))) r_exp = p2;
       if(R_num !== r_exp[4:0]) bad_r = bad_r + 1;
     end
-    chk("duo=1 ĞĞ±àºÅÖğµãÒ»ÖÂ(681 µã)", bad_r, 0);
+    chk("duo=1 è¡Œç¼–å·é€ç‚¹ä¸€è‡´(681 ç‚¹)", bad_r, 0);
     duo = 1'b0; col_now = 20; bad_c = 0; bad_r = 0;
     for(hc2 = 300; hc2 <= 1100; hc2 = hc2 + 1)begin
       hc = hc2[10:0]; vc = 11'd400;
@@ -546,7 +547,7 @@ initial begin
       if((o2 < col_now) && (hc2 >= (321 + 32*o2)) && (hc2 < (351 + 32*o2))) c_exp = o2;
       if(C_num !== c_exp[4:0]) bad_c = bad_c + 1;
     end
-    chk("duo=0 ÁĞ±àºÅÖğµãÒ»ÖÂ(801 µã)", bad_c, 0);
+    chk("duo=0 åˆ—ç¼–å·é€ç‚¹ä¸€è‡´(801 ç‚¹)", bad_c, 0);
     duo = 1'b1;
     hc = 11'd0; vc = 11'd0; #1;
   end

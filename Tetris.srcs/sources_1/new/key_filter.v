@@ -1,7 +1,8 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 //============================================================
-// Ä£¿é£ºkey_filter
-// ×÷ÓÃ£ºµ¥¼üÏû¶¶£ºÉú³É°´ÏÂÂö³å¡¢ÊÍ·ÅÂö³åºÍÎÈ¶¨°´×¡µçÆ½¡£
-// Ê±ÖÓ/¸´Î»£ºClk£»Reset_n µÍÓĞĞ§
+// æ¨¡å—ï¼škey_filter
+// ä½œç”¨ï¼šå•é”®æ¶ˆæŠ–ï¼šç”ŸæˆæŒ‰ä¸‹è„‰å†²ã€é‡Šæ”¾è„‰å†²å’Œç¨³å®šæŒ‰ä½ç”µå¹³ã€‚
+// æ—¶é’Ÿ/å¤ä½ï¼šClkï¼›Reset_n ä½æœ‰æ•ˆ
 //============================================================
 module key_filter(
     Clk,
@@ -34,7 +35,7 @@ module key_filter(
 
     parameter MCNT_CNT = 1_000_000 - 1;
 
-//    20ms¼ÆÊ±
+//    20msè®¡æ—¶
     always@(posedge Clk or negedge Reset_n)begin
     if(!Reset_n)
     counter_cnt <= 0;
@@ -44,7 +45,7 @@ module key_filter(
     counter_cnt <= counter_cnt + 1;
     end
 
-//    È¥ÑÇÎÈÌ¬ºÍ¼ÇÂ¼ÏÂ½µÑØºÍÉÏÉıÑØ
+//    å»äºšç¨³æ€å’Œè®°å½•ä¸‹é™æ²¿å’Œä¸Šå‡æ²¿
     always@(posedge Clk or negedge Reset_n)
     if(!Reset_n)
     sync_d0_key <= 1'b1;
@@ -66,7 +67,7 @@ module key_filter(
     assign key_down = (!sync_d1_key) && (r_key);
     assign key_up = (sync_d1_key) && (!r_key);
 
-//    ¼ÆÊıÊ¹ÄÜ¿ª¹ØÓëÊÇ·ñ°´ÏÂ¿ª¹Ø
+//    è®¡æ•°ä½¿èƒ½å¼€å…³ä¸æ˜¯å¦æŒ‰ä¸‹å¼€å…³
     always@(posedge Clk or negedge Reset_n)begin
     if(!Reset_n)begin
     en_cnt <= 0;
@@ -94,7 +95,7 @@ module key_filter(
     end
     end
 
-//    Êä³ö°´ÏÂÓëËÉ¿ªĞÅºÅ
+//    è¾“å‡ºæŒ‰ä¸‹ä¸æ¾å¼€ä¿¡å·
     always@(posedge Clk or negedge Reset_n)
     if(!Reset_n)
     key_en_tx <= 1'b0;

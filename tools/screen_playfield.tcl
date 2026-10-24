@@ -8,6 +8,9 @@ create_project -in_memory -part xc7a35tfgg484-2
 read_verilog [file join $root Tetris.srcs sources_1 ip Tetromino Tetromino_stub.v]
 read_verilog [file join $root Tetris.srcs sources_1 ip weiyibiao weiyibiao_stub.v]
 read_verilog [file join $root Tetris.srcs sources_1 new solo_hint.v]
+foreach name {Playfield_pixel_mapper Playfield_speed_control Playfield_hold_controller Playfield_ghost_scanner} {
+    read_verilog [file join $root Tetris.srcs sources_1 new $name.v]
+}
 read_verilog $rtl
 synth_design -top Playfield -mode out_of_context -part xc7a35tfgg484-2 -directive AreaOptimized_high -control_set_opt_threshold 1
 create_clock -period 13.468 [get_ports Clk_74M]

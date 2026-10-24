@@ -1,8 +1,9 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 `timescale 1ns/1ps
 
 //============================================================
-// ²âÊÔÌ¨£ºnet_level_tb
-// ²âÊÔÄ¿±ê£ºµ¥ÈË¼Æ·Ö¡¢µÈ¼¶ãĞÖµºÍ×Ô¶¯ÏÂÂäËÙ¶È»Ø¹é¡£
+// æµ‹è¯•å°ï¼šnet_level_tb
+// æµ‹è¯•ç›®æ ‡ï¼šå•äººè®¡åˆ†ã€ç­‰çº§é˜ˆå€¼å’Œè‡ªåŠ¨ä¸‹è½é€Ÿåº¦å›å½’ã€‚
 //============================================================
 module Tetromino(input clka, input [4:0] addra, output [31:0] douta);
   assign douta = 32'h0;
@@ -105,18 +106,18 @@ initial begin
   Rst = 0; #200; Rst = 1;
   repeat(20) @(posedge Clk_74M);
 
-  $display("=== 1) ¼Ó·Ö x2 (µÈ¼¶0) ===");
+  $display("=== 1) åŠ åˆ† x2 (ç­‰çº§0) ===");
   set_score(20'd0); rel_score;
   add_clear(5'd1, 1);
-  chk("1¸öÂö³å c_clear=1", score, 2);
+  chk("1ä¸ªè„‰å†² c_clear=1", score, 2);
   set_score(20'd0); rel_score;
   add_clear(5'd1, 2);
-  chk("2¸öÂö³å c_clear=1 (µÈ¼¶ÈÔ0)", score, 4);
+  chk("2ä¸ªè„‰å†² c_clear=1 (ç­‰çº§ä»0)", score, 4);
   set_score(20'd0); rel_score;
   add_clear(5'd4, 1);
-  chk("1¸öÂö³å c_clear=4", score, 8);
+  chk("1ä¸ªè„‰å†² c_clear=4", score, 8);
 
-  $display("=== 2) ·ÖÊıµÈ¼¶(4/15/35/70/150/300/600) ===");
+  $display("=== 2) åˆ†æ•°ç­‰çº§(4/15/35/70/150/300/600) ===");
   set_time(0);
   set_score(20'd3);    chk("score=3",   speed_level, 0);
   set_score(20'd4);    chk("score=4",   speed_level, 1);
@@ -128,7 +129,7 @@ initial begin
   set_score(20'd600);  chk("score=600", speed_level, 7);
   set_score(20'd1000); chk("score=1000",speed_level, 7);
 
-  $display("=== 3) Ê±¼äµÈ¼¶(20/60/120/200/300/440/600 Ãë) ===");
+  $display("=== 3) æ—¶é—´ç­‰çº§(20/60/120/200/300/440/600 ç§’) ===");
   set_score(20'd0);
   set_time(19);   chk("19s",  speed_level, 0);
   set_time(20);   chk("20s",  speed_level, 1);
@@ -138,19 +139,19 @@ initial begin
   set_time(599);  chk("599s", speed_level, 6);
   set_time(600);  chk("600s", speed_level, 7);
 
-  $display("=== 4) È¡½Ï´óÕß ===");
-  set_score(20'd3);   set_time(60);  chk("·ÖÊı0+Ê±¼ä2", speed_level, 2);
-  set_score(20'd300); set_time(20);  chk("·ÖÊı6+Ê±¼ä1", speed_level, 6);
-  set_score(20'd3);   set_time(600); chk("·ÖÊı0+Ê±¼ä7", speed_level, 7);
-  set_score(20'd600); set_time(0);   chk("·ÖÊı7+Ê±¼ä0", speed_level, 7);
+  $display("=== 4) å–è¾ƒå¤§è€… ===");
+  set_score(20'd3);   set_time(60);  chk("åˆ†æ•°0+æ—¶é—´2", speed_level, 2);
+  set_score(20'd300); set_time(20);  chk("åˆ†æ•°6+æ—¶é—´1", speed_level, 6);
+  set_score(20'd3);   set_time(600); chk("åˆ†æ•°0+æ—¶é—´7", speed_level, 7);
+  set_score(20'd600); set_time(0);   chk("åˆ†æ•°7+æ—¶é—´0", speed_level, 7);
 
-  $display("=== 5) ÇåÁã»ØÂä ===");
+  $display("=== 5) æ¸…é›¶å›è½ ===");
   rel_score; rel_time;
   set_score(20'd0); set_time(0);
   repeat(8) @(posedge Clk_74M);
-  chk("¶¼ÇåÁã", speed_level, 0);
+  chk("éƒ½æ¸…é›¶", speed_level, 0);
 
-  $display("=== 6) ÂäËÙ±í»Ø¹é ===");
+  $display("=== 6) è½é€Ÿè¡¨å›å½’ ===");
   repeat(4) @(posedge Clk_74M);
   chk("level0 Drop", dut.Playfield_inst.Drop, (64'd74_249_999*64'd80)/64'd100);
   set_score(20'd600);
@@ -158,7 +159,7 @@ initial begin
   chk("level7 Drop", dut.Playfield_inst.Drop, (64'd74_249_999*64'd21)/64'd100);
   rel_score; rel_time;
 
-  $display("=== 7) ·ÖÊı BCD(´®ĞĞ×ª»»)ÓëÊ®½øÖÆÖğÎ»Ò»ÖÂ ===");
+  $display("=== 7) åˆ†æ•° BCD(ä¸²è¡Œè½¬æ¢)ä¸åè¿›åˆ¶é€ä½ä¸€è‡´ ===");
   begin : bcd_chk
     integer vi, v, e0, e1, e2, e3, e4, e5, badv;
     badv = 0;
@@ -191,7 +192,7 @@ initial begin
       end
     end
     release dut.scoring_inst.counter;
-    chk("·ÖÊı BCD ÖğÎ»Ò»ÖÂ(7 ¸öÖµ)", badv, 0);
+    chk("åˆ†æ•° BCD é€ä½ä¸€è‡´(7 ä¸ªå€¼)", badv, 0);
   end
 
   $display("=== 8) level energy bar geometry ===");

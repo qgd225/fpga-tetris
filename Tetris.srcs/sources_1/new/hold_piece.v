@@ -1,7 +1,8 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 //============================================================
-// Ä£¿é£ºhold_piece
-// ×÷ÓÃ£ºHOLD ²ÛÎ»Ô¤ÀÀ£º¶ÁÈ¡Ôİ´æ·½¿é²¢Éú³É²ÛÄÚÏÔÊ¾×ø±ê¡£
-// Ê±ÖÓ/¸´Î»£ºClk_74M£»Reset_n µÍÓĞĞ§
+// æ¨¡å—ï¼šhold_piece
+// ä½œç”¨ï¼šHOLD æ§½ä½é¢„è§ˆï¼šè¯»å–æš‚å­˜æ–¹å—å¹¶ç”Ÿæˆæ§½å†…æ˜¾ç¤ºåæ ‡ã€‚
+// æ—¶é’Ÿ/å¤ä½ï¼šClk_74Mï¼›Reset_n ä½æœ‰æ•ˆ
 //============================================================
 module hold_piece(
     input Clk_74M,
@@ -22,7 +23,7 @@ module hold_piece(
     output reg hold_slot
     );
 
-//    Hold ²ÛÎ»Óë Next Í¬¹æ¸ñ(4x4 ¸ö 32px ¸ñ×Ó), ·½¿éµÚ 0 ¸ñ»­ÔÚ (1,3)
+//    Hold æ§½ä½ä¸ Next åŒè§„æ ¼(4x4 ä¸ª 32px æ ¼å­), æ–¹å—ç¬¬ 0 æ ¼ç”»åœ¨ (1,3)
     reg [1:0]C_num;
     reg [1:0]R_num;
     reg [1:0]C_num2;
@@ -30,7 +31,7 @@ module hold_piece(
     reg [3:0]cc;
     reg [3:0]rr;
 
-//    P1 ²ÛÎ»ĞĞÁĞºÅ
+//    P1 æ§½ä½è¡Œåˆ—å·
     always@(*)begin : blk1
         integer o1, p1;
     C_num = 2'd0;
@@ -44,7 +45,7 @@ module hold_piece(
     end
     end
 
-//    P2 ²ÛÎ»ĞĞÁĞºÅ(½öË«ÈË)
+//    P2 æ§½ä½è¡Œåˆ—å·(ä»…åŒäºº)
     always@(*)begin : blk2
         integer o2, p2;
     C_num2 = 2'd0;
@@ -58,7 +59,7 @@ module hold_piece(
     end
     end
 
-//    ²ÛÎ»µ×É«ÇøÓò
+//    æ§½ä½åº•è‰²åŒºåŸŸ
     always@(*)begin
     hold_slot = 1'b0;
     if((hcounter >= X1) && (hcounter < (X1 + 11'd128)) && (vcounter >= Y1) && (vcounter < (Y1 + 11'd128)))
@@ -76,7 +77,7 @@ module hold_piece(
         .douta(Tetromino_dout)
     );
 
-//    Hold ÀïµÄ·½¿é(Idle »ò»¹Ã»´æ¹ıÊ±²»»­)
+//    Hold é‡Œçš„æ–¹å—(Idle æˆ–è¿˜æ²¡å­˜è¿‡æ—¶ä¸ç”»)
     always@(*)begin : blk3
         integer i1;
     if(Idle || !en_hold)
@@ -94,6 +95,6 @@ module hold_piece(
     end
     end
 
-    assign hold_margin = 1'b0;  //Íâ¿òÒÑÉ¾
+    assign hold_margin = 1'b0;  //å¤–æ¡†å·²åˆ 
 
 endmodule

@@ -1,8 +1,9 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 //============================================================
-// Ä£¿é£ºhorizontal_repeat
-// ×÷ÓÃ£ººáÏò°´¼üÁ¬·¢£ºÊ×ÒÆÖ±Í¨£¬°´×¡ºó°´ DAS/ARR ²úÉúÒÆ¶¯Âö³å¡£
-// Ê±ÖÓ/¸´Î»£ºClk_74M£»Reset_n µÍÓĞĞ§
-// Ê±Ğò£ºleft_p/right_p ÎªÒÑÏû¶¶µÄµ¥ÅÄ°´ÏÂÂö³å£»active Îª Playing¡£
+// æ¨¡å—ï¼šhorizontal_repeat
+// ä½œç”¨ï¼šæ¨ªå‘æŒ‰é”®è¿å‘ï¼šé¦–ç§»ç›´é€šï¼ŒæŒ‰ä½åæŒ‰ DAS/ARR äº§ç”Ÿç§»åŠ¨è„‰å†²ã€‚
+// æ—¶é’Ÿ/å¤ä½ï¼šClk_74Mï¼›Reset_n ä½æœ‰æ•ˆ
+// æ—¶åºï¼šleft_p/right_p ä¸ºå·²æ¶ˆæŠ–çš„å•æ‹æŒ‰ä¸‹è„‰å†²ï¼›active ä¸º Playingã€‚
 //============================================================
 module horizontal_repeat(
     input Clk_74M,
@@ -30,7 +31,7 @@ module horizontal_repeat(
     reg repeat_l;
     reg repeat_r;
 
-//    Ê×ÒÆÓÉ left_p/right_p µ±ÅÄÖ±Í¨£»Á¬·¢Ö»ÔÚ active Ê±Êä³ö
+//    é¦–ç§»ç”± left_p/right_p å½“æ‹ç›´é€šï¼›è¿å‘åªåœ¨ active æ—¶è¾“å‡º
     assign left_out  = active && (left_p  || repeat_l);
     assign right_out = active && (right_p || repeat_r);
 
@@ -47,7 +48,7 @@ module horizontal_repeat(
     repeat_l <= 1'b0;
     repeat_r <= 1'b0;
 
-//    ÔİÍ£¡¢½áÊø¡¢·½ÏòÈ«²¿ËÉ¿ªÊ±Çå³ı DAS/ARR£¬»Ö¸´ºó±ØĞëÖØĞÂ°´ÏÂ
+//    æš‚åœã€ç»“æŸã€æ–¹å‘å…¨éƒ¨æ¾å¼€æ—¶æ¸…é™¤ DAS/ARRï¼Œæ¢å¤åå¿…é¡»é‡æ–°æŒ‰ä¸‹
     if(!active || (!left_held && !right_held))begin
         dir <= DIR_NONE;
         armed <= 1'b0;
@@ -55,7 +56,7 @@ module horizontal_repeat(
         timer_cnt <= 24'd0;
     end
 
-//    ĞÂ·½Ïò°´ÏÂ£ºÁ¢¼´Ê×ÒÆ£¬Í¬Ê±´ÓÁã¿ªÊ¼ĞÂ·½Ïò DAS
+//    æ–°æ–¹å‘æŒ‰ä¸‹ï¼šç«‹å³é¦–ç§»ï¼ŒåŒæ—¶ä»é›¶å¼€å§‹æ–°æ–¹å‘ DAS
     else if(left_p && !right_p)begin
         dir <= DIR_LEFT;
         armed <= 1'b1;
@@ -69,24 +70,24 @@ module horizontal_repeat(
         timer_cnt <= 24'd0;
     end
 
-//    ÔİÍ£/½áÊøºóÈÔ°´×Å¾É·½ÏòÊ±£¬²»×Ô¶¯»Ö¸´Á¬·¢
+//    æš‚åœ/ç»“æŸåä»æŒ‰ç€æ—§æ–¹å‘æ—¶ï¼Œä¸è‡ªåŠ¨æ¢å¤è¿å‘
     else if(!armed)begin
         dir <= DIR_NONE;
         das_done <= 1'b0;
         timer_cnt <= 24'd0;
     end
 
-//    Ë«·½ÏòÍ¬Ê±°´×¡£ºÔİÍ£Á¬·¢²¢°Ñ DAS ¹éÁã
+//    åŒæ–¹å‘åŒæ—¶æŒ‰ä½ï¼šæš‚åœè¿å‘å¹¶æŠŠ DAS å½’é›¶
     else if(left_held && right_held)begin
         das_done <= 1'b0;
         timer_cnt <= 24'd0;
     end
 
-//    ×ó·½Ïò±£³Ö
+//    å·¦æ–¹å‘ä¿æŒ
     else if(left_held)begin
         if(dir != DIR_LEFT)begin
 
-// ÇĞ»»·½Ïò£ºÁ¢¼´²¹Ò»ÅÄ£¬²¢´ÓĞÂ·½Ïò DAS ÖØĞÂ¼ÆÊ±
+// åˆ‡æ¢æ–¹å‘ï¼šç«‹å³è¡¥ä¸€æ‹ï¼Œå¹¶ä»æ–°æ–¹å‘ DAS é‡æ–°è®¡æ—¶
         dir <= DIR_LEFT;
         das_done <= 1'b0;
         timer_cnt <= 24'd0;
@@ -111,11 +112,11 @@ module horizontal_repeat(
         end
     end
 
-//    ÓÒ·½Ïò±£³Ö
+//    å³æ–¹å‘ä¿æŒ
     else if(right_held)begin
         if(dir != DIR_RIGHT)begin
 
-// ÇĞ»»·½Ïò£ºÁ¢¼´²¹Ò»ÅÄ£¬²¢´ÓĞÂ·½Ïò DAS ÖØĞÂ¼ÆÊ±
+// åˆ‡æ¢æ–¹å‘ï¼šç«‹å³è¡¥ä¸€æ‹ï¼Œå¹¶ä»æ–°æ–¹å‘ DAS é‡æ–°è®¡æ—¶
         dir <= DIR_RIGHT;
         das_done <= 1'b0;
         timer_cnt <= 24'd0;

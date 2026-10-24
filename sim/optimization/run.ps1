@@ -26,7 +26,7 @@ foreach ($rom in @(@('shape_rom',16,8), @('offset_rom',2,2))) {
 }
 Push-Location $build
 try {
-    $command = 'call D:\xilinx\Vivado\2018.3\settings64.bat >nul 2>&1 && cd /d "' + (Get-Location).Path + '" && call xvlog.bat ..\playfield_equivalence_tb.v Playfield_reference.v Candidate.v ..\..\..\Tetris.srcs\sources_1\new\solo_hint.v --nolog && call xelab.bat playfield_equivalence_tb -s playfield_equivalence --timescale 1ns/1ps --nolog && call xsim.bat playfield_equivalence -runall -log equivalence.log'
+    $command = 'call D:\xilinx\Vivado\2018.3\settings64.bat >nul 2>&1 && cd /d "' + (Get-Location).Path + '" && call xvlog.bat ..\playfield_equivalence_tb.v Playfield_reference.v Candidate.v ..\..\..\Tetris.srcs\sources_1\new\Playfield_pixel_mapper.v ..\..\..\Tetris.srcs\sources_1\new\Playfield_speed_control.v ..\..\..\Tetris.srcs\sources_1\new\Playfield_hold_controller.v ..\..\..\Tetris.srcs\sources_1\new\Playfield_ghost_scanner.v ..\..\..\Tetris.srcs\sources_1\new\solo_hint.v --nolog && call xelab.bat playfield_equivalence_tb -s playfield_equivalence --timescale 1ns/1ps --nolog && call xsim.bat playfield_equivalence -runall -log equivalence.log'
     & cmd /c $command
     if ($LASTEXITCODE -ne 0) { throw 'Equivalence simulation failed to run' }
     $log = [IO.File]::ReadAllText((Join-Path $build 'equivalence.log'))

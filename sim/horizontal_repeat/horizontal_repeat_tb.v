@@ -1,8 +1,9 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 `timescale 1ns/1ps
 
 //============================================================
-// ²âÊÔÌ¨£ºhorizontal_repeat_tb
-// ²âÊÔÄ¿±ê£ºDAS/ARR¡¢Ê×ÒÆÖ±Í¨£¬ÒÔ¼°ËÉ¿ª/ÇĞ»»/ÔİÍ£/½áÊø¸´Î»¡£
+// æµ‹è¯•å°ï¼šhorizontal_repeat_tb
+// æµ‹è¯•ç›®æ ‡ï¼šDAS/ARRã€é¦–ç§»ç›´é€šï¼Œä»¥åŠæ¾å¼€/åˆ‡æ¢/æš‚åœ/ç»“æŸå¤ä½ã€‚
 //============================================================
 module horizontal_repeat_tb;
 reg Clk_74M = 0;
@@ -71,7 +72,7 @@ end
 endtask
 
 initial begin
-  $display("=== horizontal_repeat ºáÏòÁ¬·¢ ===");
+  $display("=== horizontal_repeat æ¨ªå‘è¿å‘ ===");
   repeat(2) tick();
   chk("default DAS 220ms", default_dut.DAS_CNT, 16335000);
   chk("default ARR 80ms", default_dut.ARR_CNT, 5940000);
@@ -79,7 +80,7 @@ initial begin
   active = 1;
   tick();
 
-//    Ê×ÒÆÖ±Í¨ + DAS/ARR
+//    é¦–ç§»ç›´é€š + DAS/ARR
   @(negedge Clk_74M);
   left_held = 1;
   left_p = 1;
@@ -104,7 +105,7 @@ initial begin
   tick();
   chk("left second repeat after ARR", left_out, 1);
 
-//    ËÉ¿ª·½ÏòÁ¢¼´Çå DAS/ARR
+//    æ¾å¼€æ–¹å‘ç«‹å³æ¸… DAS/ARR
   @(negedge Clk_74M);
   left_held = 0;
   tick();
@@ -112,7 +113,7 @@ initial begin
   chk("left release clears repeat", left_out, 0);
   chk("left release disarms", dut.armed, 0);
 
-//    ÖØĞÂ°´ÏÂ±ØĞëÖØĞÂµÈ´ıÍêÕû DAS
+//    é‡æ–°æŒ‰ä¸‹å¿…é¡»é‡æ–°ç­‰å¾…å®Œæ•´ DAS
   @(negedge Clk_74M);
   left_held = 1;
   left_p = 1;
@@ -128,7 +129,7 @@ initial begin
   tick();
   chk("left repress repeat after DAS", left_out, 1);
 
-//    ×óÓÒÇĞ»»£ºÓÒ·½ÏòÁ¢¼´Ê×ÒÆ£¬DAS ÖØĞÂ¿ªÊ¼
+//    å·¦å³åˆ‡æ¢ï¼šå³æ–¹å‘ç«‹å³é¦–ç§»ï¼ŒDAS é‡æ–°å¼€å§‹
   @(negedge Clk_74M);
   right_held = 1;
   right_p = 1;
@@ -147,7 +148,7 @@ initial begin
   tick();
   chk("right switch repeat after DAS", right_out, 1);
 
-//    ÔİÍ£/½áÊøÊ§ÄÜ£º±£³Ö°´×¡Ò²²»Á¬·¢£¬»Ö¸´ºó±ØĞëÖØĞÂ°´ÏÂ
+//    æš‚åœ/ç»“æŸå¤±èƒ½ï¼šä¿æŒæŒ‰ä½ä¹Ÿä¸è¿å‘ï¼Œæ¢å¤åå¿…é¡»é‡æ–°æŒ‰ä¸‹
   @(negedge Clk_74M);
   active = 0;
   tick();

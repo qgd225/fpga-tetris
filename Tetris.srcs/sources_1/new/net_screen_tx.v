@@ -1,20 +1,22 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 //============================================================
-// Ä£¿é£ºnet_screen_tx
-// ×÷ÓÃ£ºÒÔÌ«Íø·¢ËÍ£ºUDP »­Ãæ/µ÷É«°åºÍ PC ¼üÅÌ½ÓÊÕ¡£
-// Ê±ÖÓ/¸´Î»£ºClk_74M£»Reset_n/por_n
+// æ¨¡å—: net_screen_tx
+// ä½œç”¨: åè°ƒä»¥å¤ªç½‘ç”»é¢å‘é€ä»¥åŠç”µè„‘ç«¯é”®ç›˜è¾“å…¥ã€‚
+// åˆ†å·¥: ç½‘ç»œæŒ‰é”®å¸§è§£æã€æŒ‰é”®çŠ¶æ€å’Œå¤ä½è¯·æ±‚ç”± net_keyboard_receiver è´Ÿè´£ã€‚
+// æ—¶é’Ÿ/å¤ä½: Clk_74M, Reset_n å’Œ por_n å‡ä¸ºä½æœ‰æ•ˆã€‚
 //============================================================
 module net_screen_tx(
   input         Clk_74M,
   input         Reset_n,
   input         por_n,
 
-//-------- »­ÃæÊäÈë£¨À´×Ô hdmi / frame£©--------
-  input         de,  // 1 = µ±Ç°ÏñËØÔÚÓĞĞ§Çø(1280x720)
+//-------- ç”»é¢è¾“å…¥ï¼ˆæ¥è‡ª hdmi / frameï¼‰--------
+  input         de,  // 1 = å½“å‰åƒç´ åœ¨æœ‰æ•ˆåŒº(1280x720)
   input  [10:0] hcounter,
   input  [10:0] vcounter,
   input  [23:0] rgb,
 
-//-------- ÒÔÌ«ÍøÒı½Å --------
+//-------- ä»¥å¤ªç½‘å¼•è„š --------
   input         rgmii_rx_clk_i,
   input  [3:0]  rgmii_rxd,
   input         rgmii_rxdv,
@@ -25,7 +27,7 @@ module net_screen_tx(
   output        eth_mdc,
   output        eth_mdio,
 
-//-------- ¼üÅÌ(ÍøÂç)°´¼ü£ºĞÎ×´ÓëÎïÀí°´¼üÒ»ÖÂ --------
+//-------- é”®ç›˜(ç½‘ç»œ)æŒ‰é”®ï¼šå½¢çŠ¶ä¸ç‰©ç†æŒ‰é”®ä¸€è‡´ --------
   output        kb_left_p,
   output        kb_right_p,
   output        kb_left_held,
@@ -40,19 +42,19 @@ module net_screen_tx(
   output        kb_reset_en,
   output        kb_activity
 );
-parameter DST_MAC    = 48'hFF_FF_FF_FF_FF_FF;  // Ä¬ÈÏ¹ã²¥£¬PC ¶Ë²»ÓÃÏÈÖªµÀÒ²ĞĞ
+parameter DST_MAC    = 48'hFF_FF_FF_FF_FF_FF;  // é»˜è®¤å¹¿æ’­ï¼ŒPC ç«¯ä¸ç”¨å…ˆçŸ¥é“ä¹Ÿè¡Œ
 parameter DST_IP     = 32'hFF_FF_FF_FF;
 parameter DST_PORT   = 16'd5000;
 parameter FPS_DIV    = 1;  // 1=60fps  2=30fps  3=20fps
-parameter PAL_FRAMES = 60;  // Ã¿ 60 Ö¡²åÒ»¸öµ÷É«°å°ü(=1s@60fps)
-parameter LINE_LEN   = 16'd1287;  // 7 ×Ö½Ú°üÍ· + 1280 ¸ö±êºÅ
+parameter PAL_FRAMES = 60;  // æ¯ 60 å¸§æ’ä¸€ä¸ªè°ƒè‰²æ¿åŒ…(=1s@60fps)
+parameter LINE_LEN   = 16'd1287;  // 7 å­—èŠ‚åŒ…å¤´ + 1280 ä¸ªæ ‡å·
 parameter PAL_LEN    = 16'd228;
 parameter [7:0] PAL_LAST = 8'd227;
 parameter PAL_N      = 8'd56;
-parameter KB_TIMEOUT = 24'd14_850_000;  // 200ms @74.25MHz Ã»ÓĞ°´¼ü°ü¾ÍÈ«²¿ËÉ¿ª
-parameter KB_RST_CNT = 25'd1_485_000;  // Ğ¡¼üÅÌ9¸´Î»°Ñ Reset_n À­µÍ 20ms
-parameter KB_ACT_CNT = 25'd22_275_000;  // ÊÕµ½°´¼ü°üºó kb_activity ÁÁ 0.3s
-parameter KB_GAP_MAX = 8'd255;  // °üÄÚ×Ö½Ú¼ä¸ô³¬Ê±=°ü²»ÍêÕû£¬ÖØĞÂÍ¬²½
+parameter KB_TIMEOUT = 24'd14_850_000;  // 200ms @74.25MHz æ²¡æœ‰æŒ‰é”®åŒ…å°±å…¨éƒ¨æ¾å¼€
+parameter KB_RST_CNT = 25'd1_485_000;  // å°é”®ç›˜9å¤ä½æŠŠ Reset_n æ‹‰ä½ 20ms
+parameter KB_ACT_CNT = 25'd22_275_000;  // æ”¶åˆ°æŒ‰é”®åŒ…å kb_activity äº® 0.3s
+parameter KB_GAP_MAX = 8'd255;  // åŒ…å†…å­—èŠ‚é—´éš”è¶…æ—¶=åŒ…ä¸å®Œæ•´ï¼Œé‡æ–°åŒæ­¥
 
 assign eth_rstn = 1'b1;
 assign eth_mdc  = 1'b1;
@@ -62,7 +64,7 @@ wire       rx_empty;
 wire       kb_rd_en;
 
 //============================================================
-//    eth_udp_loopback_rgmii Àı»¯
+//    eth_udp_loopback_rgmii ä¾‹åŒ–
 //============================================================
 reg         tog_line;
 reg         tog_pal;
@@ -99,7 +101,7 @@ eth_udp_loopback_rgmii eth_udp_loopback_rgmii_inst(
 );
 
 //============================================================
-//    clk125m Óò£ºtx_start Âö³å + °ü³¤Ñ¡Ôñ£¨toggle ÎÕÊÖ£©
+//    clk125m åŸŸï¼štx_start è„‰å†² + åŒ…é•¿é€‰æ‹©ï¼ˆtoggle æ¡æ‰‹ï¼‰
 //============================================================
 reg  gl1, gl2, gl3;
 reg  gp1, gp2, gp3;
@@ -135,7 +137,7 @@ assign tx_start_125 = p_line | p_pal;
 assign tx_len_125   = p_pal ? PAL_LEN : LINE_LEN;
 
 //============================================================
-//    pll_locked Í¬²½µ½ 74.25 Óò
+//    pll_locked åŒæ­¥åˆ° 74.25 åŸŸ
 //============================================================
 reg pl_s1, pl_s2;
 
@@ -150,7 +152,7 @@ end
 wire link_up = pl_s2;
 
 //============================================================
-//    ÏñËØ´òÒ»ÅÄ + ÑÕÉ«²é±í
+//    åƒç´ æ‰“ä¸€æ‹ + é¢œè‰²æŸ¥è¡¨
 //============================================================
 reg        de_r, de_r2;
 reg [10:0] vc_r;
@@ -183,18 +185,18 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else if(de_r) line_num <= vc_r;
 end
 
-// RGB¡úµ÷É«°åË÷Òı£º8 Î»ÎŞÅö×²¹şÏ£ºó²é BRAM ±í£¬±ÜÃâ 24 Î»È«É«±È½Ï¡£
-// Ó³ÉäÓÉ rgb_to_palette.v µÄÍ¬²½ ROM Íê³É£¬½á¹ûÖ±½ÓĞ´Èë TX FIFO¡£
+// RGBâ†’è°ƒè‰²æ¿ç´¢å¼•ï¼š8 ä½æ— ç¢°æ’å“ˆå¸ŒåæŸ¥ BRAM è¡¨ï¼Œé¿å… 24 ä½å…¨è‰²æ¯”è¾ƒã€‚
+// æ˜ å°„ç”± rgb_to_palette.v çš„åŒæ­¥ ROM å®Œæˆï¼Œç»“æœç›´æ¥å†™å…¥ TX FIFOã€‚
 //============================================================
-//    ĞĞÄ©/³¡Ä© ´ò°üĞòÁĞÆ÷
+//    è¡Œæœ«/åœºæœ« æ‰“åŒ…åºåˆ—å™¨
 //============================================================
 localparam SEQ_IDLE = 4'd0;
-localparam SEQ_HDR  = 4'd1;  // Ğ´ÏÂÒ»ĞĞ°üÍ· 7 ×Ö½Ú
-localparam SEQ_TOG  = 4'd2;  // tx_start£¨ĞĞ°ü£©
-localparam SEQ_PAL  = 4'd3;  // Ğ´µ÷É«°å°ü
-localparam SEQ_PTOG = 4'd4;  // tx_start£¨µ÷É«°å°ü£©
-localparam SEQ_H0   = 4'd5;  // Ğ´ÏÂÒ»Ö¡µÚ 0 ĞĞ°üÍ·
-localparam SEQ_WAIT = 4'd6;  // µÈ MAC ·¢ÍêÉÏÒ»°ü
+localparam SEQ_HDR  = 4'd1;  // å†™ä¸‹ä¸€è¡ŒåŒ…å¤´ 7 å­—èŠ‚
+localparam SEQ_TOG  = 4'd2;  // tx_startï¼ˆè¡ŒåŒ…ï¼‰
+localparam SEQ_PAL  = 4'd3;  // å†™è°ƒè‰²æ¿åŒ…
+localparam SEQ_PTOG = 4'd4;  // tx_startï¼ˆè°ƒè‰²æ¿åŒ…ï¼‰
+localparam SEQ_H0   = 4'd5;  // å†™ä¸‹ä¸€å¸§ç¬¬ 0 è¡ŒåŒ…å¤´
+localparam SEQ_WAIT = 4'd6;  // ç­‰ MAC å‘å®Œä¸Šä¸€åŒ…
 
 reg [3:0]  seq;
 reg [7:0]  seq_idx;
@@ -213,7 +215,7 @@ wire pal_due   = (pal_cnt == PAL_FRAMES - 1);
 wire send_pal  = line_719 && pal_due && frame_on;
 
 //============================================================
-//    ĞĞÄ©/µ÷É«°å·¢ËÍ±êÖ¾¼Ä´æ
+//    è¡Œæœ«/è°ƒè‰²æ¿å‘é€æ ‡å¿—å¯„å­˜
 //============================================================
 reg         h0_lat;
 reg         pal_lat;
@@ -325,7 +327,7 @@ always@(posedge Clk_74M or negedge Reset_n)begin
 end
 
 //============================================================
-//    °üÍ· / µ÷É«°å°ü ×Ö½Ú
+//    åŒ…å¤´ / è°ƒè‰²æ¿åŒ… å­—èŠ‚
 //============================================================
 wire [10:0] hdr_line  = (seq == SEQ_H0) ? 11'd0 : (line_num + 11'd1);
 wire [15:0] hdr_frame = frame_cnt;
@@ -427,7 +429,7 @@ always@(*)begin
 end
 
 //============================================================
-//    FIFO Ğ´£ºÏñËØ / °üÍ· / µ÷É«°å
+//    FIFO å†™ï¼šåƒç´  / åŒ…å¤´ / è°ƒè‰²æ¿
 //============================================================
 always@(*)begin
   if(seq == SEQ_HDR || seq == SEQ_H0)
@@ -449,119 +451,19 @@ always@(posedge Clk_74M or negedge Reset_n)begin
   else wait_cnt <= 11'd0;
 end
 
-//============================================================
-//    ÍøÂç°´¼ü£º´Ó½ÓÊÕ FIFO ½âÎö A5 5A 03 | Î»Í¼
-//============================================================
-localparam KB_WA5 = 2'd0;
-localparam KB_W5A = 2'd1;
-localparam KB_W03 = 2'd2;
-localparam KB_BIT = 2'd3;
-
-reg  [1:0]  kb_st;
-reg  [7:0]  kb_bits;
-reg  [7:0]  kb_bits_d;
-reg  [23:0] kb_timer;
-reg  [24:0] kb_act_cnt;
-reg  [24:0] kb_rst_cnt;
-reg  [7:0]  kb_gap;
-reg         kb_rst_hold;
-
-wire kb_hit      = kb_rd_en && (kb_st == KB_BIT);
-wire kb_gap_done = (kb_gap >= KB_GAP_MAX);
-wire kb_tout     = (kb_timer >= KB_TIMEOUT);
-wire kb_rst_trig = kb_bits[6] && (!kb_bits_d[6]);
-
-assign kb_rd_en = (!rx_empty);
-
-always@(posedge Clk_74M or negedge Reset_n)begin
-  if(!Reset_n)
-  kb_st <= KB_WA5;
-  else if(kb_rd_en)
-  case(kb_st)
-  KB_WA5: kb_st <= (rx_byte == 8'hA5) ? KB_W5A : KB_WA5;
-  KB_W5A: kb_st <= (rx_byte == 8'h5A) ? KB_W03 : ((rx_byte == 8'hA5) ? KB_W5A : KB_WA5);
-  KB_W03: kb_st <= (rx_byte == 8'd3)  ? KB_BIT : ((rx_byte == 8'hA5) ? KB_W5A : KB_WA5);
-  KB_BIT: kb_st <= KB_WA5;
-  default:kb_st <= KB_WA5;
-  endcase
-  else if(kb_gap_done)
-  kb_st <= KB_WA5;
-end
-
-always@(posedge Clk_74M or negedge Reset_n)begin
-  if(!Reset_n)
-  kb_gap <= 8'd0;
-  else if(kb_rd_en)
-  kb_gap <= 8'd0;
-  else if(kb_gap < KB_GAP_MAX)
-  kb_gap <= kb_gap + 8'd1;
-end
-
-always@(posedge Clk_74M or negedge Reset_n)begin
-  if(!Reset_n)
-  kb_bits <= 8'd0;
-  else if(kb_hit)
-  kb_bits <= rx_byte;
-  else if(kb_tout)
-  kb_bits <= 8'd0;
-end
-
-always@(posedge Clk_74M or negedge Reset_n)begin
-  if(!Reset_n)
-  kb_bits_d <= 8'd0;
-  else
-  kb_bits_d <= kb_bits;
-end
-
-always@(posedge Clk_74M or negedge Reset_n)begin
-  if(!Reset_n)
-  kb_timer <= 24'd0;
-  else if(kb_hit)
-  kb_timer <= 24'd0;
-  else if(kb_timer < KB_TIMEOUT)
-  kb_timer <= kb_timer + 24'd1;
-end
-
-always@(posedge Clk_74M or negedge Reset_n)begin
-  if(!Reset_n)
-  kb_act_cnt <= 25'd0;
-  else if(kb_hit)
-  kb_act_cnt <= KB_ACT_CNT;
-  else if(kb_act_cnt != 25'd0)
-  kb_act_cnt <= kb_act_cnt - 25'd1;
-end
-
-//    Ğ¡¼üÅÌ9¸´Î»£º°Ñ Reset_n À­µÍÒ»¶ÎÊ±¼ä£¬µÈĞ§°´°åÉÏ¸´Î»¼ü
-always@(posedge Clk_74M or negedge por_n)begin
-  if(!por_n)
-  kb_rst_cnt <= 25'd0;
-  else if(kb_rst_trig)
-  kb_rst_cnt <= 25'd0;
-  else if(kb_rst_hold && (kb_rst_cnt < KB_RST_CNT))
-  kb_rst_cnt <= kb_rst_cnt + 25'd1;
-end
-
-always@(posedge Clk_74M or negedge por_n)begin
-  if(!por_n)
-  kb_rst_hold <= 1'b0;
-  else if(kb_rst_trig)
-  kb_rst_hold <= 1'b1;
-  else if(kb_rst_cnt == KB_RST_CNT)
-  kb_rst_hold <= 1'b0;
-end
-
-assign kb_reset_en = kb_rst_hold;
-assign kb_activity = (kb_act_cnt != 25'd0);
-
-assign kb_left_p    = kb_bits[0] && (!kb_bits_d[0]);
-assign kb_right_p   = kb_bits[1] && (!kb_bits_d[1]);
-assign kb_left_held  = kb_bits[0];
-assign kb_right_held = kb_bits[1];
-assign kb_rotate_p  = kb_bits[3] && (!kb_bits_d[3]);
-assign kb_hold_p    = kb_bits[4] && (!kb_bits_d[4]);
-assign kb_hold_en   = kb_bits[4];
-assign kb_drop_en   = kb_bits[2];
-assign kb_drop_r    = (!kb_bits[2]) && kb_bits_d[2];
-assign kb_switch_en = kb_bits[5];
-assign kb_switch_r  = (!kb_bits[5]) && kb_bits_d[5];
+    // ç½‘ç»œé”®ç›˜æ¥æ”¶: è§£ææ¥æ”¶ FIFO ä¸­çš„æŒ‰é”®å¸§, è¾“å‡ºæ¸¸æˆæ“ä½œä¿¡å·ã€‚
+    net_keyboard_receiver #(
+        .KB_TIMEOUT(KB_TIMEOUT), .KB_RST_CNT(KB_RST_CNT),
+        .KB_ACT_CNT(KB_ACT_CNT), .KB_GAP_MAX(KB_GAP_MAX)
+    ) keyboard_receiver_inst(
+        .Clk_74M(Clk_74M), .Reset_n(Reset_n), .por_n(por_n),
+        .rx_byte(rx_byte), .rx_empty(rx_empty), .kb_rd_en(kb_rd_en),
+        .kb_left_p(kb_left_p), .kb_right_p(kb_right_p),
+        .kb_left_held(kb_left_held), .kb_right_held(kb_right_held),
+        .kb_drop_r(kb_drop_r), .kb_drop_en(kb_drop_en),
+        .kb_rotate_p(kb_rotate_p), .kb_switch_r(kb_switch_r),
+        .kb_switch_en(kb_switch_en), .kb_hold_p(kb_hold_p),
+        .kb_hold_en(kb_hold_en), .kb_reset_en(kb_reset_en),
+        .kb_activity(kb_activity)
+    );
 endmodule

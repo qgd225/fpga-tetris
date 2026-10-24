@@ -1,10 +1,11 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 `timescale 1ns/1ps
 
 //============================================================
-// ²âÊÔÌ¨£ºsolo_hint_tb
-// ²âÊÔÄ¿±ê£ºÖÇÄÜÂäµãËÑË÷¡¢ÆÀ·Ö¡¢¿Õ¶´Ö§³ÖºÍÀàĞÍÇĞ»»»Ø¹é¡£
+// æµ‹è¯•å°ï¼šsolo_hint_tb
+// æµ‹è¯•ç›®æ ‡ï¼šæ™ºèƒ½è½ç‚¹æœç´¢ã€è¯„åˆ†ã€ç©ºæ´æ”¯æŒå’Œç±»å‹åˆ‡æ¢å›å½’ã€‚
 //============================================================
-// 1 ÅÄ¶ÁÑÓ³ÙµÄĞÎ×´ ROM ·ÂÕæ×®, Êı¾İÓë Tetromino.mif ÍêÈ«Ò»ÖÂ
+// 1 æ‹è¯»å»¶è¿Ÿçš„å½¢çŠ¶ ROM ä»¿çœŸæ¡©, æ•°æ®ä¸ Tetromino.mif å®Œå…¨ä¸€è‡´
 module Tetromino(input clka, input [4:0] addra, output reg [31:0] douta);
 function [31:0] shape_of;
 input [4:0] a;
@@ -161,13 +162,13 @@ end
 endfunction
 
 initial begin
-$display("=== solo_hint Éî¶ÈËÑË÷ ===");
+$display("=== solo_hint æ·±åº¦æœç´¢ ===");
 
-// Æ½³¡
+// å¹³åœº
 reset_dut; run_search(3'd3);
 chk("flat valid",hint_valid,1); chk("flat type",hint_type,3); chk("flat cells in board",all_in_board(0),1); chk("flat no overlap",no_overlap(0),1);
 
-// Á¬ĞøÇĞ»»·½¿éÀàĞÍ: µÚÒ»¸öºòÑ¡²»µÃÑØÓÃÉÏÒ»ÀàĞÍµÄ ROM ĞÎ×´
+// è¿ç»­åˆ‡æ¢æ–¹å—ç±»å‹: ç¬¬ä¸€ä¸ªå€™é€‰ä¸å¾—æ²¿ç”¨ä¸Šä¸€ç±»å‹çš„ ROM å½¢çŠ¶
 reset_dut; run_search(3'd0);
 chk("type0 shape left",cell_at(0,19),1); chk("type0 shape right",cell_at(3,19),1);
 run_search(3'd5);
@@ -175,14 +176,14 @@ chk("type5 shape a",cell_at(0,18),1); chk("type5 shape b",cell_at(1,18),1);
 chk("type5 shape c",cell_at(1,19),1); chk("type5 shape d",cell_at(2,19),1);
 chk("type5 not stale I row",cell_at(3,19),0);
 
-// ½üÏûĞĞ: µ×ĞĞ½ö 8..11 ¿Õ, I Ğı×ª 1 ±ØĞë²¹Âú²¢ÏûĞĞ
+// è¿‘æ¶ˆè¡Œ: åº•è¡Œä»… 8..11 ç©º, I æ—‹è½¬ 1 å¿…é¡»è¡¥æ»¡å¹¶æ¶ˆè¡Œ
 reset_dut; set_row(19,20'hFF0FF); run_search(3'd0);
 chk("near clear valid",hint_valid,1); chk("near clear rotation",dut.best_rot,1);
 chk("near clear gap0",cell_at(8,19),1); chk("near clear gap1",cell_at(9,19),1);
 chk("near clear gap2",cell_at(10,19),1); chk("near clear gap3",cell_at(11,19),1);
 chk("near clear score",dut.best_score,480);
 
-// ËÑË÷ÆÚ¼äÆåÅÌ±ä»¯²»Ó°ÏìÒÑËø´æ¿ìÕÕ
+// æœç´¢æœŸé—´æ£‹ç›˜å˜åŒ–ä¸å½±å“å·²é”å­˜å¿«ç…§
 reset_dut; set_row(19,20'hFF0FF); type=3'd0;
 start=1; @(posedge Clk); #1; start=0;
 cyc=0; while((dut.state==18)&&(cyc<200))begin @(posedge Clk);cyc=cyc+1;end
@@ -191,12 +192,12 @@ rows=480'd0;
 cyc=0; while((dut.state!=0)&&(cyc<30000))begin @(posedge Clk);cyc=cyc+1;end
 chk("snapshot search valid",hint_valid,1); chk("snapshot search score",dut.best_score,480);
 
-// Ìù×óÇ½: Ö»ÓĞ 0..3 ¿Õ, Ë®Æ½ I ±ØĞëÌùÇ½²¹Âú
+// è´´å·¦å¢™: åªæœ‰ 0..3 ç©º, æ°´å¹³ I å¿…é¡»è´´å¢™è¡¥æ»¡
 reset_dut; set_row(19,20'hFFFF0); run_search(3'd0);
 chk("wall valid",hint_valid,1); chk("wall rotation",dut.best_rot,1);
 chk("wall c0",cell_at(0,19),1); chk("wall c3",cell_at(3,19),1);
 
-// ÒÑÓĞ¿Õ¶´: ¿Õ¶´×ÜÊı±ØĞë±»É¨Ãèµ½, ÇÒºòÑ¡²»¸²¸ÇÒÑÓĞ¸ñ
+// å·²æœ‰ç©ºæ´: ç©ºæ´æ€»æ•°å¿…é¡»è¢«æ‰«æåˆ°, ä¸”å€™é€‰ä¸è¦†ç›–å·²æœ‰æ ¼
 reset_dut;
 for(pcol=8;pcol<=10;pcol=pcol+1)
   for(prow=4;prow<=19;prow=prow+1) rows[prow*24+pcol]=1'b1;
@@ -206,15 +207,15 @@ chk("stack I supported",no_hint_overhang(0),1);
 reset_dut; set_row(18,20'h00001); run_search(3'd0);
 chk("hole valid",hint_valid,1); chk("hole counted",(dut.holes_total>0),1); chk("hole no overlap",no_overlap(0),1);
 
-// Ìù¶¥ÎŞºÏ·¨Âäµã
+// è´´é¡¶æ— åˆæ³•è½ç‚¹
 reset_dut; set_row(0,20'hFFFFF); run_search(3'd3);
 chk("top full invalid",hint_valid,0); chk("top no best",dut.best_valid,0);
 
-// Ë«ÈËÇ¿ÖÆ²»Æô¶¯
+// åŒäººå¼ºåˆ¶ä¸å¯åŠ¨
 reset_dut; duo=1; start=1; repeat(20)@(posedge Clk); start=0; repeat(4)@(posedge Clk);
 chk("duo no search",dut.state,0); chk("duo keeps invalid",hint_valid,0);
 
-// ¶ş´ÎËÑË÷: ´¥·¢ºóÄÜ´Ó IDLE Õı³£ÖØËã
+// äºŒæ¬¡æœç´¢: è§¦å‘åèƒ½ä» IDLE æ­£å¸¸é‡ç®—
 reset_dut; set_row(19,20'hFF0FF); run_search(3'd0);
 chk("repeat search1",hint_valid,1);
 start=1;@(posedge Clk);#1;start=0;
@@ -222,7 +223,7 @@ chk("new trigger hides old hint",hint_valid,0);
 cyc=0;while((dut.state!=0)&&(cyc<30000))begin @(posedge Clk);cyc=cyc+1;end
 chk("repeat search2",hint_valid,1); chk("repeat still rotated",dut.best_rot,1);
 
-// ÖğÁĞ¸ß¶ÈÈ«Ãæ»Ø¹é: 20 ×é½×ÌİµØĞÎ, ÖÇÄÜÂäµã²»µÃ¸²¸ÇÈÎºÎËø´æ¸ñ
+// é€åˆ—é«˜åº¦å…¨é¢å›å½’: 20 ç»„é˜¶æ¢¯åœ°å½¢, æ™ºèƒ½è½ç‚¹ä¸å¾—è¦†ç›–ä»»ä½•é”å­˜æ ¼
 for(pidx=0;pidx<20;pidx=pidx+1)begin
   rows=480'd0;
   for(pcol=0;pcol<20;pcol=pcol+1)begin

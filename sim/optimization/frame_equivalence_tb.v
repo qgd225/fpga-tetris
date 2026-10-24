@@ -1,3 +1,4 @@
+// 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
 `timescale 1ns/1ps
 `define FRAME_INPUTS \
     .Clk_74M(clk),.Reset_n(rst),.hcounter(hc),.vcounter(vc), \

@@ -1,7 +1,8 @@
+// ç¼–ç : æœ¬åœ°å·¥ä½œåŒº GBK æ—  BOM, Git ä»“åº“ UTF-8ã€‚
 //============================================================
-// Ä£¿é£ºsolo_hint
-// ×÷ÓÃ£ºÖÇÄÜÂäµãËÑË÷£º4 Ğı×ª x 20 ÁĞ£¬°´ÏûĞĞ¡¢¿Õ¶´¡¢¸ß¶ÈºÍĞü¿ÕÆÀ·Ö¡£
-// Ê±ÖÓ/¸´Î»£ºClk_74M£»Reset_n µÍÓĞĞ§
+// æ¨¡å—ï¼šsolo_hint
+// ä½œç”¨ï¼šæ™ºèƒ½è½ç‚¹æœç´¢ï¼š4 æ—‹è½¬ x 20 åˆ—ï¼ŒæŒ‰æ¶ˆè¡Œã€ç©ºæ´ã€é«˜åº¦å’Œæ‚¬ç©ºè¯„åˆ†ã€‚
+// æ—¶é’Ÿ/å¤ä½ï¼šClk_74Mï¼›Reset_n ä½æœ‰æ•ˆ
 //============================================================
 module solo_hint(
     input Clk_74M,
@@ -69,7 +70,7 @@ module solo_hint(
     end
     endfunction
 
-//    ¶îÍâ½öÒ»¸öĞÎ×´ ROM ÊµÀı, Óë³¡µØ¹²ÓÃÍ¬Ò»·İ 28 ÏîĞÎ×´Êı¾İ
+//    é¢å¤–ä»…ä¸€ä¸ªå½¢çŠ¶ ROM å®ä¾‹, ä¸åœºåœ°å…±ç”¨åŒä¸€ä»½ 28 é¡¹å½¢çŠ¶æ•°æ®
     wire signed [6:0]candidate_col = col_s + s4(shp_r[build_i*8+7 -:4]);
     wire [4:0]board_read_row = state == S_TOP ? top_r[4:0] :
         state == S_HOLE ? hole_r[4:0] :
@@ -90,7 +91,7 @@ module solo_hint(
         .douta(rom_dout)
     );
 
-//    ºòÑ¡ÆÀ·Ö: ÏûĞĞ½±Àø - ¿Õ¶´/¸ß¶È/°¼Í¹/×î¸ß/Ğü¿Õ³Í·£
+//    å€™é€‰è¯„åˆ†: æ¶ˆè¡Œå¥–åŠ± - ç©ºæ´/é«˜åº¦/å‡¹å‡¸/æœ€é«˜/æ‚¬ç©ºæƒ©ç½š
     always@(*)begin
     case(cand_clears)
     0:score_calc = 17'sd0;
@@ -131,7 +132,7 @@ module solo_hint(
     end
     else if(start && ((state == S_IDLE) || !start_d))begin
 
-// ÆåÅÌ/·½¿éÊÂ¼şÒ»µ½ÏÈÒş²Ø, µÈ´ıÎÈ¶¨ºóÔÙËÑË÷
+// æ£‹ç›˜/æ–¹å—äº‹ä»¶ä¸€åˆ°å…ˆéšè—, ç­‰å¾…ç¨³å®šåå†æœç´¢
         hint_valid <= 1'b0;
         best_valid <= 1'b0;
         best_score <= -17'sd32768;
@@ -337,7 +338,7 @@ module solo_hint(
     S_EVAL:begin
         newtop_temp = (ptop < {1'b0,top_read_data}) ? ptop : {1'b0,top_read_data};
 
-// tops ÊÇ¶¥ÃæĞĞºÅ, ÕæÊµ¸ß¶È±ØĞëÓÃ 20-top
+// tops æ˜¯é¡¶é¢è¡Œå·, çœŸå®é«˜åº¦å¿…é¡»ç”¨ 20-top
         cand_total <= cand_total + (6'd20 - {1'b0,newtop_temp});
         if(eval_c != 0)
             cand_bump <= cand_bump + ((newtop_temp > prev_top) ? (newtop_temp - prev_top) : (prev_top - newtop_temp));
