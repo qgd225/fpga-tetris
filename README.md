@@ -17,8 +17,8 @@ HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模�
 - 模块划分：`sound` 事件/音符 → `game_audio_pcm` 采样 → `hdmi_audio_packets` FIFO/ACR/InfoFrame → `hdmi_av_encoder` 数据岛/TMDS。
 - 图像仍使用原有 1280×720 坐标，音视频使用同一像素时钟；音频以时钟使能推进，不增加低速时钟域。
 - PLL 实际输出约 74.21875 MHz，采样使能按实际频率生成；ACR 使用 N=6144，并测量 CTS，避免直接套用标称频率。
-- 新版比特流单独命名为 `Tetris_hdmi_audio.bit`。根目录原有 `Tetris.bit` 保持归档版本，不能用它验证 HDMI 音效。
-- 已通过新增跨帧 HDMI 协议仿真，当前优化基线回归正在重跑；完整实现结果及上板测试步骤见 [HDMI 音效说明](docs/HDMI音效测试.md)。
+- 新版比特流已生成并随功能分支提供，单独命名为 `Tetris_hdmi_audio.bit`。根目录原有 `Tetris.bit` 保持归档版本，不能用它验证 HDMI 音效。
+- 已通过当前优化基线的 13 个回归入口及新增跨帧 HDMI 协议仿真；实现通过，LUT 11,794（56.70%）、WNS +0.166 ns、WHS +0.071 ns；完整结果及上板测试步骤见 [HDMI 音效说明](docs/HDMI音效测试.md)。
 
 ## 工程信息
 
@@ -75,7 +75,9 @@ Game_state_machine ────────┐
    场地/碰撞/           HUD/菜单/
    幽灵/智能提示        结算/UI特效
         │                  │
-        ├──────► sound ────┴──────► buzz_main / buzz_else
+        ├──────► sound ──► game_audio_pcm ──► hdmi_audio_packets ──► hdmi
+        │                  │
+        │                  └──────► buzz_else（蜂鸣器对照）
         │
         └──────► net_screen_tx ─────► UDP 画面
 ```
@@ -99,6 +101,9 @@ Tetris.srcs/
     │   ├── scoring.v / level.v / timer.v / frame.v
     │   ├── rgb_to_palette.v          # PC 画面 RGB→56 色 BRAM 索引
     │   ├── music.v / sound.v         # 音乐与音效
+    │   ├── game_audio_pcm.v          # 游戏音效转 PCM
+    │   ├── hdmi_audio_packets.sv     # 音频 FIFO、ACR 与包调度
+    │   ├── hdmi_av_encoder.sv        # HDMI 数据岛与音视频编码
     │   ├── key_filter.v / Key.v      # 按键消抖
     │   ├── horizontal_repeat.v       # 横向 DAS/ARR 连发
     │   └── game_over.v / Playfield_edge.v

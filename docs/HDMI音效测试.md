@@ -36,8 +36,8 @@
 D:/xilinx/Vivado/2018.3/bin/vivado.bat -mode batch -source tools/build_hdmi_audio.tcl
 ```
 
-- HDMI 协议模块已在原发布基线上通过九套回归；本分支还会重跑当前 LUTRAM/模块化基线的回归。
-- 新增测试驱动真实 `sound` 菜单事件，经 PCM、FIFO、包调度和编码器传输。
+- 当前 LUTRAM/模块化基线的 13 个回归入口全部通过：duo、frame_duo、level、sound、input_route、net_keyboard、horizontal_repeat、hold_gesture、solo_hint、rgb_palette、lutram、optimization、hdmi_audio。
+- 新增测试驱动真实 `sound` 菜单事件，经 PCM、FIFO、包调度和编码器传输。输出 `ALL PASS HDMI audio: 7848263 checks, 1632 samples, 407 audio packets, 32 ACR`，其中 7,848,263 是逐周期断言执行次数，并非独立功能用例数。
 - 覆盖正/负采样、静音、效果结束、精确采样数量与间隔、FIFO 无溢出、跨帧元数据重发、复位恢复。
 - 从数据岛重组包，独立检查头部及 4 个子包 BCH、左右声道一致、16 位对齐、IEC 奇偶校验、ACR N/CTS。
 - 独立反解视频 TMDS 检查 RGB 相位，检查 TERC4 编码、每行 320 数据岛像素和可见行 1280 视频像素。
@@ -46,7 +46,23 @@ D:/xilinx/Vivado/2018.3/bin/vivado.bat -mode batch -source tools/build_hdmi_audi
 
 ## 完整实现结果
 
-完整综合、布局布线与比特流正在构建，完成后更新本节。归档 README 中旧版资源和时序数据不能作为本版结果。
+2026-10-24 使用 Vivado 2018.3 从零综合和实现，功能 RTL 提交为 `5059a1a`。完整回归、建立/保持时序及总线偏斜检查通过，全部 14,588 条可布线网络已布通。
+
+| 项目 | 结果 |
+| --- | --- |
+| LUT | 11,794 / 20,800（56.70%） |
+| 寄存器 | 4,423（其中 FF 4,411，原设计锁存器 12） |
+| BRAM | 15.5 / 50 |
+| DSP | 0 |
+| IOB | 34 |
+| WNS / WHS | +0.166 ns / +0.071 ns |
+| TNS / THS | 0 / 0 |
+| 总线偏斜最小余量 | +5.891 ns |
+| 实现及比特流生成 | 0 error、0 critical warning |
+| 测试比特流 | `Tetris_hdmi_audio.bit`，2,192,114 字节 |
+| SHA256 | `2FFE730568E0DB149D5F2A548D5907EBFCA0A2DB3253311D8666949800F6E0F6` |
+
+报告与回归摘要保存在 [验证报告目录](reports/hdmi_audio)。时序通过指已定义约束的路径；报告仍包含与原优化基线一致的 102 个未约束内部引脚及部分未定义输入/输出延迟。默认 DRC 共 48 条 warning，涉及既有门控/锁存、BRAM 异步控制及 PHY 时钟放置等，详细内容保留在报告中。
 
 ## 上板测试步骤
 

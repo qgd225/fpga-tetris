@@ -18,3 +18,4 @@
 
 # 保留第三方 HDL 的原始 UTF-8 编码
 third_party/hdl_util_hdmi/src/*.sv text eol=lf working-tree-encoding=UTF-8
+docs/reports/hdmi_audio/*.rpt text eol=lf

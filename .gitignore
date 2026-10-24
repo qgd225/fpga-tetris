@@ -54,3 +54,7 @@ tools/startup_error.log
 
 # ===== 本地发布压缩包 =====
 /Tetris*.zip
+
+# HDMI 测试交付比特流保留，重复生成的根目录报告排除
+!/Tetris_hdmi_audio.bit
+/hdmi_audio_*.rpt

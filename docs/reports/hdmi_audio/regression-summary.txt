@@ -1,0 +1,13 @@
+duo: === ALL PASS ===
+frame_duo: === ALL PASS ===
+level: === ALL PASS ===
+sound: === ALL PASS ===
+input_route: === ALL PASS ===
+net_keyboard: === ALL PASS: NET KEYBOARD ===
+horizontal_repeat: === ALL PASS: 30 checks ===
+hold_gesture: === ALL PASS ===
+solo_hint: === ALL PASS ===
+rgb_palette: === ALL PASS: 56 checks ===
+lutram: === ALL PASS: LUTRAM ===; === ALL PASS: LUTRAM ===; === ALL PASS: LUTRAM FRAME ===
+optimization: === ALL PASS: PLAYFIELD EQUIVALENCE ===; === ALL PASS: FRAME EQUIVALENCE ===; === ALL PASS: HINT EQUIVALENCE ===; === ALL PASS: METADATA ===; === ALL PASS: METADATA ===; === ALL PASS ===; === ALL PASS: LUTRAM FRAME ===; === ALL PASS: OPTIMIZATION ===
+hdmi_audio: ALL PASS HDMI audio: 7848263 checks, 1632 samples, 407 audio packets, 32 ACR

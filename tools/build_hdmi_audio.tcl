@@ -14,6 +14,7 @@ if {[get_property PROGRESS [get_runs impl_1]] ne "100%"} { error "Implementation
 open_run impl_1
 report_utilization -file hdmi_audio_utilization.rpt
 report_timing_summary -file hdmi_audio_timing.rpt
+report_bus_skew -file hdmi_audio_bus_skew.rpt
 report_route_status -file hdmi_audio_route.rpt
 report_drc -file hdmi_audio_drc.rpt
 if {[llength [get_timing_paths -quiet -slack_lesser_than 0 -delay_type max]] > 0} { error "Setup timing failed" }
