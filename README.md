@@ -2,6 +2,12 @@
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
+## HDMI 音效开发前归档（2026-10-24）
+
+本次以 GitHub 最新版 `2f1502f` 为基线，保存故事板界面、现有游戏音效、资源优化与便携 PC 程序。归档标签为 `baseline-current-before-hdmi-audio-20261024`。
+
+此基线的 HDMI 只传画面，声音由蜂鸣器播放；后续在独立分支 `codex/hdmi-game-audio` 开发数字音频采样与 HDMI 数据岛发送。下方资源、时序和 `Tetris.bit` 均属于归档版本，不代表后续音频版的验证结果。
+
 ## 工程信息
 
 | 项目 | 值 |
