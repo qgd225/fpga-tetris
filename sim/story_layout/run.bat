@@ -3,7 +3,7 @@ call "D:\xilinx\Vivado\2018.3\settings64.bat" >nul 2>&1
 cd /d "%~dp0"
 if not exist build mkdir build
 cd build
-call xvlog.bat ..\mapper_tb.v ..\..\..\Tetris.srcs\sources_1\new\story_pixel_mapper.v --nolog
+call xvlog.bat -i ..\..\..\Tetris.srcs\sources_1\new ..\mapper_tb.v ..\..\..\Tetris.srcs\sources_1\new\story_pixel_mapper.v ..\..\..\Tetris.srcs\sources_1\new\story_pixel_frontend.v --nolog
 if errorlevel 1 exit /b 1
 call xelab.bat mapper_tb -s mapper --timescale 1ns/1ps --nolog
 if errorlevel 1 exit /b 1

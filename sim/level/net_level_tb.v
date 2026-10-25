@@ -30,7 +30,7 @@ integer bad, m, sp;
 always #6.734 Clk_74M = ~Clk_74M;
 
 frame #(.EFF_TICK(21'd8)) dut(
-  .Clk_74M(Clk_74M), .Reset_n(Rst), .hcounter(hc), .vcounter(vc),
+  .Clk_74M(Clk_74M), .Reset_n(Rst), .hcounter(hc), .vcounter(vc), .video_de(1'b1), .choose(1'b0), .choose_cnt(4'd0),
   .left_p_flag(left_p), .right_p_flag(right_p), .drop_r_flag(drop_r), .drop_en(drop_en),
   .rotate_p_flag(rotate_p), .switch_r_flag(switch_r), .hold_p_flag(hold_p),
   .Idle(Idle), .Playing(Playing), .Stop(Stop), .Finalize(Finalize),
@@ -178,34 +178,18 @@ initial begin
     chk("分数 BCD 逐位一致(7 个值)", badv, 0);
   end
 
-  $display("=== 8) level energy bar geometry ===");
-  begin : level_geom
-    force dut.story_inst.story_speed = 3'd3;
-    repeat(4) @(posedge Clk_74M);
-    hc = 11'd293; vc = 11'd400; #1;
-    chk("segment margin", dut.level_inst.margin, 1);
-    hc = 11'd293; vc = 11'd402; #1;
-    chk("current inner", dut.level_inst.inner, 1);
-    chk("current segment", dut.level_inst.cur, 1);
-    chk("current segment index", dut.level_inst.seg, 3);
-    chk("current cap", dut.level_inst.cap, 1);
-    vc = 11'd408; #1;
-    chk("cap ends at 6px", dut.level_inst.cap, 0);
-    vc = 11'd440; #1;
-    chk("current body lit", dut.level_inst.on, 1);
-    vc = 11'd360; #1;
-    chk("above segment unlit", dut.level_inst.on, 0);
-    hc = 11'd267; vc = 11'd440; #1;
-    chk("outside left", dut.level_inst.inner, 0);
-    hc = 11'd268; #1;
-    chk("width starts 268", dut.level_inst.inner, 1);
-    hc = 11'd301; #1;
-    chk("width ends 301", dut.level_inst.inner, 1);
-    hc = 11'd302; #1;
-    chk("outside right", dut.level_inst.inner, 0);
-    release dut.story_inst.story_speed;
-    hc = 11'd0; vc = 11'd0;
-  end
+  $display("=== 8) 核心：结构、八段锁定与边界 ===");
+  force dut.story_inst.story_speed=3'd3;
+  hc=0;vc=0;repeat(3)@(negedge Clk_74M);
+  hc=1024-4;vc=512;repeat(2)@(negedge Clk_74M);repeat(2)@(negedge Clk_74M);#1;chk("phase1 lower rail",dut.story_ui_inst.core.color_index,53);
+  vc=392;repeat(2)@(negedge Clk_74M);#1;chk("phase1 upper rail open",dut.story_ui_inst.core.color_index,47);
+  hc=1040-4;vc=586;repeat(2)@(negedge Clk_74M);#1;chk("locked lower segment",dut.story_ui_inst.core.color_index,39);
+  vc=372;repeat(2)@(negedge Clk_74M);#1;chk("unlocked upper segment",dut.story_ui_inst.core.color_index,50);
+  hc=1015-4;repeat(2)@(negedge Clk_74M);#1;chk("outside core left",dut.story_ui_inst.core.hit,0);
+  hc=1016-4;repeat(2)@(negedge Clk_74M);#1;chk("core left boundary",dut.story_ui_inst.core.hit,1);
+  hc=1063-4;repeat(2)@(negedge Clk_74M);#1;chk("core last pixel",dut.story_ui_inst.core.hit,1);
+  hc=1064-4;repeat(2)@(negedge Clk_74M);#1;chk("outside core right",dut.story_ui_inst.core.hit,0);
+  release dut.story_inst.story_speed;
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);
   $finish;

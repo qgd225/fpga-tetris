@@ -1,126 +1,44 @@
 // 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
-//============================================================
-// 模块：Next_piece
-// 作用：NEXT 预览：读取下一方块类型并生成槽内显示坐标。
-// 时钟/复位：Clk_74M；Reset_n 低有效
-//============================================================
-module Next_piece(
-    input Clk_74M,
-    input Reset_n,
-    input [10:0]hcounter,
-    input [10:0]vcounter,
-    input Idle,
-    input duo,
-    input [2:0]type_t,
-    input [2:0]type_t2,
-    input [10:0]X1,
-    input [10:0]Y1,
-    input [10:0]X2,
-    input [10:0]Y2,
-
-    output reg next,
-    output reg next2,
-    output next_margin,
-    output reg next_slot
-    );
-
-//    无框面板: 预览区是 4x4 个 32px 格子组成的槽位(底色由 frame 画)
-//    格子编号从槽位左上角算起, 方块第 0 格画在 (1,3) 的位置, 与原来一致
-    reg [1:0]C_num;
-    reg [1:0]R_num;
-    reg [1:0]C_num2;
-    reg [1:0]R_num2;
-    reg [3:0]cc;
-    reg [3:0]rr;
-
-//    P1 预览槽位的行列号
-    always@(*)begin : blk1
-        integer o1, p1;
-    C_num = 2'd0;
-    R_num = 2'd0;
-    for(o1 = 0; o1 < 4; o1 = o1 + 1)
-    for(p1 = 0; p1 < 4; p1 = p1 + 1)
-    if((hcounter >= (X1 + 32*o1)) && (hcounter < (X1 + 30 + 32*o1)) &&
-       (vcounter >= (Y1 + 32*p1)) && (vcounter < (Y1 + 30 + 32*p1)))begin
-        C_num = o1[1:0];
-        R_num = p1[1:0];
-    end
-    end
-
-//    P2 预览槽位的行列号(仅双人)
-    always@(*)begin : blk2
-        integer o2, p2;
-    C_num2 = 2'd0;
-    R_num2 = 2'd0;
-    for(o2 = 0; o2 < 4; o2 = o2 + 1)
-    for(p2 = 0; p2 < 4; p2 = p2 + 1)
-    if(duo && (hcounter >= (X2 + 32*o2)) && (hcounter < (X2 + 30 + 32*o2)) &&
-       (vcounter >= (Y2 + 32*p2)) && (vcounter < (Y2 + 30 + 32*p2)))begin
-        C_num2 = o2[1:0];
-        R_num2 = p2[1:0];
-    end
-    end
-
-//    槽位底色区域: 双人两块, 单人一块
-    always@(*)begin
-    next_slot = 1'b0;
-    if((hcounter >= X1) && (hcounter < (X1 + 11'd128)) && (vcounter >= Y1) && (vcounter < (Y1 + 11'd128)))
-    next_slot = 1'b1;
-    else if(duo && (hcounter >= X2) && (hcounter < (X2 + 11'd128)) && (vcounter >= Y2) && (vcounter < (Y2 + 11'd128)))
-    next_slot = 1'b1;
-    end
-
-    wire [31:0]Tetromino_dout;
-    reg  [4:0]Tetromino_addr;
-    wire [31:0]Tetromino_dout2;
-    reg  [4:0]Tetromino_addr2;
-
-    Tetromino Tetromino_inst0(
-        .clka(Clk_74M),
-        .addra(Tetromino_addr),
-        .douta(Tetromino_dout)
-    );
-
-    Tetromino Tetromino_inst2(
-        .clka(Clk_74M),
-        .addra(Tetromino_addr2),
-        .douta(Tetromino_dout2)
-    );
-
-//    P1 下一块预览
-    always@(*)begin : blk3
-        integer i1;
-    if(Idle)
-    next = 1'b0;
-    else begin
-    Tetromino_addr = {type_t[2:0],2'b0};
-    next = 0;
-    for(i1 = 0; i1 < 4; i1 = i1 + 1)begin
-        cc = 1 + { { 7{Tetromino_dout[i1*8+7]} }, Tetromino_dout[(i1*8+7)-:4] };
-        rr = 3 + { { 7{Tetromino_dout[i1*8+3]} }, Tetromino_dout[(i1*8+3)-:4] };
-        if((C_num == cc) && (R_num == rr) && !rr[3])
-        next = 1'b1;
-    end
-    end
-    end
-
-//    P2 下一块预览(仅双人)
-    always@(*)begin : blk4
-        integer i2;
-    if(Idle || !duo)
-    next2 = 1'b0;
-    else begin
-    Tetromino_addr2 = {type_t2[2:0],2'b0};
-    next2 = 0;
-    for(i2 = 0; i2 < 4; i2 = i2 + 1)begin
-        cc = 1 + { { 7{Tetromino_dout2[i2*8+7]} }, Tetromino_dout2[(i2*8+7)-:4] };
-        rr = 3 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
-        if((C_num2 == cc) && (R_num2 == rr) && !rr[3])
-        next2 = 1'b1;
-    end
-    end
-    end
-
-    assign next_margin = 1'b0;  //外框与虚线已删, 改为 frame 里的文字标签 + 2px 分隔线
-
+module Next_piece #(parameter CELL_PITCH=32)(
+    input Clk_74M,Reset_n,input [10:0] hcounter,vcounter,
+    input Idle,duo,input [2:0] type_t,type_t2,
+    input [10:0] X1,Y1,X2,Y2,
+    output next,next2,next_margin,next_slot,
+    output [4:0] pixel_x,pixel_y
+);
+    function [1:0] grid4;
+        input [10:0] delta;
+        begin grid4=delta>=3*CELL_PITCH?2'd3:(delta>=2*CELL_PITCH?2'd2:(delta>=CELL_PITCH?2'd1:2'd0));end
+    endfunction
+    function shape_hit;
+        input [31:0] shape;
+        input [1:0] c,r;
+        integer k;
+        reg [3:0] cx,ry;
+        begin
+            shape_hit=0;
+            for(k=0;k<4;k=k+1)begin
+                cx=4'd1+shape[k*8+4 +:4];
+                ry=4'd3+shape[k*8 +:4];
+                if(cx=={2'd0,c} && ry=={2'd0,r})shape_hit=1;
+            end
+        end
+    endfunction
+    wire [10:0] dx1=hcounter-X1,dy1=vcounter-Y1;
+    wire [10:0] dx2=hcounter-X2,dy2=vcounter-Y2;
+    wire [1:0] c1=grid4(dx1),r1=grid4(dy1),c2=grid4(dx2),r2=grid4(dy2);
+    wire [10:0] lx1=dx1-c1*CELL_PITCH,ly1=dy1-r1*CELL_PITCH;
+    wire [10:0] lx2=dx2-c2*CELL_PITCH,ly2=dy2-r2*CELL_PITCH;
+    wire slot1=hcounter>=X1 && vcounter>=Y1 && dx1<4*CELL_PITCH && dy1<4*CELL_PITCH;
+    wire slot2=duo && hcounter>=X2 && vcounter>=Y2 && dx2<4*CELL_PITCH && dy2<4*CELL_PITCH;
+    wire [31:0] Tetromino_dout,Tetromino_dout2;
+    wire [4:0] Tetromino_addr={type_t,2'b0},Tetromino_addr2={type_t2,2'b0};
+    Tetromino Tetromino_inst0(.clka(Clk_74M),.addra(Tetromino_addr),.douta(Tetromino_dout));
+    Tetromino Tetromino_inst2(.clka(Clk_74M),.addra(Tetromino_addr2),.douta(Tetromino_dout2));
+    assign next=!Idle && slot1 && lx1<CELL_PITCH-2 && ly1<CELL_PITCH-2 && shape_hit(Tetromino_dout,c1,r1);
+    assign next2=!Idle && slot2 && lx2<CELL_PITCH-2 && ly2<CELL_PITCH-2 && shape_hit(Tetromino_dout2,c2,r2);
+    assign next_slot=slot1||slot2;
+    assign next_margin=1'b0;
+    assign pixel_x=slot2?lx2[4:0]:lx1[4:0];
+    assign pixel_y=slot2?ly2[4:0]:ly1[4:0];
 endmodule

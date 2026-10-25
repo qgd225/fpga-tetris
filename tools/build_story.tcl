@@ -39,13 +39,19 @@ proc used_resource {text name} {
 if {![regexp {^story_[a-zA-Z0-9_]+$} $round]} {error "Invalid round name"}
 set output [file join $root docs reports $round]
 file mkdir $output
+puts [exec python [file join $root tools build_story_assets.py]]
 puts [exec python [file join $root tools story_build_manifest.py] write [file join $output source-manifest.json]]
 open_project Tetris.xpr
-foreach name {story_controller bin_to_bcd hud_text hud_font_rom core_renderer scene_sprite_rom audio_synth story_comms voice_player voice_adpcm_rom} {
+set_property include_dirs [list [file join $root Tetris.srcs sources_1 new]] [get_filesets sources_1]
+foreach name {story_pixel_frontend story_pixel_mapper story_ui story_scene story_presentation story_feedback story_controller bin_to_bcd hud_text hud_font_rom core_renderer scene_sprite_rom audio_synth story_comms voice_player voice_adpcm_rom} {
     set source [file join $root Tetris.srcs sources_1 new ${name}.v]
     if {[file isfile $source] && [llength [get_files -quiet $source]] == 0} {
         add_files -norecurse $source
     }
+}
+foreach name {story_font.mem story_sprites.mem story_layout.vh story_text_ids.vh story_palette.vh} {
+    set source [file join $root Tetris.srcs sources_1 new $name]
+    if {[file isfile $source] && [llength [get_files -quiet $source]] == 0} {add_files -norecurse $source}
 }
 set hook [get_property STEPS.WRITE_BITSTREAM.TCL.POST [get_runs impl_1]]
 set_property STEPS.WRITE_BITSTREAM.TCL.POST {} [get_runs impl_1]
@@ -67,8 +73,6 @@ set status [catch {
     report_bus_skew -file [file join $output bus_skew.rpt]
     source [file join $root tools check_lutram_pins.tcl]
     check_lutram_pins [file join $output lutram_pins.rpt]
-    if {[llength [get_timing_paths -quiet -slack_lesser_than 0 -delay_type max]] > 0} {error "Setup timing failed"}
-    if {[llength [get_timing_paths -quiet -slack_lesser_than 0 -delay_type min]] > 0} {error "Hold timing failed"}
     puts [exec python [file join $root tools story_build_manifest.py] verify [file join $output source-manifest.json]]
     set utilization [report_utilization -return_string]
     set luts [used_resource $utilization {Slice LUTs}]
@@ -83,15 +87,36 @@ set status [catch {
     set whs [get_property SLACK $hold_path]
     set green [expr {$wns >= $timing_target && $whs >= $timing_target}]
     set budget [expr {$luts <= $lut_limit && $bram <= $bram_limit && $registers <= $register_limit && $latches <= 12 && $dsp == 0}]
+    set font_gate 1
+    if {[regexp {^story_r(2b|2c|[3-6])} $round]} {
+        set font_tiles 0.0
+        set old_tiles 0.0
+        set font_report [open [file join $output font_recovery.rpt] w]
+        foreach ram [get_cells -hierarchical -filter {REF_NAME =~ RAMB*}] {
+            set name [get_property NAME $ram]
+            set kind [get_property REF_NAME $ram]
+            set tiles [expr {[string match RAMB18* $kind] ? 0.5 : 1.0}]
+            if {[string match *text_layer* $name]} {set font_tiles [expr {$font_tiles+$tiles}];puts $font_report "NEW_FONT $name $tiles"}
+            foreach old {letter_hud_inst choose_menu_inst game_over_inst number_lv_inst scoring_inst timer_inst} {
+                if {[string match *$old* $name]} {set old_tiles [expr {$old_tiles+$tiles}];puts $font_report "OLD_FONT $name $tiles"}
+            }
+        }
+        set font_values [gate_numbers $gates R6]
+        set font_recovered [expr {[lindex $font_values 2]-$font_tiles}]
+        set font_gate [expr {$old_tiles == 0 && $font_tiles > 0 && $font_tiles <= [lindex $font_values 0] && $font_recovered >= [lindex $font_values 1]}]
+        puts $font_report "OLD_REMAINING=$old_tiles NEW_FONT=$font_tiles NET_RECOVERED=$font_recovered G3=$font_gate"
+        close $font_report
+    }
     set target_budget [expr {$luts <= $lut_target && $bram <= $bram_target}]
     set visual_budget [expr {![regexp {^story_r[23]} $round] || $luts <= $visual_limit}]
     set result [open [file join $output gate-summary.txt] w]
     puts $result "LUT=$luts REGISTERS=$registers BRAM=$bram LATCHES=$latches DSP=$dsp"
-    puts $result "WNS=$wns WHS=$whs TARGET=$timing_target GREEN=$green BUDGET=$budget TARGET_BUDGET=$target_budget VISUAL_BUDGET=$visual_budget PUBLISH_REQUESTED=$publish"
+    puts $result "WNS=$wns WHS=$whs TARGET=$timing_target GREEN=$green BUDGET=$budget TARGET_BUDGET=$target_budget VISUAL_BUDGET=$visual_budget FONT_GATE=$font_gate PUBLISH_REQUESTED=$publish"
     close $result
     report_timing -max_paths 20 -file [file join $output setup_paths.rpt]
+    if {$wns<0 || $whs<0} {error "Candidate timing failed"}
     if {$publish} {
-        if {!$green || !$budget || !$target_budget || !$visual_budget} {error "Publish blocked by story gates"}
+        if {!$green || !$budget || !$target_budget || !$visual_budget || !$font_gate} {error "Publish blocked by story gates"}
         source [file join $root tools publish_bitstream.tcl]
         publish_bitstream [file join $root Tetris.runs impl_1 Tetris.bit] $root
     } else {

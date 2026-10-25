@@ -37,6 +37,8 @@ module Playfield(
     output reg [479:0]state,
     output wire lock_commit1,
     output wire lock_commit2,
+    output wire [4:0] pixel_x,pixel_y,
+    output wire pixel_in_field,pixel_visible,
     output wire batch_done,
     output reg [4:0] batch_n,
     output reg [2:0] batch_speed,
@@ -116,6 +118,7 @@ module Playfield(
 //    参数
 //============================================================
     parameter MCNT = 74_250_000;
+    parameter STORY_DISPLAY = 0;
     parameter MCNT_LAND = 20_000_000;
     parameter MCNT_Drop = 74_218_750 - 1;  //自动下落时间
 
@@ -451,10 +454,22 @@ module Playfield(
     integer k2;
 
     // 像素坐标映射: 将当前像素转换为场地行列编号。
+    wire display_pixel_range=STORY_DISPLAY?pixel_visible:pixel_in_field;
+    generate if(STORY_DISPLAY)begin : story_mapping
+        story_pixel_mapper mapper(.hcounter(hcounter),.vcounter(vcounter),.duo(duo),
+            .in_field(pixel_in_field),.cell_visible(pixel_visible),.column(),.row(),
+            .sample_column(C_num),.sample_row(R_num),
+            .local_x(pixel_x),.local_y(pixel_y));
+    end else begin : legacy_mapping
     Playfield_pixel_mapper pixel_mapper_inst(
         .hcounter(hcounter), .vcounter(vcounter), .columns(COL),
         .column(C_num), .row(R_num)
     );
+        assign pixel_x=(hcounter-11'd321)&11'd31;
+        assign pixel_y=(vcounter-11'd81)&11'd31;
+        assign pixel_in_field=hcounter>=321 && hcounter<(321+32*COL) && vcounter>=81 && vcounter<721;
+        assign pixel_visible=pixel_in_field && C_num<24 && R_num<20;
+    end endgenerate
 
     // 速度控制: 根据分数和时间选择等级, 输出自动下落间隔。
     Playfield_speed_control #(.MCNT_Drop(MCNT_Drop)) speed_control_inst(
@@ -566,12 +581,12 @@ module Playfield(
             boundary_collision_left = 1'b1;
             if(cc >= (COL - 1'b1) || ((cc < (COL - 1'b1)) && (rr < 11'd20) && read_current1[i][cc + 6'd1]))  //右边界碰撞检测
             boundary_collision_right = 1'b1;
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr) && !rr[5])  //正在运动方块
+            if(display_pixel_range && (C_num == cc) && (R_num == rr) && !rr[5])  //正在运动方块
             Piece = 1'b1;
             if((!rr[5]) && (cc <= (COL - 1'b1)) && (rr <= 11'd19) && read_current1[i][cc])  //和已锁方块重叠=顶到
             touch_top = 1'b1;
             rr_g = counter_ghost_r_t + { { 7{Tetromino_dout[i*8+3]} }, Tetromino_dout[(i*8+3)-:4] };
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && ghost_valid && (!clear_time) && (counter_ghost_r_t > (counter_r + 5'd4)))
+            if(display_pixel_range && (C_num == cc) && (R_num == rr_g) && !rr_g[5] && (!ghost_blk_oth) && ghost_valid && (!clear_time) && (counter_ghost_r_t > (counter_r + 5'd4)))
             ghost = 1'b1;
         end
     end
@@ -1294,12 +1309,12 @@ module Playfield(
             boundary_collision_left2 = 1'b1;
             if(cc2 >= (COL - 1'b1) || ((cc2 < (COL - 1'b1)) && (rr2 < 11'd20) && read_current2[i2][cc2 + 6'd1]))  //右边界碰撞检测
             boundary_collision_right2 = 1'b1;
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr2) && !rr2[5])  //正在运动方块
+            if(display_pixel_range && (C_num == cc2) && (R_num == rr2) && !rr2[5])  //正在运动方块
             Piece2 = 1'b1;
             if((!rr2[5]) && (cc2 <= (COL - 1'b1)) && (rr2 <= 11'd19) && read_current2[i2][cc2])  //和已锁方块重叠=顶到
             touch_top2 = 1'b1;
             rr_g2 = counter_ghost_r_t2 + { { 7{Tetromino_dout2[i2*8+3]} }, Tetromino_dout2[(i2*8+3)-:4] };
-            if((hcounter >= 321) && (hcounter < (321 + 32*COL)) && (vcounter >= 81) && (vcounter < 721) && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && ghost_valid2 && (!clear_time) && (counter_ghost_r_t2 > (counter_r2 + 5'd4)))
+            if(display_pixel_range && (C_num == cc2) && (R_num == rr_g2) && !rr_g2[5] && (!ghost_blk_oth2) && ghost_valid2 && (!clear_time) && (counter_ghost_r_t2 > (counter_r2 + 5'd4)))
             ghost2 = 1'b1;
         end
     end

@@ -1,0 +1,45 @@
+{
+  "kind": "rtl_fixed_test_fixture_not_hardware_capture",
+  "frames": {
+    "scene_duo0_phase0_state0.png": {
+      "ppm_sha256": "8fbc4b0f130187995a4ca402812a1f000e25578001fd1cc345dad8a461b03288",
+      "png_sha256": "bae79a2739bb93bfbbb6a9d6e9a0975e5982f5d7437ea7575650f346507fccb0"
+    },
+    "scene_duo1_phase0_state0.png": {
+      "ppm_sha256": "27cf79b4d9c9e91c0cfb740f38595def8352efdd3cfb1059189de23ed044505c",
+      "png_sha256": "edff76e0bf57ca3b7b981d38b76246b383f863feecd6888b90eb5b368273983d"
+    },
+    "scene_duo1_phase0_state1.png": {
+      "ppm_sha256": "c0244ad92c70c4b98dc9af1233c4b381f0dbd57ebd48589769ed5d59a09b9e61",
+      "png_sha256": "b7ea417ad5d8a8b369451583a94e518e593a3d0e1868def29757eb48441ec4b7"
+    },
+    "scene_duo1_phase0_state2.png": {
+      "ppm_sha256": "595fb9631f78ad43355ad5358b745f06c9f4924a4cc920cf610babcf8bf87582",
+      "png_sha256": "81f4391012f20cf42aab9a2d556b7aa8b214ffd7c49fbffb48b4cd5892e23983"
+    },
+    "scene_duo1_phase1_state0.png": {
+      "ppm_sha256": "e8a8ddfd5e895e470a030aefbdf357c9786ee677246c50bbd84ef9933aad5f8a",
+      "png_sha256": "7587d112bf464e479b18299e61d3025deebaf191b2577e678e2153da8a39dfe7"
+    },
+    "scene_duo1_phase2_state0.png": {
+      "ppm_sha256": "94bc709d4eafe5dcd82b72e682e7e60a2234355eabfae50eec6763b9bc656ad3",
+      "png_sha256": "d5c68f2b0be0a48fd4392db96ad9827e4b5bfb37dce997f2f8159f26cc8ec13a"
+    },
+    "scene_duo1_phase3_state0.png": {
+      "ppm_sha256": "36d170c330ddf573f1ae4ea7d5c873e18d73de7a513688f24fc15ce8855bf3c1",
+      "png_sha256": "0af03b366b1c62dbcd8b7616d6e8d074dfb516fa146b73a177e738c95e647226"
+    },
+    "scene_duo1_phase3_state3.png": {
+      "ppm_sha256": "f9a12d6a26d05d8ae23375fd53479daa53d97a2f54a1bf865bb63d75e1cf530b",
+      "png_sha256": "ae1cd51bba412e9dfc52eabf041556d783d87a4389344dfb6365b8eb969a0b14"
+    },
+    "scene_duo1_phase3_state4.png": {
+      "ppm_sha256": "6f31dc12a0a9adffe26cd8dd716fc9b5fc81bef2d8f7820b76c3cff18343bedd",
+      "png_sha256": "c78c899f9134a6e7ef70a5188d46da7281b13c66609d7da8c17bd0531cfabb57"
+    },
+    "scene_duo1_phase3_state5.png": {
+      "ppm_sha256": "bbb491c61d335f20c81845ffb1b0641a9bc7e06642f5dc406e6c5dc3ce5adc21",
+      "png_sha256": "189ff3031a6cd60df0076c2b4f148ef27b8cb3de86831ae8b8dd0cb92d7955f2"
+    }
+  }
+}

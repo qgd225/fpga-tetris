@@ -1,0 +1,19 @@
+M1 visual candidate, NOT PUBLISHED, NOT HARDWARE ACCEPTED
+Sources: main HEAD ced5383 with working-tree implementation; 98 build inputs match source-manifest.json.
+Routed: LUT=8905 REGISTERS=4477 BRAM=9.5 DSP=0 LATCHES=3.
+Relative to task baseline R1: LUT=-3017 REGISTERS=-48 BRAM=-6.0.
+WNS=+0.352 ns WHS=+0.076 ns TNS=0 THS=0.
+All automated resource/font gates pass; 16 full regression suites pass.
+Mapper=16777216 font=139778 scene=510 VGA-phase=4416 feedback=24 frame=38 story=337.
+HDMI independent protocol checks=7848263; metadata RTL/UNISIM=29769 each.
+Post-route LUTRAM checks: 768 gameplay bits, 96 display + 96 copy metadata bits.
+Old six font ROMs absent; new font=0.5 tile, font recovery=7.0 tiles.
+DRC warnings=46 (R1=48); max-delay unconstrained pins=93 (R1=102), existing constraints remain.
+Candidate cache: Tetris.runs/story_m1_candidate/Tetris.bit
+Candidate SHA256=8293972F964FE00B9AACD3286D64A085C76B3D091A91827CFA140E19C09F2BC8
+Published bit/Tetris.bit remains ced5383 (2A), unchanged.
+G2 physical display/readability and visual G6 playthrough are pending. No new voice or HDMI BGM yet.
+
+2026-10-25 publication: user reports hardware test had no problems.
+Quantitative per-sample readability data and display settings were not provided.
+The tested candidate is promoted unchanged to bit/Tetris.bit; no M2 audio feature claimed.

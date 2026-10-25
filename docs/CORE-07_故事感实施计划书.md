@@ -1,6 +1,6 @@
 # CORE-07 舱外核心修复：“故事感”实施计划书
 
-初稿：2026-10-24；修订：2026-10-25（二次审阅）。状态：第 1 轮任务闭环已在 `81e75a1` 验证；2A 标签查表基础也已通过完整回归与实现并发布。新布局、共享字体替换、阶段画面、配乐与配音仍待实施。
+初稿：2026-10-24；修订：2026-10-25（二次审阅）。状态：第 1 轮任务闭环已在 `81e75a1` 验证；2A 标签查表基础也已通过完整回归与实现并发布。新布局、共享字库、阶段画面与局部反馈候选已完成 16 套回归和完整布线，用户于 2026-10-25 上板反馈“测试下来没问题”，按该定性反馈发布 M1；未提供的量化样本数据保留为空。配乐与配音继续实施。当前候选证据见 [M1 报告](<D:/vivado_project/Tetris/docs/reports/story_r3_feedback/build-summary.txt>)，M1 发布证据见 [验收记录](<D:/vivado_project/Tetris/docs/story-m1-acceptance.md>)；不得据此声称 M2 音画完成。
 
 执行先看[逐轮门禁清单](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)；建议的采纳、改造与暂缓理由见[本次评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
 

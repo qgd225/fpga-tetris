@@ -1,16 +1,18 @@
 // 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
 // 故事布局候选：只转换显示坐标，未接入现有场地，冻结前须全扫描/综合/实屏验证。
+`include "story_layout.vh"
 module story_pixel_mapper #(
-    parameter CELL_PITCH = 24,
-    parameter X_SOLO = 400,
-    parameter X_DUO = 352,
-    parameter FIELD_Y = 144
+    parameter CELL_PITCH = `STORY_CELL,
+    parameter X_SOLO = `STORY_FIELD_X_SOLO,
+    parameter X_DUO = `STORY_FIELD_X_DUO,
+    parameter FIELD_Y = `STORY_FIELD_Y
 )(
     input [10:0] hcounter, vcounter,
     input duo,
     output wire in_field, cell_visible,
     output wire [4:0] column, row,
-    output wire [4:0] local_x, local_y
+    output wire [4:0] local_x, local_y,
+    output wire [4:0] sample_column,sample_row
 );
     localparam FACE = CELL_PITCH-2;
     wire [10:0] field_x = duo ? X_DUO : X_SOLO;
@@ -64,6 +66,9 @@ module story_pixel_mapper #(
         assign lx = {6'd0,dx[4:0]};
         assign ly = {6'd0,dy[4:0]};
     end endgenerate
+    // 存储只读地址不依赖面内/格缝比较；格缝仍由 cell_visible 严格遮掉。
+    assign sample_column=in_x?cx:5'd0;
+    assign sample_row=in_y?ry:5'd0;
     assign local_x = lx[4:0];
     assign local_y = ly[4:0];
     assign column = in_x && lx<FACE ? cx : 5'd24;

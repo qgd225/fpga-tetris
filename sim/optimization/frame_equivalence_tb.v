@@ -8,6 +8,7 @@
     .left_p_flag2(1'b0),.right_p_flag2(1'b0),.drop_r_flag2(1'b0),.drop_en2(1'b0), \
     .rotate_p_flag2(1'b0),.hold_p_flag2(1'b0),.hint_show(1'b0), \
     .choose(choose),.choose_cnt(4'd0)
+// 历史布局严格对照台；新UI使用 story_visual 与真实VGA相位台验收。
 module frame_equivalence_tb;
     reg clk=0,rst=0,duo=1,choose=0,finalize=0;
     reg [10:0]hc=0,vc=0;
