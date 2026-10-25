@@ -65,3 +65,5 @@ tools/startup_error.log
 
 # 当前构建的临时报告；正式验证记录归档至 docs/reports。
 /hdmi_audio_*.rpt
+
+/sim/story_audio/build_music/

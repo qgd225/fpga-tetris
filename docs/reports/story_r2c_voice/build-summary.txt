@@ -1,0 +1,10 @@
+G4 CLEAN VOICE PIPELINE CANDIDATE, NOT PUBLISHED OR HARDWARE AUDITIONED
+Source base main 0b937eb plus working tree; 106 build inputs matched before/after.
+Clean V0: 6748 8k samples, 0.8435 sec, 3374 payload bytes; no final signal gradient.
+17 full regression suites pass; decoder checks=73314, player checks=122658 (40488 output samples).
+Additional adaptive source-length assertion passed separately: player checks=122659.
+Routed LUT=9310 REGISTERS=4629 BRAM=10.5 DSP=0 LATCHES=3.
+Relative to published M1: +405 LUT, +152 registers, +1.0 BRAM; audio net budget passes.
+WNS=+0.338 ns WHS=+0.081 ns TNS=0 THS=0; all automated gates pass.
+Published bit/Tetris.bit remains M1; this clean candidate is an intermediate validation step.
+Next: substitute already prepared weak-signal V0, derive length from assets, rerun tests and routed implementation.

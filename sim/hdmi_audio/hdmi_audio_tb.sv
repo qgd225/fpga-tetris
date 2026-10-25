@@ -3,7 +3,8 @@
 module hdmi_audio_tb;
     reg clk=0; always #5 clk=~clk;
     reg reset=1, menu_left=0;
-    wire active,wave;
+    wire active,urgent;wire [4:0] event_id;wire [3:0] step_id,note_id;
+    wire signed [15:0] fx;
     sound effects(.Clk_74M(clk),.Reset_n(!reset),
         .over(1'b0),.clear(1'b0),.clr_n(3'd0),.lvl_up(1'b0),.danger1(1'b0),.danger2(1'b0),
         .sw_short(1'b0),.sw_long(1'b0),.menu_l(menu_left),.menu_r(1'b0),
@@ -11,9 +12,16 @@ module hdmi_audio_tb;
         .hard1(1'b0),.soft1(1'b0),.hold1(1'b0),.blk1(1'b0),
         .lft2(1'b0),.rgt2(1'b0),.rot2(1'b0),.hard2(1'b0),.soft2(1'b0),
         .hold2(1'b0),.blk2(1'b0),.blk_rot1(1'b0),.blk_rot2(1'b0),
-        .buzz_else(wave),.fx_active(active));
+        .cancel(1'b0),.event_id(event_id),.step_id(step_id),.note_id(note_id),.fx_urgent(urgent),.fx_active(active));
     wire ce; wire signed [15:0] pcm;
-    game_audio_pcm source(.clk(clk),.reset_n(!reset),.fx_wave(wave),.fx_active(active),.sample_ce(ce),.pcm(pcm));
+    audio_synth synth(.clk(clk),.reset_n(!reset),.sample_ce(ce),.active(active),.event_id(event_id),.step_id(step_id),.note_id(note_id),.pcm(fx));
+    game_audio_pcm source(.clk(clk),.reset_n(!reset),.fx(fx),.bgm(16'sd0),.voice(16'sd0),
+        .voice_busy(1'b0),.urgent(urgent),.force_silence(1'b0),.sample_ce(ce),.pcm(pcm));
+    reg [15:0] expected_pcm[0:4095];integer submitted=0,decoded_samples=0;
+    always @(posedge clk)begin
+        if(reset)submitted<=0;
+        else if(ce)begin expected_pcm[submitted]<=pcm;submitted<=submitted+1;end
+    end
     reg [10:0] h=0,v=24;
     wire de = h>=259 && h<1539 && v>=24 && v<744;
     reg [23:0] rgb=0;
@@ -83,6 +91,7 @@ module hdmi_audio_tb;
     endtask
     // 从编码器流水中的 12 位岛数据重组包，独立校验 BCH、采样与 ACR。
     always @(negedge clk) if(reset) begin
+        decoded_samples=0;
         packet_bit=0;line_video=0;line_island=0;warmup_lines=0;last_tick=0;
     end else begin
         ticks=ticks+1;
@@ -92,8 +101,7 @@ module hdmi_audio_tb;
             if(pcm>0) positive_samples=positive_samples+1;
             else if(pcm<0) negative_samples=negative_samples+1;
             else silent_samples=silent_samples+1;
-            if(!active) check(pcm==0,"silence PCM");
-            else check(pcm==(wave?16'sd1024:-16'sd1024),"bipolar PCM");
+            check(pcm>= -1024 && pcm<=1024,"mixed PCM bounded");
         end
         check(!dut.overflow,"FIFO overflow");
         if(de3) begin
@@ -136,7 +144,8 @@ module hdmi_audio_tb;
                         for(j=0;j<4;j=j+1) begin
                             check(sb[j][23:0]==sb[j][47:24],"stereo duplicate");
                             check(sb[j][7:0]==0,"16-bit alignment");
-                            check(sb[j][23:8]==0 || sb[j][23:8]==16'h0400 || sb[j][23:8]==16'hfc00,"PCM values");
+                            check(decoded_samples<submitted && sb[j][23:8]===expected_pcm[decoded_samples],"exact mixed PCM sequence through FIFO and packets");
+                            decoded_samples=decoded_samples+1;
                             check(((^sb[j][23:0]) ^ (^sb[j][51:48])) == 0,"left IEC parity");
                             check(((^sb[j][47:24]) ^ (^sb[j][55:52])) == 0,"right IEC parity");
                         end

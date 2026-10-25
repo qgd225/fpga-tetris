@@ -1,5 +1,7 @@
 # FPGA 俄罗斯方块 (Tetris)
 
+> 2026-10-25 音频整合：四阶段配乐、机械操作音、七句 CORE-07 通信及播放同步字幕已统一通过 HDMI；两个原蜂鸣器静音。17 套回归与完整布线通过，人工听感未测（用户要求不等待反馈）。实测 9,360 LUT / 4,754 寄存器 / 25 BRAM / 0 DSP，WNS +0.337 / WHS +0.067 ns。详见 [音频报告](docs/reports/story_r6_audio/build-summary.txt)。新增 UI 美化尚未实施。
+
 ## 比特流存放规则
 
 唯一开发目录为 `D:/vivado_project/Tetris`，本地和 GitHub 只维护 `main`。历史版本保存在 Git 提交中，不再复制工程或保留并行版本目录。最新下载文件为 `bit/Tetris.bit`，成功构建后覆盖更新；Vivado 内部 `.runs` 文件仅作为构建缓存。

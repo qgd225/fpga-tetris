@@ -4,6 +4,7 @@
 module story_ui(
     input clk,reset_n,input [10:0] x,y,
     input duo,choose,Idle,Playing,Stop,Finalize,
+    input comms_visible,input [2:0] comms_id,
     input [3:0] choose_cnt,input [1:0] phase,danger,
     input [3:0] locked,input success,result_ready,
     input [2:0] speed,input [19:0] lines_bcd,input [23:0] score_bcd,input [15:0] time_bcd,
@@ -23,6 +24,7 @@ module story_ui(
     wire [10:0] field_x=duo?`STORY_FIELD_X_DUO:`STORY_FIELD_X_SOLO;
     // 两种布局在编译期求边界，避免模式选择后再做乘加。
     wire [10:0] field_right=duo?(`STORY_FIELD_X_DUO+24*`STORY_CELL):(`STORY_FIELD_X_SOLO+20*`STORY_CELL);
+    wire comms_allowed=comms_visible && !choose && !(Finalize && success && !result_ready);
     wire [5:0] background_index,core_index;
     wire core_hit;
     story_scene scene(.clk(clk),.reset_n(reset_n),.x(x),.y(y),.field_right(field_right),
@@ -106,6 +108,10 @@ module story_ui(
             end
         end else if(box(x,y,476,duo?340:268,328,48) && !box(x,y,478,duo?342:270,324,44))begin
             foreground=1;foreground_index=duo?6'd7:6'd25;
+        end
+        if(comms_allowed && box(x,y,800,24,448,96))begin
+            material_kind=0;material_fx=0;foreground=1;
+            foreground_index=(x==800 || x==1247 || y==24 || y==119)?6'd37:6'd44;
         end
     end
     // 同一像素只请求一个字形；固定文案走 ROM，BCD 字符直接选编号。
@@ -212,6 +218,15 @@ module story_ui(
                         direct_mode=0;
                     end
                 end
+            end
+        end
+        if(comms_allowed)begin
+            if(box(x,y,816,28,80,24))begin
+                text_valid=1;direct_mode=0;text_x=816;text_y=28;text_base=TXT_COMMS;text_length=LEN_COMMS;text_ink=6'd37;
+            end else if(box(x,y,816,56,416,24))begin
+                text_valid=1;direct_mode=0;text_x=816;text_y=56;text_base=TXT_COMMS0+{1'b0,comms_id,6'd0};text_length=26;text_ink=6'd16;
+            end else if(box(x,y,816,88,416,24))begin
+                text_valid=1;direct_mode=0;text_x=816;text_y=88;text_base=TXT_COMMS0+{1'b0,comms_id,6'd0}+10'd32;text_length=26;text_ink=6'd16;
             end
         end
         if(Finalize && success && !result_ready)text_valid=0;

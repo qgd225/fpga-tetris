@@ -29,10 +29,12 @@ module render_tb;
         Idle=state==1;choose=state==2;Finalize=state==3 || state==4;Playing=!Idle && !choose && !Finalize;
         success=state==3;result_ready=Finalize;
         if(success)begin locked=8;phase=3;speed=7;lines_bcd=duo?20'h00040:20'h00032;end
+        if(state==6)comms_visible=1;
         if(state==5)begin danger=2;for(n=0;n<18;n=n+1)tile(n,2,n%7,n%2);end
         repeat(3)@(negedge clk);rst=1;
         if($test$plusargs("render"))begin
-            $sformat(filename,"scene_duo%0d_phase%0d_state%0d.ppm",duo,phase,state);
+            if(state==6)filename="comms_opening.ppm";
+            else $sformat(filename,"scene_duo%0d_phase%0d_state%0d.ppm",duo,phase,state);
             handle=$fopen(filename,"wb");$fwrite(handle,"P6\n1280 720\n255\n");
             for(n=0;n<921602;n=n+1)begin
                 @(negedge clk);
@@ -51,6 +53,11 @@ module render_tb;
             for(n=0;n<(duo?24:20);n=n+1)begin
                 if(board[19*24+n])sample((duo?352:400)+24*n+10,610,palette[1+board_type[19*24+n]]);
             end
+            comms_visible=1;comms_id=0;sample(800,24,palette[37]);sample(810,32,palette[44]);
+            sample(818,58,palette[16]);sample(816,88,palette[44]);
+            comms_id=1;sample(818,58,palette[16]);sample(818,90,palette[16]);
+            Finalize=1;success=1;result_ready=0;sample(800,24,palette[44]);Finalize=0;success=0;result_ready=0;
+            comms_visible=0;sample(800,24,palette[44]);
             // 真实材质边缘短亮，主体不白闪；能量行收束与淡出。
             feedback_lock=1;sample(353,601,palette[16]);sample(362,610,palette[1]);feedback_lock=0;
             feedback_hard_left=1;sample(352,619,palette[16]);sample(362,610,palette[1]);feedback_hard_left=0;

@@ -67,15 +67,25 @@ module Tetris(
     wire hdmi_de;
     wire Clk_74M;
 
-    wire mission_win, mission_hold, mission_success;
+    wire mission_win, mission_hold, mission_success, story_result_ready, story_tick_60hz;
     wire fx_active;
-    wire music_buzz,fx_buzz;
+    wire fx_urgent;
+    wire [4:0] fx_event;wire [3:0] fx_step,fx_note;
+    wire signed [15:0] bgm_pcm;
     wire audio_sample_ce;
-    wire signed [15:0] audio_pcm;
-    // 此版先传游戏音效，保留蜂鸣器用于对照。
-    game_audio_pcm pcm_inst(.clk(Clk_74M), .reset_n(Reset_n),
-        .fx_wave(buzz_else), .fx_active(fx_active && !mission_success),
-        .sample_ce(audio_sample_ce), .pcm(audio_pcm));
+    wire signed [15:0] audio_pcm,fx_pcm,voice_pcm;
+    wire voice_start,voice_cancel,voice_busy,voice_done,comms_visible,story_alarm2;
+    wire [2:0] comms_id;
+    story_comms comms_inst(.clk(Clk_74M),.reset_n(Reset_n),.Idle(Idle),.choose(choose),.Playing(Playing),.Stop(Stop),
+        .Finalize(Finalize),.restart(Finalize && switch_r_f),.voice_busy(voice_busy),.voice_done(voice_done),
+        .phase(story_phase),.danger(danger_lvl),.success(mission_success),.result_ready(story_result_ready),.tick_60hz(story_tick_60hz),
+        .voice_start(voice_start),.alarm2_pulse(story_alarm2),.voice_cancel(voice_cancel),.comms_visible(comms_visible),.comms_id(comms_id));
+    voice_player voice_inst(.clk(Clk_74M),.reset_n(Reset_n),.sample_ce(audio_sample_ce),.start(voice_start),
+        .cancel(voice_cancel),.pause(Stop),.voice_id(comms_id),.busy(voice_busy),.done(voice_done),.pcm(voice_pcm),.sample_index(),.repeat_index());
+    // 配乐、操作音、通信统一送现有 HDMI，两个物理蜂鸣器端口静音。
+    game_audio_pcm pcm_inst(.clk(Clk_74M),.reset_n(Reset_n),.fx(fx_pcm),.bgm(bgm_pcm),.voice(voice_pcm),
+        .voice_busy(voice_busy),.urgent(fx_urgent),.force_silence(mission_success && !story_result_ready),
+        .sample_ce(audio_sample_ce),.pcm(audio_pcm));
     hdmi hdmi_inst(
     .Clk(Clk),
     .Clk_74M(Clk_74M),
@@ -165,8 +175,8 @@ wire solo_hold_long;
     wire choose;
     wire [3:0]choose_cnt;
     wire duo = (choose_cnt == 4'd1);
-    assign buzz_main=(Finalize || Stop || mission_hold)?1'b0:music_buzz;
-    assign buzz_else=mission_success?1'b0:fx_buzz;
+    assign buzz_main=1'b0;
+    assign buzz_else=1'b0;
 hold_gesture hold_gesture_inst(
 .Clk_74M(Clk_74M),
 .Reset_n(Reset_n),
@@ -340,6 +350,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .hcounter(hcounter),
     .vcounter(vcounter),
     .video_de(hdmi_de),
+    .comms_visible(comms_visible),.comms_id(comms_id),
     .left_p_flag(left_p),
     .right_p_flag(right_p),
     .drop_r_flag(drop_r_f),
@@ -386,18 +397,20 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .snd_clr_n(snd_clr_n),
     .danger_lvl(danger_lvl),
     .mission_win(mission_win), .mission_hold(mission_hold),
-    .story_phase(story_phase), .mission_success(mission_success)
+    .story_phase(story_phase), .mission_success(mission_success),.story_result_ready(story_result_ready),.story_tick_60hz(story_tick_60hz)
     );
 
-    music music_inst(
-    .Clk_74M(Clk_74M),
-    .Reset_n(Reset_n),
-    .Idle(Idle | choose),
-    .speed_level(speed_level),
+    music music_inst(.Clk_74M(Clk_74M),.Reset_n(Reset_n),.sample_ce(audio_sample_ce),
+        .active(Playing || Stop),.pause(Stop),.Finalize(Finalize),.success(mission_success),
+        .quiet(mission_success && !story_result_ready),.phase(story_phase),.pcm(bgm_pcm));
 
-    .buzz_main(music_buzz)
-    );
-
+    audio_synth synth_inst(.clk(Clk_74M),.reset_n(Reset_n),.sample_ce(audio_sample_ce),
+        .active(fx_active && !mission_success && !Stop),.event_id(fx_event),.step_id(fx_step),.note_id(fx_note),.pcm(fx_pcm));
+    reg audio_menu_d;
+    always @(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)audio_menu_d<=0;else audio_menu_d<=Idle || choose;
+    end
+    wire audio_reset_event=((Idle || choose) && !audio_menu_d) || (Finalize && switch_r_f);
     sound sound_inst(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
@@ -428,9 +441,10 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .blk_rot1(blk_rot1),
     .blk_rot2(blk_rot2),
     .danger1(danger1_pulse),
-    .danger2(danger2_pulse),
+    .danger2(story_alarm2),
 
-    .buzz_else(fx_buzz),
+    .cancel(audio_reset_event || Stop || mission_success),
+    .event_id(fx_event),.step_id(fx_step),.note_id(fx_note),.fx_urgent(fx_urgent),
     .fx_active(fx_active)
     );
 

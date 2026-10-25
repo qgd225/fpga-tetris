@@ -1,0 +1,20 @@
+{
+  "status": "G4_signal_candidate_not_hardware_auditioned_not_full_voice_pack",
+  "text": "YOU CAME.",
+  "samples": 48168,
+  "rate_hz": 48000,
+  "seconds": 1.0035,
+  "peak": 501,
+  "normalization_after_rtl": false,
+  "noise_profile": "seed7 lowpass white +/-96, 5ms edge fade; no syllable deletion",
+  "pause_markers": [
+    {
+      "source_sample": 2160,
+      "added_samples": 1280,
+      "seconds": 0.16
+    }
+  ],
+  "payload_sha256": "3a7322af3b29c7cd2fe4e7c6703c7fb3be58665c2fa4f4eb09bfe63144f8b089",
+  "sha256": "f0f50622fb08e92bf6cf00d71289d78957df4464853325fcaa6c92b55d693dd4",
+  "source": "Actual voice_player testbench PCM, unpaused playback with gain envelope."
+}

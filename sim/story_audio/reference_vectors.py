@@ -31,3 +31,25 @@ for predictor in [-32768, -32000, -1, 0, 1, 32000, 32767]:
             vectors.append(f"{word:017x}\n")
 (BUILD / "decoder_cases.mem").write_text("".join(vectors))
 print(f"REFERENCE_VECTORS_READY cases={len(vectors)} voice_samples={len(expected)} final_state={state}")
+
+# 当前生产候选的参考独立从压缩源清单解码，不从 RTL ROM 反推期望值。
+pack = json.loads((ROOT.parents[1] / "assets/story_voice.json").read_text(encoding="utf-8"))
+current = pack["voices"][0]
+packed = bytes.fromhex(current["payload_hex"])
+assert hashlib.sha256(packed).hexdigest() == current["payload_sha256"]
+raw, _ = audioop.adpcm2lin(packed, 2, (current["predictor"], current["index"]))
+current_samples = array.array("h", raw)
+assert len(current_samples) == current["samples"]
+(BUILD / "voice_current_expected.mem").write_text("".join(f"{x & 65535:04x}\n" for x in current_samples))
+(BUILD / "current_voice_count.vh").write_text(f"localparam integer VOICE_SAMPLES={len(current_samples)};\n")
+print(f"CURRENT_VOICE_REFERENCE samples={len(current_samples)}")
+
+all_expected=[];lengths=[]
+for voice in pack['voices']:
+    packed=bytes.fromhex(voice['payload_hex'])
+    raw,_=audioop.adpcm2lin(packed,2,(voice['predictor'],voice['index']))
+    samples=array.array('h',raw);assert len(samples)==voice['samples']
+    all_expected.extend(samples);lengths.append(len(samples))
+(BUILD/'voice_pack_expected.mem').write_text(''.join(f'{x & 65535:04x}\n' for x in all_expected))
+(BUILD/'voice_pack_lengths.mem').write_text(''.join(f'{n:05x}\n' for n in lengths))
+(BUILD/'voice_pack_count.vh').write_text(f'localparam integer PACK_SAMPLES={len(all_expected)};\n')

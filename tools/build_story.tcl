@@ -39,17 +39,26 @@ proc used_resource {text name} {
 if {![regexp {^story_[a-zA-Z0-9_]+$} $round]} {error "Invalid round name"}
 set output [file join $root docs reports $round]
 file mkdir $output
+set gate_snapshot [open [file join $output gates-at-build.md] w]
+fconfigure $gate_snapshot -encoding utf-8 -translation lf
+puts -nonewline $gate_snapshot $gates
+close $gate_snapshot
 puts [exec python [file join $root tools build_story_assets.py]]
+if {[file isfile [file join $root assets story_voice.json]]} {
+    puts [exec python [file join $root tools prepare_story_voice.py]]
+    puts [exec python [file join $root tools build_voice_assets.py]]
+}
 puts [exec python [file join $root tools story_build_manifest.py] write [file join $output source-manifest.json]]
 open_project Tetris.xpr
+foreach stale {voice_v0.mem voice_v0_config.vh} {set entries [get_files -quiet *$stale];if {[llength $entries]} {remove_files $entries}}
 set_property include_dirs [list [file join $root Tetris.srcs sources_1 new]] [get_filesets sources_1]
-foreach name {story_pixel_frontend story_pixel_mapper story_ui story_scene story_presentation story_feedback story_controller bin_to_bcd hud_text hud_font_rom core_renderer scene_sprite_rom audio_synth story_comms voice_player voice_adpcm_rom} {
+foreach name {story_pixel_frontend story_pixel_mapper story_ui story_scene story_presentation story_feedback story_controller bin_to_bcd hud_text hud_font_rom core_renderer scene_sprite_rom audio_synth audio_mixer ima_adpcm_decoder story_comms voice_player voice_adpcm_rom} {
     set source [file join $root Tetris.srcs sources_1 new ${name}.v]
     if {[file isfile $source] && [llength [get_files -quiet $source]] == 0} {
         add_files -norecurse $source
     }
 }
-foreach name {story_font.mem story_sprites.mem story_layout.vh story_text_ids.vh story_palette.vh} {
+foreach name {story_font.mem story_sprites.mem story_voice.mem story_voice_config.vh story_voice_ids.vh story_audio_priority.vh story_layout.vh story_text_ids.vh story_palette.vh} {
     set source [file join $root Tetris.srcs sources_1 new $name]
     if {[file isfile $source] && [llength [get_files -quiet $source]] == 0} {add_files -norecurse $source}
 }
@@ -86,7 +95,18 @@ set status [catch {
     set wns [get_property SLACK $setup_path]
     set whs [get_property SLACK $hold_path]
     set green [expr {$wns >= $timing_target && $whs >= $timing_target}]
-    set budget [expr {$luts <= $lut_limit && $bram <= $bram_limit && $registers <= $register_limit && $latches <= 12 && $dsp == 0}]
+    # M1 已提交的实测值作为音频新增组账目基点，不用视觉节省掩盖音频超支。
+    set audio_delta 0
+    set audio_budget 1
+    if {[regexp {^story_r(2c|[4-6])} $round]} {
+        set baseline_file [open [file join $root docs reports story_r3_feedback gate-summary.txt] r]
+        set baseline_text [read $baseline_file]
+        close $baseline_file
+        if {![regexp {LUT=([0-9]+)} $baseline_text -> baseline_lut]} {error "Missing measured M1 audio baseline"}
+        set audio_delta [expr {$luts-$baseline_lut}]
+        set audio_budget [expr {$audio_delta <= [lindex [gate_numbers $gates R3] 0]}]
+    }
+    set budget [expr {$luts <= $lut_limit && $bram <= $bram_limit && $registers <= $register_limit && $latches <= 12 && $dsp == 0 && $audio_budget}]
     set font_gate 1
     if {[regexp {^story_r(2b|2c|[3-6])} $round]} {
         set font_tiles 0.0
@@ -111,7 +131,7 @@ set status [catch {
     set visual_budget [expr {![regexp {^story_r[23]} $round] || $luts <= $visual_limit}]
     set result [open [file join $output gate-summary.txt] w]
     puts $result "LUT=$luts REGISTERS=$registers BRAM=$bram LATCHES=$latches DSP=$dsp"
-    puts $result "WNS=$wns WHS=$whs TARGET=$timing_target GREEN=$green BUDGET=$budget TARGET_BUDGET=$target_budget VISUAL_BUDGET=$visual_budget FONT_GATE=$font_gate PUBLISH_REQUESTED=$publish"
+    puts $result "WNS=$wns WHS=$whs TARGET=$timing_target GREEN=$green BUDGET=$budget TARGET_BUDGET=$target_budget VISUAL_BUDGET=$visual_budget FONT_GATE=$font_gate AUDIO_NET=$audio_delta AUDIO_BUDGET=$audio_budget PUBLISH_REQUESTED=$publish"
     close $result
     report_timing -max_paths 20 -file [file join $output setup_paths.rpt]
     if {$wns<0 || $whs<0} {error "Candidate timing failed"}

@@ -1,0 +1,5 @@
+Build completed 2026-10-25 09:43:17 local time; gate document appended at 09:44:22.
+Original gate contents are exactly the committed main 0b937eb version, stored in gates-at-build.md with the manifest hash.
+All other 106 recorded build inputs remain byte-identical, including all RTL/assets/build scripts.
+Current gate preserves the entire build-time document as an unchanged prefix. R1-R7 and T1 are unchanged.
+Appended UI geometry/styling requirements were not part of this audio build and are NOT claimed complete.

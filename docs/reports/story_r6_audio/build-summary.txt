@@ -1,0 +1,17 @@
+M2 AUDIO IMPLEMENTATION: AUTOMATED GATES PASS, HARDWARE AUDITION NOT PERFORMED
+Source base main 0b937eb plus audio working tree; 118 build inputs match before/after.
+17 full regression suites pass. Decoder=73314, V0 player=199436, full voice pack=2008318,
+comms=18, FX=51504, four-phase music=768012 checks. HDMI exact PCM sequence/protocol/video=7848263 checks.
+7 voice sources total 111572 8k samples, 13.9465 seconds, 55786 ADPCM payload bytes.
+Payload ceil count=14 RAMB36-equivalent tiles; ACTUAL Vivado long-ROM mapping=16 RAMB36.
+Actual non-voice BRAM=9.0, including shared font=0.5; old music note ROM=0.0.
+Routed LUT=9360 REGISTERS=4754 BRAM=25.0 DSP=0 LATCHES=3.
+Relative to M1: +455 LUT, +277 registers, +15.5 BRAM (includes subtracting old 0.5 music ROM).
+Relative to original task baseline: LUT=-2562, REGISTERS=+229, BRAM=+9.5.
+WNS=+0.337 ns WHS=+0.067 ns TNS=0 THS=0; R1-R7 automated gates pass.
+LUTRAM structural checks: 768 gameplay and 96+96 metadata bit instances pass.
+DRC=46 warnings, unchanged from M1; max-delay unconstrained pins=93, unchanged from M1.
+bit SHA256=F2E8BCF4CDDD41441ECB9FF7EF46C8134DA11877E1B0BCDD14A5ACA0A337ED43
+All BGM/FX/voices share the existing HDMI PCM interface. Original buzzer pins silent.
+User explicitly instructed not to wait for hardware feedback; no listening or subjective quality pass claimed.
+New UI styling is NOT implemented in this audio checkpoint. User's latest order is audio -> revise UI plan -> implement UI.

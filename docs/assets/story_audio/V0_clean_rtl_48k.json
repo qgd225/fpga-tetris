@@ -1,0 +1,11 @@
+{
+  "status": "G4_candidate_not_hardware_auditioned_not_full_voice_pack",
+  "text": "YOU CAME.",
+  "samples": 40488,
+  "rate_hz": 48000,
+  "seconds": 0.8435,
+  "peak": 513,
+  "normalization_after_rtl": false,
+  "sha256": "1c26e28b0b938a23db37f01ff915cbc9bb91554a9ecff7ee0a7458e80c981dcd",
+  "source": "Actual voice_player testbench PCM, unpaused playback with gain envelope; clean Zira V0 fixture; no final signal noise gradient."
+}

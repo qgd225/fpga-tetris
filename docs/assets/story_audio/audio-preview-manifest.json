@@ -1,0 +1,68 @@
+{
+  "status": "RTL_verified_hardware_audition_not_performed",
+  "voices": [
+    {
+      "file": "V0_rtl_48k.wav",
+      "samples": 48168,
+      "peak": 501,
+      "sha256": "f0f50622fb08e92bf6cf00d71289d78957df4464853325fcaa6c92b55d693dd4",
+      "id": 0,
+      "text": "YOU CAME.",
+      "payload_sha256": "3a7322af3b29c7cd2fe4e7c6703c7fb3be58665c2fa4f4eb09bfe63144f8b089"
+    },
+    {
+      "file": "V1_rtl_48k.wav",
+      "samples": 118692,
+      "peak": 496,
+      "sha256": "9066cda0c6134cc6b6eef10e92843134d6a8d92a5437baba79f5305a36ada4c0",
+      "id": 1,
+      "text": "LINK RESTORED. THERE YOU ARE.",
+      "payload_sha256": "0d338a6980187fe628ee7a4aa79891833ce919788c4d945f98776e4b07910f10"
+    },
+    {
+      "file": "V2_rtl_48k.wav",
+      "samples": 107052,
+      "peak": 503,
+      "sha256": "7b58a3a7169fe969e8892b6f8c14940f3b92f9db52a142619cc3c358bf3380c0",
+      "id": 2,
+      "text": "THAT IS IT. KEEP GOING.",
+      "payload_sha256": "6388a637d8a55f1c4387e2a63c78eaac1ee23b515016f59ede3c22b0b3a0bfd4"
+    },
+    {
+      "file": "V3_rtl_48k.wav",
+      "samples": 109296,
+      "peak": 520,
+      "sha256": "51f325d0aee12d7b104650955d8e68f2d53fa7640b1cd332442421c8a594e22d",
+      "id": 3,
+      "text": "STEADY. ALMOST THERE.",
+      "payload_sha256": "ddd15774464eacd06097e8ba4f5bd82a1e991003b8fcd613216ab79d5ee00117"
+    },
+    {
+      "file": "V4_rtl_48k.wav",
+      "samples": 102600,
+      "peak": 480,
+      "sha256": "3b14d8b05a95ec886e77a2215bb4f9e864d9a5ec3017709ed72ac9aff74dcc53",
+      "id": 4,
+      "text": "CLEAR THE ARRAY. NOW.",
+      "payload_sha256": "70ab91b30cfb53cbc7ea493ef9535fa04c723a4f9473ab5d585dc33eae34ecd5"
+    },
+    {
+      "file": "V5_rtl_48k.wav",
+      "samples": 120324,
+      "peak": 520,
+      "sha256": "db9af1ea7def143365d0b5da68a3a798283235add14b20cfe97eaf03cea90de4",
+      "id": 5,
+      "text": "POWER RESTORED. THANK YOU.",
+      "payload_sha256": "17b59e85deacf0a98cc887c9db452053fe65156ac5663e21f9338ffb3b792ed8"
+    },
+    {
+      "file": "V6_rtl_48k.wav",
+      "samples": 63300,
+      "peak": 535,
+      "sha256": "c4b2097091f79849d522d8cc2c1239bb32898930e39d1086509c32ea2373a56e",
+      "id": 6,
+      "text": "NOT... YET.",
+      "payload_sha256": "87f41fc39316f4d3804a311773317ba58f8f89f091857014ac25ce8fda0a2d79"
+    }
+  ]
+}

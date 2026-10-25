@@ -37,7 +37,7 @@ reg hold2 = 0;
 reg blk2 = 0;
 reg blk_rot1 = 0;
 reg blk_rot2 = 0;
-wire buzz_else;
+wire fx_active;wire [3:0] note_id;
 
 reg sm_switch_r = 0;
 reg sm_switch_en = 0;
@@ -51,11 +51,11 @@ wire sm_finalize;
 wire [3:0]sm_choose_cnt;
 
 sound #(
-    .MS_MAX(17'd31),
-    .NOTE_SH(4'd10)
+    .MS_MAX(17'd31)
 ) dut(
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
+    .cancel(1'b0),
     .over(over),
     .clear(clear),
     .clr_n(clr_n),
@@ -84,7 +84,7 @@ sound #(
     .blk2(blk2),
     .blk_rot1(blk_rot1),
     .blk_rot2(blk_rot2),
-    .buzz_else(buzz_else)
+    .fx_active(fx_active),.note_id(note_id)
 );
 
 Game_state_machine #(
@@ -189,7 +189,7 @@ endtask
 
 task wait_done;
 begin
-    while(dut.en != 0)begin
+    while(dut.en != 0 || dut.block_cooldown!=0)begin
         @(posedge Clk_74M);
         #1;
     end
@@ -298,7 +298,7 @@ initial begin
     check_event("P1/P2 same rotate", 6);
     do_reset;
     lvl_up = 1; danger2 = 1; one_pulse;
-    check_event("level_up > danger", 10);
+    check_event("severe danger > level_up", 20);
     do_reset;
     danger2 = 1; hard1 = 1; one_pulse;
     check_event("danger > hard", 20);
@@ -310,7 +310,7 @@ initial begin
     hard1 = 1; over = 1;
     @(posedge Clk_74M);
     #1;
-    chk("playing keeps en=6", dut.en, 6);
+    chk("terminal preempts ordinary FX", dut.en, 16);
     clear_all;
 
     $display("=== 4) 消行序列长度 ===");
@@ -339,26 +339,26 @@ initial begin
     $display("=== 6) 控制音高与时序 ===");
     do_reset;
     over = 1; one_pulse;
-    chk("over st0 note=G5", dut.note, 47360);
+    chk("over st0 note=G5", dut.note_id, 8);
     chk("over st0 cnt=180ms", dut.cnt, 180);
     chk("over st_last=3", dut.st_last, 3);
     clear_all;
     wait_done;
     do_reset;
     menu_l = 1; one_pulse;
-    chk("menu note=F5", dut.note, 53163);
+    chk("menu note=F5", dut.note_id, 7);
     chk("menu cnt=18ms", dut.cnt, 18);
     clear_all;
     wait_done;
     do_reset;
     lft1 = 1; one_pulse;
-    chk("move note=E5", dut.note, 56335);
+    chk("move note=E5", dut.note_id, 6);
     chk("move cnt=20ms", dut.cnt, 20);
     clear_all;
     wait_done;
     do_reset;
     rot1 = 1; one_pulse;
-    chk("rotate note=G5", dut.note, 47360);
+    chk("rotate note=G5", dut.note_id, 8);
     chk("rotate cnt=20ms", dut.cnt, 20);
     clear_all;
     wait_done;
@@ -379,46 +379,46 @@ initial begin
     $display("=== 7) 被挡双音与开关双音 ===");
     do_reset;
     blk1 = 1; one_pulse;
-    chk("move blocked st0 note=E5", dut.note, 56335);
-    chk("move blocked st0 cnt=30ms", dut.cnt, 30);
+    chk("move blocked st0 mechanical D3", dut.note_id, 1);
+    chk("move blocked st0 cnt=12ms", dut.cnt, 12);
     wait_st(1);
-    chk("move blocked rest note=0", dut.note, 0);
+    chk("move blocked rest note=0", dut.note_id, 0);
     chk("move blocked rest cnt=8ms", dut.cnt, 8);
     wait_st(2);
-    chk("move blocked st2 note=C5", dut.note, 70985);
-    chk("move blocked st2 cnt=45ms", dut.cnt, 45);
+    chk("move blocked st2 mechanical D3", dut.note_id, 1);
+    chk("move blocked st2 cnt=18ms", dut.cnt, 18);
     clear_all;
     wait_done;
 
     do_reset;
     blk_rot1 = 1; one_pulse;
-    chk("rotate blocked st0 note=D5", dut.note, 63245);
-    chk("rotate blocked st0 cnt=30ms", dut.cnt, 30);
+    chk("rotate blocked st0 mechanical D3", dut.note_id, 1);
+    chk("rotate blocked st0 cnt=12ms", dut.cnt, 12);
     wait_st(1);
-    chk("rotate blocked rest note=0", dut.note, 0);
+    chk("rotate blocked rest note=0", dut.note_id, 0);
     chk("rotate blocked rest cnt=8ms", dut.cnt, 8);
     wait_st(2);
-    chk("rotate blocked st2 note=B4", dut.note, 75188);
-    chk("rotate blocked st2 cnt=45ms", dut.cnt, 45);
+    chk("rotate blocked st2 mechanical D3", dut.note_id, 1);
+    chk("rotate blocked st2 cnt=18ms", dut.cnt, 18);
     clear_all;
     wait_done;
 
     do_reset;
     sw_short = 1; one_pulse;
-    chk("switch short st0 note=E5", dut.note, 56335);
+    chk("switch short st0 note=E5", dut.note_id, 6);
     chk("switch short st0 cnt=45ms", dut.cnt, 45);
     wait_st(1);
-    chk("switch short st1 note=G5", dut.note, 47360);
+    chk("switch short st1 note=G5", dut.note_id, 8);
     chk("switch short st1 cnt=60ms", dut.cnt, 60);
     clear_all;
     wait_done;
 
     do_reset;
     sw_long = 1; one_pulse;
-    chk("switch long st0 note=G5", dut.note, 47360);
+    chk("switch long st0 note=G5", dut.note_id, 8);
     chk("switch long st0 cnt=60ms", dut.cnt, 60);
     wait_st(1);
-    chk("switch long st1 note=C5", dut.note, 70985);
+    chk("switch long st1 note=C5", dut.note_id, 4);
     chk("switch long st1 cnt=90ms", dut.cnt, 90);
     clear_all;
     wait_done;
@@ -436,28 +436,12 @@ initial begin
     clear_all;
     wait_done;
 
-    $display("=== 9) 方波翻转次数 ===");
-    do_reset;
-    menu_l = 1; one_pulse;
-    edges = 0;
-    prev_buzz = buzz_else;
-    while(dut.en != 0)begin
-        @(posedge Clk_74M);
-        #1;
-        if(buzz_else != prev_buzz)begin
-            edges = edges + 1;
-            prev_buzz = buzz_else;
-        end
-    end
-    chk("menu F5 18ms toggle count", edges, 11);
-
-    $display("=== 10) 复位静音 ===");
-    do_reset;
-    chk("reset en=0", dut.en, 0);
-    chk("reset buzz=0", buzz_else, 0);
-    repeat(20) @(posedge Clk_74M);
-    #1;
-    chk("idle buzz=0", buzz_else, 0);
+    $display("=== 9) PCM pitch descriptor ===");
+    do_reset;menu_l=1;one_pulse;
+    chk("menu F5 note ID",note_id,7);chk("menu FX active",fx_active,1);wait_done;
+    $display("=== 10) reset and idle silence ===");
+    do_reset;chk("reset en=0",dut.en,0);chk("reset FX inactive",fx_active,0);
+    repeat(20)@(posedge Clk_74M);#1;chk("idle FX inactive",fx_active,0);
 
     $display("=== 11) switch 状态机长短按映射 ===");
     do_reset;
@@ -496,8 +480,8 @@ initial begin
     menu_l = 1; one_pulse;
     chk("pending: menu starts", dut.en, 2);
     over = 1; @(posedge Clk_74M); #1; over = 0;
-    chk("pending captured", dut.over_pending, 1);
-    chk("pending: current sound unchanged", dut.en, 2);
+    chk("terminal accepted immediately", dut.en, 16);
+    chk("terminal replaces current sound", dut.en, 16);
     cycles = 0;
     while((dut.en != 16) && (cycles < 200000))begin
       @(posedge Clk_74M); #1;
@@ -510,6 +494,20 @@ initial begin
     repeat(100) @(posedge Clk_74M);
     chk("over does not retrigger", dut.en, 0);
     $display("测试: %0d", checks);
+    $display("=== 13) new audio event contracts ===");
+    do_reset;clear=1;clr_n=4;one_pulse;danger2=1;lvl_up=1;one_pulse;
+    chk("clear sequence protected from alert",dut.en,14);
+    cycles=0;while(dut.en!=20 && cycles<200000)begin @(posedge Clk_74M);#1;cycles=cycles+1;end
+    chk("alert waits for atomic clear",dut.en,20);
+    cycles=0;while(dut.en!=10 && cycles<200000)begin @(posedge Clk_74M);#1;cycles=cycles+1;end
+    chk("phase follows queued alert",dut.en,10);wait_done;
+    do_reset;blk1=1;one_pulse;
+    while(dut.en!=0)begin @(posedge Clk_74M);#1;end
+    blk2=1;one_pulse;chk("blocked cooldown shared across players",dut.en,0);
+    wait_done;blk_rot2=1;one_pulse;chk("blocked rearmed after cooldown",dut.en,18);wait_done;
+    do_reset;over=1;@(posedge Clk_74M);#1;
+    while(dut.en!=0)begin @(posedge Clk_74M);#1;end
+    repeat(500)@(posedge Clk_74M);#1;chk("held terminal never repeats",dut.en,0);over=0;
     if(bad == 0)
         $display("=== ALL PASS ===");
     else

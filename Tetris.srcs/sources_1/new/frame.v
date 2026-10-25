@@ -11,6 +11,7 @@ module frame(
     input [10:0]hcounter,
     input [10:0]vcounter,
     input video_de,
+    input comms_visible,input [2:0] comms_id,
     input left_p_flag,
     input right_p_flag,
     input drop_r_flag,
@@ -59,7 +60,9 @@ module frame(
     output mission_hold,
     output [1:0] story_phase,
     output mission_success,
-    output [1:0] danger_lvl
+    output [1:0] danger_lvl,
+    output story_tick_60hz,
+    output story_result_ready
     );
     `include "story_layout.vh"
     // 坐标寄存加三拍绘制共四级；屏幕左右安全边保持统一底色。
@@ -368,6 +371,7 @@ module frame(
     parameter SUCCESS_TICKS=72;
     reg [20:0] eff_cnt;
     wire eff_tick=eff_cnt==EFF_TICK;
+    assign story_tick_60hz=eff_tick;
     reg [7:0] animation;
     reg [4:0] charge_left;
     always @(posedge Clk_74M or negedge Reset_n)begin
@@ -380,6 +384,7 @@ module frame(
         end
     end
     wire result_ready;
+    assign story_result_ready=result_ready;
     wire [6:0] success_age;
     story_presentation #(.SUCCESS_TICKS(SUCCESS_TICKS)) presentation(
         .clk(Clk_74M),.reset_n(Reset_n),.new_run(new_run),.ui_tick(eff_tick),
@@ -413,7 +418,7 @@ module frame(
         .clear_hit(feedback_clear),.clear_inset(feedback_inset),.side_marks(feedback_sides),.rotation_marks(feedback_rotation));
     story_ui story_ui_inst(
         .clk(Clk_74M),.reset_n(Reset_n),.x(render_h),.y(render_v),
-        .duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),.choose_cnt(choose_cnt),
+        .comms_visible(comms_visible),.comms_id(comms_id),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),.choose_cnt(choose_cnt),
         .phase(display_phase),.danger(display_danger),.locked(display_locked),.success(display_success),.result_ready(result_ready),
         .speed(display_speed),.lines_bcd(display_lines),.score_bcd(display_score),.time_bcd(display_time),
         .feedback_lock(feedback_lock),.feedback_hard_left(feedback_hard_left),.feedback_hard_right(feedback_hard_right),
@@ -423,7 +428,7 @@ module frame(
         .type1(type),.type2(type2),.cell_type(meta_pixel[2:0]),.hint_type(hint_type),.owner(meta_pixel[3]),
         .next1(next),.next2(next2),.hold(hold),.next_slot(next_slot),.hold_slot(hold_slot),
         .next_type1(type_t),.next_type2(type_t2),.hold_type(hold_type),.next_x(next_x),.next_y(next_y),.hold_x(hold_x),.hold_y(hold_y),.rgb(rgb));
-    assign snd_clr_n=c_clear[2:0];
+    assign snd_clr_n=c_clear>4?3'd4:c_clear[2:0];
 endmodule
 
 module cell_metadata_bank(

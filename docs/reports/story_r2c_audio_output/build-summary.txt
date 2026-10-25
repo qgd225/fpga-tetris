@@ -1,0 +1,20 @@
+G4 REPRESENTATIVE OPENING VOICE CANDIDATE, NOT PUBLISHED, WAITING HARDWARE AUDITION
+Source base main 0b937eb plus working tree; 107 build inputs match source-manifest.json.
+Actual signal V0: 8028 8k samples, 1.0035 sec, 4014 payload bytes, predictor/index=0, high nibble first.
+Light deterministic lowpass noise and 160ms inter-word pause; every source speech sample retained.
+17 full regression suites pass; decoder=73314, player=145701 checks, whole 48k output=48168 samples.
+Additional voiced-syllable pause/resume/restart/cancel checks after full regression: player=199434, all pass.
+UI: font=139778, scene=518, VGA phase=4416, feedback=24; story=337; mapper=16777216.
+HDMI independent protocol=7848263 checks, 1632 samples, 407 packets, 32 ACR; metadata RTL/UNISIM=29769 each.
+Routed LUT=9290 REGISTERS=4645 BRAM=10.5 DSP=0 LATCHES=3.
+Relative to published M1: +385 LUT, +168 registers, +1.0 BRAM; audio net budget <=750 passes.
+WNS=+0.483 ns WHS=+0.105 ns TNS=0 THS=0. All automated resource/font/timing gates pass.
+Mixer keeps rising-edge calculation plus falling-edge output; original HDMI FIFO captures on rising edge.
+No timing constraint, protocol module, external clock, or PLL changed.
+LUTRAM structural checks: 768 gameplay bits and 96+96 metadata bits pass.
+Candidate cache: Tetris.runs/story_audio_candidate/Tetris.bit
+Candidate SHA256=CA14DEF45FAB29ADFE42A3864F7B552654B7B0228A144EE203A2069C8481D337
+Published bit/Tetris.bit and main 0b937eb remain the hardware-accepted M1.
+This is V0 only, no full seven-line comms queue, HDMI BGM, or final mechanical FX; no G4 hardware hearing pass claimed.
+
+Post-build audit: only gate documentation was appended AFTER the completed build. Original gate snapshot hash matches manifest; all other 106 inputs including every RTL/asset/build script still match. New UI styling requirements are pending review, not claimed complete. See post-build-gate-change.txt.

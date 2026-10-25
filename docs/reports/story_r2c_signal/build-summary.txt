@@ -1,0 +1,11 @@
+G4 SIGNAL VOICE CANDIDATE, NOT PUBLISHED: HOLD-MARGIN TARGET NOT MET
+107 source inputs matched before/after; 17 full regression suites pass.
+V0: 8028 8k samples, 1.0035 sec, 4014 payload bytes, low noise and 160ms inter-word pause.
+Player reference checks=145699, complete 48k output samples=48168.
+Routed LUT=9289 REGISTERS=4629 BRAM=10.5 DSP=0 LATCHES=3.
+Audio net relative to M1=+384 LUT, +152 registers, +1.0 BRAM.
+WNS=+0.230 ns WHS=+0.048 ns TNS=0 THS=0: physically non-negative, below T1 +0.050 margin, GREEN=0.
+Worst hold: mixer_inst/pcm_reg[12]/C to hdmi_inst/av_encoder/packets/fifo_reg_r1_0_15_12_15/RAMA/I.
+Zero logic levels, 0.208ns data delay. No timing constraint changed.
+Next: explicit falling-edge output stage after the existing rising-edge mixed sample register, to launch data between FIFO capture edges.
+Published M1 bit remains unchanged. No G4 hardware-audition pass claimed.

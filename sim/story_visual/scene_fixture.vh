@@ -26,12 +26,13 @@ reg [2:0] next_type1=1,next_type2=6,hold_type=5;
 reg [4:0] next_x=0,next_y=0,hold_x=0,hold_y=0;
 reg feedback_lock=0,feedback_hard_left=0,feedback_hard_right=0,feedback_clear=0;
 reg [3:0] feedback_inset=0,feedback_sides=0;reg [1:0] feedback_rotation=0;
+reg comms_visible=0;reg [2:0] comms_id=0;
 wire [23:0] rgb;
 reg board[0:479];reg [2:0] board_type[0:479];reg board_owner[0:479];
 reg [23:0] palette[0:55];
 integer bi;
 story_ui dut(.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
-    .choose_cnt(duo?4'd1:4'd0),.phase(phase),.danger(danger),.locked(locked),.success(success),.result_ready(result_ready),
+    .comms_visible(comms_visible),.comms_id(comms_id),.choose_cnt(duo?4'd1:4'd0),.phase(phase),.danger(danger),.locked(locked),.success(success),.result_ready(result_ready),
     .feedback_lock(feedback_lock),.feedback_hard_left(feedback_hard_left),.feedback_hard_right(feedback_hard_right),.feedback_clear(feedback_clear),
     .feedback_inset(feedback_inset),.feedback_sides(feedback_sides),.feedback_rotation(feedback_rotation),.speed(speed),.lines_bcd(lines_bcd),.score_bcd(score_bcd),.time_bcd(time_bcd),.animation(animation),.charge_left(charge_left),
     .in_field(in_field),.cell_visible(cell_visible),.local_x(local_x),.local_y(local_y),

@@ -1,7 +1,7 @@
 // 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
 //============================================================
 // 模块：sound
-// 作用：音效序列器：事件优先级、音高/时长查表和双蜂鸣器输出。
+// 作用：音效序列器：事件优先级、音高/时长查表和 PCM 音符描述。
 // 时钟/复位：Clk_74M；Reset_n 低有效
 //============================================================
 module sound(
@@ -36,44 +36,54 @@ module sound(
     input blk_rot1,
     input blk_rot2,
 
-    output reg buzz_else,
+
+    input cancel,
+    output [4:0] event_id,output [3:0] step_id,output reg [3:0] note_id,
+    output fx_urgent,
     output fx_active
     );
 
 //    仿真可覆盖: 1ms 节拍与音高右移量
     parameter [16:0]MS_MAX = 17'd74249;
-    parameter [3:0]NOTE_SH = 4'd0;
 
-//    音高表: 半周期(74.25MHz / (2*f))
-    parameter [17:0]N_G4 = 18'd94707;
-    parameter [17:0]N_B4 = 18'd75188;
-    parameter [17:0]N_C5 = 18'd70985;
-    parameter [17:0]N_D5 = 18'd63245;
-    parameter [17:0]N_E5 = 18'd56335;
-    parameter [17:0]N_F5 = 18'd53163;
-    parameter [17:0]N_G5 = 18'd47360;
-    parameter [17:0]N_A5 = 18'd42187;
-    parameter [17:0]N_B5 = 18'd37563;
-    parameter [17:0]N_C6 = 18'd35459;
-    parameter [17:0]N_D6 = 18'd31596;
-    parameter [17:0]N_E6 = 18'd28146;
-    parameter [17:0]N_G6 = 18'd23675;
-    parameter [17:0]N_C7 = 18'd17738;
+
+//    音符编码与 audio_synth 的小型频率表一致。
 
     reg [16:0]ms_cnt;
     reg ms_tick;
     reg [4:0]en;
     reg clear_seen;
-    reg over_pending;
+    reg [3:0]st;
     reg over_d;
     wire over_rise = over && !over_d;
+    `include "story_audio_priority.vh"
+    reg alert_pending,level_pending;
+    reg [6:0] block_cooldown;
+    wire protected_clear=en>=11 && en<=14;
+    wire preempt_result=over_rise;
+    function [2:0] priority_of;
+        input [4:0] event_code;
+        begin
+            if(event_code==16)priority_of=`AUDIO_RESULT;
+            else if(event_code==20)priority_of=`AUDIO_ALERT;
+            else if(event_code>=11 && event_code<=14)priority_of=`AUDIO_CLEAR;
+            else if(event_code==10)priority_of=`AUDIO_PHASE;
+            else priority_of=`AUDIO_NORMAL;
+        end
+    endfunction
+    wire preempt_alert=danger2 && priority_of(en)<`AUDIO_ALERT && !protected_clear;
+    wire preempt=preempt_result || preempt_alert;
+    assign event_id=en;
+    assign step_id=st;
+    assign fx_urgent=en==16 || en==20;
+
     reg tick;
-    reg [17:0]note;
-    reg [17:0]note_q;
-    reg [17:0]note_t;
+
+
+
     reg [8:0]cnt;
     reg [8:0]cnt_t;
-    reg [3:0]st;
+
     reg [3:0]st_last;
 
 //    1ms 节拍: 只在播放时计数
@@ -82,7 +92,8 @@ module sound(
     ms_cnt <= 17'd0;
     ms_tick <= 1'b0;
     end
-    else if(en != 5'd0)begin
+    else if(cancel || preempt)begin ms_cnt<=0;ms_tick<=0;end
+    else if(en != 5'd0 || block_cooldown!=0)begin
         if(ms_cnt == MS_MAX)begin
         ms_cnt <= 17'd0;
         ms_tick <= 1'b1;
@@ -98,75 +109,40 @@ module sound(
     end
     end
 
-//    事件优先链: 播放中不接收新事件; 同动作 P1 先于 P2
-    always@(posedge Clk_74M or negedge Reset_n)begin
-    if(!Reset_n)begin
-    en <= 5'd0;
-    clear_seen <= 1'b0;
-    over_pending <= 1'b0;
-    over_d <= 1'b0;
-    end
-    else begin
-    over_d <= over;
-    if(over_rise)
-    over_pending <= 1'b1;
-    if(!clear)
-    clear_seen <= 1'b0;
-    if(tick)
-    en <= 5'd0;
-    else if(en == 5'd0)begin
-        if(over || over_pending)begin
-        en <= 5'd16;
-        over_pending <= 1'b0;
+// 终局立即替换；严重告警可替换普通音，但消行五音保持原子性。
+    always @(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin
+            en<=0;clear_seen<=0;over_d<=0;alert_pending<=0;level_pending<=0;block_cooldown<=0;
+        end else if(cancel)begin
+            en<=0;clear_seen<=0;over_d<=over;alert_pending<=0;level_pending<=0;block_cooldown<=0;
+        end else begin
+            over_d<=over;
+            if(!clear)clear_seen<=0;
+            if(danger2)alert_pending<=1;
+            if(lvl_up)level_pending<=1;
+            if(ms_tick && block_cooldown!=0)block_cooldown<=block_cooldown-1'b1;
+            if(preempt_result)begin en<=16;alert_pending<=0;level_pending<=0;end
+            else if(preempt_alert)begin en<=20;alert_pending<=0;end
+            else if(tick)en<=0;
+            else if(en==0)begin
+                if(alert_pending)begin en<=20;alert_pending<=0;end
+                else if(clear && !clear_seen && clr_n!=0)begin
+                    en<=clr_n==1?11:(clr_n==2?12:(clr_n==3?13:14));clear_seen<=1;
+                end else if(lvl_up || level_pending)begin en<=10;level_pending<=0;end
+                else if(sw_long)en<=17;
+                else if(sw_short)en<=15;
+                else if(danger1)en<=19;
+                else if(hard1 || hard2)en<=9;
+                else if(land1 || land2)en<=8;
+                else if(hold1 || hold2)en<=7;
+                else if(rot1 || rot2)en<=6;
+                else if(lft1 || rgt1 || lft2 || rgt2)en<=5;
+                else if((blk1 || blk2) && block_cooldown==0)begin en<=4;block_cooldown<=120;end
+                else if((blk_rot1 || blk_rot2) && block_cooldown==0)begin en<=18;block_cooldown<=120;end
+                else if(soft1 || soft2)en<=3;
+                else if(menu_l || menu_r)en<=2;
+            end
         end
-        else if(sw_long)
-        en <= 5'd17;
-        else if(sw_short)
-        en <= 5'd15;
-        else if(clear && !clear_seen && (clr_n == 3'd4))begin
-        en <= 5'd14;
-        clear_seen <= 1'b1;
-        end
-        else if(clear && !clear_seen && (clr_n == 3'd3))begin
-        en <= 5'd13;
-        clear_seen <= 1'b1;
-        end
-        else if(clear && !clear_seen && (clr_n == 3'd2))begin
-        en <= 5'd12;
-        clear_seen <= 1'b1;
-        end
-        else if(clear && !clear_seen && (clr_n == 3'd1))begin
-        en <= 5'd11;
-        clear_seen <= 1'b1;
-        end
-        else if(lvl_up)
-        en <= 5'd10;
-        else if(danger2)
-        en <= 5'd20;
-        else if(danger1)
-        en <= 5'd19;
-        else if(hard1 || hard2)
-        en <= 5'd9;
-        else if(land1 || land2)
-        en <= 5'd8;
-        else if(hold1 || hold2)
-        en <= 5'd7;
-        else if(rot1 || rot2)
-        en <= 5'd6;
-        else if(lft1 || rgt1)
-        en <= 5'd5;
-        else if(lft2 || rgt2)
-        en <= 5'd5;
-        else if(blk1 || blk2)
-        en <= 5'd4;
-        else if(blk_rot1 || blk_rot2)
-        en <= 5'd18;
-        else if(soft1 || soft2)
-        en <= 5'd3;
-        else if(menu_l || menu_r)
-        en <= 5'd2;
-    end
-    end
     end
 
 //    每条音效的末音符编号
@@ -197,102 +173,98 @@ module sound(
 
 //    音符查表: (en, st) -> 半周期
     always@(*)begin
-    note = 18'd0;
+    note_id = 4'd0;
     case(en)
     5'd17: case(st)
-        4'd0: note = N_G5;
-        4'd1: note = N_C5;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd8;
+        4'd1: note_id = 4'd4;
+        default: note_id = 4'd0;
         endcase
     5'd16: case(st)
-        4'd0: note = N_G5;
-        4'd1: note = N_E5;
-        4'd2: note = N_C5;
-        4'd3: note = N_G4;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd8;
+        4'd1: note_id = 4'd6;
+        4'd2: note_id = 4'd4;
+        4'd3: note_id = 4'd2;
+        default: note_id = 4'd0;
         endcase
     5'd15: case(st)
-        4'd0: note = N_E5;
-        4'd1: note = N_G5;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd6;
+        4'd1: note_id = 4'd8;
+        default: note_id = 4'd0;
         endcase
     5'd18: case(st)
-        4'd0: note = N_D5;
-        4'd1: note = 18'd0;
-        4'd2: note = N_B4;
-        default: note = 18'd0;
+        4'd0,4'd2: note_id = 4'd1;
+        default: note_id = 4'd0;
         endcase
     5'd20: case(st)
-        4'd0: note = N_A5;
-        4'd1: note = 18'd0;
-        4'd2: note = N_E5;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd9;
+        4'd1: note_id = 4'd0;
+        4'd2: note_id = 4'd6;
+        default: note_id = 4'd0;
         endcase
     5'd19: case(st)
-        4'd0: note = N_D5;
-        4'd1: note = 18'd0;
-        4'd2: note = N_B4;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd5;
+        4'd1: note_id = 4'd0;
+        4'd2: note_id = 4'd3;
+        default: note_id = 4'd0;
         endcase
     5'd14: case(st)
-        4'd0: note = N_C5;
-        4'd1: note = N_D5;
-        4'd2: note = N_E5;
-        4'd3: note = N_G5;
-        4'd4: note = N_C6;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd4;
+        4'd1: note_id = 4'd5;
+        4'd2: note_id = 4'd6;
+        4'd3: note_id = 4'd8;
+        4'd4: note_id = 4'd11;
+        default: note_id = 4'd0;
         endcase
     5'd13: case(st)
-        4'd0: note = N_C5;
-        4'd1: note = N_D5;
-        4'd2: note = N_E5;
-        4'd3: note = N_G5;
-        4'd4: note = N_C6;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd4;
+        4'd1: note_id = 4'd5;
+        4'd2: note_id = 4'd6;
+        4'd3: note_id = 4'd8;
+        4'd4: note_id = 4'd11;
+        default: note_id = 4'd0;
         endcase
     5'd12: case(st)
-        4'd0: note = N_C5;
-        4'd1: note = N_D5;
-        4'd2: note = N_E5;
-        4'd3: note = N_G5;
-        4'd4: note = N_C6;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd4;
+        4'd1: note_id = 4'd5;
+        4'd2: note_id = 4'd6;
+        4'd3: note_id = 4'd8;
+        4'd4: note_id = 4'd11;
+        default: note_id = 4'd0;
         endcase
     5'd11: case(st)
-        4'd0: note = N_C5;
-        4'd1: note = N_D5;
-        4'd2: note = N_E5;
-        4'd3: note = N_G5;
-        4'd4: note = N_C6;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd4;
+        4'd1: note_id = 4'd5;
+        4'd2: note_id = 4'd6;
+        4'd3: note_id = 4'd8;
+        4'd4: note_id = 4'd11;
+        default: note_id = 4'd0;
         endcase
     5'd10: case(st)
-        4'd0: note = N_G5;
-        4'd1: note = N_C6;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd8;
+        4'd1: note_id = 4'd11;
+        default: note_id = 4'd0;
         endcase
     5'd9: case(st)
-        4'd0: note = N_C5;
-        4'd1: note = N_G5;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd4;
+        4'd1: note_id = 4'd8;
+        default: note_id = 4'd0;
         endcase
-    5'd8: note = N_C5;
+    5'd8: note_id = 4'd4;
     5'd7: case(st)
-        4'd0: note = N_C5;
-        4'd1: note = N_E5;
-        default: note = 18'd0;
+        4'd0: note_id = 4'd4;
+        4'd1: note_id = 4'd6;
+        default: note_id = 4'd0;
         endcase
-    5'd6: note = N_G5;
-    5'd5: note = N_E5;
+    5'd6: note_id = 4'd8;
+    5'd5: note_id = 4'd6;
     5'd4: case(st)
-        4'd0: note = N_E5;
-        4'd1: note = 18'd0;
-        4'd2: note = N_C5;
-        default: note = 18'd0;
+        4'd0,4'd2: note_id = 4'd1;
+        default: note_id = 4'd0;
         endcase
-    5'd3: note = N_D5;
-    5'd2: note = N_F5;
-    default: note = 18'd0;
+    5'd3: note_id = 4'd5;
+    5'd2: note_id = 4'd7;
+    default: note_id = 4'd0;
     endcase
     end
 
@@ -318,9 +290,9 @@ module sound(
         default: cnt = 9'd0;
         endcase
     5'd18: case(st)
-        4'd0: cnt = 9'd30;
+        4'd0: cnt = 9'd12;
         4'd1: cnt = 9'd8;
-        4'd2: cnt = 9'd45;
+        4'd2: cnt = 9'd18;
         default: cnt = 9'd0;
         endcase
     5'd20: case(st)
@@ -386,43 +358,15 @@ module sound(
     5'd6: cnt = 9'd20;
     5'd5: cnt = 9'd20;
     5'd4: case(st)
-        4'd0: cnt = 9'd30;
+        4'd0: cnt = 9'd12;
         4'd1: cnt = 9'd8;
-        4'd2: cnt = 9'd45;
+        4'd2: cnt = 9'd18;
         default: cnt = 9'd0;
         endcase
     5'd3: cnt = 9'd15;
     5'd2: cnt = 9'd18;
     default: cnt = 9'd0;
     endcase
-    end
-
-//    仿真缩放: 只缩短半周期, 不改音符/时长表
-    always@(*)begin
-    if(note == 18'd0)
-    note_q = 18'd0;
-    else
-    note_q = note >> NOTE_SH;
-    end
-
-//    方波翻转: 每 note_q 拍翻转一次
-    always@(posedge Clk_74M or negedge Reset_n)begin
-    if(!Reset_n)begin
-    buzz_else <= 1'b0;
-    note_t <= 18'd0;
-    end
-    else if((en != 5'd0) && (note_q != 18'd0))begin
-        if(note_t >= (note_q - 18'd1))begin
-        buzz_else <= !buzz_else;
-        note_t <= 18'd0;
-        end
-        else
-        note_t <= note_t + 18'd1;
-    end
-    else begin
-    buzz_else <= 1'b0;
-    note_t <= 18'd0;
-    end
     end
 
 //    音符序列推进: 按 ms_tick 切到下一音, 末音结束给 tick
@@ -432,6 +376,7 @@ module sound(
     cnt_t <= 9'd0;
     tick <= 1'b0;
     end
+    else if(cancel || preempt)begin st<=0;cnt_t<=0;tick<=0;end
     else if(en != 5'd0)begin
         tick <= 1'b0;
         if(ms_tick && (cnt != 9'd0))begin
@@ -455,6 +400,6 @@ module sound(
     end
     end
 
-// PCM 静音标志；方波低半周仍是有效声音。
-    assign fx_active = Reset_n && (en != 5'd0) && (note_q != 18'd0);
+// 音符休止与有效音显式区分；波形合成只在音频使能下执行。
+    assign fx_active = Reset_n && (en != 5'd0) && (note_id != 4'd0);
 endmodule

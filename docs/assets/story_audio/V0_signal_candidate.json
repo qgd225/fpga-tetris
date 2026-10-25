@@ -1,0 +1,27 @@
+{
+  "id": "V0",
+  "text": "YOU CAME.",
+  "status": "offline_signal_candidate_not_integrated_not_auditioned",
+  "voice": "Microsoft Zira Desktop",
+  "rate_hz": 8000,
+  "predictor": 0,
+  "index": 0,
+  "nibble_order": "high_first",
+  "samples": 8028,
+  "seconds": 1.0035,
+  "word_count": 2,
+  "noise_profile": "seed7 lowpass white +/-96, 5ms edge fade; no syllable deletion",
+  "pause_markers": [
+    {
+      "source_sample": 2160,
+      "added_samples": 1280,
+      "seconds": 0.16
+    }
+  ],
+  "peak": 8023,
+  "payload_bytes": 4014,
+  "ramb36_payload_tiles": 1,
+  "snr_db_vs_precompression": 23.12,
+  "source_sha256": "354a8808700789ce7159b3b9fb0155fa3d9808a84e31b07a92b9c51ead848adc",
+  "payload_sha256": "3a7322af3b29c7cd2fe4e7c6703c7fb3be58665c2fa4f4eb09bfe63144f8b089"
+}
