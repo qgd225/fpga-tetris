@@ -1,0 +1,22 @@
+[
+  {
+    "phase": 1,
+    "colors": 35,
+    "default_dialog": false
+  },
+  {
+    "phase": 2,
+    "colors": 34,
+    "default_dialog": false
+  },
+  {
+    "phase": 3,
+    "colors": 34,
+    "default_dialog": false
+  },
+  {
+    "phase": 4,
+    "colors": 34,
+    "default_dialog": false
+  }
+]

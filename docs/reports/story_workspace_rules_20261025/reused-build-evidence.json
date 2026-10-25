@@ -1,0 +1,8 @@
+{
+  "hardware_and_asset_inputs_checked": 100,
+  "changed_inputs": [],
+  "source_manifest": "D:\\vivado_project\\Tetris\\docs\\reports\\story_r3_ui_reference2\\source-manifest.json",
+  "bit_sha256": "8328A8C1BC18D3812D328A39F72DD1E1E14390505A76701880CD9EFBD65652DC",
+  "build_reused": true,
+  "reason": "硬件输入未变化，复用已有完整构建、13场景预览、网表文字和存储连接通过记录；不重复综合和生成bit"
+}

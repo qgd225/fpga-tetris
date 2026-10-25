@@ -114,3 +114,24 @@
     localparam [6:0] LEN_RETRY = 7'd21;
     localparam [9:0] TXT_SEALED = 10'd692;
     localparam [6:0] LEN_SEALED = 7'd6;
+    localparam [9:0] TXT_MENU_TITLE = 10'd698;
+    localparam [6:0] LEN_MENU_TITLE = 7'd11;
+    localparam [9:0] TXT_MENU_HINT = 10'd709;
+    localparam [6:0] LEN_MENU_HINT = 7'd26;
+    localparam [4:0] STORY_MODE_COUNT = 5'd2;
+    function [9:0] story_mode_text;
+    input [3:0] id;
+    begin case(id)
+        4'd0: story_mode_text=TXT_SOLO;
+        4'd1: story_mode_text=TXT_DUO;
+        default: story_mode_text=TXT_SOLO;
+    endcase end
+    endfunction
+    function [6:0] story_mode_length;
+    input [3:0] id;
+    begin case(id)
+        4'd0: story_mode_length=LEN_SOLO;
+        4'd1: story_mode_length=LEN_DUO;
+        default: story_mode_length=LEN_SOLO;
+    endcase end
+    endfunction

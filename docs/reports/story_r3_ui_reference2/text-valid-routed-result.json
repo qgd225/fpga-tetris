@@ -1,0 +1,18 @@
+{
+  "checks": 100,
+  "failures": [],
+  "nodes": 601,
+  "primitive_types": {
+    "LUT6": 69,
+    "LUT4": 64,
+    "FDCE": 47,
+    "LUT2": 183,
+    "LUT3": 86,
+    "FDPE": 1,
+    "LUT5": 43,
+    "CARRY4": 71,
+    "GND": 1,
+    "LUT1": 35,
+    "VCC": 1
+  }
+}

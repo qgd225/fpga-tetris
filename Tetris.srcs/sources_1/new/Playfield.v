@@ -320,7 +320,13 @@ module Playfield(
     reg [23:0]row_data;
     wire restart_board = (Idle && !idle_d) || (Finalize && switch_r_flag);
     wire board_busy = board_init || move_active || restart_board;
-    wire player_stop = Stop || mission_hold || clear_time;
+    reg [1:0] rotation_settle;
+    always @(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)rotation_settle<=0;
+        else if(Idle || Finalize)rotation_settle<=0;
+        else rotation_settle<={rotation_settle[0],en_rotate || (duo && en_rotate2)};
+    end
+    wire player_stop = Stop || mission_hold || clear_time || (|rotation_settle);
     reg batch_active;
     wire clear_cancel = Idle || restart_board;
     assign batch_done = clear_down && batch_active;
@@ -440,6 +446,12 @@ module Playfield(
     wire [5:0] or1_2 = counter_r + { { 7{Tetromino_dout[19]} }, Tetromino_dout[19-:4] };
     wire [5:0] oc1_3 = counter_c + { { 7{Tetromino_dout[31]} }, Tetromino_dout[31-:4] };
     wire [5:0] or1_3 = counter_r + { { 7{Tetromino_dout[27]} }, Tetromino_dout[27-:4] };
+    wire [5:0] candidate_c1[0:3],candidate_r1[0:3];
+    genvar rc;
+    generate for(rc=0;rc<4;rc=rc+1)begin:rotation_reservation
+        assign candidate_c1[rc]=counter_c+ddc_ext+{{7{Tetromino_dout1[rc*8+7]}},Tetromino_dout1[rc*8+7 -:4]};
+        assign candidate_r1[rc]=counter_r+ddr_ext+{{7{Tetromino_dout1[rc*8+3]}},Tetromino_dout1[rc*8+3 -:4]};
+    end endgenerate
     genvar gw;
     generate for(gw = 0; gw < 20; gw = gw + 1)begin : gen_roww
         assign row_w[gw] = { state[23*20+gw], state[22*20+gw], state[21*20+gw], state[20*20+gw],
@@ -761,7 +773,7 @@ module Playfield(
 
 //    P1 旋转预判: 转过去会不会出界或撞到已落格
     always@(*)begin
-        Tetromino_addr1 = {type[2:0], (rot[1:0] + 1)};
+        Tetromino_addr1 = {type[2:0], (rot[1:0] + 2'd1)};
         rot_block = 1'b0;
         for(k = 0; k < 4; k = k + 1)begin
             cc_r = counter_c + ddc_ext + { { 7{Tetromino_dout1[k*8+7]} }, Tetromino_dout1[(k*8+7)-:4] };
@@ -772,8 +784,9 @@ module Playfield(
             rot_block = 1'b1;
             else if((cc_r <= (COL - 1'b1)) && (rr_r <= 11'd19) && read_rotate1[k][cc_r])
             rot_block = 1'b1;
+            if(duo && ((cc_r==oc2_0 && rr_r==or2_0) || (cc_r==oc2_1 && rr_r==or2_1) || (cc_r==oc2_2 && rr_r==or2_2) || (cc_r==oc2_3 && rr_r==or2_3)))rot_block=1'b1;
         end
-        en_rotate = (rotate_p_flag) && (!rot_block) && (!lock_we) && !board_busy;
+        en_rotate = rotate_p_flag && !rot_block && !lock_we && !land_we && !board_busy && Playing && !player_stop && !drop_r && !drop_hold && !hold_up && !land_pulse && !(duo && (left_p_flag2 || right_p_flag2 || drop_r2 || drop_hold2 || counter_drop2==Drop || land_pulse2 || hold_up2));
     end
 
 //    P1 当前旋转序号
@@ -1171,8 +1184,8 @@ module Playfield(
     assign blk_r2 = duo && right_p_flag2 && boundary_collision_right2;
     assign snd_hold1 = hold_up;
     assign snd_hold2 = duo && hold_up2;
-    assign blk_rot1 = Playing && rotate_p_flag && (rot_block || lock_we);
-    assign blk_rot2 = duo && Playing && rotate_p_flag2 && (rot_block2 || lock_we2);
+    assign blk_rot1 = Playing && rotate_p_flag && (rot_block || lock_we || player_stop || !en_rotate);
+    assign blk_rot2 = duo && Playing && rotate_p_flag2 && (rot_block2 || lock_we2 || player_stop || !en_rotate2);
     assign ghost_ev1 = ghost_restart1;
     assign ghost_ev2 = duo && ghost_restart2;
     assign land_pulse2 = Playing && !player_stop && (lock_counter2 == 5940000);
@@ -1450,7 +1463,7 @@ module Playfield(
 
 //    P2 旋转预判: 转过去会不会出界或撞到已落格
     always@(*)begin
-        Tetromino_addr3 = {type2[2:0], (rot2[1:0] + 1)};
+        Tetromino_addr3 = {type2[2:0], (rot2[1:0] + 2'd1)};
         rot_block2 = 1'b0;
         for(k2 = 0; k2 < 4; k2 = k2 + 1)begin
             cc_r2 = counter_c2 + ddc_ext2 + { { 7{Tetromino_dout3[k2*8+7]} }, Tetromino_dout3[(k2*8+7)-:4] };
@@ -1461,8 +1474,10 @@ module Playfield(
             rot_block2 = 1'b1;
             else if((cc_r2 <= (COL - 1'b1)) && (rr_r2 <= 11'd19) && read_rotate2[k2][cc_r2])
             rot_block2 = 1'b1;
+            if(duo && ((cc_r2==oc1_0 && rr_r2==or1_0) || (cc_r2==oc1_1 && rr_r2==or1_1) || (cc_r2==oc1_2 && rr_r2==or1_2) || (cc_r2==oc1_3 && rr_r2==or1_3)))rot_block2=1'b1;
+            if(duo && en_rotate && ((cc_r2==candidate_c1[0] && rr_r2==candidate_r1[0]) || (cc_r2==candidate_c1[1] && rr_r2==candidate_r1[1]) || (cc_r2==candidate_c1[2] && rr_r2==candidate_r1[2]) || (cc_r2==candidate_c1[3] && rr_r2==candidate_r1[3])))rot_block2=1'b1;
         end
-        en_rotate2 = (rotate_p_flag2) && (!rot_block2) && (!lock_we2) && !board_busy;
+        en_rotate2 = rotate_p_flag2 && !rot_block2 && !lock_we2 && !land_we2 && !board_busy && Playing && !player_stop && !drop_r2 && !drop_hold2 && !hold_up2 && !land_pulse2 && !(duo && (left_p_flag || right_p_flag || drop_r || drop_hold || counter_drop==Drop || land_pulse || hold_up));
     end
 
 //    P2 当前旋转序号

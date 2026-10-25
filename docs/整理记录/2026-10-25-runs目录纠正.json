@@ -1,0 +1,326 @@
+[
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\hdmi_audio_baseline",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\hdmi_audio_baseline"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\lutram_check",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\lutram_check"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\lutram_final",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\lutram_final"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_final_metadata_hint2",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_final_metadata_hint2"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_final_storage_hint",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_final_storage_hint"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round1",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_round1"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round2_pairs",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_round2_pairs"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round3_colors",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_round3_colors"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round3_colors_labels",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_round3_colors_labels"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round5_metadata",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_round5_metadata"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round6_hint",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_round6_hint"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_base",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_screen_base"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_colors",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_screen_colors"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_frame_base",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_screen_frame_base"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_frame_base_clean",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_screen_frame_base_clean"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_hint",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_screen_hint"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_hint_base",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_screen_hint_base"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_metadata",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_screen_metadata"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_pairs",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\opt_screen_pairs"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\optimization_backups",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\optimization_backups"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\story_audio_candidate",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\story_audio_candidate"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\story_m1_candidate",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\story_m1_candidate"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\dump_text_netlist.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\dump_text_netlist.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\dump_text_netlist.tcl",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\dump_text_netlist.tcl"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\eval_text_cone.py",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\eval_text_cone.py"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\export_valid_cone.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\export_valid_cone.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\export_valid_cone.tcl",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\export_valid_cone.tcl"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\inspect_metadata_routed.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\inspect_metadata_routed.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\inspect_metadata.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\inspect_metadata.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\inspect_text_valid.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\inspect_text_valid.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\inspect_text_valid.tcl",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\inspect_text_valid.tcl"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\inspect_ui_feedback.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\inspect_ui_feedback.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\inspect_ui_feedback.tcl",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\inspect_ui_feedback.tcl"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\lutram_check_driver.jou",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\lutram_check_driver.jou"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\lutram_check_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\lutram_check_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\lutram_final_driver.jou",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\lutram_final_driver.jou"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\lutram_final_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\lutram_final_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\old-text-netlist-defect.json",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\old-text-netlist-defect.json"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_final_metadata_hint2_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_final_metadata_hint2_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_final_storage_hint_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_final_storage_hint_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_final_storage_hint_resume.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_final_storage_hint_resume.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_final_storage_hint_resume2.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_final_storage_hint_resume2.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round1_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round1_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round2_pairs_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round2_pairs_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round3_colors_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round3_colors_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round3_colors_labels_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round3_colors_labels_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round5_metadata_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round5_metadata_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round5_metadata_resume.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round5_metadata_resume.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round5_metadata_resume3.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round5_metadata_resume3.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round5_metadata_resume4.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round5_metadata_resume4.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round5_metadata_resume5.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round5_metadata_resume5.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_round6_hint_driver.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_round6_hint_driver.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_base.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_screen_base.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_colors.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_screen_colors.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_frame_base_clean.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_screen_frame_base_clean.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_frame_base.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_screen_frame_base.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_hint_base.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_screen_hint_base.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_hint.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_screen_hint.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_metadata.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_screen_metadata.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\opt_screen_pairs.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\opt_screen_pairs.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\promote_audio.jou",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\promote_audio.jou"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\promote_audio.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\promote_audio.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\promote_audio.tcl",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\promote_audio.tcl"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\publish_reference2.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\publish_reference2.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\publish_reference2.tcl",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\publish_reference2.tcl"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\publish_story_ui.tcl",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\publish_story_ui.tcl"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\publish_ui_feedback.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\publish_ui_feedback.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\publish_ui_feedback.tcl",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\publish_ui_feedback.tcl"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\reference2_game_preview.png",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\reference2_game_preview.png"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\reference2_menu_preview.png",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\reference2_menu_preview.png"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\reference2_text_routed_cone.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\reference2_text_routed_cone.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\reference2_text_synth_cone.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\reference2_text_synth_cone.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\story_r3_ui_feedback_build.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\story_r3_ui_feedback_build.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\story_r3_ui_reference2_build.log",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\story_r3_ui_reference2_build.log"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\text_bug_netlist.v",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\text_bug_netlist.v"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\text_valid_cone.tsv",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\text_valid_cone.tsv"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\ui_feedback_menu.png",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\ui_feedback_menu.png"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\ui_feedback_phase3.png",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\ui_feedback_phase3.png"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\ui_feedback_placed_paths.rpt",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\ui_feedback_placed_paths.rpt"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\ui_feedback_preview.png",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\ui_feedback_preview.png"
+  },
+  {
+    "Source": "D:\\vivado_project\\Tetris\\temporary\\Tetris.runs\\ui_feedback_result.png",
+    "Destination": "D:\\vivado_project\\Tetris\\temporary\\验收运行\\遗留散件\\ui_feedback_result.png"
+  }
+]

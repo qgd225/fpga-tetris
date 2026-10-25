@@ -1,0 +1,26 @@
+{
+  "A": {
+    "size": [
+      24,
+      24
+    ],
+    "colors": 23,
+    "semi_alpha": 0
+  },
+  "B": {
+    "size": [
+      24,
+      24
+    ],
+    "colors": 23,
+    "semi_alpha": 0
+  },
+  "C": {
+    "size": [
+      24,
+      24
+    ],
+    "colors": 22,
+    "semi_alpha": 0
+  }
+}

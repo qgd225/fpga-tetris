@@ -1,0 +1,15 @@
+{
+  "id": "V0",
+  "text": "YOU CAME.",
+  "voice": "Microsoft Zira Desktop",
+  "rate_hz": 8000,
+  "predictor": 0,
+  "index": 0,
+  "nibble_order": "high_first",
+  "samples": 6748,
+  "seconds": 0.8435,
+  "payload_bytes": 3374,
+  "ramb36_payload_tiles": 1,
+  "snr_db_vs_pcm": 23.37,
+  "status": "offline_candidate_not_integrated_not_audition_approved"
+}

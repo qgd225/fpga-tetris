@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CORE-07 / Last Shuttle — UI and Sound Study</title>
+<style>
+:root{color-scheme:dark;font-family:"Bahnschrift","Segoe UI",sans-serif;background:#e6ecef;color:#233c4a}*{box-sizing:border-box}body{max-width:1440px;margin:auto;padding:24px}h1{font-size:24px;margin:0 0 8px}p{color:#506c7a;line-height:1.8;margin:8px 0 18px}.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 0}button,select{font:inherit;color:#233c4a;background:#ccd9de;border:1px solid #8ca6b4;padding:9px 14px;cursor:pointer}button:hover{border-color:#197f88}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #95641f;outline-offset:3px}label{display:flex;gap:8px;align-items:center}input[type=range]{width:250px;accent-color:#197f88}#screen{width:100%;aspect-ratio:16/9;display:block;border:1px solid #8ca6b4;background:#e6ecef}#desc{min-height:55px;border-left:3px solid #197f88;padding:8px 14px;background:#d9e4e9;color:#c3d5dc}.note{font-size:14px}svg text{font-family:"Bahnschrift","Segoe UI",sans-serif}output{font-variant-numeric:tabular-nums;min-width:105px}#status{font-size:14px;color:#95641f;min-height:24px}
+</style>
+<h1>CORE-07 / LAST SHUTTLE — FOUR CHAPTERS, EIGHT SPEEDS</h1>
+<p>Design preview, not integrated with the FPGA. Change the speed to inspect the station's progression, or hide the console to inspect the full-frame environment.</p>
+<div class="controls">
+<label>Mode <select id="mode"><option value="solo">Solo Watch</option><option value="duo">Dual Operators</option></select></label>
+<label>Speed <input id="step" type="range" min="0" max="7" value="0"><output id="value"></output></label>
+<label><input id="danger" type="checkbox">Stack Warning</label>
+<label><input id="bgonly" type="checkbox">Environment Only</label>
+<label><input id="success" type="checkbox">Mission Complete</label>
+</div>
+<svg id="screen" viewBox="0 0 1280 720" role="img" aria-labelledby="screen-title screen-desc"><title id="screen-title">CORE-07 console concept</title><desc id="screen-desc">Four power modules, central containment grid, operator panels and communications over a changing station environment.</desc></svg>
+<p id="desc" aria-live="polite"></p>
+<div class="controls"><button id="oldSound">Original Block Tone / Reconstruction</button><button id="newSound">Mechanical Limit / Candidate</button><button id="clearSound">Discharge / Candidate</button></div>
+<div id="status" role="status"></div>
+<p class="note">Audio starts only on a button click at a low level. The original tone is reconstructed from source parameters, not a buzzer recording. Test the candidates on the M156 before selection. Fonts, materials and colors are concept studies; hardware requires palette quantization and resource checks. Grid pitch: 24 pixels. Solo: 20 columns. Duo: 24 columns. Both: 20 rows.</p>
+<script>
+const $=s=>document.getElementById(s), screen=$('screen');
+const stages=[
+ {name:'TAKE CONTROL',device:'CONTAINMENT',steps:['CALIBRATING','STABLE DISCHARGE'],goal:'Establish a stable discharge circuit.',subtitle:'The last shuttle is still docked.',base:'#aabac5',sky:'#748fa2',accent:'#167a84',reason:'The station begins on reserve lighting. Connecting the first circuit leaves a steady blue access light.'},
+ {name:'RESTORE ACCESS',device:'BOARDING ACCESS',steps:['POWERING ACCESS','OPENING ACCESS'],goal:'Restore power to the boarding corridor.',subtitle:'The corridor is coming back. Keep the power on.',base:'#dce5e8',sky:'#83a0ae',accent:'#167a84',reason:'The boarding corridor gains a continuous guide-light strip. Powered equipment stays online in later chapters.'},
+ {name:'DEPARTURE SYSTEMS',device:'DEPARTURE SYSTEMS',steps:['SYSTEMS ONLINE','IGNITION STANDBY'],goal:'Bring the departure systems online.',subtitle:'Boarding is almost complete. Systems are coming online.',base:'#c3cdd3',sky:'#96acb8',accent:'#97691e',reason:'Shuttle position lights and equipment bays come online. Non-essential lighting is reduced. The shuttle remains docked.'},
+ {name:'FINAL TRANSFER',device:'FINAL TRANSFER',steps:['RELEASE CHECK','FINAL TRANSFER'],goal:'Complete the final departure power transfer.',subtitle:'One last transfer. Please.',base:'#d0d5d6',sky:'#a7b8bf',accent:'#946016',reason:'Docking arms prepare for release and lane lights appear. The shuttle departs only after the objective is complete.'}
+];
+const single=[0,2,4,8,12,18,24,28,32],double=[0,3,6,11,16,23,30,35,40];
+const periods=[800,710,630,550,460,380,300,210];
+const palette=['#62c5dc','#a686ce','#d9c66d','#d97878','#7fb18a','#dc9b69','#ca84b2'];
+function rect(x,y,w,h,fill,stroke='none',sw=1){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`}
+function path(d,c,w=1,fill='none'){return `<path d="${d}" fill="${fill}" stroke="${c}" stroke-width="${w}"/>`}
+function text(x,y,s,size=16,fill='#213a49',extra=''){return `<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" ${extra}>${s}</text>`}
+function cell(x,y,size,c,active=false){return rect(x+1,y+1,size-2,size-2,'#9aadb7','#364f5d')+rect(x+4,y+4,size-8,size-8,c)+path(`M${x+3} ${y+size-4}V${y+3}H${x+size-4}`,'#e6edf0')+path(`M${x+size-4} ${y+4}V${y+size-4}H${x+4}`,'#49606c')+rect(x+5,y+5,5,2,active?'#eff6df':'#dce9e6')+rect(x+size-7,y+size-7,3,3,'#49606c')}
+function deviceIcon(i,x,y,c){const shapes=[`M${x+2} ${y+2}H${x+15}V${y+15}H${x+2}ZM${x+5} ${y+8}l3-4 2 8 3-4M${x+8} ${y-2}V${y+2}M${x+8} ${y+15}V${y+19}`,`M${x+1} ${y+16}V${y+1}H${x+16}V${y+16}M${x+7} ${y+3}V${y+15}M${x+11} ${y+9}h3`,`M${x+1} ${y+12}L${x+8} ${y+2}L${x+16} ${y+12}H${x+1}ZM${x+5} ${y+14}V${y+18}M${x+12} ${y+14}V${y+18}`,`M${x+5} ${y+1}V${y+7}M${x+12} ${y+1}V${y+7}M${x+2} ${y+7}H${x+15}V${y+13}L${x+9} ${y+18}L${x+2} ${y+13}Z`];return path(shapes[i],c,1.5)}
+function preview(x,y,c,shape){let a='';shape.forEach(([cx,cy])=>a+=cell(x+cx*24,y+cy*24,24,c,true));return a}
+function panel(x,y,w,h,label){return rect(x,y,w,h,'#dce5e8','#8fa8b3')+path(`M${x+10} ${y+1}H${x+w-10}`,'#f2f6f7',2)+text(x+14,y+25,label,17,'#3d5b6a')}
+function background(stage,step,done){const st=stages[stage];let a=rect(0,0,1280,720,st.base);
+ a+=rect(34,24,1212,663,st.sky,'#3e505d',2);
+ for(let i=0;i<65;i++){let x=46+(i*137)%1186,y=34+(i*59)%562;a+=rect(x,y,i%4===0?2:1,1,i%3===0?'#e0ecf1':'#a8bcc9')}
+ a+=path('M34 558 L151 519 L300 490 L471 470 L650 466 L861 487 L1071 537 L1246 617 V687 H34 Z','#7593a5',2,'#7c9bab');
+ a+=path('M34 566 L151 527 L300 498 L471 478 L650 474 L861 495 L1071 545 L1246 625','#c3d7df',2);
+ a+=path('M34 206H256L282 182H910L944 213H1246','#6c8492',16);
+ a+=path('M34 572H205L239 542H1012L1042 568H1246','#6c8492',20);
+ a+=path('M188 24V154L256 206V572L188 630V687M1092 24V154L1016 206V572L1092 630V687','#5f7889',12);
+ // 同一条登艇廊桥：阶段推进后持续供电。
+ a+=rect(42,237,255,51,'#718c9c','#c2d4dc')+rect(45,251,248,20,'#14202a');
+ for(let i=0;i<11;i++)a+=rect(49+i*22,244,14,3,stage>=1?'#d5f1dc':'#6b8493');
+ // 对接艇位于同一全画面背景中的观察区域，前景控制台在此留出大窗口。
+ a+='<g transform="translate(0 230)">';
+ a+=rect(969,247,100,25,'#718c9c','#c2d4dc');
+ for(let i=0;i<5;i++)a+=rect(976+i*17,250,10,3,stage>=1?'#d5f1dc':'#6b8493');
+ // 对接艇只在成功后离开；结尾改用远处灯点。
+ if(!done){a+=path('M1008 251L1055 224H1169L1223 245V270H1050Z','#e2e9ec',2,'#c5d2d8');a+=rect(1072,231,55,9,'#5e8caa');
+  for(let i=0;i<5;i++)a+=rect(1140+i*12,235,6,3,stage>=2?'#fff0c0':'#91a8b4');
+  a+=path(stage===3?'M1019 280L1042 311L1031 345':'M1019 280V312H1080V345','#dae0db',7);
+  a+=path('M1220 283V319H1197V345','#dae0db',7);
+ }else{a+=path('M1070 215L1080 209L1097 215L1080 219Z','#dce7dc',1,'#849796')+rect(1099,213,4,3,'#e4c989');a+=path('M1020 280L1030 303L1013 319M1220 283L1208 309L1223 326','#dae0db',7)}
+ a+='</g>';
+ // 舱室骨架和已有设备始终保持空间连续。
+ for(let x of [24,312,968,1256])a+=rect(x,0,8,720,'#68818f')+rect(x+2,14,2,690,'#d7e1e5');
+ for(let i=0;i<8;i++)a+=rect(60+i*165,61,79,4,(i<stage+1||done)?'#eef6e8':'#607988');
+ a+=path('M24 688H1256M24 108H1256','#d4e0e6',2);
+ if(stage>=2)a+=rect(44,624,128,3,'#e6c28b')+rect(1108,624,128,3,'#e6c28b');
+ if(step===7&&!done)a+=path('M995 190H1223M1012 194H1210','#f3d39b',2);
+ if(done)a+=rect(40,647,150,6,'#9db9a4');return a}
+function render(){if($('success').checked)$('step').value='7';const n=Number($('step').value),stage=n>>1,duo=$('mode').value==='duo',done=$('success').checked,only=$('bgonly').checked,danger=$('danger').checked&&!done,st=stages[stage],limits=duo?double:single,lines=done?limits[8]:limits[n],cols=duo?24:20,fx=duo?352:400,fy=112,fw=cols*24;
+  $('value').textContent=`${n+1} / 8 · ${periods[n]} ms`;
+  $('desc').textContent=done?'MISSION COMPLETE: The shuttle is clear and the maintenance bay has reserve power. Freeze gameplay before this ending sequence.':`CHAPTER ${stage+1}: ${st.name} / ${st.steps[n%2]}. ${st.reason}`;
+ let a='<title id="screen-title">CORE-07 console concept</title><desc id="screen-desc">Four chapters and eight speeds across one continuous station environment.</desc>'+background(stage,n,done);
+ if(!only){
+ a+=rect(48,28,1184,66,'#dce5e8','#96acb6')+text(64,55,'CORE-07 / LAST SHUTTLE',21,'#203b48')+text(64,80,duo?'DUAL OPERATORS / ONE CORE':'SOLO WATCH / MANUAL CONTROL',14,'#4a6574');
+ a+=text(413,53,done?'LAST SHUTTLE CLEAR':`TASK ${stage+1}/4  ${st.name}`,22,st.accent)+text(413,80,done?'Maintenance bay reserve power restored.':st.goal,16,'#48636f');
+ a+=text(1000,53,`LINES ${lines} / ${limits[8]}`,20)+text(1000,80,`SPD ${n+1}/8  TIME 03:24`,15,'#4a6574');
+ a+=panel(48,112,256,480,'EVACUATION POWER');
+ const names=['CONTAINMENT','BOARDING ACCESS','DEPARTURE SYSTEMS','FINAL TRANSFER'];
+ for(let i=0;i<4;i++){const y=156+i*101,past=done||i<stage,current=!done&&i===stage,c=past?'#468676':current?st.accent:'#627784';
+  if(i<3)a+=path(`M79 ${y+62}V${y+101}`,past?'#468676':'#344651',4);
+  a+=path(`M65 ${y}H270L284 ${y+14}V${y+67}H65Z`,c,1,'#ccd9de');
+  a+=deviceIcon(i,76,y+10,c)+text(103,y+25,`${i+1} ${names[i]}`,15,c);
+  a+=text(79,y+50,past?'TRANSFER COMPLETE':current?st.steps[n%2]:'WAITING',13,past?'#3c6a5a':'#4c6878');
+  for(let j=0;j<2;j++){const active=current&&j===n%2,lit=past||(current&&j<n%2);a+=rect(236+j*19,y+37,11,15,lit?'#468676':active?st.accent:'#a8bcc5',c);if(lit)a+=path(`M${238+j*19} ${y+44}l2 3 4-6`,'#e8f1e9',1.5)}
+ }
+ a+=rect(fx-8,fy-8,fw+16,496,'#7e98a6',danger?'#bd4e39':'#a7bdc7',2)+rect(fx,fy,fw,480,'#344d5a');
+ for(let x=0;x<=cols;x++)a+=path(`M${fx+x*24} ${fy}V${fy+480}`,'#3e5b69');
+ for(let y=0;y<=20;y++)a+=path(`M${fx} ${fy+y*24}H${fx+fw}`,'#3e5b69');
+ // 固定局面，避免把示意的堆叠变化误认为阶段机制。
+ for(let x=0;x<cols;x++){const h=[3,2,2,4,3,2,1,0,2,3,4,3,2,1,1,2,3,2,1,2,3,2,1,1][x];for(let y=0;y<h;y++)if(!(x===7))a+=cell(fx+x*24,fy+(19-y)*24,24,palette[(x+y)%7]);}
+ a+=preview(fx+96,fy+96,palette[0],[[0,0],[1,0],[2,0],[1,1]]);
+ for(let [x,y]of [[0,0],[1,0],[2,0],[1,1]])a+=rect(fx+96+x*24+3,fy+14*24+y*24+3,18,18,'none','#b6d4dc');
+ if(duo)a+=preview(fx+360,fy+168,palette[6],[[0,1],[1,1],[1,0],[2,0]]);
+ a+=text(fx+6,fy+23,'CONTAINMENT GRID',14,'#b5cbd4');
+ if(danger){a+=rect(fx,fy,fw,4,'#bd4e39')+text(fx+fw-160,fy+25,'▲ STACK WARNING',16,'#ce614b');}
+ a+=panel(976,112,256,138,duo?'OPERATOR 01':'OPERATOR 01 / NEXT');
+ if(duo){a+=text(992,165,'NEXT',14,'#4a6574')+text(1104,165,'SHARED HOLD',13,'#4a6574')+preview(992,181,palette[2],[[0,0],[1,0],[0,1],[1,1]])+preview(1112,181,palette[1],[[0,0],[0,1],[1,1],[2,1]]);a+=panel(976,268,256,138,'OPERATOR 02')+text(992,321,'NEXT',14,'#4a6574')+text(1104,321,'SHARED HOLD',13,'#4a6574')+preview(992,337,palette[5],[[0,0],[1,0],[2,0],[2,1]])+preview(1112,337,palette[1],[[0,0],[0,1],[1,1],[2,1]]);
+ }else{a+=preview(1012,174,palette[2],[[0,0],[1,0],[0,1],[1,1]])+text(1100,202,'NEXT UNIT',15,'#4a6574')+panel(976,268,256,138,'BUFFER / HOLD')+preview(1012,330,palette[1],[[0,0],[0,1],[1,1],[2,1]]);}
+ a+=rect(976,424,256,168,'none','#a7bdc7',2)+rect(977,425,254,30,'#ccd9de')+text(990,447,'EXTERIOR / LAST SHUTTLE',15,'#334e5d');
+ a+=text(64,574,'SCORE 001248',17,'#466473');
+ a+=rect(48,616,1184,72,'#dce5e8','#96acb6')+rect(62,632,7,38,done?'#468676':st.accent)+text(82,643,done?'PILOT / SIGNAL RESTORED':'PILOT / CHANNEL OPEN',15,'#446473')+text(82,674,done?"We're clear. Everyone made it.":st.subtitle,21,'#223d4a');
+ a+=text(949,647,done?'EVACUATION COMPLETE':danger?'▲ STACK WARNING':'● CONTAINMENT STABLE',16,done?'#468676':danger?'#ce614b':'#36765e')+text(949,675,done?'MISSION DEBRIEF':`STAGE ${lines-limits[stage*2]} / ${limits[stage*2+2]-limits[stage*2]} LINES`,16,'#446473');
+ }screen.innerHTML=a;
+}
+const params=new URLSearchParams(location.search);
+if(params.has('step'))$('step').value=Math.max(0,Math.min(7,Number(params.get('step'))||0));
+if(params.get('mode')==='duo')$('mode').value='duo';
+for(const key of ['danger','bgonly','success'])if(params.get(key)==='1')$(key).checked=true;
+document.querySelectorAll('select,input').forEach(el=>el.addEventListener('input',render));render();
+let ac;
+async function audio(){ac ||=new (window.AudioContext||window.webkitAudioContext)();await ac.resume();return ac}
+function tone(ctx,t,hz,duration,volume=.065,type='square'){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(hz,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(volume,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+duration+.01)}
+function noise(ctx,t,duration,volume=.035){const b=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),d=b.getChannelData(0);let seed=137;for(let i=0;i<d.length;i++){seed=(Math.imul(seed,1664525)+1013904223)|0;d[i]=((seed>>>0)/4294967296*2-1)}const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=b;f.type='lowpass';f.frequency.value=1800;g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.0001,t+duration);s.connect(f).connect(g).connect(ctx.destination);s.start(t)}
+let last=0;
+async function play(kind){try{const ctx=await audio(),t=ctx.currentTime+.02;if(t-last<.25)return;last=t;if(kind==='old'){tone(ctx,t,74250000/(2*56335),.030);tone(ctx,t+.038,74250000/(2*70985),.045);$('status').textContent='Original: E5 / gap / C5, reconstructed from source parameters.'}else if(kind==='new'){noise(ctx,t,.012);tone(ctx,t+.009,125,.058,.08,'triangle');tone(ctx,t+.009,250,.037,.018,'square');$('status').textContent='Mechanical limit: contact click plus a short muted impact. Test on the target display before selection.'}else{tone(ctx,t,440,.035,.04,'triangle');noise(ctx,t+.035,.11,.025);tone(ctx,t+.13,660,.07,.055,'triangle');$('status').textContent='Discharge: connect, release, confirm. Match the pipe pulse and committed progress.'}}catch(e){$('status').textContent='Audio could not start. Open this file in a browser that supports Web Audio.'}}
+$('oldSound').onclick=()=>play('old');$('newSound').onclick=()=>play('new');$('clearSound').onclick=()=>play('clear');
+</script>
+</html>

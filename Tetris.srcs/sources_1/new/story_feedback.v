@@ -8,19 +8,20 @@ module story_feedback(
     input clear_start,clear_active,input [19:0] clear_mask,
     input [4:0] column,row,
     output lock_hit,hard_left,hard_right,clear_hit,
+    output [4:0] clear_age_out,output clear_row_hit,
     output [3:0] clear_inset,output [3:0] side_marks,output [1:0] rotation_marks
 );
     reg [19:0] locked_c1,locked_r1,locked_c2,locked_r2;
     reg [1:0] lock_age1,lock_age2,hard_age1,hard_age2;
-    reg [1:0] left_age1,right_age1,left_age2,right_age2,rot_age1,rot_age2;
+    reg [3:0] left_age1,right_age1,left_age2,right_age2,rot_age1,rot_age2;
     reg hard_pending1,hard_pending2;
     reg [4:0] hard_min1,hard_max1,hard_row1,hard_min2,hard_max2,hard_row2;
     reg [4:0] clear_age;
     wire first1=lock1 && lock_index1==0;
     wire first2=duo && lock2 && lock_index2==0;
-    function [1:0] remaining;
-        input [1:0] age;input event_now;
-        begin remaining=event_now?2'd2:((ui_tick && age!=0)?age-1'b1:age);end
+    function [3:0] remaining;
+        input [3:0] age;input event_now;
+        begin remaining=event_now?4'd8:((ui_tick && age!=0)?age-1'b1:age);end
     endfunction
     function [4:0] minimum;
         input [19:0] values;integer k;
@@ -79,6 +80,8 @@ module story_feedback(
                     (duo && hard_age2!=0 && row==hard_row2 && column==hard_min2));
     assign hard_right=visible && ((hard_age1!=0 && row==hard_row1 && column==hard_max1) ||
                     (duo && hard_age2!=0 && row==hard_row2 && column==hard_max2));
+    assign clear_age_out=clear_age;
+    assign clear_row_hit=visible && clear_active && row<20 && clear_mask[row];
     assign clear_inset=clear_age[4:1];
     assign clear_hit=visible && clear_active && row<20 && clear_mask[row] &&
                      column>=clear_inset && column<(duo?24:20)-clear_inset;

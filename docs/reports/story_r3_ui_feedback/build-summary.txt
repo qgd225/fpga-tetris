@@ -1,0 +1,57 @@
+CORE-07 用户反馈集中修改完成（2026-10-25）
+
+正式文件：D:/vivado_project/Tetris/bit/Tetris.bit
+构建来源：tools/build_story.tcl story_r3_ui_feedback，唯一工程main工作区当前源码。
+SHA256：21AB80D244366D15665E8C380469905F8646738290EAFE62494D7896110EFBB5
+基线：5f260c1，10286 LUT / 4760寄存器 / 25 BRAM。
+
+本轮：11111 LUT（53.42%）/ 4783寄存器 / 25 BRAM / 0 DSP。
+净增：825 LUT、23寄存器、0 BRAM、0 DSP；3处既有Latch保持不变。
+WNS +0.115ns，WHS +0.082ns，TNS/THS=0；全部自动限额通过。
+
+改动：
+1. 旋转候选检查另一玩家当前四格；同时旋转预留已接受的候选；ROM地址明确两位回绕并保留类型。接受旋转后等待同步ROM稳定，冲突提交被拒绝并产生反馈。
+2. 下落整块外围四个短L角框分玩家；落定格4x4亮角标改2x1暗微标，预览纯类型材质。
+3. 禁止左右移动在对应活动块侧边显示琥珀括号；禁止旋转闪整体角框，持续8个UI节拍。
+4. 独立选择页标题/核心示意/操作提示；注册表驱动三行滚动窗口、计数上限和人数路由。当前只挂载已实现的单人/双人，新玩法实现后可接入。
+5. 八槽机械阶段条、核心横夹持与警戒齿、甲板检修折线和手边散热缝。
+6. 移除悬挂黑铭牌，底部标识进入最低行背景，被方块/幽灵覆盖；TIME上移。
+7. 结算删除SCORE显示，保留SPD/LINES/TIME和修复进度；内部计分业务不变。
+8. 消行整行增加4px短白/琥珀能量束、2px边缘，清行事务和声音时序不变。
+9. 星点每32个UI节拍漂移1px，稳定阶段保持当前位置，暂停冻结、新局复位。
+10. 固定文本显式限制字数，防止菜单副标题读取相邻文本。
+
+验证：
+- 17套入口全部通过，详见regression-summary.json。
+- 真实同步ROM双向2192局面，其中230个互撞旋转被拒绝且不终局；另测7类型x4方向合法双人同时旋转及同步ROM过渡。
+- 112707项存储/未改变碰撞/显示等价及独立整数旋转模型检查。
+- frame 41项，包含早期漂移、暂停冻结、稳定保持位置。
+- 7723023项几何、4416项像素相位、139778项字形、26项反馈检查；12处固定文字边界审计。
+- 13场景真实RTL预览及灰度对照，概念参考图单独保存。
+- 底部遮挡初版布局诊断-5.500ns（label-path-before-fix.rpt），未发布；改成独立两拍遮挡流水后，13场景与调整前逐像素一致，最终时序如上。
+- 118项构建输入一致；768个场地RAM、192个元数据RAM连接通过；共享字模0.5 BRAM、旧六份字模已回收。
+- HDMI音频、配乐、英语配音及字幕沿用已完成链路，协议/逐样本回归通过。
+
+人工上板及整合音频试听：本轮未执行，按用户要求不等待反馈。
+计划外新功能：无，星点运动已由用户明确提出。
+
+完整资源：
+Slice LUTs=11111
+LUT as Logic=9903
+LUT as Memory=1208
+LUT as Distributed RAM=1204
+LUT as Shift Register=4
+Slice Registers=4783
+Register as Flip Flop=4780
+Register as Latch=3
+Block RAM Tile=25
+RAMB36/FIFO*=18
+RAMB18=14
+DSPs=0
+Bonded IOB=34
+BUFGCTRL=6
+MMCME2_ADV=2
+PLLE2_ADV=0
+
+LUT=11111 REGISTERS=4783 BRAM=25 LATCHES=3 DSP=0
+WNS=0.115 WHS=0.082 TARGET=0.050 GREEN=1 BUDGET=1 TARGET_BUDGET=1 VISUAL_BUDGET=1 FONT_GATE=1 AUDIO_NET=0 AUDIO_BUDGET=1 UI_NET=1751 UI_BUDGET=1 PUBLISH_REQUESTED=0

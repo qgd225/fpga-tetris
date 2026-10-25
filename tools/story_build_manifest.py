@@ -21,9 +21,9 @@ def inputs():
         hardware = name.startswith(("Tetris.srcs/", "third_party/")) and p.suffix in {
             ".v", ".sv", ".vh", ".xdc", ".xci", ".mem", ".coe"
         }
-        build = name.startswith("tools/") and p.suffix in {".tcl", ".py"}
+        build = name.startswith("tools/") and p.suffix in {".tcl", ".py", ".ps1", ".bat"}
         asset = name.startswith("assets/") and p.suffix in {".json", ".wav", ".ima"}
-        if hardware or build or asset or name == "docs/story-execution-gates.md":
+        if hardware or build or asset or name == "AGENTS.md":
             result[name] = hashlib.sha256(p.read_bytes()).hexdigest()
     return result
 

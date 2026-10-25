@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CORE-07 / Anime Visual Study</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f6ff;color:#273b60;font-family:"Segoe UI",sans-serif}main{max-width:1600px;margin:auto;padding:22px}header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}h1{font-size:22px;letter-spacing:2px;margin:0}nav{display:flex;gap:6px}button{font:inherit;font-size:13px;letter-spacing:1px;border:0;padding:12px 20px;border-radius:24px;background:#e1eafa;color:#4d6287;cursor:pointer}button[aria-selected=true]{background:#376ed6;color:white}button:focus-visible,a:focus-visible{outline:3px solid #f5ad81;outline-offset:3px}section{margin-top:20px}section[hidden]{display:none}.art{display:block;width:100%;height:auto;border-radius:12px}.caption{font-size:11px;letter-spacing:2px;color:#7184a6;margin:13px 0}a{color:#356ac1}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{padding:22px;border-radius:16px;background:white;border:1px solid #dfe9fa}.card h2{font-size:17px;font-weight:600;margin:0 0 12px}.card p{font-size:14px;color:#65799b;line-height:1.6}.card a{display:inline-block;margin-top:8px;font-size:13px}.row{display:flex;gap:24px;align-items:center;flex-wrap:wrap}.row img{width:336px;image-rendering:pixelated}#blocks .art{max-width:1280px;margin:auto}footer{margin-top:25px;padding-top:15px;border-top:1px solid #d8e3f5;color:#7184a6;font-size:12px}@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:580px){main{padding:12px}.grid{grid-template-columns:1fr}button{padding:10px 13px}}
+</style>
+<main>
+<header><h1>CORE-07 / LAST SHUTTLE</h1><nav role="tablist" aria-label="Visual studies"><button role="tab" id="tab-story" aria-controls="story" aria-selected="true">STORY</button><button role="tab" id="tab-blocks" aria-controls="blocks" aria-selected="false" tabindex="-1">BLOCKS</button><button role="tab" id="tab-sources" aria-controls="sources" aria-selected="false" tabindex="-1">SOURCES</button></nav></header>
+<section id="story" role="tabpanel" aria-labelledby="tab-story"><img class="art" src="../pixel-art/core07-anime/out/story_concept_v2.png" alt="Four anime rescue chapters: reboot, boarding, ignition, final transfer."><p class="caption">ART DIRECTION STUDY · NOT FPGA OUTPUT</p></section>
+<section id="blocks" role="tabpanel" aria-labelledby="tab-blocks" hidden><img class="art" src="../pixel-art/core07-anime/out/block_styles.png" alt="Three original block studies: soft glow, crystal cut, cel shade."><div class="row"><a href="../pixel-art/core07-anime/out/blocks_A_1x.png">A / 1x MASTER</a><a href="../pixel-art/core07-anime/out/blocks_B_1x.png">B / 1x MASTER</a><a href="../pixel-art/core07-anime/out/blocks_C_1x.png">C / 1x MASTER</a></div></section>
+<section id="sources" role="tabpanel" aria-labelledby="tab-sources" hidden><div class="grid">
+<article class="card"><h2>Blue Archive</h2><p>Airy color, anime presentation and light interface shapes. Style reference.</p><a href="https://bluearchive.nexon.com/home" target="_blank" rel="noopener noreferrer">OFFICIAL SITE ↗</a></article>
+<article class="card"><h2>Honkai Impact 3</h2><p>Anime science-fiction environments, lighting and human stakes. Style reference.</p><a href="https://honkaiimpact3.hoyoverse.com/global/en-us/media/wallpaper" target="_blank" rel="noopener noreferrer">OFFICIAL GALLERY ↗</a></article>
+<article class="card"><h2>Puyo Puyo Tetris 2</h2><p>Colorful puzzle readability, anime framing and graphical feedback. Style reference.</p><a href="https://puyo.sega.com/tetris2/" target="_blank" rel="noopener noreferrer">OFFICIAL SITE ↗</a><br><a href="https://www.nintendo.com/de-de/Spiele/Nintendo-Switch-Spiele/Puyo-Puyo-Tetris-2-1832846.html" target="_blank" rel="noopener noreferrer">NINTENDO SCREENSHOTS ↗</a></article>
+<article class="card"><h2>Kenney / Puzzle Pack 2</h2><p>CC0 asset candidates: blocks, particles and connection shapes.</p><a href="https://kenney.nl/assets/puzzle-pack-2" target="_blank" rel="noopener noreferrer">ASSET PACK ↗</a></article>
+<article class="card"><h2>Kenney / Planets &amp; UI</h2><p>CC0 asset candidates: planet silhouettes, small icons and interface shapes.</p><a href="https://kenney.nl/assets/planets" target="_blank" rel="noopener noreferrer">PLANETS ↗</a><br><a href="https://kenney.nl/assets/ui-pack-sci-fi" target="_blank" rel="noopener noreferrer">SCI-FI UI ↗</a></article>
+<article class="card"><h2>Kenney / Sci-fi Sounds</h2><p>CC0 sound candidates: engines and short device responses. Audition before selection.</p><a href="https://kenney.nl/assets/sci-fi-sounds" target="_blank" rel="noopener noreferrer">SOUND PACK ↗</a></article>
+</div></section>
+<footer>Original concept art and pixel block candidates. The source packs are references and candidates, not imported FPGA assets.</footer>
+</main>
+<script>
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function select(tab,focus=false){for(const t of tabs){const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;document.getElementById(t.getAttribute('aria-controls')).hidden=!active}if(focus)tab.focus()}
+tabs.forEach((t,i)=>{t.addEventListener('click',()=>select(t));t.addEventListener('keydown',e=>{let next=i;if(e.key==='ArrowRight')next=(i+1)%tabs.length;else if(e.key==='ArrowLeft')next=(i+tabs.length-1)%tabs.length;else if(e.key==='Home')next=0;else if(e.key==='End')next=tabs.length-1;else return;e.preventDefault();select(tabs[next],true)})});
+</script>
+</html>

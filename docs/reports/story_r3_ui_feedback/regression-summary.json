@@ -1,0 +1,165 @@
+{
+  "suites": 17,
+  "passed": true,
+  "results": [
+    {
+      "name": "duo",
+      "passed": true,
+      "log_sha256": "5f6100cd2f53c234c2fec041c84eda6a998d613b0335d7401a4fe99d4902d0e3",
+      "markers": [
+        "REAL_ROTATION_CASES 2192 blocked=230",
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "name": "frame_duo",
+      "passed": true,
+      "log_sha256": "2a83b162a225a6e1c2967292fc567d00c53dcaf741b2a392222cd5d0e8bb0bda",
+      "markers": [
+        "=== ALL PASS: STORY FRAME 41 checks ==="
+      ]
+    },
+    {
+      "name": "level",
+      "passed": true,
+      "log_sha256": "e0023d28fa63da9ed713b12fa9781ded0faa312d0e815d7f695509f9e0dce77f",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "name": "sound",
+      "passed": true,
+      "log_sha256": "3d09cab190aba38b5df585f90dd5bf6a42584253ad00f6c03a71548220331fab",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "name": "input_route",
+      "passed": true,
+      "log_sha256": "e1ae261b2f2670c1945a2f89afe3a7beb564c2bfa46ed87e59031d4e993ce382",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "name": "net_keyboard",
+      "passed": true,
+      "log_sha256": "ee20a88c69c519fa3ff886464098c316c64c291bba50af23e57ec3f2e8e098e6",
+      "markers": [
+        "=== ALL PASS: NET KEYBOARD ==="
+      ]
+    },
+    {
+      "name": "horizontal_repeat",
+      "passed": true,
+      "log_sha256": "c55055fed2d6a83a6c152ecb6fffa5d23d7aa5c4171e80f210318a98b4ddc8cd",
+      "markers": [
+        "=== ALL PASS: 30 checks ==="
+      ]
+    },
+    {
+      "name": "hold_gesture",
+      "passed": true,
+      "log_sha256": "bc56923485fb8d2444de839971bb1007864a53c2bf44f360594b689f8f809795",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "name": "solo_hint",
+      "passed": true,
+      "log_sha256": "54edbdc023907658aaf5c211245d32c0dd4dd30160509bdaa4b98e2d7a29385b",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "name": "rgb_palette",
+      "passed": true,
+      "log_sha256": "e04a2f0b14fd76f61cf9fc344aca33d4ebc15cb08ff3d95738b408c23ba4b04c",
+      "markers": [
+        "=== ALL PASS: 56 checks ==="
+      ]
+    },
+    {
+      "name": "lutram",
+      "passed": true,
+      "log_sha256": "c945119d7f194750819711f9c0be8440a569c2e07c09fb81338462401341df93",
+      "markers": [
+        "=== ALL PASS: LUTRAM ===",
+        "=== ALL PASS: LUTRAM ===",
+        "=== ALL PASS: LUTRAM FRAME ==="
+      ]
+    },
+    {
+      "name": "optimization",
+      "passed": true,
+      "log_sha256": "1fe79c9f4e3a80e70ea798a3130ad51b5c085c501a5747208ca968328d8953a6",
+      "markers": [
+        "Equivalence checks: 112707",
+        "=== ALL PASS: PLAYFIELD EQUIVALENCE ===",
+        "=== ALL PASS: HINT EQUIVALENCE ===",
+        "=== ALL PASS: METADATA ===",
+        "=== ALL PASS: METADATA ===",
+        "=== ALL PASS: STORY FRAME 41 checks ===",
+        "=== ALL PASS: LUTRAM FRAME ===",
+        "=== ALL PASS: OPTIMIZATION ==="
+      ]
+    },
+    {
+      "name": "hdmi_audio",
+      "passed": true,
+      "log_sha256": "8691bd21f55abdad2c81d1727b32d16541468451b7ad743839277270ae756721",
+      "markers": [
+        "ALL PASS HDMI audio: 7848263 checks, 1632 samples, 407 audio packets, 32 ACR"
+      ]
+    },
+    {
+      "name": "story",
+      "passed": true,
+      "log_sha256": "50d24d432174d6980771981a06f8b2b8308366ff98917a466d581b577a64a690",
+      "markers": [
+        "ALL PASS STORY: 337 checks"
+      ]
+    },
+    {
+      "name": "story_layout",
+      "passed": true,
+      "log_sha256": "8c43b70c5e5078674f35c3794edfb4d9ad3a5a9e244d2ef9efac99926504e43c",
+      "markers": [
+        "ALL PASS STORY MAPPER checks=16777216"
+      ]
+    },
+    {
+      "name": "story_visual",
+      "passed": true,
+      "log_sha256": "eed33b74dbc4fa362e8e959d7c306b8aec1b4ac6b28e7d37c318c36b70b3784c",
+      "markers": [
+        "ALL PASS UI ASSETS colors=56 projection_bits=8 font_bytes=2048 sprite_pixels=4096",
+        "ALL PASS UI TEXT EXTENTS static_regions=12",
+        "ALL PASS STORY FONT checks=139778",
+        "ALL PASS STORY SCENE checks=521 rendered=0",
+        "ALL PASS VGA STORY PHASE checks=4416",
+        "ALL PASS STORY FEEDBACK checks=26",
+        "ALL PASS UI GEOMETRY checks=7723023",
+        "ALL PASS STORY VISUAL"
+      ]
+    },
+    {
+      "name": "story_audio",
+      "passed": true,
+      "log_sha256": "6d4bf06d74a7d3538a91a6729510d24560187caccfcecab2d0acff952120abd8",
+      "markers": [
+        "ALL PASS IMA DECODER checks=73314 cases=9968 stream_samples=6748",
+        "ALL PASS VOICE PLAYER checks=199436 complete_samples=48168",
+        "ALL PASS VOICE PACK checks=2008318 source_samples=111572",
+        "ALL PASS STORY COMMS checks=18",
+        "ALL PASS STORY FX checks=51504",
+        "ALL PASS STORY MUSIC checks=768012",
+        "ALL PASS STORY AUDIO"
+      ]
+    }
+  ]
+}

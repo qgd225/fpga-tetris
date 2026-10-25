@@ -1,0 +1,56 @@
+===== SUMMARY =====
+--- duo ---
+=== ALL PASS ===
+--- frame_duo ---
+=== ALL PASS: STORY FRAME 41 checks ===
+--- level ---
+=== ALL PASS ===
+--- sound ---
+=== ALL PASS ===
+--- input_route ---
+=== ALL PASS ===
+--- net_keyboard ---
+=== ALL PASS: NET KEYBOARD ===
+--- horizontal_repeat ---
+=== ALL PASS: 30 checks ===
+--- hold_gesture ---
+=== ALL PASS ===
+--- solo_hint ---
+=== ALL PASS ===
+--- rgb_palette ---
+=== ALL PASS: 56 checks ===
+--- lutram ---
+=== ALL PASS: LUTRAM ===
+=== ALL PASS: LUTRAM ===
+=== ALL PASS: LUTRAM FRAME ===
+--- optimization ---
+=== ALL PASS: PLAYFIELD EQUIVALENCE ===
+=== ALL PASS: HINT EQUIVALENCE ===
+=== ALL PASS: METADATA ===
+=== ALL PASS: METADATA ===
+=== ALL PASS: STORY FRAME 41 checks ===
+=== ALL PASS: LUTRAM FRAME ===
+=== ALL PASS: OPTIMIZATION ===
+--- hdmi_audio ---
+ALL PASS HDMI audio: 7848263 checks, 1632 samples, 407 audio packets, 32 ACR
+--- story ---
+ALL PASS STORY: 337 checks
+--- story_layout ---
+ALL PASS STORY MAPPER checks=16777216
+--- story_visual ---
+ALL PASS UI ASSETS colors=56 projection_bits=8 font_bytes=2048 sprite_pixels=4096
+ALL PASS UI TEXT EXTENTS static_regions=15
+ALL PASS STORY FONT checks=139778
+ALL PASS STORY SCENE checks=531 rendered=0
+ALL PASS VGA STORY PHASE checks=4416
+ALL PASS STORY FEEDBACK checks=26
+ALL PASS UI GEOMETRY checks=7718415
+ALL PASS STORY VISUAL
+--- story_audio ---
+ALL PASS IMA DECODER checks=73314 cases=9968 stream_samples=6748
+ALL PASS VOICE PLAYER checks=199436 complete_samples=48168
+ALL PASS VOICE PACK checks=2008318 source_samples=111572
+ALL PASS STORY COMMS checks=18
+ALL PASS STORY FX checks=51504
+ALL PASS STORY MUSIC checks=768012
+ALL PASS STORY AUDIO

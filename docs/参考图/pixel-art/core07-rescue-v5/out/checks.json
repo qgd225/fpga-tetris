@@ -1,0 +1,38 @@
+[
+  {
+    "phase": 1,
+    "colors": 30,
+    "size": [
+      640,
+      360
+    ],
+    "alpha": "opaque"
+  },
+  {
+    "phase": 2,
+    "colors": 29,
+    "size": [
+      640,
+      360
+    ],
+    "alpha": "opaque"
+  },
+  {
+    "phase": 3,
+    "colors": 29,
+    "size": [
+      640,
+      360
+    ],
+    "alpha": "opaque"
+  },
+  {
+    "phase": 4,
+    "colors": 31,
+    "size": [
+      640,
+      360
+    ],
+    "alpha": "opaque"
+  }
+]

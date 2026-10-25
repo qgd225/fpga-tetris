@@ -373,13 +373,14 @@ module frame(
     wire eff_tick=eff_cnt==EFF_TICK;
     assign story_tick_60hz=eff_tick;
     reg [7:0] animation;
+    reg [10:0] star_drift;
     reg [4:0] charge_left;
     always @(posedge Clk_74M or negedge Reset_n)begin
-        if(!Reset_n)begin eff_cnt<=0;animation<=0;charge_left<=0;end
-        else if(new_run)begin eff_cnt<=0;animation<=0;charge_left<=0;end
+        if(!Reset_n)begin eff_cnt<=0;animation<=0;star_drift<=0;charge_left<=0;end
+        else if(new_run)begin eff_cnt<=0;animation<=0;star_drift<=0;charge_left<=0;end
         else if(!Stop)begin
             if(eff_tick)eff_cnt<=0;else eff_cnt<=eff_cnt+1'b1;
-            if(eff_tick)animation<=animation+1'b1;
+            if(eff_tick)begin animation<=animation+1'b1;if(story_phase<2 && animation[4:0]==0 && !Finalize)star_drift<=star_drift==1279?11'd0:star_drift+1'b1;end
             if(charge_pulse)charge_left<=24;
             else if(eff_tick && charge_left!=0)charge_left<=charge_left-1'b1;
         end
@@ -406,6 +407,8 @@ module frame(
             display_speed<=speed_level;display_lines<=lines_bcd;display_score<=score_bcd;display_time<=time_bcd;
         end
     end
+    wire [4:0] feedback_clear_age;
+    wire feedback_clear_row;
     wire feedback_lock,feedback_hard_left,feedback_hard_right,feedback_clear;
     wire [3:0] feedback_sides,feedback_inset;
     wire [1:0] feedback_rotation;
@@ -416,13 +419,38 @@ module frame(
         .hard1(snd_hard1),.hard2(snd_hard2),.block_l1(blk_l1),.block_r1(blk_r1),.block_l2(blk_l2),.block_r2(blk_r2),
         .block_rot1(blk_rot1),.block_rot2(blk_rot2),.clear_start(clear_pulse),.clear_active(clear_time),.clear_mask(line_t),
         .column(C_num),.row(R_num),.lock_hit(feedback_lock),.hard_left(feedback_hard_left),.hard_right(feedback_hard_right),
-        .clear_hit(feedback_clear),.clear_inset(feedback_inset),.side_marks(feedback_sides),.rotation_marks(feedback_rotation));
+        .clear_hit(feedback_clear),.clear_age_out(feedback_clear_age),.clear_row_hit(feedback_clear_row),.clear_inset(feedback_inset),.side_marks(feedback_sides),.rotation_marks(feedback_rotation));
+    reg [19:0] bounds_cells1,bounds_cells2;
+    reg bounds_duo;
+    reg [43:0] bounds1,bounds2;
+    function [10:0] pitch24;input [4:0] c;begin pitch24=({6'd0,c}<<4)+({6'd0,c}<<3);end endfunction
+    function [43:0] pixel_bounds;
+        input [19:0] c;input two;
+        reg [10:0] fx,fr,x0,x1,y0,y1;
+        begin
+            fx=two?352:400;fr=two?928:880;
+            x0=fx+pitch24(c[4:0])-(c[4:0]==0?0:3);
+            x1=c[9:5]>=(two?23:19)?fr-1:fx+pitch24(c[9:5])+25;
+            y0=144+pitch24(c[14:10])-(c[14:10]==0?0:3);
+            y1=c[19:15]>=19?623:144+pitch24(c[19:15])+25;
+            pixel_bounds={y1,y0,x1,x0};
+        end
+    endfunction
+    always @(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin bounds_cells1<=0;bounds_cells2<=0;bounds_duo<=0;bounds1<=0;bounds2<=0;end
+        else begin
+            bounds_cells1<={piece_rmax1,piece_rmin1,piece_cmax1,piece_cmin1};
+            bounds_cells2<={piece_rmax2,piece_rmin2,piece_cmax2,piece_cmin2};bounds_duo<=duo;
+            bounds1<=pixel_bounds(bounds_cells1,bounds_duo);bounds2<=pixel_bounds(bounds_cells2,bounds_duo);
+        end
+    end
     story_ui story_ui_inst(
         .clk(Clk_74M),.reset_n(Reset_n),.x(render_h),.y(render_v),
         .comms_visible(comms_visible),.comms_id(comms_id),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),.choose_cnt(choose_cnt),
         .phase(display_phase),.danger(display_danger),.locked(display_locked),.success(display_success),.result_ready(result_ready),
         .speed(display_speed),.lines_bcd(display_lines),.score_bcd(display_score),.time_bcd(display_time),
         .feedback_lock(feedback_lock),.feedback_hard_left(feedback_hard_left),.feedback_hard_right(feedback_hard_right),
+        .bounds1(bounds1),.bounds2(bounds2),.star_drift(star_drift),.feedback_clear_age(feedback_clear_age),.feedback_clear_row(feedback_clear_row),
         .feedback_clear(feedback_clear),.feedback_inset(feedback_inset),.feedback_sides(feedback_sides),.feedback_rotation(feedback_rotation),
         .animation(animation),.charge_left(charge_left),.in_field(pixel_in_field),.cell_visible(pixel_visible),.local_x(local_x),.local_y(local_y),
         .occupied(occupied_now),.piece1(Piece),.piece2(Piece2),.ghost1(ghost),.ghost2(ghost2),.hint_hit(hint_draw),

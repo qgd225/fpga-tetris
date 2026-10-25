@@ -1,0 +1,24 @@
+{
+  "bit": "bit/Tetris.bit",
+  "sha256": "21AB80D244366D15665E8C380469905F8646738290EAFE62494D7896110EFBB5",
+  "source_manifest": "source-manifest.json",
+  "resources": {
+    "Slice LUTs": "11111",
+    "LUT as Logic": "9903",
+    "LUT as Memory": "1208",
+    "LUT as Distributed RAM": "1204",
+    "LUT as Shift Register": "4",
+    "Slice Registers": "4783",
+    "Register as Flip Flop": "4780",
+    "Register as Latch": "3",
+    "Block RAM Tile": "25",
+    "RAMB36/FIFO*": "18",
+    "RAMB18": "14",
+    "DSPs": "0",
+    "Bonded IOB": "34",
+    "BUFGCTRL": "6",
+    "MMCME2_ADV": "2",
+    "PLLE2_ADV": "0"
+  },
+  "hardware_tested": false
+}

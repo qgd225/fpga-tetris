@@ -29,6 +29,15 @@ def main():
         text.extend(chars.index(c) for c in value)
         header.append(f"    localparam [9:0] TXT_{name} = 10'd{offset};")
         header.append(f"    localparam [6:0] LEN_{name} = 7'd{len(value)};")
+    modes = data["modes"]
+    assert 1 <= len(modes) <= 16
+    header.append(f"    localparam [4:0] STORY_MODE_COUNT = 5'd{len(modes)};")
+    for func, width, prefix, fallback in [("story_mode_text",9,"TXT", "TXT_SOLO"), ("story_mode_length",6,"LEN","LEN_SOLO")]:
+        header += [f"    function [{width}:0] {func};", "    input [3:0] id;", "    begin case(id)"]
+        for i, mode in enumerate(modes):
+            assert mode["text"] in data["texts"]
+            header.append(f"        4'd{i}: {func}={prefix}_{mode['text']};")
+        header += [f"        default: {func}={fallback};", "    endcase end", "    endfunction"]
     assert len(text) <= 1024, "Text capacity exceeded"
     memory = font + text + [0] * (1024 - len(text))
     target = ROOT / "Tetris.srcs/sources_1/new"
@@ -36,6 +45,21 @@ def main():
         "".join(f"{x:02x}\n" for x in memory), encoding="ascii", newline="\n")
     (target / "story_text_ids.vh").write_text(
         "\n".join(header) + "\n", encoding="gbk", newline="\n")
+    # 菜单计数与已接入玩法共用注册表；新增模式必须明确给出人数配置。
+    for mode in modes:
+        assert isinstance(mode["duo"], bool)
+    state_file = target / "Game_state_machine.v"
+    state = state_file.read_text(encoding="gbk")
+    state, count = re.subn(r"parameter \[3:0\]CHOOSE_MAX = 4'd\d+;",
+                          f"parameter [3:0]CHOOSE_MAX = 4'd{len(modes)-1};", state)
+    assert count == 1
+    state_file.write_text(state, encoding="gbk", newline="\n")
+    top_file = target / "Tetris.v"
+    top = top_file.read_text(encoding="gbk")
+    expression = " || ".join(f"(choose_cnt == 4'd{i})" for i, mode in enumerate(modes) if mode["duo"]) or "1'b0"
+    top, count = re.subn(r"wire duo = .*?;", f"wire duo = {expression};", top)
+    assert count == 1
+    top_file.write_text(top, encoding="gbk", newline="\n")
     palette = data["palette_rgb"]
     assert len(palette) == 56 and len(set(palette)) == 56
     colors = ["    function [23:0] story_palette;", "    input [5:0] index;", "    begin", "        case(index)"]

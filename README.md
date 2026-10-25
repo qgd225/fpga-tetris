@@ -1,10 +1,12 @@
 # FPGA 俄罗斯方块 (Tetris)
 
+> 当前维护规则只见 [AGENTS.md](AGENTS.md)。故事设定见 [世界观与各模式故事](docs/计划书/CORE-07_世界观与各模式故事.md)，UI 以 [当前参考图](docs/参考图/当前UI参考图.png) 为准。下文旧门禁和资源预算链接仅供历史追溯，不再作为执行要求。
+
 > 2026-10-25 完成故事音频和UI：四阶段配乐、机械音、七句通信及同步字幕均走HDMI；机械像素卡座、场地、四支路核心、阶段背景与结算已实施。17套回归、13场景RTL预览与完整布线通过。资源 **10,286 LUT / 4,760 寄存器 / 25 BRAM / 0 DSP**，WNS **+0.204** / WHS **+0.065 ns**。新UI实屏与整合音频试听未测，按用户要求不等待反馈。[实施报告](<D:/vivado_project/Tetris/docs/reports/story_r3_ui_complete/build-summary.txt>) · [四阶段预览](<D:/vivado_project/Tetris/docs/assets/story_ui/four_phases.png>)。
 
 ## 比特流存放规则
 
-唯一开发目录为 `D:/vivado_project/Tetris`，本地和 GitHub 只维护 `main`。历史版本保存在 Git 提交中，不再复制工程或保留并行版本目录。最新下载文件为 `bit/Tetris.bit`，成功构建后覆盖更新；Vivado 内部 `.runs` 文件仅作为构建缓存。
+唯一开发目录为 `D:/vivado_project/Tetris`，本地和 GitHub 只维护 `main`。最新下载文件为 `bit/Tetris.bit`；旧 bit 在本机 `bit/` 按时间及摘要归档，Git 和 GitHub 当前版本只包含最新版。`Tetris.runs/` 是正式工程的普通运行目录，只保留工程登记的标准运行；逐轮验收目录、一次性产物、日志与命令记录统一进入 `temporary/`。
 
 历史2A任务/时序基线见[构建摘要](<D:/vivado_project/Tetris/docs/reports/story_r2a_labels/build-summary.txt>)；它不代表当前源码或当前发布bit。
 
@@ -14,7 +16,7 @@
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
-单一工作区的整合、历史恢复入口及验证见[工作区统一记录](<D:/vivado_project/Tetris/docs/workspace-unification.md>)。后续故事化改造以[代码与资源实施计划书](<D:/vivado_project/Tetris/docs/CORE-07_故事感实施计划书.md>)为准，任务闭环、M1布局/阶段画面和M2配乐/配音已实现，UI细化已按[修订计划](<D:/vivado_project/Tetris/docs/UI美化计划书.md>)；2026-10-25 修订加入[执行门禁](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)与[建议评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
+单一工作区的整合、历史恢复入口及验证见[工作区统一记录](<D:/vivado_project/Tetris/docs/workspace-unification.md>)。后续故事化改造以[代码与资源实施计划书](<D:/vivado_project/Tetris/docs/计划书/CORE-07_故事感实施计划书.md>)为准，任务闭环、M1布局/阶段画面和M2配乐/配音已实现，UI细化已按[修订计划](<D:/vivado_project/Tetris/docs/计划书/UI美化计划书.md>)；2026-10-25 修订加入[执行门禁](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)与[建议评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
 
 ## HDMI 音效开发前历史归档（2026-10-24）
 
@@ -136,7 +138,7 @@ Tetris.srcs/
 3. 直接 Run Synthesis / Implementation。首次综合时 Vivado 会依据 IP 目录下的 `.xci` 配置文件**自动重新生成** IP 输出产物(仓库中未提交任何生成物,属正常现象)。
 4. 可直接使用仓库提供的 `bit/Tetris.bit` 下载到器件，也可以重新综合生成。
 
-> 本仓库包含源码、IP 配置和发布比特流 `bit/Tetris.bit`。Vivado 的编译产物(`.runs/`、`.cache/`、`.hw/`、`.ip_user_files/`、`.sim/`)以及 IP 生成的 HDL 均已由 `.gitignore` 排除。
+> 本仓库包含源码、IP 配置和发布比特流 `bit/Tetris.bit`。Vivado 的编译产物(`.runs/`、`.cache/`、`.hw/`、`.ip_user_files/`、`.sim/`)以及 IP 生成的 HDL 均已由 `.gitignore` 排除；`Tetris.sim/` 中的测试台为明确保留的例外。
 
 > 手写 RTL 工作区统一为 GBK 无 BOM，Git 提交转换为 UTF-8，编码规则与源码一起归档，详见 `docs/source-encoding.md`。
 
@@ -185,3 +187,8 @@ Windows 会按自己挑的适配器绑定（实测挂到了 Radmin VPN 的 169.2
 `arp -a` 显示 static 也照样发不出去；再加上默认路由可能把包从 WiFi 走出去，
 现象就是"画面能收到、按键没反应"。所以脚本显式指定网卡 + 加 /32 路由，
 viewer 也会把发送源地址绑到 `192.168.0.x` 那块网卡上。
+
+
+## 仿真目录
+
+测试台源码仅存放于 `Tetris.sim/`，其中只保留 `*tb.v`、`*tb.sv`。本机运行入口为 `temporary/sim/run_all.bat`，运行脚本、参考向量、编译文件、日志和波形都在 `temporary/sim/`。Git 与 GitHub 的仿真范围为 `Tetris.sim/`；temporary 不纳入仓库。

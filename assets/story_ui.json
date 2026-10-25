@@ -1083,7 +1083,9 @@
     "PLAYER1": "P1",
     "PLAYER2": "P2",
     "RETRY": "PRESS SWITCH TO RETRY",
-    "SEALED": "SEALED"
+    "SEALED": "SEALED",
+    "MENU_TITLE": "CORE REPAIR",
+    "MENU_HINT": "SELECT MODE / PRESS SWITCH"
   },
   "provenance": "项目自制字形，来自2026-10-24工作区草稿；固定文本按已批准的故事计划。",
   "palette_rgb": [
@@ -1153,5 +1155,15 @@
     9,
     2,
     0
+  ],
+  "modes": [
+    {
+      "text": "SOLO",
+      "duo": false
+    },
+    {
+      "text": "DUO",
+      "duo": true
+    }
   ]
 }

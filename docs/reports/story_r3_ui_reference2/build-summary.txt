@@ -1,0 +1,49 @@
+机械像素参考图深化与开局铺字修复（2026-10-25）
+
+正式文件：D:/vivado_project/Tetris/bit/Tetris.bit
+SHA256：8328A8C1BC18D3812D328A39F72DD1E1E14390505A76701880CD9EFBD65652DC
+构建：tools/build_story.tcl story_r3_ui_reference2，当前唯一工作区源码；118项输入一致。
+Git：按用户最新要求未提交，也未创建分支或工程副本。
+
+完成内容：
+- 文字有效区与属性选择分离：34个明确矩形独立解码；互斥属性用掩码并行合并，越过文本长度的部分送入空格字形，避免默认文本表铺满屏幕。
+- 旧发布网表在100个状态/坐标样例中复现54个空白区误请求，最终实际路由网表同一检查100项全部通过。包括单/双人、菜单、准备、游玩、暂停、终局及标题正例。
+- 核心柱从48px加宽到80px，24px能量窗、八个舱格、上下端盖、双导轨、四组卡扣/螺栓/警戒齿与四路接头；周边管线接入柱体。
+- 左右空白处增加折角检修舱、嵌入灯座和状态灯、结构肋、散热缝、小检修盖。
+- 顶部八档阶段条改为带端头、边轨、螺钉和能量玻璃窗的机械模块。
+- 菜单采用最后指定参考图的左飞船、右纵向卡片：飞船舱盖、翼面肋线、驾驶窗、引擎与角框；卡片带图标、上下箭头、滚动指示。保留可扩展注册表与三行窗口，未固定为两个模式。
+- HDMI配乐/配音/音效、玩法规则及此前旋转修复保留。
+
+最终结果：
+LUT 11415/20800（54.88%），比上一发布11111增加304；未以用满LUT为目标，低于用户13500上限。
+寄存器4789，比上一发布增加6；BRAM 25，DSP 0，既有Latch 3，无新增Latch。
+WNS +0.122ns，WHS +0.078ns，TNS/THS=0；全部资源、时序、字库与存储连接门禁通过。
+
+最终统一复验：
+17套入口全部通过；13场景完整RTL渲染通过，包括文字矩形互斥检查。
+7718415项几何、4416项像素相位、139778项字体、26项反馈及41项整机frame检查通过。
+核心边界断言已从旧48px规格更新为80px，未忽略旧测试失败。
+最终路由网表文字有效区100项通过；旧故障证据见old-netlist-text-defect.json与old-text-valid-cone.tsv。
+时序候选首次-0.309ns，未发布；并行属性与字形空格填充处理后，最终时序如上。游玩和菜单与重构前逐像素一致，未裁掉视觉元素。
+768场地RAM + 192元数据RAM物理连接通过；共享字体0.5 BRAM、旧六份字体无残留。
+预览：docs/assets/story_ui_reference2，固定棋盘真实RTL输出，并非上板截图。
+本轮人工上板：未执行，待用户实测，不宣称硬件已验收。
+
+完整资源：
+Slice LUTs=11415
+LUT as Logic=10207
+LUT as Memory=1208
+Slice Registers=4789
+Register as Flip Flop=4786
+Register as Latch=3
+Block RAM Tile=25
+RAMB36/FIFO*=18
+RAMB18=14
+DSPs=0
+Bonded IOB=34
+BUFGCTRL=6
+MMCME2_ADV=2
+PLLE2_ADV=0
+
+LUT=11415 REGISTERS=4789 BRAM=25 LATCHES=3 DSP=0
+WNS=0.122 WHS=0.078 TARGET=0.050 GREEN=1 BUDGET=1 TARGET_BUDGET=1 VISUAL_BUDGET=1 FONT_GATE=1 AUDIO_NET=0 AUDIO_BUDGET=1 UI_NET=2055 UI_BUDGET=1 PUBLISH_REQUESTED=0

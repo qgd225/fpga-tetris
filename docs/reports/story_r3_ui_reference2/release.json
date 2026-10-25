@@ -1,0 +1,23 @@
+{
+  "bit": "bit/Tetris.bit",
+  "sha256": "8328A8C1BC18D3812D328A39F72DD1E1E14390505A76701880CD9EFBD65652DC",
+  "resources": {
+    "Slice LUTs": "11415",
+    "LUT as Logic": "10207",
+    "LUT as Memory": "1208",
+    "Slice Registers": "4789",
+    "Register as Flip Flop": "4786",
+    "Register as Latch": "3",
+    "Block RAM Tile": "25",
+    "RAMB36/FIFO*": "18",
+    "RAMB18": "14",
+    "DSPs": "0",
+    "Bonded IOB": "34",
+    "BUFGCTRL": "6",
+    "MMCME2_ADV": "2",
+    "PLLE2_ADV": "0"
+  },
+  "git_committed": false,
+  "hardware_tested": false,
+  "final_netlist_check": "text-valid-routed-result.json"
+}

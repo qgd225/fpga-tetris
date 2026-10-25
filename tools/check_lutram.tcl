@@ -1,7 +1,11 @@
 # Build in a separate project so the published bitstream and original runs survive.
 set root [file normalize [file join [file dirname [info script]] ..]]
-set output [file join $root Tetris.runs lutram_final]
+set output [file join $root temporary validation lutram_final]
 if {$argc > 0} {set output [file normalize [lindex $argv 0]]}
+set temporary_root [file normalize [file join $root temporary]]
+if {[string first "${temporary_root}/" "[file normalize $output]/"] != 0} {
+    error "Validation output must be inside $temporary_root"
+}
 file mkdir $output
 set resume [expr {[lsearch -exact $argv "--resume"] >= 0}]
 if {$resume} {

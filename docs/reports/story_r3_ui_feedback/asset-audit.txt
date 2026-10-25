@@ -1,0 +1,2 @@
+ALL PASS UI ASSETS colors=56 projection_bits=8 font_bytes=2048 sprite_pixels=4096
+ALL PASS UI TEXT EXTENTS static_regions=12

@@ -1,0 +1,10 @@
+{
+  "testbenches": 30,
+  "git_visible_testbenches": 30,
+  "expanded_fixture_benches": [
+    "geometry_tb.v",
+    "phase_tb.v",
+    "render_tb.v"
+  ],
+  "other_testbenches_unchanged": 27
+}

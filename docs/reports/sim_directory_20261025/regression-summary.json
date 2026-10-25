@@ -1,0 +1,70 @@
+[
+  {
+    "Suite": "duo",
+    "Passed": true
+  },
+  {
+    "Suite": "frame_duo",
+    "Passed": true
+  },
+  {
+    "Suite": "level",
+    "Passed": true
+  },
+  {
+    "Suite": "sound",
+    "Passed": true
+  },
+  {
+    "Suite": "input_route",
+    "Passed": true
+  },
+  {
+    "Suite": "net_keyboard",
+    "Passed": true
+  },
+  {
+    "Suite": "horizontal_repeat",
+    "Passed": true
+  },
+  {
+    "Suite": "hold_gesture",
+    "Passed": true
+  },
+  {
+    "Suite": "solo_hint",
+    "Passed": true
+  },
+  {
+    "Suite": "rgb_palette",
+    "Passed": true
+  },
+  {
+    "Suite": "lutram",
+    "Passed": true
+  },
+  {
+    "Suite": "optimization",
+    "Passed": true
+  },
+  {
+    "Suite": "hdmi_audio",
+    "Passed": true
+  },
+  {
+    "Suite": "story",
+    "Passed": true
+  },
+  {
+    "Suite": "story_layout",
+    "Passed": true
+  },
+  {
+    "Suite": "story_visual",
+    "Passed": true
+  },
+  {
+    "Suite": "story_audio",
+    "Passed": true
+  }
+]

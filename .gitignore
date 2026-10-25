@@ -43,14 +43,11 @@ __pycache__/
 tools/scoreboard.csv
 
 # ===== 仿真台产物 =====
-/sim/*/build/
 *.wdb
-/sim/logs/
 
 # ===== 手动留存的比特流副本 =====
 /Tetris_*.bit
 tools/startup_error.log
-/sim/compile/
 
 # ===== 本地发布压缩包 =====
 /Tetris*.zip
@@ -66,4 +63,16 @@ tools/startup_error.log
 # 当前构建的临时报告；正式验证记录归档至 docs/reports。
 /hdmi_audio_*.rpt
 
-/sim/story_audio/build_music/
+
+# 所有临时运行产物和旧版 bit 仅保留本机。
+/temporary/
+/bit/*.bit
+!/bit/Tetris.bit
+
+# 仿真版本管理仅收录正式测试台；脚本、参考向量和产物在 temporary。
+/sim/
+!/Tetris.sim/
+/Tetris.sim/**
+!/Tetris.sim/**/
+!/Tetris.sim/**/*tb.v
+!/Tetris.sim/**/*tb.sv
