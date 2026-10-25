@@ -1,6 +1,6 @@
 # FPGA 俄罗斯方块 (Tetris)
 
-> 当前维护规则只见 [AGENTS.md](AGENTS.md)。故事设定见 [世界观与各模式故事](docs/计划书/CORE-07_世界观与各模式故事.md)，UI 以 [当前参考图](docs/参考图/当前UI参考图.png) 为准。下文旧门禁和资源预算链接仅供历史追溯，不再作为执行要求。
+> 当前维护规则只见 [AGENTS.md](AGENTS.md)。故事设定见 [世界观与各模式故事](docs/CORE-07_世界观与各模式故事.md)，UI 以 [当前参考图](docs/参考图/当前UI参考图.png) 为准。下文旧门禁和资源预算链接仅供历史追溯，不再作为执行要求。
 
 > 2026-10-25 完成故事音频和UI：四阶段配乐、机械音、七句通信及同步字幕均走HDMI；机械像素卡座、场地、四支路核心、阶段背景与结算已实施。17套回归、13场景RTL预览与完整布线通过。资源 **10,286 LUT / 4,760 寄存器 / 25 BRAM / 0 DSP**，WNS **+0.204** / WHS **+0.065 ns**。新UI实屏与整合音频试听未测，按用户要求不等待反馈。[实施报告](<D:/vivado_project/Tetris/docs/reports/story_r3_ui_complete/build-summary.txt>) · [四阶段预览](<D:/vivado_project/Tetris/docs/assets/story_ui/four_phases.png>)。
 
@@ -16,7 +16,7 @@
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
-单一工作区的整合、历史恢复入口及验证见[工作区统一记录](<D:/vivado_project/Tetris/docs/workspace-unification.md>)。后续故事化改造以[代码与资源实施计划书](<D:/vivado_project/Tetris/docs/计划书/CORE-07_故事感实施计划书.md>)为准，任务闭环、M1布局/阶段画面和M2配乐/配音已实现，UI细化已按[修订计划](<D:/vivado_project/Tetris/docs/计划书/UI美化计划书.md>)；2026-10-25 修订加入[执行门禁](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)与[建议评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
+单一工作区的整合、历史恢复入口及验证见[工作区统一记录](<D:/vivado_project/Tetris/docs/workspace-unification.md>)。后续故事化改造以[代码与资源实施计划书](<D:/vivado_project/Tetris/docs/计划书/CORE-07_故事感实施计划书.md>)为准，任务闭环、M1布局/阶段画面和M2配乐/配音已实现，UI细化已按[修订计划](<D:/vivado_project/Tetris/docs/计划书/UI美化计划书.md>)；2026-10-25 修订加入旧门禁（已废止并删除；现行规则见工程根目录 AGENTS.md）与[建议评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
 
 ## HDMI 音效开发前历史归档（2026-10-24）
 

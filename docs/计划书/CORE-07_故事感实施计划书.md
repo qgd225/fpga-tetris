@@ -4,7 +4,7 @@
 
 初稿：2026-10-24；修订：2026-10-25（二次审阅）。状态：第 1 轮任务闭环已在 `81e75a1` 验证；2A 标签查表基础也已通过完整回归与实现并发布。新布局、共享字库、阶段画面与局部反馈候选已完成 16 套回归和完整布线，用户于 2026-10-25 上板反馈“测试下来没问题”，按该定性反馈发布 M1；未提供的量化样本数据保留为空。配乐与配音继续实施。当前候选证据见 [M1 报告](<D:/vivado_project/Tetris/docs/reports/story_r3_feedback/build-summary.txt>)，M1 发布证据见 [验收记录](<D:/vivado_project/Tetris/docs/story-m1-acceptance.md>)；不得据此声称 M2 音画完成。
 
-执行先看[逐轮门禁清单](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)；建议的采纳、改造与暂缓理由见[本次评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
+执行先看旧门禁（已废止并删除；现行规则见工程根目录 AGENTS.md）；建议的采纳、改造与暂缓理由见[本次评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
 
 视觉依据：[第九版工业科幻像素风参考图](<D:/vivado_project/Tetris/docs/assets/core07-industrial-pixel-v9.png>)。采用它的工业结构、明暗分区、左右预览和细长核心，正式画面按下面的布局与资源约束重新制作，不直接存储整张图片。
 
@@ -454,7 +454,7 @@ IMA 差分不需要乘法器：`diff=(step>>3)+(b0?(step>>2):0)+(b1?(step>>1):0)
 
 声音只扣真正移除的振荡器、旧方波转换和 note ROM；sound 仲裁、sample_ce 与 HDMI 传输保留，不把整个旧声音系统全部减掉。新增低音/噪声/包络/虚线/字幕控制都有开销，不采用“零成本”和“必省 4 BRAM”的说法。
 
-整机资源/时序目标、硬底线、黄色候选权限、布局和字体子预算均引用[门禁清单](<D:/vivado_project/Tetris/docs/story-execution-gates.md>) T1/R1～R7，不在正文复制一套限额。R1 任务轮的当前实测余量只是历史状态，不向新视觉里程碑继承通过资格。
+整机资源/时序目标、硬底线、黄色候选权限、布局和字体子预算均引用旧门禁（已废止并删除；现行规则见工程根目录 AGENTS.md） T1/R1～R7，不在正文复制一套限额。R1 任务轮的当前实测余量只是历史状态，不向新视觉里程碑继承通过资格。
 
 削减顺序：额外装饰/多处闪烁 → 行星图块 → 多余声部和连续底噪 → 重复告警或次要语句 → 可选手套退场/动画幅度。保留四阶段结构差异、可读方块、真实通关和关键结果回应。语音先剪无效静音与重复语句，不牺牲清晰度、字幕可读性或输入安全换容量。
 
