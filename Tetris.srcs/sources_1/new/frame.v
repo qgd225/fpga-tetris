@@ -379,8 +379,9 @@ module frame(
         else if(new_run)begin eff_cnt<=0;animation<=0;charge_left<=0;end
         else if(!Stop)begin
             if(eff_tick)eff_cnt<=0;else eff_cnt<=eff_cnt+1'b1;
-            if(charge_pulse)begin animation<=0;charge_left<=24;end
-            else if(eff_tick)begin animation<=animation+1'b1;if(charge_left!=0)charge_left<=charge_left-1'b1;end
+            if(eff_tick)animation<=animation+1'b1;
+            if(charge_pulse)charge_left<=24;
+            else if(eff_tick && charge_left!=0)charge_left<=charge_left-1'b1;
         end
     end
     wire result_ready;

@@ -1,0 +1,1740 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sun Oct 25 12:52:05 2026
+| Host         : qiguidei running 64-bit major release  (build 9200)
+| Command      : report_timing -max_paths 20 -file D:/vivado_project/Tetris/docs/reports/story_r3_ui_complete/setup_paths.rpt
+| Design       : Tetris
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             0.204ns  (required time - arrival time)
+  Source:                 frame_inst/render_coordinates/y_reg[6]/C
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            frame_inst/story_ui_inst/text_layer/char_d_reg[4]/D
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        13.084ns  (logic 3.628ns (27.728%)  route 9.456ns (72.272%))
+  Logic Levels:           22  (CARRY4=1 LUT2=5 LUT3=4 LUT4=2 LUT5=2 LUT6=8)
+  Clock Path Skew:        0.019ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.305ns = ( 14.779 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.352ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.352     1.352    frame_inst/render_coordinates/clk_out1
+    SLICE_X14Y64         FDCE                                         r  frame_inst/render_coordinates/y_reg[6]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y64         FDCE (Prop_fdce_C_Q)         0.433     1.785 f  frame_inst/render_coordinates/y_reg[6]/Q
+                         net (fo=128, routed)         0.922     2.707    frame_inst/render_coordinates/y_reg[9]_0[6]
+    SLICE_X13Y62         LUT2 (Prop_lut2_I1_O)        0.115     2.822 f  frame_inst/render_coordinates/material_kind_d[1]_i_12/O
+                         net (fo=11, routed)          0.513     3.335    frame_inst/render_coordinates/material_kind_d[1]_i_12_n_0
+    SLICE_X14Y62         LUT2 (Prop_lut2_I1_O)        0.275     3.610 f  frame_inst/render_coordinates/data_a_reg_i_53/O
+                         net (fo=8, routed)           0.700     4.310    frame_inst/render_coordinates/data_a_reg_i_53_n_0
+    SLICE_X13Y69         LUT3 (Prop_lut3_I1_O)        0.105     4.415 f  frame_inst/render_coordinates/data_a_reg_i_132/O
+                         net (fo=2, routed)           0.516     4.932    frame_inst/render_coordinates/data_a_reg_i_132_n_0
+    SLICE_X13Y68         LUT4 (Prop_lut4_I1_O)        0.105     5.037 r  frame_inst/render_coordinates/data_a_reg_i_111/O
+                         net (fo=4, routed)           0.621     5.658    frame_inst/render_coordinates/data_a_reg_i_111_n_0
+    SLICE_X14Y68         LUT3 (Prop_lut3_I1_O)        0.105     5.763 r  frame_inst/render_coordinates/column_d[2]_i_41/O
+                         net (fo=2, routed)           0.492     6.255    frame_inst/render_coordinates/column_d[2]_i_41_n_0
+    SLICE_X12Y66         LUT6 (Prop_lut6_I4_O)        0.105     6.360 r  frame_inst/render_coordinates/data_a_reg_i_145/O
+                         net (fo=2, routed)           0.490     6.850    frame_inst/render_coordinates/data_a_reg_i_145_n_0
+    SLICE_X14Y65         LUT6 (Prop_lut6_I3_O)        0.105     6.955 r  frame_inst/render_coordinates/data_a_reg_i_157/O
+                         net (fo=1, routed)           0.404     7.359    Game_state_machine_inst/data_a_reg_i_120_0
+    SLICE_X8Y63          LUT6 (Prop_lut6_I1_O)        0.105     7.464 r  Game_state_machine_inst/Game_state_mach_LUT6_20/O
+                         net (fo=1, routed)           0.349     7.813    frame_inst/render_coordinates/data_a_reg_i_63_0
+    SLICE_X9Y60          LUT6 (Prop_lut6_I0_O)        0.105     7.918 r  frame_inst/render_coordinates/data_a_reg_i_120/O
+                         net (fo=6, routed)           0.361     8.279    frame_inst/render_coordinates/data_a_reg_i_120_n_0
+    SLICE_X11Y61         LUT2 (Prop_lut2_I1_O)        0.105     8.384 r  frame_inst/render_coordinates/data_a_reg_i_122/O
+                         net (fo=3, routed)           0.360     8.745    frame_inst/render_coordinates/data_a_reg_i_122_n_0
+    SLICE_X10Y63         LUT4 (Prop_lut4_I3_O)        0.105     8.850 r  frame_inst/render_coordinates/data_a_reg_i_64/O
+                         net (fo=1, routed)           0.000     8.850    frame_inst/render_coordinates/data_a_reg_i_64_n_0
+    SLICE_X10Y63         CARRY4 (Prop_carry4_S[1]_O[2])
+                                                      0.480     9.330 f  frame_inst/render_coordinates/data_a_reg_i_28/O[2]
+                         net (fo=10, routed)          0.441     9.771    frame_inst/render_coordinates/x_reg[8]_0[2]
+    SLICE_X8Y64          LUT6 (Prop_lut6_I2_O)        0.244    10.015 f  frame_inst/render_coordinates/data_a_reg_i_81/O
+                         net (fo=1, routed)           0.330    10.345    frame_inst/render_coordinates/data_a_reg_i_81_n_0
+    SLICE_X8Y65          LUT5 (Prop_lut5_I2_O)        0.105    10.450 f  frame_inst/render_coordinates/data_a_reg_i_36/O
+                         net (fo=1, routed)           0.122    10.571    frame_inst/render_coordinates/data_a_reg_i_36_n_0
+    SLICE_X8Y65          LUT5 (Prop_lut5_I0_O)        0.105    10.676 f  frame_inst/render_coordinates/data_a_reg_i_18/O
+                         net (fo=32, routed)          0.674    11.351    frame_inst/render_coordinates/story_ui_inst/text_column[3]
+    SLICE_X2Y67          LUT3 (Prop_lut3_I0_O)        0.105    11.456 f  frame_inst/render_coordinates/ink_d[2]_i_3/O
+                         net (fo=3, routed)           0.251    11.707    frame_inst/render_coordinates/ink_d[2]_i_3_n_0
+    SLICE_X7Y67          LUT2 (Prop_lut2_I1_O)        0.105    11.812 f  frame_inst/render_coordinates/char_d[3]_i_13/O
+                         net (fo=4, routed)           0.259    12.070    frame_inst/render_coordinates/char_d[3]_i_13_n_0
+    SLICE_X7Y68          LUT2 (Prop_lut2_I1_O)        0.105    12.175 r  frame_inst/render_coordinates/char_d[0]_i_7/O
+                         net (fo=5, routed)           0.505    12.681    frame_inst/render_coordinates/char_d[0]_i_7_n_0
+    SLICE_X7Y69          LUT3 (Prop_lut3_I2_O)        0.126    12.807 f  frame_inst/render_coordinates/char_d[3]_i_17/O
+                         net (fo=2, routed)           0.535    13.341    frame_inst/render_coordinates/char_d[3]_i_17_n_0
+    SLICE_X4Y70          LUT6 (Prop_lut6_I0_O)        0.275    13.616 f  frame_inst/render_coordinates/char_d[4]_i_6/O
+                         net (fo=1, routed)           0.255    13.871    frame_inst/render_coordinates/char_d[4]_i_6_n_0
+    SLICE_X5Y70          LUT6 (Prop_lut6_I0_O)        0.105    13.976 f  frame_inst/render_coordinates/char_d[4]_i_2/O
+                         net (fo=1, routed)           0.355    14.332    frame_inst/render_coordinates/char_d[4]_i_2_n_0
+    SLICE_X4Y70          LUT6 (Prop_lut6_I2_O)        0.105    14.437 r  frame_inst/render_coordinates/char_d[4]_i_1/O
+                         net (fo=1, routed)           0.000    14.437    frame_inst/story_ui_inst/text_layer/char_d_reg[5]_0[4]
+    SLICE_X4Y70          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[4]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.305    14.779    frame_inst/story_ui_inst/text_layer/clk_out1
+    SLICE_X4Y70          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[4]/C
+                         clock pessimism              0.066    14.845    
+                         clock uncertainty           -0.234    14.611    
+    SLICE_X4Y70          FDCE (Setup_fdce_C_D)        0.030    14.641    frame_inst/story_ui_inst/text_layer/char_d_reg[4]
+  -------------------------------------------------------------------
+                         required time                         14.641    
+                         arrival time                         -14.437    
+  -------------------------------------------------------------------
+                         slack                                  0.204    
+
+Slack (MET) :             0.370ns  (required time - arrival time)
+  Source:                 frame_inst/render_coordinates/y_reg[6]/C
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            frame_inst/story_ui_inst/text_layer/char_d_reg[1]/D
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.963ns  (logic 3.332ns (25.704%)  route 9.631ns (74.296%))
+  Logic Levels:           21  (CARRY4=1 LUT2=4 LUT3=2 LUT4=4 LUT5=1 LUT6=9)
+  Clock Path Skew:        0.021ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.307ns = ( 14.781 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.352ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.352     1.352    frame_inst/render_coordinates/clk_out1
+    SLICE_X14Y64         FDCE                                         r  frame_inst/render_coordinates/y_reg[6]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y64         FDCE (Prop_fdce_C_Q)         0.433     1.785 f  frame_inst/render_coordinates/y_reg[6]/Q
+                         net (fo=128, routed)         0.922     2.707    frame_inst/render_coordinates/y_reg[9]_0[6]
+    SLICE_X13Y62         LUT2 (Prop_lut2_I1_O)        0.115     2.822 f  frame_inst/render_coordinates/material_kind_d[1]_i_12/O
+                         net (fo=11, routed)          0.513     3.335    frame_inst/render_coordinates/material_kind_d[1]_i_12_n_0
+    SLICE_X14Y62         LUT2 (Prop_lut2_I1_O)        0.275     3.610 f  frame_inst/render_coordinates/data_a_reg_i_53/O
+                         net (fo=8, routed)           0.700     4.310    frame_inst/render_coordinates/data_a_reg_i_53_n_0
+    SLICE_X13Y69         LUT3 (Prop_lut3_I1_O)        0.105     4.415 f  frame_inst/render_coordinates/data_a_reg_i_132/O
+                         net (fo=2, routed)           0.516     4.932    frame_inst/render_coordinates/data_a_reg_i_132_n_0
+    SLICE_X13Y68         LUT4 (Prop_lut4_I1_O)        0.105     5.037 r  frame_inst/render_coordinates/data_a_reg_i_111/O
+                         net (fo=4, routed)           0.621     5.658    frame_inst/render_coordinates/data_a_reg_i_111_n_0
+    SLICE_X14Y68         LUT3 (Prop_lut3_I1_O)        0.105     5.763 r  frame_inst/render_coordinates/column_d[2]_i_41/O
+                         net (fo=2, routed)           0.492     6.255    frame_inst/render_coordinates/column_d[2]_i_41_n_0
+    SLICE_X12Y66         LUT6 (Prop_lut6_I4_O)        0.105     6.360 r  frame_inst/render_coordinates/data_a_reg_i_145/O
+                         net (fo=2, routed)           0.490     6.850    frame_inst/render_coordinates/data_a_reg_i_145_n_0
+    SLICE_X14Y65         LUT6 (Prop_lut6_I3_O)        0.105     6.955 r  frame_inst/render_coordinates/data_a_reg_i_157/O
+                         net (fo=1, routed)           0.404     7.359    Game_state_machine_inst/data_a_reg_i_120_0
+    SLICE_X8Y63          LUT6 (Prop_lut6_I1_O)        0.105     7.464 r  Game_state_machine_inst/Game_state_mach_LUT6_20/O
+                         net (fo=1, routed)           0.349     7.813    frame_inst/render_coordinates/data_a_reg_i_63_0
+    SLICE_X9Y60          LUT6 (Prop_lut6_I0_O)        0.105     7.918 r  frame_inst/render_coordinates/data_a_reg_i_120/O
+                         net (fo=6, routed)           0.361     8.279    frame_inst/render_coordinates/data_a_reg_i_120_n_0
+    SLICE_X11Y61         LUT2 (Prop_lut2_I1_O)        0.105     8.384 r  frame_inst/render_coordinates/data_a_reg_i_122/O
+                         net (fo=3, routed)           0.360     8.745    frame_inst/render_coordinates/data_a_reg_i_122_n_0
+    SLICE_X10Y63         LUT4 (Prop_lut4_I3_O)        0.105     8.850 r  frame_inst/render_coordinates/data_a_reg_i_64/O
+                         net (fo=1, routed)           0.000     8.850    frame_inst/render_coordinates/data_a_reg_i_64_n_0
+    SLICE_X10Y63         CARRY4 (Prop_carry4_S[1]_O[2])
+                                                      0.480     9.330 r  frame_inst/render_coordinates/data_a_reg_i_28/O[2]
+                         net (fo=10, routed)          0.678    10.008    frame_inst/story_ui_inst/text_layer/storage/column_d[2]_i_34_0[2]
+    SLICE_X8Y61          LUT6 (Prop_lut6_I2_O)        0.244    10.252 f  frame_inst/story_ui_inst/text_layer/storage/data_a_reg_i_91/O
+                         net (fo=8, routed)           0.162    10.414    frame_inst/render_coordinates/column_d_reg[2]_i_5_1
+    SLICE_X8Y61          LUT6 (Prop_lut6_I2_O)        0.105    10.519 r  frame_inst/render_coordinates/data_a_reg_i_43/O
+                         net (fo=2, routed)           0.367    10.886    frame_inst/render_coordinates/data_a_reg_i_43_n_0
+    SLICE_X9Y65          LUT4 (Prop_lut4_I3_O)        0.105    10.991 r  frame_inst/render_coordinates/data_a_reg_i_21/O
+                         net (fo=24, routed)          0.815    11.806    frame_inst/render_coordinates/story_ui_inst/text_column[0]
+    SLICE_X7Y67          LUT2 (Prop_lut2_I0_O)        0.105    11.911 r  frame_inst/render_coordinates/char_d[2]_i_10/O
+                         net (fo=10, routed)          0.383    12.294    frame_inst/render_coordinates/char_d[2]_i_10_n_0
+    SLICE_X6Y65          LUT4 (Prop_lut4_I1_O)        0.105    12.399 r  frame_inst/render_coordinates/char_d[1]_i_33/O
+                         net (fo=1, routed)           0.121    12.521    frame_inst/render_coordinates/char_d[1]_i_33_n_0
+    SLICE_X6Y65          LUT6 (Prop_lut6_I2_O)        0.105    12.626 f  frame_inst/render_coordinates/char_d[1]_i_25/O
+                         net (fo=1, routed)           0.481    13.107    frame_inst/render_coordinates/char_d[1]_i_25_n_0
+    SLICE_X6Y67          LUT5 (Prop_lut5_I1_O)        0.105    13.212 r  frame_inst/render_coordinates/char_d[1]_i_11/O
+                         net (fo=1, routed)           0.341    13.553    frame_inst/render_coordinates/char_d[1]_i_11_n_0
+    SLICE_X4Y68          LUT6 (Prop_lut6_I5_O)        0.105    13.658 r  frame_inst/render_coordinates/char_d[1]_i_2/O
+                         net (fo=1, routed)           0.553    14.210    frame_inst/render_coordinates/char_d[1]_i_2_n_0
+    SLICE_X2Y69          LUT6 (Prop_lut6_I0_O)        0.105    14.315 r  frame_inst/render_coordinates/char_d[1]_i_1/O
+                         net (fo=1, routed)           0.000    14.315    frame_inst/story_ui_inst/text_layer/char_d_reg[5]_0[1]
+    SLICE_X2Y69          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[1]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.307    14.781    frame_inst/story_ui_inst/text_layer/clk_out1
+    SLICE_X2Y69          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[1]/C
+                         clock pessimism              0.066    14.847    
+                         clock uncertainty           -0.234    14.613    
+    SLICE_X2Y69          FDCE (Setup_fdce_C_D)        0.072    14.685    frame_inst/story_ui_inst/text_layer/char_d_reg[1]
+  -------------------------------------------------------------------
+                         required time                         14.685    
+                         arrival time                         -14.315    
+  -------------------------------------------------------------------
+                         slack                                  0.370    
+
+Slack (MET) :             0.373ns  (required time - arrival time)
+  Source:                 frame_inst/render_coordinates/y_reg[6]/C
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            frame_inst/story_ui_inst/text_layer/char_d_reg[2]/D
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.917ns  (logic 3.332ns (25.796%)  route 9.585ns (74.204%))
+  Logic Levels:           21  (CARRY4=1 LUT2=6 LUT3=2 LUT4=3 LUT6=9)
+  Clock Path Skew:        0.017ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.303ns = ( 14.777 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.352ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.352     1.352    frame_inst/render_coordinates/clk_out1
+    SLICE_X14Y64         FDCE                                         r  frame_inst/render_coordinates/y_reg[6]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y64         FDCE (Prop_fdce_C_Q)         0.433     1.785 f  frame_inst/render_coordinates/y_reg[6]/Q
+                         net (fo=128, routed)         0.922     2.707    frame_inst/render_coordinates/y_reg[9]_0[6]
+    SLICE_X13Y62         LUT2 (Prop_lut2_I1_O)        0.115     2.822 f  frame_inst/render_coordinates/material_kind_d[1]_i_12/O
+                         net (fo=11, routed)          0.513     3.335    frame_inst/render_coordinates/material_kind_d[1]_i_12_n_0
+    SLICE_X14Y62         LUT2 (Prop_lut2_I1_O)        0.275     3.610 f  frame_inst/render_coordinates/data_a_reg_i_53/O
+                         net (fo=8, routed)           0.700     4.310    frame_inst/render_coordinates/data_a_reg_i_53_n_0
+    SLICE_X13Y69         LUT3 (Prop_lut3_I1_O)        0.105     4.415 f  frame_inst/render_coordinates/data_a_reg_i_132/O
+                         net (fo=2, routed)           0.516     4.932    frame_inst/render_coordinates/data_a_reg_i_132_n_0
+    SLICE_X13Y68         LUT4 (Prop_lut4_I1_O)        0.105     5.037 r  frame_inst/render_coordinates/data_a_reg_i_111/O
+                         net (fo=4, routed)           0.621     5.658    frame_inst/render_coordinates/data_a_reg_i_111_n_0
+    SLICE_X14Y68         LUT3 (Prop_lut3_I1_O)        0.105     5.763 r  frame_inst/render_coordinates/column_d[2]_i_41/O
+                         net (fo=2, routed)           0.492     6.255    frame_inst/render_coordinates/column_d[2]_i_41_n_0
+    SLICE_X12Y66         LUT6 (Prop_lut6_I4_O)        0.105     6.360 r  frame_inst/render_coordinates/data_a_reg_i_145/O
+                         net (fo=2, routed)           0.490     6.850    frame_inst/render_coordinates/data_a_reg_i_145_n_0
+    SLICE_X14Y65         LUT6 (Prop_lut6_I3_O)        0.105     6.955 r  frame_inst/render_coordinates/data_a_reg_i_157/O
+                         net (fo=1, routed)           0.404     7.359    Game_state_machine_inst/data_a_reg_i_120_0
+    SLICE_X8Y63          LUT6 (Prop_lut6_I1_O)        0.105     7.464 r  Game_state_machine_inst/Game_state_mach_LUT6_20/O
+                         net (fo=1, routed)           0.349     7.813    frame_inst/render_coordinates/data_a_reg_i_63_0
+    SLICE_X9Y60          LUT6 (Prop_lut6_I0_O)        0.105     7.918 r  frame_inst/render_coordinates/data_a_reg_i_120/O
+                         net (fo=6, routed)           0.361     8.279    frame_inst/render_coordinates/data_a_reg_i_120_n_0
+    SLICE_X11Y61         LUT2 (Prop_lut2_I1_O)        0.105     8.384 r  frame_inst/render_coordinates/data_a_reg_i_122/O
+                         net (fo=3, routed)           0.360     8.745    frame_inst/render_coordinates/data_a_reg_i_122_n_0
+    SLICE_X10Y63         LUT4 (Prop_lut4_I3_O)        0.105     8.850 r  frame_inst/render_coordinates/data_a_reg_i_64/O
+                         net (fo=1, routed)           0.000     8.850    frame_inst/render_coordinates/data_a_reg_i_64_n_0
+    SLICE_X10Y63         CARRY4 (Prop_carry4_S[1]_O[2])
+                                                      0.480     9.330 r  frame_inst/render_coordinates/data_a_reg_i_28/O[2]
+                         net (fo=10, routed)          0.678    10.008    frame_inst/story_ui_inst/text_layer/storage/column_d[2]_i_34_0[2]
+    SLICE_X8Y61          LUT6 (Prop_lut6_I2_O)        0.244    10.252 f  frame_inst/story_ui_inst/text_layer/storage/data_a_reg_i_91/O
+                         net (fo=8, routed)           0.162    10.414    frame_inst/render_coordinates/column_d_reg[2]_i_5_1
+    SLICE_X8Y61          LUT6 (Prop_lut6_I2_O)        0.105    10.519 r  frame_inst/render_coordinates/data_a_reg_i_43/O
+                         net (fo=2, routed)           0.367    10.886    frame_inst/render_coordinates/data_a_reg_i_43_n_0
+    SLICE_X9Y65          LUT4 (Prop_lut4_I3_O)        0.105    10.991 r  frame_inst/render_coordinates/data_a_reg_i_21/O
+                         net (fo=24, routed)          0.815    11.806    frame_inst/render_coordinates/story_ui_inst/text_column[0]
+    SLICE_X7Y67          LUT2 (Prop_lut2_I0_O)        0.105    11.911 r  frame_inst/render_coordinates/char_d[2]_i_10/O
+                         net (fo=10, routed)          0.367    12.278    frame_inst/render_coordinates/char_d[2]_i_10_n_0
+    SLICE_X6Y68          LUT2 (Prop_lut2_I1_O)        0.105    12.383 f  frame_inst/render_coordinates/char_d[2]_i_14/O
+                         net (fo=4, routed)           0.556    12.939    frame_inst/render_coordinates/char_d[2]_i_14_n_0
+    SLICE_X6Y70          LUT2 (Prop_lut2_I1_O)        0.105    13.044 r  frame_inst/render_coordinates/char_d[2]_i_25/O
+                         net (fo=1, routed)           0.552    13.596    frame_inst/render_coordinates/char_d[2]_i_25_n_0
+    SLICE_X6Y70          LUT6 (Prop_lut6_I4_O)        0.105    13.701 f  frame_inst/render_coordinates/char_d[2]_i_9/O
+                         net (fo=1, routed)           0.121    13.823    frame_inst/render_coordinates/char_d[2]_i_9_n_0
+    SLICE_X6Y70          LUT6 (Prop_lut6_I5_O)        0.105    13.928 r  frame_inst/render_coordinates/char_d[2]_i_2/O
+                         net (fo=1, routed)           0.236    14.164    frame_inst/render_coordinates/char_d[2]_i_2_n_0
+    SLICE_X7Y72          LUT6 (Prop_lut6_I0_O)        0.105    14.269 r  frame_inst/render_coordinates/char_d[2]_i_1/O
+                         net (fo=1, routed)           0.000    14.269    frame_inst/story_ui_inst/text_layer/char_d_reg[5]_0[2]
+    SLICE_X7Y72          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[2]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.303    14.777    frame_inst/story_ui_inst/text_layer/clk_out1
+    SLICE_X7Y72          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[2]/C
+                         clock pessimism              0.066    14.843    
+                         clock uncertainty           -0.234    14.609    
+    SLICE_X7Y72          FDCE (Setup_fdce_C_D)        0.033    14.642    frame_inst/story_ui_inst/text_layer/char_d_reg[2]
+  -------------------------------------------------------------------
+                         required time                         14.642    
+                         arrival time                         -14.269    
+  -------------------------------------------------------------------
+                         slack                                  0.373    
+
+Slack (MET) :             0.396ns  (required time - arrival time)
+  Source:                 frame_inst/render_coordinates/y_reg[6]/C
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            frame_inst/story_ui_inst/text_layer/valid_d_reg/D
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.902ns  (logic 3.882ns (30.088%)  route 9.020ns (69.912%))
+  Logic Levels:           21  (CARRY4=2 LUT2=4 LUT3=2 LUT4=3 LUT5=4 LUT6=6)
+  Clock Path Skew:        0.025ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.311ns = ( 14.785 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.352ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.352     1.352    frame_inst/render_coordinates/clk_out1
+    SLICE_X14Y64         FDCE                                         r  frame_inst/render_coordinates/y_reg[6]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y64         FDCE (Prop_fdce_C_Q)         0.433     1.785 f  frame_inst/render_coordinates/y_reg[6]/Q
+                         net (fo=128, routed)         0.922     2.707    frame_inst/render_coordinates/y_reg[9]_0[6]
+    SLICE_X13Y62         LUT2 (Prop_lut2_I1_O)        0.115     2.822 f  frame_inst/render_coordinates/material_kind_d[1]_i_12/O
+                         net (fo=11, routed)          0.513     3.335    frame_inst/render_coordinates/material_kind_d[1]_i_12_n_0
+    SLICE_X14Y62         LUT2 (Prop_lut2_I1_O)        0.275     3.610 f  frame_inst/render_coordinates/data_a_reg_i_53/O
+                         net (fo=8, routed)           0.700     4.310    frame_inst/render_coordinates/data_a_reg_i_53_n_0
+    SLICE_X13Y69         LUT3 (Prop_lut3_I1_O)        0.105     4.415 f  frame_inst/render_coordinates/data_a_reg_i_132/O
+                         net (fo=2, routed)           0.516     4.932    frame_inst/render_coordinates/data_a_reg_i_132_n_0
+    SLICE_X13Y68         LUT4 (Prop_lut4_I1_O)        0.105     5.037 r  frame_inst/render_coordinates/data_a_reg_i_111/O
+                         net (fo=4, routed)           0.621     5.658    frame_inst/render_coordinates/data_a_reg_i_111_n_0
+    SLICE_X14Y68         LUT3 (Prop_lut3_I1_O)        0.105     5.763 r  frame_inst/render_coordinates/column_d[2]_i_41/O
+                         net (fo=2, routed)           0.492     6.255    frame_inst/render_coordinates/column_d[2]_i_41_n_0
+    SLICE_X12Y66         LUT6 (Prop_lut6_I4_O)        0.105     6.360 r  frame_inst/render_coordinates/data_a_reg_i_145/O
+                         net (fo=2, routed)           0.490     6.850    frame_inst/render_coordinates/data_a_reg_i_145_n_0
+    SLICE_X14Y65         LUT6 (Prop_lut6_I3_O)        0.105     6.955 r  frame_inst/render_coordinates/data_a_reg_i_157/O
+                         net (fo=1, routed)           0.404     7.359    Game_state_machine_inst/data_a_reg_i_120_0
+    SLICE_X8Y63          LUT6 (Prop_lut6_I1_O)        0.105     7.464 r  Game_state_machine_inst/Game_state_mach_LUT6_20/O
+                         net (fo=1, routed)           0.349     7.813    frame_inst/render_coordinates/data_a_reg_i_63_0
+    SLICE_X9Y60          LUT6 (Prop_lut6_I0_O)        0.105     7.918 r  frame_inst/render_coordinates/data_a_reg_i_120/O
+                         net (fo=6, routed)           0.361     8.279    frame_inst/render_coordinates/data_a_reg_i_120_n_0
+    SLICE_X11Y61         LUT2 (Prop_lut2_I1_O)        0.105     8.384 r  frame_inst/render_coordinates/data_a_reg_i_122/O
+                         net (fo=3, routed)           0.360     8.745    frame_inst/render_coordinates/data_a_reg_i_122_n_0
+    SLICE_X10Y63         LUT4 (Prop_lut4_I3_O)        0.105     8.850 r  frame_inst/render_coordinates/data_a_reg_i_64/O
+                         net (fo=1, routed)           0.000     8.850    frame_inst/render_coordinates/data_a_reg_i_64_n_0
+    SLICE_X10Y63         CARRY4 (Prop_carry4_S[1]_O[2])
+                                                      0.480     9.330 r  frame_inst/render_coordinates/data_a_reg_i_28/O[2]
+                         net (fo=10, routed)          0.394     9.723    frame_inst/story_ui_inst/text_layer/storage/column_d[2]_i_34_0[2]
+    SLICE_X11Y63         LUT5 (Prop_lut5_I4_O)        0.244     9.967 r  frame_inst/story_ui_inst/text_layer/storage/data_a_reg_i_40/O
+                         net (fo=9, routed)           0.631    10.598    frame_inst/render_coordinates/data_a_reg_1
+    SLICE_X9Y59          LUT2 (Prop_lut2_I1_O)        0.105    10.703 f  frame_inst/render_coordinates/column_d[2]_i_35/O
+                         net (fo=2, routed)           0.360    11.063    frame_inst/render_coordinates/column_d[2]_i_35_n_0
+    SLICE_X11Y60         LUT5 (Prop_lut5_I4_O)        0.105    11.168 r  frame_inst/render_coordinates/column_d[2]_i_33/O
+                         net (fo=2, routed)           0.388    11.556    frame_inst/render_coordinates/column_d[2]_i_33_n_0
+    SLICE_X11Y62         LUT6 (Prop_lut6_I5_O)        0.105    11.661 r  frame_inst/render_coordinates/valid_d_i_47/O
+                         net (fo=2, routed)           0.443    12.104    frame_inst/render_coordinates/valid_d_i_47_n_0
+    SLICE_X9Y63          LUT5 (Prop_lut5_I4_O)        0.105    12.209 r  frame_inst/render_coordinates/valid_d_i_51/O
+                         net (fo=1, routed)           0.000    12.209    frame_inst/render_coordinates/valid_d_i_51_n_0
+    SLICE_X9Y63          CARRY4 (Prop_carry4_S[0]_O[3])
+                                                      0.503    12.712 f  frame_inst/render_coordinates/valid_d_reg_i_40/O[3]
+                         net (fo=1, routed)           0.846    13.559    frame_inst/story_ui_inst/text_layer/valid_d_i_6[6]
+    SLICE_X1Y64          LUT4 (Prop_lut4_I1_O)        0.257    13.816 r  frame_inst/story_ui_inst/text_layer/valid_d_i_20/O
+                         net (fo=1, routed)           0.113    13.929    frame_inst/render_coordinates/valid_d_reg_0
+    SLICE_X1Y64          LUT5 (Prop_lut5_I4_O)        0.105    14.034 f  frame_inst/render_coordinates/valid_d_i_6/O
+                         net (fo=1, routed)           0.116    14.149    Game_state_machine_inst/valid_d_reg_0
+    SLICE_X1Y64          LUT6 (Prop_lut6_I2_O)        0.105    14.254 r  Game_state_machine_inst/Game_state_mach_LUT6_15/O
+                         net (fo=1, routed)           0.000    14.254    frame_inst/story_ui_inst/text_layer/request_valid
+    SLICE_X1Y64          FDCE                                         r  frame_inst/story_ui_inst/text_layer/valid_d_reg/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.311    14.785    frame_inst/story_ui_inst/text_layer/clk_out1
+    SLICE_X1Y64          FDCE                                         r  frame_inst/story_ui_inst/text_layer/valid_d_reg/C
+                         clock pessimism              0.066    14.851    
+                         clock uncertainty           -0.234    14.617    
+    SLICE_X1Y64          FDCE (Setup_fdce_C_D)        0.033    14.650    frame_inst/story_ui_inst/text_layer/valid_d_reg
+  -------------------------------------------------------------------
+                         required time                         14.650    
+                         arrival time                         -14.254    
+  -------------------------------------------------------------------
+                         slack                                  0.396    
+
+Slack (MET) :             0.402ns  (required time - arrival time)
+  Source:                 frame_inst/render_coordinates/y_reg[6]/C
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            frame_inst/story_ui_inst/text_layer/char_d_reg[0]/D
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.892ns  (logic 3.406ns (26.419%)  route 9.486ns (73.581%))
+  Logic Levels:           20  (CARRY4=1 LUT2=4 LUT3=3 LUT4=3 LUT6=9)
+  Clock Path Skew:        0.023ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.309ns = ( 14.783 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.352ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.352     1.352    frame_inst/render_coordinates/clk_out1
+    SLICE_X14Y64         FDCE                                         r  frame_inst/render_coordinates/y_reg[6]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y64         FDCE (Prop_fdce_C_Q)         0.433     1.785 f  frame_inst/render_coordinates/y_reg[6]/Q
+                         net (fo=128, routed)         0.922     2.707    frame_inst/render_coordinates/y_reg[9]_0[6]
+    SLICE_X13Y62         LUT2 (Prop_lut2_I1_O)        0.115     2.822 f  frame_inst/render_coordinates/material_kind_d[1]_i_12/O
+                         net (fo=11, routed)          0.513     3.335    frame_inst/render_coordinates/material_kind_d[1]_i_12_n_0
+    SLICE_X14Y62         LUT2 (Prop_lut2_I1_O)        0.275     3.610 f  frame_inst/render_coordinates/data_a_reg_i_53/O
+                         net (fo=8, routed)           0.700     4.310    frame_inst/render_coordinates/data_a_reg_i_53_n_0
+    SLICE_X13Y69         LUT3 (Prop_lut3_I1_O)        0.105     4.415 f  frame_inst/render_coordinates/data_a_reg_i_132/O
+                         net (fo=2, routed)           0.516     4.932    frame_inst/render_coordinates/data_a_reg_i_132_n_0
+    SLICE_X13Y68         LUT4 (Prop_lut4_I1_O)        0.105     5.037 r  frame_inst/render_coordinates/data_a_reg_i_111/O
+                         net (fo=4, routed)           0.621     5.658    frame_inst/render_coordinates/data_a_reg_i_111_n_0
+    SLICE_X14Y68         LUT3 (Prop_lut3_I1_O)        0.105     5.763 r  frame_inst/render_coordinates/column_d[2]_i_41/O
+                         net (fo=2, routed)           0.492     6.255    frame_inst/render_coordinates/column_d[2]_i_41_n_0
+    SLICE_X12Y66         LUT6 (Prop_lut6_I4_O)        0.105     6.360 r  frame_inst/render_coordinates/data_a_reg_i_145/O
+                         net (fo=2, routed)           0.490     6.850    frame_inst/render_coordinates/data_a_reg_i_145_n_0
+    SLICE_X14Y65         LUT6 (Prop_lut6_I3_O)        0.105     6.955 r  frame_inst/render_coordinates/data_a_reg_i_157/O
+                         net (fo=1, routed)           0.404     7.359    Game_state_machine_inst/data_a_reg_i_120_0
+    SLICE_X8Y63          LUT6 (Prop_lut6_I1_O)        0.105     7.464 r  Game_state_machine_inst/Game_state_mach_LUT6_20/O
+                         net (fo=1, routed)           0.349     7.813    frame_inst/render_coordinates/data_a_reg_i_63_0
+    SLICE_X9Y60          LUT6 (Prop_lut6_I0_O)        0.105     7.918 r  frame_inst/render_coordinates/data_a_reg_i_120/O
+                         net (fo=6, routed)           0.361     8.279    frame_inst/render_coordinates/data_a_reg_i_120_n_0
+    SLICE_X11Y61         LUT2 (Prop_lut2_I1_O)        0.105     8.384 r  frame_inst/render_coordinates/data_a_reg_i_122/O
+                         net (fo=3, routed)           0.360     8.745    frame_inst/render_coordinates/data_a_reg_i_122_n_0
+    SLICE_X10Y63         LUT4 (Prop_lut4_I3_O)        0.105     8.850 r  frame_inst/render_coordinates/data_a_reg_i_64/O
+                         net (fo=1, routed)           0.000     8.850    frame_inst/render_coordinates/data_a_reg_i_64_n_0
+    SLICE_X10Y63         CARRY4 (Prop_carry4_S[1]_O[2])
+                                                      0.480     9.330 r  frame_inst/render_coordinates/data_a_reg_i_28/O[2]
+                         net (fo=10, routed)          0.678    10.008    frame_inst/story_ui_inst/text_layer/storage/column_d[2]_i_34_0[2]
+    SLICE_X8Y61          LUT6 (Prop_lut6_I2_O)        0.244    10.252 f  frame_inst/story_ui_inst/text_layer/storage/data_a_reg_i_91/O
+                         net (fo=8, routed)           0.162    10.414    frame_inst/render_coordinates/column_d_reg[2]_i_5_1
+    SLICE_X8Y61          LUT6 (Prop_lut6_I2_O)        0.105    10.519 r  frame_inst/render_coordinates/data_a_reg_i_43/O
+                         net (fo=2, routed)           0.367    10.886    frame_inst/render_coordinates/data_a_reg_i_43_n_0
+    SLICE_X9Y65          LUT4 (Prop_lut4_I3_O)        0.105    10.991 r  frame_inst/render_coordinates/data_a_reg_i_21/O
+                         net (fo=24, routed)          0.609    11.601    frame_inst/render_coordinates/story_ui_inst/text_column[0]
+    SLICE_X7Y67          LUT2 (Prop_lut2_I0_O)        0.105    11.706 r  frame_inst/render_coordinates/char_d[4]_i_25/O
+                         net (fo=9, routed)           0.640    12.346    frame_inst/render_coordinates/char_d[4]_i_25_n_0
+    SLICE_X6Y69          LUT3 (Prop_lut3_I2_O)        0.125    12.471 f  frame_inst/render_coordinates/char_d[4]_i_23/O
+                         net (fo=2, routed)           0.485    12.956    frame_inst/render_coordinates/char_d[4]_i_23_n_0
+    SLICE_X4Y70          LUT6 (Prop_lut6_I1_O)        0.264    13.220 f  frame_inst/render_coordinates/char_d[0]_i_11/O
+                         net (fo=1, routed)           0.364    13.584    frame_inst/render_coordinates/char_d[0]_i_11_n_0
+    SLICE_X0Y68          LUT6 (Prop_lut6_I5_O)        0.105    13.689 r  frame_inst/render_coordinates/char_d[0]_i_4/O
+                         net (fo=1, routed)           0.451    14.140    frame_inst/render_coordinates/char_d[0]_i_4_n_0
+    SLICE_X1Y67          LUT6 (Prop_lut6_I5_O)        0.105    14.245 r  frame_inst/render_coordinates/char_d[0]_i_1/O
+                         net (fo=1, routed)           0.000    14.245    frame_inst/story_ui_inst/text_layer/char_d_reg[5]_0[0]
+    SLICE_X1Y67          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[0]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.309    14.783    frame_inst/story_ui_inst/text_layer/clk_out1
+    SLICE_X1Y67          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[0]/C
+                         clock pessimism              0.066    14.849    
+                         clock uncertainty           -0.234    14.615    
+    SLICE_X1Y67          FDCE (Setup_fdce_C_D)        0.032    14.647    frame_inst/story_ui_inst/text_layer/char_d_reg[0]
+  -------------------------------------------------------------------
+                         required time                         14.647    
+                         arrival time                         -14.245    
+  -------------------------------------------------------------------
+                         slack                                  0.402    
+
+Slack (MET) :             0.467ns  (required time - arrival time)
+  Source:                 frame_inst/render_coordinates/x_reg[7]_rep/C
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            frame_inst/story_ui_inst/text_layer/char_d_reg[3]/D
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.872ns  (logic 3.718ns (28.885%)  route 9.154ns (71.115%))
+  Logic Levels:           21  (CARRY4=4 LUT2=6 LUT3=1 LUT4=2 LUT5=3 LUT6=5)
+  Clock Path Skew:        0.023ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.303ns = ( 14.777 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.346ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.346     1.346    frame_inst/render_coordinates/clk_out1
+    SLICE_X31Y65         FDCE                                         r  frame_inst/render_coordinates/x_reg[7]_rep/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X31Y65         FDCE (Prop_fdce_C_Q)         0.379     1.725 r  frame_inst/render_coordinates/x_reg[7]_rep/Q
+                         net (fo=123, routed)         0.826     2.551    frame_inst/render_coordinates/x_reg[7]_rep_0
+    SLICE_X32Y70         LUT2 (Prop_lut2_I1_O)        0.105     2.656 f  frame_inst/render_coordinates/ink_d[1]_i_11/O
+                         net (fo=31, routed)          0.409     3.065    Game_state_machine_inst/data_a_reg_i_159
+    SLICE_X33Y69         LUT2 (Prop_lut2_I0_O)        0.105     3.170 r  Game_state_machine_inst/Game_state_mach_LUT2_29/O
+                         net (fo=3, routed)           0.635     3.805    frame_inst/render_coordinates/data_a_reg_i_147_0[0]
+    SLICE_X15Y69         CARRY4 (Prop_carry4_DI[3]_CO[3])
+                                                      0.318     4.123 r  frame_inst/render_coordinates/data_a_reg_i_159/CO[3]
+                         net (fo=1, routed)           0.000     4.123    frame_inst/render_coordinates/data_a_reg_i_159_n_0
+    SLICE_X15Y70         CARRY4 (Prop_carry4_CI_CO[1])
+                                                      0.132     4.255 f  frame_inst/render_coordinates/data_a_reg_i_147/CO[1]
+                         net (fo=1, routed)           0.708     4.963    frame_inst/render_coordinates/story_ui_inst/box49_return224_in
+    SLICE_X29Y72         LUT5 (Prop_lut5_I2_O)        0.275     5.238 f  frame_inst/render_coordinates/data_a_reg_i_123/O
+                         net (fo=8, routed)           0.546     5.784    frame_inst/render_coordinates/data_a_reg_i_123_n_0
+    SLICE_X13Y73         LUT2 (Prop_lut2_I0_O)        0.105     5.889 r  frame_inst/render_coordinates/ink_d[2]_i_13/O
+                         net (fo=4, routed)           0.389     6.278    frame_inst/render_coordinates/y_reg[6]_6
+    SLICE_X11Y72         LUT3 (Prop_lut3_I1_O)        0.105     6.383 r  frame_inst/render_coordinates/data_a_reg_i_98/O
+                         net (fo=2, routed)           0.126     6.510    Game_state_machine_inst/ink_d[4]_i_2
+    SLICE_X11Y72         LUT2 (Prop_lut2_I0_O)        0.105     6.615 f  Game_state_machine_inst/Game_state_mach_LUT2_64/O
+                         net (fo=6, routed)           0.730     7.344    frame_inst/render_coordinates/ink_d_reg[1]
+    SLICE_X12Y63         LUT5 (Prop_lut5_I3_O)        0.105     7.449 r  frame_inst/render_coordinates/column_d[1]_i_14/O
+                         net (fo=1, routed)           0.366     7.815    frame_inst/render_coordinates/column_d[1]_i_14_n_0
+    SLICE_X11Y62         LUT6 (Prop_lut6_I2_O)        0.105     7.920 r  frame_inst/render_coordinates/column_d[1]_i_11/O
+                         net (fo=4, routed)           0.357     8.277    frame_inst/render_coordinates/column_d[1]_i_11_n_0
+    SLICE_X10Y62         LUT4 (Prop_lut4_I0_O)        0.105     8.382 r  frame_inst/render_coordinates/data_a_reg_i_87/O
+                         net (fo=1, routed)           0.000     8.382    frame_inst/render_coordinates/data_a_reg_i_87_n_0
+    SLICE_X10Y62         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.444     8.826 r  frame_inst/render_coordinates/data_a_reg_i_37/CO[3]
+                         net (fo=1, routed)           0.000     8.826    frame_inst/render_coordinates/data_a_reg_i_37_n_0
+    SLICE_X10Y63         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.178     9.004 r  frame_inst/render_coordinates/data_a_reg_i_28/O[0]
+                         net (fo=18, routed)          0.717     9.721    frame_inst/story_ui_inst/text_layer/storage/column_d[2]_i_34_0[0]
+    SLICE_X10Y61         LUT5 (Prop_lut5_I1_O)        0.239     9.960 r  frame_inst/story_ui_inst/text_layer/storage/data_a_reg_i_42/O
+                         net (fo=8, routed)           0.452    10.412    frame_inst/render_coordinates/data_a_reg_2
+    SLICE_X8Y63          LUT6 (Prop_lut6_I5_O)        0.283    10.695 r  frame_inst/render_coordinates/data_a_reg_i_20/O
+                         net (fo=23, routed)          0.867    11.562    frame_inst/render_coordinates/state_reg[1]_4[0]
+    SLICE_X7Y66          LUT2 (Prop_lut2_I0_O)        0.105    11.667 f  frame_inst/render_coordinates/char_d[0]_i_10/O
+                         net (fo=3, routed)           0.488    12.156    frame_inst/render_coordinates/char_d[0]_i_10_n_0
+    SLICE_X5Y68          LUT2 (Prop_lut2_I1_O)        0.105    12.261 r  frame_inst/render_coordinates/char_d[3]_i_27/O
+                         net (fo=2, routed)           0.321    12.582    frame_inst/render_coordinates/char_d[3]_i_27_n_0
+    SLICE_X5Y68          LUT4 (Prop_lut4_I2_O)        0.105    12.687 r  frame_inst/render_coordinates/char_d[3]_i_26/O
+                         net (fo=1, routed)           0.314    13.001    frame_inst/render_coordinates/char_d[3]_i_26_n_0
+    SLICE_X5Y68          LUT6 (Prop_lut6_I1_O)        0.105    13.106 f  frame_inst/render_coordinates/char_d[3]_i_10/O
+                         net (fo=1, routed)           0.314    13.420    frame_inst/render_coordinates/char_d[3]_i_10_n_0
+    SLICE_X5Y69          LUT6 (Prop_lut6_I5_O)        0.105    13.525 r  frame_inst/render_coordinates/char_d[3]_i_2/O
+                         net (fo=1, routed)           0.588    14.113    frame_inst/render_coordinates/char_d[3]_i_2_n_0
+    SLICE_X6Y71          LUT6 (Prop_lut6_I0_O)        0.105    14.218 r  frame_inst/render_coordinates/char_d[3]_i_1/O
+                         net (fo=1, routed)           0.000    14.218    frame_inst/story_ui_inst/text_layer/char_d_reg[5]_0[3]
+    SLICE_X6Y71          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[3]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.303    14.777    frame_inst/story_ui_inst/text_layer/clk_out1
+    SLICE_X6Y71          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[3]/C
+                         clock pessimism              0.066    14.843    
+                         clock uncertainty           -0.234    14.609    
+    SLICE_X6Y71          FDCE (Setup_fdce_C_D)        0.076    14.685    frame_inst/story_ui_inst/text_layer/char_d_reg[3]
+  -------------------------------------------------------------------
+                         required time                         14.685    
+                         arrival time                         -14.218    
+  -------------------------------------------------------------------
+                         slack                                  0.467    
+
+Slack (MET) :             0.546ns  (required time - arrival time)
+  Source:                 hdmi_inst/av_encoder/serializer/TMDS_shift_2l_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Destination:            hdmi_inst/av_encoder/serializer/ODDR_2/D2
+                            (rising edge-triggered cell ODDR clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Path Group:             clk_out2_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.695ns  (clk_out2_hdmi_pll rise@2.695ns - clk_out2_hdmi_pll rise@0.000ns)
+  Data Path Delay:        1.198ns  (logic 0.433ns (36.158%)  route 0.765ns (63.842%))
+  Logic Levels:           0  
+  Clock Path Skew:        -0.054ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.313ns = ( 4.007 - 2.695 ) 
+    Source Clock Delay      (SCD):    1.433ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.190ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.373ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.433     1.433    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X2Y35          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_2l_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X2Y35          FDRE (Prop_fdre_C_Q)         0.433     1.866 r  hdmi_inst/av_encoder/serializer/TMDS_shift_2l_reg[0]/Q
+                         net (fo=1, routed)           0.765     2.630    hdmi_inst/av_encoder/serializer/TMDS_shift_2l[0]
+    OLOGIC_X0Y44         ODDR                                         r  hdmi_inst/av_encoder/serializer/ODDR_2/D2
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      2.695     2.695 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     2.695 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284     3.979    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.718     1.260 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.357     2.618    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.077     2.695 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.312     4.007    hdmi_inst/av_encoder/serializer/clk_out2
+    OLOGIC_X0Y44         ODDR                                         r  hdmi_inst/av_encoder/serializer/ODDR_2/C
+                         clock pessimism              0.066     4.073    
+                         clock uncertainty           -0.190     3.884    
+    OLOGIC_X0Y44         ODDR (Setup_oddr_C_D2)      -0.707     3.177    hdmi_inst/av_encoder/serializer/ODDR_2
+  -------------------------------------------------------------------
+                         required time                          3.177    
+                         arrival time                          -2.630    
+  -------------------------------------------------------------------
+                         slack                                  0.546    
+
+Slack (MET) :             0.604ns  (required time - arrival time)
+  Source:                 hdmi_inst/av_encoder/serializer/TMDS_shift_2h_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Destination:            hdmi_inst/av_encoder/serializer/ODDR_2/D1
+                            (rising edge-triggered cell ODDR clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Path Group:             clk_out2_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.695ns  (clk_out2_hdmi_pll rise@2.695ns - clk_out2_hdmi_pll rise@0.000ns)
+  Data Path Delay:        1.140ns  (logic 0.433ns (37.996%)  route 0.707ns (62.004%))
+  Logic Levels:           0  
+  Clock Path Skew:        -0.054ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.313ns = ( 4.007 - 2.695 ) 
+    Source Clock Delay      (SCD):    1.433ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.190ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.373ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.433     1.433    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X2Y35          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_2h_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X2Y35          FDRE (Prop_fdre_C_Q)         0.433     1.866 r  hdmi_inst/av_encoder/serializer/TMDS_shift_2h_reg[0]/Q
+                         net (fo=1, routed)           0.707     2.572    hdmi_inst/av_encoder/serializer/TMDS_shift_2h[0]
+    OLOGIC_X0Y44         ODDR                                         r  hdmi_inst/av_encoder/serializer/ODDR_2/D1
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      2.695     2.695 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     2.695 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284     3.979    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.718     1.260 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.357     2.618    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.077     2.695 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.312     4.007    hdmi_inst/av_encoder/serializer/clk_out2
+    OLOGIC_X0Y44         ODDR                                         r  hdmi_inst/av_encoder/serializer/ODDR_2/C
+                         clock pessimism              0.066     4.073    
+                         clock uncertainty           -0.190     3.884    
+    OLOGIC_X0Y44         ODDR (Setup_oddr_C_D1)      -0.707     3.177    hdmi_inst/av_encoder/serializer/ODDR_2
+  -------------------------------------------------------------------
+                         required time                          3.177    
+                         arrival time                          -2.572    
+  -------------------------------------------------------------------
+                         slack                                  0.604    
+
+Slack (MET) :             0.632ns  (required time - arrival time)
+  Source:                 frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+                            (rising edge-triggered cell RAMB18E1 clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            sound_inst/en_reg[0]/CE
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.353ns  (logic 3.698ns (29.935%)  route 8.655ns (70.065%))
+  Logic Levels:           23  (LUT2=5 LUT3=2 LUT4=2 LUT5=4 LUT6=8 MUXF7=1 RAMD32=1)
+  Clock Path Skew:        -0.087ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.259ns = ( 14.732 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.411ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.411     1.411    frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/clka
+    RAMB18_X1Y17         RAMB18E1                                     r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+    RAMB18_X1Y17         RAMB18E1 (Prop_ramb18e1_CLKARDCLK_DOADO[9])
+                                                      0.734     2.145 r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/DOADO[9]
+                         net (fo=7, routed)           0.730     2.876    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_122_0[3]
+    SLICE_X49Y46         LUT2 (Prop_lut2_I0_O)        0.105     2.981 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8/O
+                         net (fo=6, routed)           0.660     3.640    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8_n_0
+    SLICE_X47Y44         LUT2 (Prop_lut2_I1_O)        0.108     3.748 f  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10/O
+                         net (fo=2, routed)           0.527     4.275    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10_n_0
+    SLICE_X47Y53         LUT6 (Prop_lut6_I3_O)        0.267     4.542 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_7/O
+                         net (fo=2, routed)           0.245     4.787    frame_inst/Playfield_inst/ghost_scanner1_inst_n_155
+    SLICE_X47Y55         LUT3 (Prop_lut3_I0_O)        0.105     4.892 r  frame_inst/Playfield_inst/Playfield_LUT3_177/O
+                         net (fo=24, routed)          0.692     5.584    frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DPRA4
+    SLICE_X50Y58         RAMD32 (Prop_ramd32_RADR4_O)
+                                                      0.106     5.690 f  frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DP/O
+                         net (fo=1, routed)           0.787     6.477    frame_inst/Playfield_inst/ghost_scanner1_inst/read_data[14]
+    SLICE_X47Y56         LUT6 (Prop_lut6_I3_O)        0.268     6.745 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209/O
+                         net (fo=1, routed)           0.000     6.745    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209_n_0
+    SLICE_X47Y56         MUXF7 (Prop_muxf7_I0_O)      0.178     6.923 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200/O
+                         net (fo=1, routed)           0.225     7.148    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200_n_0
+    SLICE_X45Y56         LUT3 (Prop_lut3_I2_O)        0.252     7.400 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192/O
+                         net (fo=1, routed)           0.225     7.625    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192_n_0
+    SLICE_X45Y55         LUT5 (Prop_lut5_I4_O)        0.105     7.730 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170/O
+                         net (fo=1, routed)           0.205     7.935    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170_n_0
+    SLICE_X45Y55         LUT6 (Prop_lut6_I2_O)        0.105     8.040 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121/O
+                         net (fo=1, routed)           0.350     8.390    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121_n_0
+    SLICE_X44Y52         LUT5 (Prop_lut5_I0_O)        0.105     8.495 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58/O
+                         net (fo=1, routed)           0.460     8.955    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58_n_0
+    SLICE_X44Y53         LUT6 (Prop_lut6_I5_O)        0.105     9.060 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21/O
+                         net (fo=1, routed)           0.222     9.281    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21_n_0
+    SLICE_X45Y52         LUT6 (Prop_lut6_I5_O)        0.105     9.386 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10/O
+                         net (fo=1, routed)           0.241     9.628    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10_n_0
+    SLICE_X44Y50         LUT5 (Prop_lut5_I4_O)        0.105     9.733 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_6/O
+                         net (fo=3, routed)           0.389    10.122    frame_inst/Playfield_inst/ghost_scanner1_inst_n_107
+    SLICE_X43Y48         LUT4 (Prop_lut4_I2_O)        0.105    10.227 f  frame_inst/Playfield_inst/Playfield_LUT4_119/O
+                         net (fo=5, routed)           0.376    10.603    Game_state_machine_inst/blk_rot1
+    SLICE_X42Y45         LUT5 (Prop_lut5_I0_O)        0.105    10.708 f  Game_state_machine_inst/Game_state_mach_LUT5_11/O
+                         net (fo=2, routed)           0.237    10.945    frame_inst/Playfield_inst/hold_controller_inst/en_reg[0]_5
+    SLICE_X41Y45         LUT4 (Prop_lut4_I1_O)        0.105    11.050 f  frame_inst/Playfield_inst/hold_controller_inst/Playfield_hold__LUT4_3/O
+                         net (fo=2, routed)           0.237    11.287    Game_state_machine_inst/en_reg[2]
+    SLICE_X43Y45         LUT6 (Prop_lut6_I0_O)        0.105    11.392 f  Game_state_machine_inst/Game_state_mach_LUT6_7/O
+                         net (fo=3, routed)           0.253    11.645    Game_state_machine_inst/Game_state_mach_net_22
+    SLICE_X42Y44         LUT2 (Prop_lut2_I1_O)        0.105    11.750 f  Game_state_machine_inst/Game_state_mach_LUT2_45/O
+                         net (fo=2, routed)           0.382    12.132    Game_state_machine_inst/Game_state_mach_net_25
+    SLICE_X42Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.237 f  Game_state_machine_inst/Game_state_mach_LUT2_47/O
+                         net (fo=3, routed)           0.328    12.565    Game_state_machine_inst/Game_state_mach_net_29
+    SLICE_X43Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.670 r  Game_state_machine_inst/Game_state_mach_LUT2_51/O
+                         net (fo=2, routed)           0.353    13.024    Game_state_machine_inst/lock_t2_reg_0
+    SLICE_X43Y44         LUT6 (Prop_lut6_I5_O)        0.105    13.129 f  Game_state_machine_inst/Game_state_mach_LUT6_11/O
+                         net (fo=2, routed)           0.235    13.364    sound_inst/en_reg[0]_3
+    SLICE_X41Y44         LUT6 (Prop_lut6_I1_O)        0.105    13.469 r  sound_inst/en[4]_i_1/O
+                         net (fo=5, routed)           0.296    13.765    sound_inst/en[4]_i_1_n_0
+    SLICE_X41Y44         FDCE                                         r  sound_inst/en_reg[0]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.259    14.732    sound_inst/clk_out1
+    SLICE_X41Y44         FDCE                                         r  sound_inst/en_reg[0]/C
+                         clock pessimism              0.066    14.798    
+                         clock uncertainty           -0.234    14.565    
+    SLICE_X41Y44         FDCE (Setup_fdce_C_CE)      -0.168    14.397    sound_inst/en_reg[0]
+  -------------------------------------------------------------------
+                         required time                         14.397    
+                         arrival time                         -13.765    
+  -------------------------------------------------------------------
+                         slack                                  0.632    
+
+Slack (MET) :             0.632ns  (required time - arrival time)
+  Source:                 frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+                            (rising edge-triggered cell RAMB18E1 clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            sound_inst/en_reg[2]/CE
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.353ns  (logic 3.698ns (29.935%)  route 8.655ns (70.065%))
+  Logic Levels:           23  (LUT2=5 LUT3=2 LUT4=2 LUT5=4 LUT6=8 MUXF7=1 RAMD32=1)
+  Clock Path Skew:        -0.087ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.259ns = ( 14.732 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.411ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.411     1.411    frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/clka
+    RAMB18_X1Y17         RAMB18E1                                     r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+    RAMB18_X1Y17         RAMB18E1 (Prop_ramb18e1_CLKARDCLK_DOADO[9])
+                                                      0.734     2.145 r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/DOADO[9]
+                         net (fo=7, routed)           0.730     2.876    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_122_0[3]
+    SLICE_X49Y46         LUT2 (Prop_lut2_I0_O)        0.105     2.981 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8/O
+                         net (fo=6, routed)           0.660     3.640    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8_n_0
+    SLICE_X47Y44         LUT2 (Prop_lut2_I1_O)        0.108     3.748 f  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10/O
+                         net (fo=2, routed)           0.527     4.275    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10_n_0
+    SLICE_X47Y53         LUT6 (Prop_lut6_I3_O)        0.267     4.542 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_7/O
+                         net (fo=2, routed)           0.245     4.787    frame_inst/Playfield_inst/ghost_scanner1_inst_n_155
+    SLICE_X47Y55         LUT3 (Prop_lut3_I0_O)        0.105     4.892 r  frame_inst/Playfield_inst/Playfield_LUT3_177/O
+                         net (fo=24, routed)          0.692     5.584    frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DPRA4
+    SLICE_X50Y58         RAMD32 (Prop_ramd32_RADR4_O)
+                                                      0.106     5.690 f  frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DP/O
+                         net (fo=1, routed)           0.787     6.477    frame_inst/Playfield_inst/ghost_scanner1_inst/read_data[14]
+    SLICE_X47Y56         LUT6 (Prop_lut6_I3_O)        0.268     6.745 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209/O
+                         net (fo=1, routed)           0.000     6.745    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209_n_0
+    SLICE_X47Y56         MUXF7 (Prop_muxf7_I0_O)      0.178     6.923 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200/O
+                         net (fo=1, routed)           0.225     7.148    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200_n_0
+    SLICE_X45Y56         LUT3 (Prop_lut3_I2_O)        0.252     7.400 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192/O
+                         net (fo=1, routed)           0.225     7.625    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192_n_0
+    SLICE_X45Y55         LUT5 (Prop_lut5_I4_O)        0.105     7.730 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170/O
+                         net (fo=1, routed)           0.205     7.935    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170_n_0
+    SLICE_X45Y55         LUT6 (Prop_lut6_I2_O)        0.105     8.040 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121/O
+                         net (fo=1, routed)           0.350     8.390    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121_n_0
+    SLICE_X44Y52         LUT5 (Prop_lut5_I0_O)        0.105     8.495 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58/O
+                         net (fo=1, routed)           0.460     8.955    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58_n_0
+    SLICE_X44Y53         LUT6 (Prop_lut6_I5_O)        0.105     9.060 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21/O
+                         net (fo=1, routed)           0.222     9.281    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21_n_0
+    SLICE_X45Y52         LUT6 (Prop_lut6_I5_O)        0.105     9.386 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10/O
+                         net (fo=1, routed)           0.241     9.628    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10_n_0
+    SLICE_X44Y50         LUT5 (Prop_lut5_I4_O)        0.105     9.733 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_6/O
+                         net (fo=3, routed)           0.389    10.122    frame_inst/Playfield_inst/ghost_scanner1_inst_n_107
+    SLICE_X43Y48         LUT4 (Prop_lut4_I2_O)        0.105    10.227 f  frame_inst/Playfield_inst/Playfield_LUT4_119/O
+                         net (fo=5, routed)           0.376    10.603    Game_state_machine_inst/blk_rot1
+    SLICE_X42Y45         LUT5 (Prop_lut5_I0_O)        0.105    10.708 f  Game_state_machine_inst/Game_state_mach_LUT5_11/O
+                         net (fo=2, routed)           0.237    10.945    frame_inst/Playfield_inst/hold_controller_inst/en_reg[0]_5
+    SLICE_X41Y45         LUT4 (Prop_lut4_I1_O)        0.105    11.050 f  frame_inst/Playfield_inst/hold_controller_inst/Playfield_hold__LUT4_3/O
+                         net (fo=2, routed)           0.237    11.287    Game_state_machine_inst/en_reg[2]
+    SLICE_X43Y45         LUT6 (Prop_lut6_I0_O)        0.105    11.392 f  Game_state_machine_inst/Game_state_mach_LUT6_7/O
+                         net (fo=3, routed)           0.253    11.645    Game_state_machine_inst/Game_state_mach_net_22
+    SLICE_X42Y44         LUT2 (Prop_lut2_I1_O)        0.105    11.750 f  Game_state_machine_inst/Game_state_mach_LUT2_45/O
+                         net (fo=2, routed)           0.382    12.132    Game_state_machine_inst/Game_state_mach_net_25
+    SLICE_X42Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.237 f  Game_state_machine_inst/Game_state_mach_LUT2_47/O
+                         net (fo=3, routed)           0.328    12.565    Game_state_machine_inst/Game_state_mach_net_29
+    SLICE_X43Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.670 r  Game_state_machine_inst/Game_state_mach_LUT2_51/O
+                         net (fo=2, routed)           0.353    13.024    Game_state_machine_inst/lock_t2_reg_0
+    SLICE_X43Y44         LUT6 (Prop_lut6_I5_O)        0.105    13.129 f  Game_state_machine_inst/Game_state_mach_LUT6_11/O
+                         net (fo=2, routed)           0.235    13.364    sound_inst/en_reg[0]_3
+    SLICE_X41Y44         LUT6 (Prop_lut6_I1_O)        0.105    13.469 r  sound_inst/en[4]_i_1/O
+                         net (fo=5, routed)           0.296    13.765    sound_inst/en[4]_i_1_n_0
+    SLICE_X41Y44         FDCE                                         r  sound_inst/en_reg[2]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.259    14.732    sound_inst/clk_out1
+    SLICE_X41Y44         FDCE                                         r  sound_inst/en_reg[2]/C
+                         clock pessimism              0.066    14.798    
+                         clock uncertainty           -0.234    14.565    
+    SLICE_X41Y44         FDCE (Setup_fdce_C_CE)      -0.168    14.397    sound_inst/en_reg[2]
+  -------------------------------------------------------------------
+                         required time                         14.397    
+                         arrival time                         -13.765    
+  -------------------------------------------------------------------
+                         slack                                  0.632    
+
+Slack (MET) :             0.632ns  (required time - arrival time)
+  Source:                 frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+                            (rising edge-triggered cell RAMB18E1 clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            sound_inst/en_reg[4]/CE
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.353ns  (logic 3.698ns (29.935%)  route 8.655ns (70.065%))
+  Logic Levels:           23  (LUT2=5 LUT3=2 LUT4=2 LUT5=4 LUT6=8 MUXF7=1 RAMD32=1)
+  Clock Path Skew:        -0.087ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.259ns = ( 14.732 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.411ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.411     1.411    frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/clka
+    RAMB18_X1Y17         RAMB18E1                                     r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+    RAMB18_X1Y17         RAMB18E1 (Prop_ramb18e1_CLKARDCLK_DOADO[9])
+                                                      0.734     2.145 r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/DOADO[9]
+                         net (fo=7, routed)           0.730     2.876    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_122_0[3]
+    SLICE_X49Y46         LUT2 (Prop_lut2_I0_O)        0.105     2.981 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8/O
+                         net (fo=6, routed)           0.660     3.640    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8_n_0
+    SLICE_X47Y44         LUT2 (Prop_lut2_I1_O)        0.108     3.748 f  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10/O
+                         net (fo=2, routed)           0.527     4.275    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10_n_0
+    SLICE_X47Y53         LUT6 (Prop_lut6_I3_O)        0.267     4.542 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_7/O
+                         net (fo=2, routed)           0.245     4.787    frame_inst/Playfield_inst/ghost_scanner1_inst_n_155
+    SLICE_X47Y55         LUT3 (Prop_lut3_I0_O)        0.105     4.892 r  frame_inst/Playfield_inst/Playfield_LUT3_177/O
+                         net (fo=24, routed)          0.692     5.584    frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DPRA4
+    SLICE_X50Y58         RAMD32 (Prop_ramd32_RADR4_O)
+                                                      0.106     5.690 f  frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DP/O
+                         net (fo=1, routed)           0.787     6.477    frame_inst/Playfield_inst/ghost_scanner1_inst/read_data[14]
+    SLICE_X47Y56         LUT6 (Prop_lut6_I3_O)        0.268     6.745 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209/O
+                         net (fo=1, routed)           0.000     6.745    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209_n_0
+    SLICE_X47Y56         MUXF7 (Prop_muxf7_I0_O)      0.178     6.923 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200/O
+                         net (fo=1, routed)           0.225     7.148    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200_n_0
+    SLICE_X45Y56         LUT3 (Prop_lut3_I2_O)        0.252     7.400 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192/O
+                         net (fo=1, routed)           0.225     7.625    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192_n_0
+    SLICE_X45Y55         LUT5 (Prop_lut5_I4_O)        0.105     7.730 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170/O
+                         net (fo=1, routed)           0.205     7.935    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170_n_0
+    SLICE_X45Y55         LUT6 (Prop_lut6_I2_O)        0.105     8.040 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121/O
+                         net (fo=1, routed)           0.350     8.390    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121_n_0
+    SLICE_X44Y52         LUT5 (Prop_lut5_I0_O)        0.105     8.495 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58/O
+                         net (fo=1, routed)           0.460     8.955    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58_n_0
+    SLICE_X44Y53         LUT6 (Prop_lut6_I5_O)        0.105     9.060 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21/O
+                         net (fo=1, routed)           0.222     9.281    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21_n_0
+    SLICE_X45Y52         LUT6 (Prop_lut6_I5_O)        0.105     9.386 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10/O
+                         net (fo=1, routed)           0.241     9.628    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10_n_0
+    SLICE_X44Y50         LUT5 (Prop_lut5_I4_O)        0.105     9.733 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_6/O
+                         net (fo=3, routed)           0.389    10.122    frame_inst/Playfield_inst/ghost_scanner1_inst_n_107
+    SLICE_X43Y48         LUT4 (Prop_lut4_I2_O)        0.105    10.227 f  frame_inst/Playfield_inst/Playfield_LUT4_119/O
+                         net (fo=5, routed)           0.376    10.603    Game_state_machine_inst/blk_rot1
+    SLICE_X42Y45         LUT5 (Prop_lut5_I0_O)        0.105    10.708 f  Game_state_machine_inst/Game_state_mach_LUT5_11/O
+                         net (fo=2, routed)           0.237    10.945    frame_inst/Playfield_inst/hold_controller_inst/en_reg[0]_5
+    SLICE_X41Y45         LUT4 (Prop_lut4_I1_O)        0.105    11.050 f  frame_inst/Playfield_inst/hold_controller_inst/Playfield_hold__LUT4_3/O
+                         net (fo=2, routed)           0.237    11.287    Game_state_machine_inst/en_reg[2]
+    SLICE_X43Y45         LUT6 (Prop_lut6_I0_O)        0.105    11.392 f  Game_state_machine_inst/Game_state_mach_LUT6_7/O
+                         net (fo=3, routed)           0.253    11.645    Game_state_machine_inst/Game_state_mach_net_22
+    SLICE_X42Y44         LUT2 (Prop_lut2_I1_O)        0.105    11.750 f  Game_state_machine_inst/Game_state_mach_LUT2_45/O
+                         net (fo=2, routed)           0.382    12.132    Game_state_machine_inst/Game_state_mach_net_25
+    SLICE_X42Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.237 f  Game_state_machine_inst/Game_state_mach_LUT2_47/O
+                         net (fo=3, routed)           0.328    12.565    Game_state_machine_inst/Game_state_mach_net_29
+    SLICE_X43Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.670 r  Game_state_machine_inst/Game_state_mach_LUT2_51/O
+                         net (fo=2, routed)           0.353    13.024    Game_state_machine_inst/lock_t2_reg_0
+    SLICE_X43Y44         LUT6 (Prop_lut6_I5_O)        0.105    13.129 f  Game_state_machine_inst/Game_state_mach_LUT6_11/O
+                         net (fo=2, routed)           0.235    13.364    sound_inst/en_reg[0]_3
+    SLICE_X41Y44         LUT6 (Prop_lut6_I1_O)        0.105    13.469 r  sound_inst/en[4]_i_1/O
+                         net (fo=5, routed)           0.296    13.765    sound_inst/en[4]_i_1_n_0
+    SLICE_X41Y44         FDCE                                         r  sound_inst/en_reg[4]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.259    14.732    sound_inst/clk_out1
+    SLICE_X41Y44         FDCE                                         r  sound_inst/en_reg[4]/C
+                         clock pessimism              0.066    14.798    
+                         clock uncertainty           -0.234    14.565    
+    SLICE_X41Y44         FDCE (Setup_fdce_C_CE)      -0.168    14.397    sound_inst/en_reg[4]
+  -------------------------------------------------------------------
+                         required time                         14.397    
+                         arrival time                         -13.765    
+  -------------------------------------------------------------------
+                         slack                                  0.632    
+
+Slack (MET) :             0.647ns  (required time - arrival time)
+  Source:                 frame_inst/render_coordinates/y_reg[6]/C
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            frame_inst/story_ui_inst/text_layer/char_d_reg[5]/D
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.579ns  (logic 3.497ns (27.800%)  route 9.082ns (72.200%))
+  Logic Levels:           21  (CARRY4=1 LUT2=6 LUT3=2 LUT4=2 LUT5=4 LUT6=6)
+  Clock Path Skew:        -0.046ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.240ns = ( 14.714 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.352ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.352     1.352    frame_inst/render_coordinates/clk_out1
+    SLICE_X14Y64         FDCE                                         r  frame_inst/render_coordinates/y_reg[6]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X14Y64         FDCE (Prop_fdce_C_Q)         0.433     1.785 f  frame_inst/render_coordinates/y_reg[6]/Q
+                         net (fo=128, routed)         0.922     2.707    frame_inst/render_coordinates/y_reg[9]_0[6]
+    SLICE_X13Y62         LUT2 (Prop_lut2_I1_O)        0.115     2.822 f  frame_inst/render_coordinates/material_kind_d[1]_i_12/O
+                         net (fo=11, routed)          0.513     3.335    frame_inst/render_coordinates/material_kind_d[1]_i_12_n_0
+    SLICE_X14Y62         LUT2 (Prop_lut2_I1_O)        0.275     3.610 f  frame_inst/render_coordinates/data_a_reg_i_53/O
+                         net (fo=8, routed)           0.700     4.310    frame_inst/render_coordinates/data_a_reg_i_53_n_0
+    SLICE_X13Y69         LUT3 (Prop_lut3_I1_O)        0.105     4.415 f  frame_inst/render_coordinates/data_a_reg_i_132/O
+                         net (fo=2, routed)           0.516     4.932    frame_inst/render_coordinates/data_a_reg_i_132_n_0
+    SLICE_X13Y68         LUT4 (Prop_lut4_I1_O)        0.105     5.037 r  frame_inst/render_coordinates/data_a_reg_i_111/O
+                         net (fo=4, routed)           0.621     5.658    frame_inst/render_coordinates/data_a_reg_i_111_n_0
+    SLICE_X14Y68         LUT3 (Prop_lut3_I1_O)        0.105     5.763 r  frame_inst/render_coordinates/column_d[2]_i_41/O
+                         net (fo=2, routed)           0.492     6.255    frame_inst/render_coordinates/column_d[2]_i_41_n_0
+    SLICE_X12Y66         LUT6 (Prop_lut6_I4_O)        0.105     6.360 r  frame_inst/render_coordinates/data_a_reg_i_145/O
+                         net (fo=2, routed)           0.490     6.850    frame_inst/render_coordinates/data_a_reg_i_145_n_0
+    SLICE_X14Y65         LUT6 (Prop_lut6_I3_O)        0.105     6.955 r  frame_inst/render_coordinates/data_a_reg_i_157/O
+                         net (fo=1, routed)           0.404     7.359    Game_state_machine_inst/data_a_reg_i_120_0
+    SLICE_X8Y63          LUT6 (Prop_lut6_I1_O)        0.105     7.464 r  Game_state_machine_inst/Game_state_mach_LUT6_20/O
+                         net (fo=1, routed)           0.349     7.813    frame_inst/render_coordinates/data_a_reg_i_63_0
+    SLICE_X9Y60          LUT6 (Prop_lut6_I0_O)        0.105     7.918 r  frame_inst/render_coordinates/data_a_reg_i_120/O
+                         net (fo=6, routed)           0.361     8.279    frame_inst/render_coordinates/data_a_reg_i_120_n_0
+    SLICE_X11Y61         LUT2 (Prop_lut2_I1_O)        0.105     8.384 r  frame_inst/render_coordinates/data_a_reg_i_122/O
+                         net (fo=3, routed)           0.360     8.745    frame_inst/render_coordinates/data_a_reg_i_122_n_0
+    SLICE_X10Y63         LUT4 (Prop_lut4_I3_O)        0.105     8.850 r  frame_inst/render_coordinates/data_a_reg_i_64/O
+                         net (fo=1, routed)           0.000     8.850    frame_inst/render_coordinates/data_a_reg_i_64_n_0
+    SLICE_X10Y63         CARRY4 (Prop_carry4_S[1]_O[2])
+                                                      0.480     9.330 f  frame_inst/render_coordinates/data_a_reg_i_28/O[2]
+                         net (fo=10, routed)          0.441     9.771    frame_inst/render_coordinates/x_reg[8]_0[2]
+    SLICE_X8Y64          LUT6 (Prop_lut6_I2_O)        0.244    10.015 f  frame_inst/render_coordinates/data_a_reg_i_81/O
+                         net (fo=1, routed)           0.330    10.345    frame_inst/render_coordinates/data_a_reg_i_81_n_0
+    SLICE_X8Y65          LUT5 (Prop_lut5_I2_O)        0.105    10.450 f  frame_inst/render_coordinates/data_a_reg_i_36/O
+                         net (fo=1, routed)           0.122    10.571    frame_inst/render_coordinates/data_a_reg_i_36_n_0
+    SLICE_X8Y65          LUT5 (Prop_lut5_I0_O)        0.105    10.676 f  frame_inst/render_coordinates/data_a_reg_i_18/O
+                         net (fo=32, routed)          0.613    11.289    frame_inst/render_coordinates/story_ui_inst/text_column[3]
+    SLICE_X9Y67          LUT2 (Prop_lut2_I0_O)        0.105    11.394 f  frame_inst/render_coordinates/char_d[3]_i_16/O
+                         net (fo=6, routed)           0.362    11.757    frame_inst/render_coordinates/char_d[3]_i_16_n_0
+    SLICE_X9Y66          LUT2 (Prop_lut2_I1_O)        0.105    11.862 r  frame_inst/render_coordinates/char_d[4]_i_14/O
+                         net (fo=4, routed)           0.323    12.185    frame_inst/render_coordinates/char_d[4]_i_14_n_0
+    SLICE_X9Y67          LUT2 (Prop_lut2_I1_O)        0.108    12.293 f  frame_inst/render_coordinates/char_d[5]_i_24/O
+                         net (fo=2, routed)           0.357    12.649    frame_inst/render_coordinates/char_d[5]_i_24_n_0
+    SLICE_X8Y66          LUT5 (Prop_lut5_I4_O)        0.267    12.916 r  frame_inst/render_coordinates/char_d[5]_i_9/O
+                         net (fo=1, routed)           0.350    13.267    frame_inst/render_coordinates/char_d[5]_i_9_n_0
+    SLICE_X8Y68          LUT5 (Prop_lut5_I3_O)        0.105    13.372 r  frame_inst/render_coordinates/char_d[5]_i_2/O
+                         net (fo=1, routed)           0.455    13.826    frame_inst/render_coordinates/char_d[5]_i_2_n_0
+    SLICE_X9Y68          LUT6 (Prop_lut6_I1_O)        0.105    13.931 r  frame_inst/render_coordinates/char_d[5]_i_1/O
+                         net (fo=1, routed)           0.000    13.931    frame_inst/story_ui_inst/text_layer/char_d_reg[5]_0[5]
+    SLICE_X9Y68          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[5]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.240    14.714    frame_inst/story_ui_inst/text_layer/clk_out1
+    SLICE_X9Y68          FDCE                                         r  frame_inst/story_ui_inst/text_layer/char_d_reg[5]/C
+                         clock pessimism              0.066    14.780    
+                         clock uncertainty           -0.234    14.546    
+    SLICE_X9Y68          FDCE (Setup_fdce_C_D)        0.032    14.578    frame_inst/story_ui_inst/text_layer/char_d_reg[5]
+  -------------------------------------------------------------------
+                         required time                         14.578    
+                         arrival time                         -13.931    
+  -------------------------------------------------------------------
+                         slack                                  0.647    
+
+Slack (MET) :             0.651ns  (required time - arrival time)
+  Source:                 hdmi_inst/av_encoder/serializer/TMDS_shift_3l_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Destination:            hdmi_inst/av_encoder/serializer/ODDR_3/D2
+                            (rising edge-triggered cell ODDR clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Path Group:             clk_out2_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.695ns  (clk_out2_hdmi_pll rise@2.695ns - clk_out2_hdmi_pll rise@0.000ns)
+  Data Path Delay:        0.949ns  (logic 0.348ns (36.686%)  route 0.601ns (63.314%))
+  Logic Levels:           0  
+  Clock Path Skew:        -0.061ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.300ns = ( 3.995 - 2.695 ) 
+    Source Clock Delay      (SCD):    1.428ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.190ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.373ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.428     1.428    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X3Y30          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_3l_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X3Y30          FDRE (Prop_fdre_C_Q)         0.348     1.776 r  hdmi_inst/av_encoder/serializer/TMDS_shift_3l_reg[0]/Q
+                         net (fo=1, routed)           0.601     2.376    hdmi_inst/av_encoder/serializer/TMDS_shift_3l[0]
+    OLOGIC_X0Y26         ODDR                                         r  hdmi_inst/av_encoder/serializer/ODDR_3/D2
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      2.695     2.695 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     2.695 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284     3.979    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.718     1.260 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.357     2.618    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.077     2.695 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.300     3.995    hdmi_inst/av_encoder/serializer/clk_out2
+    OLOGIC_X0Y26         ODDR                                         r  hdmi_inst/av_encoder/serializer/ODDR_3/C
+                         clock pessimism              0.066     4.061    
+                         clock uncertainty           -0.190     3.872    
+    OLOGIC_X0Y26         ODDR (Setup_oddr_C_D2)      -0.844     3.028    hdmi_inst/av_encoder/serializer/ODDR_3
+  -------------------------------------------------------------------
+                         required time                          3.028    
+                         arrival time                          -2.376    
+  -------------------------------------------------------------------
+                         slack                                  0.651    
+
+Slack (MET) :             0.696ns  (required time - arrival time)
+  Source:                 frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+                            (rising edge-triggered cell RAMB18E1 clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            sound_inst/en_reg[1]/CE
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.321ns  (logic 3.698ns (30.015%)  route 8.623ns (69.985%))
+  Logic Levels:           23  (LUT2=5 LUT3=2 LUT4=2 LUT5=4 LUT6=8 MUXF7=1 RAMD32=1)
+  Clock Path Skew:        -0.087ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.259ns = ( 14.732 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.411ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.411     1.411    frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/clka
+    RAMB18_X1Y17         RAMB18E1                                     r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+    RAMB18_X1Y17         RAMB18E1 (Prop_ramb18e1_CLKARDCLK_DOADO[9])
+                                                      0.734     2.145 r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/DOADO[9]
+                         net (fo=7, routed)           0.730     2.876    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_122_0[3]
+    SLICE_X49Y46         LUT2 (Prop_lut2_I0_O)        0.105     2.981 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8/O
+                         net (fo=6, routed)           0.660     3.640    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8_n_0
+    SLICE_X47Y44         LUT2 (Prop_lut2_I1_O)        0.108     3.748 f  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10/O
+                         net (fo=2, routed)           0.527     4.275    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10_n_0
+    SLICE_X47Y53         LUT6 (Prop_lut6_I3_O)        0.267     4.542 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_7/O
+                         net (fo=2, routed)           0.245     4.787    frame_inst/Playfield_inst/ghost_scanner1_inst_n_155
+    SLICE_X47Y55         LUT3 (Prop_lut3_I0_O)        0.105     4.892 r  frame_inst/Playfield_inst/Playfield_LUT3_177/O
+                         net (fo=24, routed)          0.692     5.584    frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DPRA4
+    SLICE_X50Y58         RAMD32 (Prop_ramd32_RADR4_O)
+                                                      0.106     5.690 f  frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DP/O
+                         net (fo=1, routed)           0.787     6.477    frame_inst/Playfield_inst/ghost_scanner1_inst/read_data[14]
+    SLICE_X47Y56         LUT6 (Prop_lut6_I3_O)        0.268     6.745 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209/O
+                         net (fo=1, routed)           0.000     6.745    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209_n_0
+    SLICE_X47Y56         MUXF7 (Prop_muxf7_I0_O)      0.178     6.923 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200/O
+                         net (fo=1, routed)           0.225     7.148    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200_n_0
+    SLICE_X45Y56         LUT3 (Prop_lut3_I2_O)        0.252     7.400 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192/O
+                         net (fo=1, routed)           0.225     7.625    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192_n_0
+    SLICE_X45Y55         LUT5 (Prop_lut5_I4_O)        0.105     7.730 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170/O
+                         net (fo=1, routed)           0.205     7.935    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170_n_0
+    SLICE_X45Y55         LUT6 (Prop_lut6_I2_O)        0.105     8.040 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121/O
+                         net (fo=1, routed)           0.350     8.390    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121_n_0
+    SLICE_X44Y52         LUT5 (Prop_lut5_I0_O)        0.105     8.495 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58/O
+                         net (fo=1, routed)           0.460     8.955    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58_n_0
+    SLICE_X44Y53         LUT6 (Prop_lut6_I5_O)        0.105     9.060 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21/O
+                         net (fo=1, routed)           0.222     9.281    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21_n_0
+    SLICE_X45Y52         LUT6 (Prop_lut6_I5_O)        0.105     9.386 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10/O
+                         net (fo=1, routed)           0.241     9.628    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10_n_0
+    SLICE_X44Y50         LUT5 (Prop_lut5_I4_O)        0.105     9.733 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_6/O
+                         net (fo=3, routed)           0.389    10.122    frame_inst/Playfield_inst/ghost_scanner1_inst_n_107
+    SLICE_X43Y48         LUT4 (Prop_lut4_I2_O)        0.105    10.227 f  frame_inst/Playfield_inst/Playfield_LUT4_119/O
+                         net (fo=5, routed)           0.376    10.603    Game_state_machine_inst/blk_rot1
+    SLICE_X42Y45         LUT5 (Prop_lut5_I0_O)        0.105    10.708 f  Game_state_machine_inst/Game_state_mach_LUT5_11/O
+                         net (fo=2, routed)           0.237    10.945    frame_inst/Playfield_inst/hold_controller_inst/en_reg[0]_5
+    SLICE_X41Y45         LUT4 (Prop_lut4_I1_O)        0.105    11.050 f  frame_inst/Playfield_inst/hold_controller_inst/Playfield_hold__LUT4_3/O
+                         net (fo=2, routed)           0.237    11.287    Game_state_machine_inst/en_reg[2]
+    SLICE_X43Y45         LUT6 (Prop_lut6_I0_O)        0.105    11.392 f  Game_state_machine_inst/Game_state_mach_LUT6_7/O
+                         net (fo=3, routed)           0.253    11.645    Game_state_machine_inst/Game_state_mach_net_22
+    SLICE_X42Y44         LUT2 (Prop_lut2_I1_O)        0.105    11.750 f  Game_state_machine_inst/Game_state_mach_LUT2_45/O
+                         net (fo=2, routed)           0.382    12.132    Game_state_machine_inst/Game_state_mach_net_25
+    SLICE_X42Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.237 f  Game_state_machine_inst/Game_state_mach_LUT2_47/O
+                         net (fo=3, routed)           0.328    12.565    Game_state_machine_inst/Game_state_mach_net_29
+    SLICE_X43Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.670 r  Game_state_machine_inst/Game_state_mach_LUT2_51/O
+                         net (fo=2, routed)           0.353    13.024    Game_state_machine_inst/lock_t2_reg_0
+    SLICE_X43Y44         LUT6 (Prop_lut6_I5_O)        0.105    13.129 f  Game_state_machine_inst/Game_state_mach_LUT6_11/O
+                         net (fo=2, routed)           0.235    13.364    sound_inst/en_reg[0]_3
+    SLICE_X41Y44         LUT6 (Prop_lut6_I1_O)        0.105    13.469 r  sound_inst/en[4]_i_1/O
+                         net (fo=5, routed)           0.263    13.732    sound_inst/en[4]_i_1_n_0
+    SLICE_X42Y44         FDCE                                         r  sound_inst/en_reg[1]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.259    14.732    sound_inst/clk_out1
+    SLICE_X42Y44         FDCE                                         r  sound_inst/en_reg[1]/C
+                         clock pessimism              0.066    14.798    
+                         clock uncertainty           -0.234    14.565    
+    SLICE_X42Y44         FDCE (Setup_fdce_C_CE)      -0.136    14.429    sound_inst/en_reg[1]
+  -------------------------------------------------------------------
+                         required time                         14.429    
+                         arrival time                         -13.732    
+  -------------------------------------------------------------------
+                         slack                                  0.696    
+
+Slack (MET) :             0.696ns  (required time - arrival time)
+  Source:                 frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+                            (rising edge-triggered cell RAMB18E1 clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            sound_inst/en_reg[3]/CE
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.321ns  (logic 3.698ns (30.015%)  route 8.623ns (69.985%))
+  Logic Levels:           23  (LUT2=5 LUT3=2 LUT4=2 LUT5=4 LUT6=8 MUXF7=1 RAMD32=1)
+  Clock Path Skew:        -0.087ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.259ns = ( 14.732 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.411ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.411     1.411    frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/clka
+    RAMB18_X1Y17         RAMB18E1                                     r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+    RAMB18_X1Y17         RAMB18E1 (Prop_ramb18e1_CLKARDCLK_DOADO[9])
+                                                      0.734     2.145 r  frame_inst/Playfield_inst/weiyibiao_inst/U0/inst_blk_mem_gen/gnbram.gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/prim_init.ram/DEVICE_7SERIES.NO_BMM_INFO.SP.WIDE_PRIM18.ram/DOADO[9]
+                         net (fo=7, routed)           0.730     2.876    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_122_0[3]
+    SLICE_X49Y46         LUT2 (Prop_lut2_I0_O)        0.105     2.981 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8/O
+                         net (fo=6, routed)           0.660     3.640    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].rotate1_i_8_n_0
+    SLICE_X47Y44         LUT2 (Prop_lut2_I1_O)        0.108     3.748 f  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10/O
+                         net (fo=2, routed)           0.527     4.275    frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_10_n_0
+    SLICE_X47Y53         LUT6 (Prop_lut6_I3_O)        0.267     4.542 r  frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[2].rotate1_i_7/O
+                         net (fo=2, routed)           0.245     4.787    frame_inst/Playfield_inst/ghost_scanner1_inst_n_155
+    SLICE_X47Y55         LUT3 (Prop_lut3_I0_O)        0.105     4.892 r  frame_inst/Playfield_inst/Playfield_LUT3_177/O
+                         net (fo=24, routed)          0.692     5.584    frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DPRA4
+    SLICE_X50Y58         RAMD32 (Prop_ramd32_RADR4_O)
+                                                      0.106     5.690 f  frame_inst/Playfield_inst/board_reads[2].rotate1/bits[14].ram/DP/O
+                         net (fo=1, routed)           0.787     6.477    frame_inst/Playfield_inst/ghost_scanner1_inst/read_data[14]
+    SLICE_X47Y56         LUT6 (Prop_lut6_I3_O)        0.268     6.745 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209/O
+                         net (fo=1, routed)           0.000     6.745    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_209_n_0
+    SLICE_X47Y56         MUXF7 (Prop_muxf7_I0_O)      0.178     6.923 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200/O
+                         net (fo=1, routed)           0.225     7.148    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c_reg[2]_i_200_n_0
+    SLICE_X45Y56         LUT3 (Prop_lut3_I2_O)        0.252     7.400 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192/O
+                         net (fo=1, routed)           0.225     7.625    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_192_n_0
+    SLICE_X45Y55         LUT5 (Prop_lut5_I4_O)        0.105     7.730 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170/O
+                         net (fo=1, routed)           0.205     7.935    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_170_n_0
+    SLICE_X45Y55         LUT6 (Prop_lut6_I2_O)        0.105     8.040 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121/O
+                         net (fo=1, routed)           0.350     8.390    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_121_n_0
+    SLICE_X44Y52         LUT5 (Prop_lut5_I0_O)        0.105     8.495 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58/O
+                         net (fo=1, routed)           0.460     8.955    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_58_n_0
+    SLICE_X44Y53         LUT6 (Prop_lut6_I5_O)        0.105     9.060 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21/O
+                         net (fo=1, routed)           0.222     9.281    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_21_n_0
+    SLICE_X45Y52         LUT6 (Prop_lut6_I5_O)        0.105     9.386 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10/O
+                         net (fo=1, routed)           0.241     9.628    frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_10_n_0
+    SLICE_X44Y50         LUT5 (Prop_lut5_I4_O)        0.105     9.733 f  frame_inst/Playfield_inst/ghost_scanner1_inst/counter_c[2]_i_6/O
+                         net (fo=3, routed)           0.389    10.122    frame_inst/Playfield_inst/ghost_scanner1_inst_n_107
+    SLICE_X43Y48         LUT4 (Prop_lut4_I2_O)        0.105    10.227 f  frame_inst/Playfield_inst/Playfield_LUT4_119/O
+                         net (fo=5, routed)           0.376    10.603    Game_state_machine_inst/blk_rot1
+    SLICE_X42Y45         LUT5 (Prop_lut5_I0_O)        0.105    10.708 f  Game_state_machine_inst/Game_state_mach_LUT5_11/O
+                         net (fo=2, routed)           0.237    10.945    frame_inst/Playfield_inst/hold_controller_inst/en_reg[0]_5
+    SLICE_X41Y45         LUT4 (Prop_lut4_I1_O)        0.105    11.050 f  frame_inst/Playfield_inst/hold_controller_inst/Playfield_hold__LUT4_3/O
+                         net (fo=2, routed)           0.237    11.287    Game_state_machine_inst/en_reg[2]
+    SLICE_X43Y45         LUT6 (Prop_lut6_I0_O)        0.105    11.392 f  Game_state_machine_inst/Game_state_mach_LUT6_7/O
+                         net (fo=3, routed)           0.253    11.645    Game_state_machine_inst/Game_state_mach_net_22
+    SLICE_X42Y44         LUT2 (Prop_lut2_I1_O)        0.105    11.750 f  Game_state_machine_inst/Game_state_mach_LUT2_45/O
+                         net (fo=2, routed)           0.382    12.132    Game_state_machine_inst/Game_state_mach_net_25
+    SLICE_X42Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.237 f  Game_state_machine_inst/Game_state_mach_LUT2_47/O
+                         net (fo=3, routed)           0.328    12.565    Game_state_machine_inst/Game_state_mach_net_29
+    SLICE_X43Y44         LUT2 (Prop_lut2_I0_O)        0.105    12.670 r  Game_state_machine_inst/Game_state_mach_LUT2_51/O
+                         net (fo=2, routed)           0.353    13.024    Game_state_machine_inst/lock_t2_reg_0
+    SLICE_X43Y44         LUT6 (Prop_lut6_I5_O)        0.105    13.129 f  Game_state_machine_inst/Game_state_mach_LUT6_11/O
+                         net (fo=2, routed)           0.235    13.364    sound_inst/en_reg[0]_3
+    SLICE_X41Y44         LUT6 (Prop_lut6_I1_O)        0.105    13.469 r  sound_inst/en[4]_i_1/O
+                         net (fo=5, routed)           0.263    13.732    sound_inst/en[4]_i_1_n_0
+    SLICE_X42Y44         FDCE                                         r  sound_inst/en_reg[3]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.259    14.732    sound_inst/clk_out1
+    SLICE_X42Y44         FDCE                                         r  sound_inst/en_reg[3]/C
+                         clock pessimism              0.066    14.798    
+                         clock uncertainty           -0.234    14.565    
+    SLICE_X42Y44         FDCE (Setup_fdce_C_CE)      -0.136    14.429    sound_inst/en_reg[3]
+  -------------------------------------------------------------------
+                         required time                         14.429    
+                         arrival time                         -13.732    
+  -------------------------------------------------------------------
+                         slack                                  0.696    
+
+Slack (MET) :             0.787ns  (required time - arrival time)
+  Source:                 hdmi_inst/av_encoder/serializer/TMDS_shift_3h_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Destination:            hdmi_inst/av_encoder/serializer/ODDR_3/D1
+                            (rising edge-triggered cell ODDR clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Path Group:             clk_out2_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.695ns  (clk_out2_hdmi_pll rise@2.695ns - clk_out2_hdmi_pll rise@0.000ns)
+  Data Path Delay:        0.950ns  (logic 0.379ns (39.885%)  route 0.571ns (60.115%))
+  Logic Levels:           0  
+  Clock Path Skew:        -0.061ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.300ns = ( 3.995 - 2.695 ) 
+    Source Clock Delay      (SCD):    1.428ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.190ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.373ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.428     1.428    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X3Y30          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_3h_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X3Y30          FDRE (Prop_fdre_C_Q)         0.379     1.807 r  hdmi_inst/av_encoder/serializer/TMDS_shift_3h_reg[0]/Q
+                         net (fo=1, routed)           0.571     2.378    hdmi_inst/av_encoder/serializer/TMDS_shift_3h[0]
+    OLOGIC_X0Y26         ODDR                                         r  hdmi_inst/av_encoder/serializer/ODDR_3/D1
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      2.695     2.695 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     2.695 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284     3.979    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.718     1.260 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.357     2.618    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.077     2.695 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.300     3.995    hdmi_inst/av_encoder/serializer/clk_out2
+    OLOGIC_X0Y26         ODDR                                         r  hdmi_inst/av_encoder/serializer/ODDR_3/C
+                         clock pessimism              0.066     4.061    
+                         clock uncertainty           -0.190     3.872    
+    OLOGIC_X0Y26         ODDR (Setup_oddr_C_D1)      -0.707     3.165    hdmi_inst/av_encoder/serializer/ODDR_3
+  -------------------------------------------------------------------
+                         required time                          3.165    
+                         arrival time                          -2.378    
+  -------------------------------------------------------------------
+                         slack                                  0.787    
+
+Slack (MET) :             0.787ns  (required time - arrival time)
+  Source:                 Game_state_machine_inst/choose_cnt_reg[3]/C
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Destination:            frame_inst/story_ui_inst/material_type_d_reg[1]/D
+                            (rising edge-triggered cell FDCE clocked by clk_out1_hdmi_pll  {rise@0.000ns fall@6.737ns period=13.474ns})
+  Path Group:             clk_out1_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.474ns  (clk_out1_hdmi_pll rise@13.474ns - clk_out1_hdmi_pll rise@0.000ns)
+  Data Path Delay:        12.457ns  (logic 4.161ns (33.404%)  route 8.296ns (66.596%))
+  Logic Levels:           25  (CARRY4=3 LUT2=2 LUT4=5 LUT5=3 LUT6=12)
+  Clock Path Skew:        -0.028ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.248ns = ( 14.722 - 13.474 ) 
+    Source Clock Delay      (SCD):    1.342ns
+    Clock Pessimism Removal (CPR):    0.066ns
+  Clock Uncertainty:      0.234ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.462ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.342     1.342    Game_state_machine_inst/clk_out1
+    SLICE_X33Y69         FDCE                                         r  Game_state_machine_inst/choose_cnt_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X33Y69         FDCE (Prop_fdce_C_Q)         0.379     1.721 f  Game_state_machine_inst/choose_cnt_reg[3]/Q
+                         net (fo=4, routed)           0.431     2.152    Game_state_machine_inst/choose_cnt_reg_n_0_[3]
+    SLICE_X33Y69         LUT4 (Prop_lut4_I3_O)        0.105     2.257 r  Game_state_machine_inst/Game_state_mach_LUT4/O
+                         net (fo=382, routed)         0.804     3.061    Game_state_machine_inst/Game_state_mach_net
+    SLICE_X30Y65         LUT2 (Prop_lut2_I1_O)        0.105     3.166 r  Game_state_machine_inst/Game_state_mach_LUT2/O
+                         net (fo=4, routed)           0.376     3.542    frame_inst/render_coordinates/material_x_d[4]_i_14_1[0]
+    SLICE_X32Y63         CARRY4 (Prop_carry4_S[0]_O[2])
+                                                      0.558     4.100 r  frame_inst/render_coordinates/material_x_d_reg[4]_i_15/O[2]
+                         net (fo=6, routed)           0.828     4.928    frame_inst/render_coordinates/Playfield_inst/story_mapping.mapper/sel0[3]
+    SLICE_X34Y63         LUT6 (Prop_lut6_I2_O)        0.253     5.181 r  frame_inst/render_coordinates/material_x_d[3]_i_9/O
+                         net (fo=1, routed)           0.130     5.311    frame_inst/render_coordinates/material_x_d[3]_i_9_n_0
+    SLICE_X34Y63         LUT4 (Prop_lut4_I3_O)        0.105     5.416 f  frame_inst/render_coordinates/material_x_d[3]_i_5/O
+                         net (fo=1, routed)           0.232     5.647    frame_inst/render_coordinates/material_x_d[3]_i_5_n_0
+    SLICE_X34Y64         LUT4 (Prop_lut4_I0_O)        0.105     5.752 r  frame_inst/render_coordinates/material_x_d[3]_i_4/O
+                         net (fo=7, routed)           0.379     6.131    frame_inst/render_coordinates/material_x_d[3]_i_4_n_0
+    SLICE_X35Y64         LUT5 (Prop_lut5_I3_O)        0.105     6.236 r  frame_inst/render_coordinates/material_x_d[4]_i_6/O
+                         net (fo=2, routed)           0.499     6.734    frame_inst/render_coordinates/material_x_d[4]_i_6_n_0
+    SLICE_X33Y63         CARRY4 (Prop_carry4_DI[1]_CO[3])
+                                                      0.418     7.152 r  frame_inst/render_coordinates/material_x_d_reg[4]_i_2/CO[3]
+                         net (fo=1, routed)           0.000     7.152    frame_inst/render_coordinates/material_x_d_reg[4]_i_2_n_0
+    SLICE_X33Y64         CARRY4 (Prop_carry4_CI_O[2])
+                                                      0.200     7.352 r  frame_inst/render_coordinates/material_owner_d_reg_i_63/O[2]
+                         net (fo=1, routed)           0.345     7.698    frame_inst/story_ui_inst/lx2_out[5]
+    SLICE_X32Y62         LUT6 (Prop_lut6_I1_O)        0.253     7.951 f  frame_inst/story_ui_inst/story_ui_LUT6_1/O
+                         net (fo=1, routed)           0.222     8.173    frame_inst/story_ui_inst/story_ui_net
+    SLICE_X33Y62         LUT6 (Prop_lut6_I5_O)        0.105     8.278 f  frame_inst/story_ui_inst/story_ui_LUT6_2/O
+                         net (fo=1, routed)           0.243     8.521    frame_inst/story_ui_inst/story_ui_net_1
+    SLICE_X35Y62         LUT2 (Prop_lut2_I1_O)        0.105     8.626 r  frame_inst/story_ui_inst/story_ui_LUT2_2/O
+                         net (fo=1, routed)           0.233     8.859    frame_inst/render_coordinates/material_owner_d_i_8_0
+    SLICE_X34Y61         LUT6 (Prop_lut6_I1_O)        0.105     8.964 r  frame_inst/render_coordinates/material_owner_d_i_20/O
+                         net (fo=1, routed)           0.125     9.090    frame_inst/render_coordinates/material_owner_d_i_20_n_0
+    SLICE_X34Y61         LUT6 (Prop_lut6_I5_O)        0.105     9.195 f  frame_inst/render_coordinates/material_owner_d_i_8/O
+                         net (fo=9, routed)           0.262     9.456    frame_inst/render_coordinates/pixel_visible
+    SLICE_X35Y61         LUT6 (Prop_lut6_I0_O)        0.105     9.561 f  frame_inst/render_coordinates/material_owner_d_i_15/O
+                         net (fo=2, routed)           0.246     9.807    frame_inst/Playfield_inst/material_owner_d_reg
+    SLICE_X35Y59         LUT6 (Prop_lut6_I2_O)        0.105     9.912 f  frame_inst/Playfield_inst/Playfield_LUT6_91/O
+                         net (fo=1, routed)           0.405    10.317    frame_inst/Playfield_inst/Playfield_net_157
+    SLICE_X29Y55         LUT5 (Prop_lut5_I4_O)        0.105    10.422 f  frame_inst/Playfield_inst/Playfield_LUT5_102/O
+                         net (fo=1, routed)           0.313    10.736    frame_inst/Playfield_inst/Playfield_net_159
+    SLICE_X29Y54         LUT5 (Prop_lut5_I3_O)        0.105    10.841 r  frame_inst/Playfield_inst/Playfield_LUT5_104/O
+                         net (fo=1, routed)           0.329    11.170    frame_inst/Playfield_inst/Playfield_net_162
+    SLICE_X28Y54         LUT6 (Prop_lut6_I5_O)        0.105    11.275 r  frame_inst/Playfield_inst/Playfield_LUT6_93/O
+                         net (fo=1, routed)           0.332    11.606    frame_inst/Playfield_inst/Playfield_net_165
+    SLICE_X28Y55         LUT4 (Prop_lut4_I3_O)        0.105    11.711 f  frame_inst/Playfield_inst/Playfield_LUT4_22/O
+                         net (fo=11, routed)          0.365    12.076    frame_inst/Playfield_inst/Playfield_net_1488
+    SLICE_X28Y55         LUT6 (Prop_lut6_I5_O)        0.105    12.181 r  frame_inst/Playfield_inst/Playfield_LUT6_1249/O
+                         net (fo=4, routed)           0.505    12.686    frame_inst/Playfield_inst/ghost_scanner1_inst/hint_draw
+    SLICE_X15Y55         LUT6 (Prop_lut6_I3_O)        0.105    12.791 f  frame_inst/Playfield_inst/ghost_scanner1_inst/material_type_d[2]_i_5/O
+                         net (fo=3, routed)           0.359    13.150    frame_inst/Playfield_inst/ghost_scanner1_inst/material_type_d[2]_i_5_n_0
+    SLICE_X15Y54         LUT6 (Prop_lut6_I0_O)        0.105    13.255 r  frame_inst/Playfield_inst/ghost_scanner1_inst/material_type_d[1]_i_3/O
+                         net (fo=1, routed)           0.113    13.368    frame_inst/Playfield_inst/ghost_scanner1_inst/material_type_d[1]_i_3_n_0
+    SLICE_X15Y54         LUT6 (Prop_lut6_I4_O)        0.105    13.473 r  frame_inst/Playfield_inst/ghost_scanner1_inst/material_type_d[1]_i_2/O
+                         net (fo=1, routed)           0.221    13.694    frame_inst/Playfield_inst/ghost_scanner1_inst/material_type_d[1]_i_2_n_0
+    SLICE_X15Y53         LUT4 (Prop_lut4_I0_O)        0.105    13.799 r  frame_inst/Playfield_inst/ghost_scanner1_inst/material_type_d[1]_i_1/O
+                         net (fo=1, routed)           0.000    13.799    frame_inst/story_ui_inst/material_type_d_reg[2]_0[1]
+    SLICE_X15Y53         FDCE                                         r  frame_inst/story_ui_inst/material_type_d_reg[1]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out1_hdmi_pll rise edge)
+                                                     13.474    13.474 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000    13.474 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284    14.757    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT0)
+                                                     -2.718    12.039 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT0
+                         net (fo=1, routed)           1.357    13.397    hdmi_inst/hdmi_pll_inst/inst/clk_out1_hdmi_pll
+    BUFGCTRL_X0Y2        BUFG (Prop_bufg_I_O)         0.077    13.474 r  hdmi_inst/hdmi_pll_inst/inst/clkout1_buf/O
+                         net (fo=5973, routed)        1.248    14.722    frame_inst/story_ui_inst/clk_out1
+    SLICE_X15Y53         FDCE                                         r  frame_inst/story_ui_inst/material_type_d_reg[1]/C
+                         clock pessimism              0.066    14.788    
+                         clock uncertainty           -0.234    14.554    
+    SLICE_X15Y53         FDCE (Setup_fdce_C_D)        0.032    14.586    frame_inst/story_ui_inst/material_type_d_reg[1]
+  -------------------------------------------------------------------
+                         required time                         14.586    
+                         arrival time                         -13.799    
+  -------------------------------------------------------------------
+                         slack                                  0.787    
+
+Slack (MET) :             0.797ns  (required time - arrival time)
+  Source:                 hdmi_inst/av_encoder/serializer/TMDS_mod5_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Destination:            hdmi_inst/av_encoder/serializer/TMDS_shift_0h_reg[4]/R
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Path Group:             clk_out2_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.695ns  (clk_out2_hdmi_pll rise@2.695ns - clk_out2_hdmi_pll rise@0.000ns)
+  Data Path Delay:        1.261ns  (logic 0.590ns (46.791%)  route 0.671ns (53.209%))
+  Logic Levels:           1  (LUT1=1)
+  Clock Path Skew:        -0.024ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.323ns = ( 4.018 - 2.695 ) 
+    Source Clock Delay      (SCD):    1.429ns
+    Clock Pessimism Removal (CPR):    0.082ns
+  Clock Uncertainty:      0.190ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.373ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.429     1.429    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X3Y31          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_mod5_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X3Y31          FDRE (Prop_fdre_C_Q)         0.348     1.777 f  hdmi_inst/av_encoder/serializer/TMDS_mod5_reg[2]/Q
+                         net (fo=36, routed)          0.411     2.187    hdmi_inst/av_encoder/serializer/p_4_in
+    SLICE_X3Y31          LUT1 (Prop_lut1_I0_O)        0.242     2.429 r  hdmi_inst/av_encoder/serializer/TMDS_shift_0h[4]_i_1/O
+                         net (fo=6, routed)           0.260     2.690    hdmi_inst/av_encoder/serializer/TMDS_shift_0h[4]_i_1_n_0
+    SLICE_X2Y32          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_0h_reg[4]/R
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      2.695     2.695 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     2.695 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284     3.979    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.718     1.260 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.357     2.618    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.077     2.695 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.323     4.018    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X2Y32          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_0h_reg[4]/C
+                         clock pessimism              0.082     4.100    
+                         clock uncertainty           -0.190     3.910    
+    SLICE_X2Y32          FDRE (Setup_fdre_C_R)       -0.423     3.487    hdmi_inst/av_encoder/serializer/TMDS_shift_0h_reg[4]
+  -------------------------------------------------------------------
+                         required time                          3.487    
+                         arrival time                          -2.690    
+  -------------------------------------------------------------------
+                         slack                                  0.797    
+
+Slack (MET) :             0.797ns  (required time - arrival time)
+  Source:                 hdmi_inst/av_encoder/serializer/TMDS_mod5_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Destination:            hdmi_inst/av_encoder/serializer/TMDS_shift_0l_reg[4]/R
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Path Group:             clk_out2_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.695ns  (clk_out2_hdmi_pll rise@2.695ns - clk_out2_hdmi_pll rise@0.000ns)
+  Data Path Delay:        1.261ns  (logic 0.590ns (46.791%)  route 0.671ns (53.209%))
+  Logic Levels:           1  (LUT1=1)
+  Clock Path Skew:        -0.024ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.323ns = ( 4.018 - 2.695 ) 
+    Source Clock Delay      (SCD):    1.429ns
+    Clock Pessimism Removal (CPR):    0.082ns
+  Clock Uncertainty:      0.190ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.373ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.429     1.429    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X3Y31          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_mod5_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X3Y31          FDRE (Prop_fdre_C_Q)         0.348     1.777 f  hdmi_inst/av_encoder/serializer/TMDS_mod5_reg[2]/Q
+                         net (fo=36, routed)          0.411     2.187    hdmi_inst/av_encoder/serializer/p_4_in
+    SLICE_X3Y31          LUT1 (Prop_lut1_I0_O)        0.242     2.429 r  hdmi_inst/av_encoder/serializer/TMDS_shift_0h[4]_i_1/O
+                         net (fo=6, routed)           0.260     2.690    hdmi_inst/av_encoder/serializer/TMDS_shift_0h[4]_i_1_n_0
+    SLICE_X2Y32          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_0l_reg[4]/R
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      2.695     2.695 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     2.695 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284     3.979    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.718     1.260 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.357     2.618    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.077     2.695 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.323     4.018    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X2Y32          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_0l_reg[4]/C
+                         clock pessimism              0.082     4.100    
+                         clock uncertainty           -0.190     3.910    
+    SLICE_X2Y32          FDRE (Setup_fdre_C_R)       -0.423     3.487    hdmi_inst/av_encoder/serializer/TMDS_shift_0l_reg[4]
+  -------------------------------------------------------------------
+                         required time                          3.487    
+                         arrival time                          -2.690    
+  -------------------------------------------------------------------
+                         slack                                  0.797    
+
+Slack (MET) :             0.797ns  (required time - arrival time)
+  Source:                 hdmi_inst/av_encoder/serializer/TMDS_mod5_reg[2]/C
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Destination:            hdmi_inst/av_encoder/serializer/TMDS_shift_1h_reg[4]/R
+                            (rising edge-triggered cell FDRE clocked by clk_out2_hdmi_pll  {rise@0.000ns fall@1.347ns period=2.695ns})
+  Path Group:             clk_out2_hdmi_pll
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            2.695ns  (clk_out2_hdmi_pll rise@2.695ns - clk_out2_hdmi_pll rise@0.000ns)
+  Data Path Delay:        1.261ns  (logic 0.590ns (46.791%)  route 0.671ns (53.209%))
+  Logic Levels:           1  (LUT1=1)
+  Clock Path Skew:        -0.024ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    1.323ns = ( 4.018 - 2.695 ) 
+    Source Clock Delay      (SCD):    1.429ns
+    Clock Pessimism Removal (CPR):    0.082ns
+  Clock Uncertainty:      0.190ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Discrete Jitter          (DJ):    0.373ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      0.000     0.000 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     0.000 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.388     1.388    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.893    -1.506 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.425    -0.081    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.081     0.000 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.429     1.429    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X3Y31          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_mod5_reg[2]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X3Y31          FDRE (Prop_fdre_C_Q)         0.348     1.777 f  hdmi_inst/av_encoder/serializer/TMDS_mod5_reg[2]/Q
+                         net (fo=36, routed)          0.411     2.187    hdmi_inst/av_encoder/serializer/p_4_in
+    SLICE_X3Y31          LUT1 (Prop_lut1_I0_O)        0.242     2.429 r  hdmi_inst/av_encoder/serializer/TMDS_shift_0h[4]_i_1/O
+                         net (fo=6, routed)           0.260     2.690    hdmi_inst/av_encoder/serializer/TMDS_shift_0h[4]_i_1_n_0
+    SLICE_X2Y32          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_1h_reg[4]/R
+  -------------------------------------------------------------------    -------------------
+
+                         (clock clk_out2_hdmi_pll rise edge)
+                                                      2.695     2.695 r  
+    BUFGCTRL_X0Y3        BUFG                         0.000     2.695 r  Clk_IBUF_BUFG_inst/O
+                         net (fo=46, routed)          1.284     3.979    hdmi_inst/hdmi_pll_inst/inst/clk_in1
+    MMCME2_ADV_X0Y0      MMCME2_ADV (Prop_mmcme2_adv_CLKIN1_CLKOUT1)
+                                                     -2.718     1.260 r  hdmi_inst/hdmi_pll_inst/inst/mmcm_adv_inst/CLKOUT1
+                         net (fo=1, routed)           1.357     2.618    hdmi_inst/hdmi_pll_inst/inst/clk_out2_hdmi_pll
+    BUFGCTRL_X0Y1        BUFG (Prop_bufg_I_O)         0.077     2.695 r  hdmi_inst/hdmi_pll_inst/inst/clkout2_buf/O
+                         net (fo=45, routed)          1.323     4.018    hdmi_inst/av_encoder/serializer/clk_out2
+    SLICE_X2Y32          FDRE                                         r  hdmi_inst/av_encoder/serializer/TMDS_shift_1h_reg[4]/C
+                         clock pessimism              0.082     4.100    
+                         clock uncertainty           -0.190     3.910    
+    SLICE_X2Y32          FDRE (Setup_fdre_C_R)       -0.423     3.487    hdmi_inst/av_encoder/serializer/TMDS_shift_1h_reg[4]
+  -------------------------------------------------------------------
+                         required time                          3.487    
+                         arrival time                          -2.690    
+  -------------------------------------------------------------------
+                         slack                                  0.797    
+
+
+
+

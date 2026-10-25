@@ -1,20 +1,20 @@
 # FPGA 俄罗斯方块 (Tetris)
 
-> 2026-10-25 音频整合：四阶段配乐、机械操作音、七句 CORE-07 通信及播放同步字幕已统一通过 HDMI；两个原蜂鸣器静音。17 套回归与完整布线通过，人工听感未测（用户要求不等待反馈）。实测 9,360 LUT / 4,754 寄存器 / 25 BRAM / 0 DSP，WNS +0.337 / WHS +0.067 ns。详见 [音频报告](docs/reports/story_r6_audio/build-summary.txt)。新增 UI 美化尚未实施。
+> 2026-10-25 完成故事音频和UI：四阶段配乐、机械音、七句通信及同步字幕均走HDMI；机械像素卡座、场地、四支路核心、阶段背景与结算已实施。17套回归、13场景RTL预览与完整布线通过。资源 **10,286 LUT / 4,760 寄存器 / 25 BRAM / 0 DSP**，WNS **+0.204** / WHS **+0.065 ns**。新UI实屏与整合音频试听未测，按用户要求不等待反馈。[实施报告](<D:/vivado_project/Tetris/docs/reports/story_r3_ui_complete/build-summary.txt>) · [四阶段预览](<D:/vivado_project/Tetris/docs/assets/story_ui/four_phases.png>)。
 
 ## 比特流存放规则
 
 唯一开发目录为 `D:/vivado_project/Tetris`，本地和 GitHub 只维护 `main`。历史版本保存在 Git 提交中，不再复制工程或保留并行版本目录。最新下载文件为 `bit/Tetris.bit`，成功构建后覆盖更新；Vivado 内部 `.runs` 文件仅作为构建缓存。
 
-当前发布为故事化 2A 的时序基础版本：保留第 1 轮单人 32 行、双人 40 行通关和四段八档任务；静态标签改行掩码查询。15 套完整回归通过，尚未上板。布线后 LUT **11,786**（较任务轮减少 136）、寄存器 **4,525**、BRAM **15.5 tile**，WNS **+0.138 ns** / WHS **+0.107 ns**。布局仍为旧坐标；24 格距 mapper 仅完成独立验证，新字库尚未替换。报告见[2A 构建摘要](<D:/vivado_project/Tetris/docs/reports/story_r2a_labels/build-summary.txt>)。
+历史2A任务/时序基线见[构建摘要](<D:/vivado_project/Tetris/docs/reports/story_r2a_labels/build-summary.txt>)；它不代表当前源码或当前发布bit。
 
-当前操作音已通过 HDMI，维持 ±1024 的低振幅；背景音乐仍走蜂鸣器，统一 HDMI 的阶段配乐与配音尚待实施。用户曾确认较早 HDMI 音效版上板成功，不等于本轮已上板。
+配乐、机械操作音与七句通信已统一通过HDMI，蜂鸣器端口恒零。人工试听未执行，用户明确要求不等待反馈。
 
 音效开发前基线在场地 LUTRAM 上优化颜色/归属存储和智能提示：布线后 LUT 为 **11,525 (55.41%)**，较 LUTRAM 基线 17,272 再省 **5,747 (33.27%)**，寄存器为 4,237，WNS +0.239 ns、WHS +0.070 ns。逐轮取舍、验证及报告路径见 [逐轮优化记录](<D:/vivado_project/Tetris/docs/optimization-rounds.md>)；此前基线见 [LUTRAM 重试](<D:/vivado_project/Tetris/docs/lutram-retry.md>)。该音频加入前的参考版本已上板验证，历史版本通过 Git 提交保留。
 
 基于 Verilog HDL 在 Artix-7 FPGA 上实现的俄罗斯方块游戏。画面通过 HDMI (TMDS) 输出，集成双人同场、智能落点、故事板 UI、程序化音效与 PC 画面镜像。
 
-单一工作区的整合、历史恢复入口及验证见[工作区统一记录](<D:/vivado_project/Tetris/docs/workspace-unification.md>)。后续故事化改造以[代码与资源实施计划书](<D:/vivado_project/Tetris/docs/CORE-07_故事感实施计划书.md>)为准，第 1 轮任务闭环和 2A 时序基础已实现，新布局、阶段画面、配乐和配音仍在实施；2026-10-25 修订加入[执行门禁](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)与[建议评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
+单一工作区的整合、历史恢复入口及验证见[工作区统一记录](<D:/vivado_project/Tetris/docs/workspace-unification.md>)。后续故事化改造以[代码与资源实施计划书](<D:/vivado_project/Tetris/docs/CORE-07_故事感实施计划书.md>)为准，任务闭环、M1布局/阶段画面和M2配乐/配音已实现，UI细化已按[修订计划](<D:/vivado_project/Tetris/docs/UI美化计划书.md>)；2026-10-25 修订加入[执行门禁](<D:/vivado_project/Tetris/docs/story-execution-gates.md>)与[建议评审取舍](<D:/vivado_project/Tetris/docs/story-review-decisions-20261025.md>)。
 
 ## HDMI 音效开发前历史归档（2026-10-24）
 
@@ -24,13 +24,13 @@ HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模�
 
 ## HDMI 游戏音效功能与历史测试基线
 
-发布分支：`main`。现有游戏音效通过 HDMI 输出为 **48 kHz、16 位、双声道 LPCM**（左右相同），保留蜂鸣器便于对照。背景音乐仍走原蜂鸣器，本次先验证操作与状态音效。
+当前分支：`main`。音频输出 **48 kHz、16 位、双声道 LPCM**（左右相同）；四阶段两声部配乐、程序化FX和8k ADPCM语音共用采样使能与混音器，蜂鸣器静音。以下13套数字为故事化前历史协议基线。
 
-- 模块划分：`sound` 事件/音符 → `game_audio_pcm` 采样 → `hdmi_audio_packets` FIFO/ACR/InfoFrame → `hdmi_av_encoder` 数据岛/TMDS。
+- 音频：`sound`→`audio_synth`、`music`、`story_comms`→`voice_player`，共用`game_audio_pcm`的48k使能→`audio_mixer`→原HDMI FIFO与包编码。
 - 图像仍使用原有 1280×720 坐标，音视频使用同一像素时钟；音频以时钟使能推进，不增加低速时钟域。
 - PLL 实际输出约 74.21875 MHz，采样使能按实际频率生成；ACR 使用 N=6144，并测量 CTS，避免直接套用标称频率。
 - 最新发布比特流统一为 `bit/Tetris.bit`，本机下载路径为 `D:/vivado_project/Tetris/bit/Tetris.bit`。
-- 故事化实施前 HDMI 基线通过 13 个回归入口及跨帧 HDMI 协议仿真；当时 LUT 11,815（56.80%）、WNS +0.076 ns、WHS +0.068 ns。当前第 1 轮数值见本文开头；历史结果及上板测试步骤见 [HDMI 音效说明](<D:/vivado_project/Tetris/docs/HDMI音效测试.md>)。
+- 故事化实施前 HDMI 基线通过 13 个回归入口及跨帧 HDMI 协议仿真；当时 LUT 11,815（56.80%）、WNS +0.076 ns、WHS +0.068 ns。当前发布数值见本文开头；历史结果及上板测试步骤见 [HDMI 音效说明](<D:/vivado_project/Tetris/docs/HDMI音效测试.md>)。
 
 ## 工程信息
 
@@ -64,11 +64,11 @@ HDMI 音效开发前保存当前 LUTRAM 优化、场地/背景/网络键盘模�
 - 横向连发：首移立即发生，DAS 220ms、ARR 80ms；松开方向、换向、暂停或结束时复位。
 - 单人智能落点：长按 Hold 显示方块本色虚线靶框和中心点；按消行、空洞、高度、凹凸和悬空评分搜索 4 旋转 x 20 列。
 - 双人输入分流：板载键控制 P1，PC 键盘控制 P2；单人时板载键和 PC 键共同控制 P1。
-- CORE-07 故事板画面：“轨道核心：最后的收容”双层反应堆舱室、游戏区收容槽、双人单核心缝、观察窗与冷却管线。
-- 完整 UI：Impact Glass 方块、1px 圆角、幽灵空心框、34px 八级热力压力柱、警戒齿、分段危险灯带、阵营光条和菜单呼吸色。
-- 反应堆反馈：落锁/升级/换块/加分特效、消行坍缩环与中心热点、GAME OVER `CORE BREACH` 副标题和局部压暗结算面板。
-- GAME OVER 结算页：SCORE、LEVEL、LINES、TIME、SOLO/DUO 标识和模式化数据区。
-- 音频：背景音乐 + 20 类操作/状态音效，音高与时长查表，危险等级上升沿触发反应堆警报，P1/P2 共用蜂鸣器且同拍 P1 优先。
+- CORE-07：穿着太空服在事故飞船表面运行修复系统，消行输送能量、修复八个核心接口。单人32行、双人40行；四段剧情配八档速度，通关结束。
+- 24像素格距点阵场地、双人共用场地，两侧对应NEXT、左侧共享HOLD；112像素机械卡座、场地外通道/刻度/端口与身份铭牌，英文像素字库复用一份ROM。
+- 表现：类型色切边方块、双人归属角标、断线幽灵和内框智能提示，落锁/旋转/消行局部反馈；只有核心顶部一处机械开合。
+- 结果：POWER RESTORED / LINK LOST；SCORE、SPD、LINES、TIME和已修接口。成功先静音演出，再显示结果/回应，失败保留修复进度。
+- 音频：20类事件、四阶段动机配乐、七句英语通信，字幕随真实语音忙信号显示；告警/结果抢占与配乐避让，两个蜂鸣器静音。
 - PC 端：UDP 逐行画面、调色板同步、键盘遥控和静态 ARP 助手。
 
 ## 系统架构
@@ -87,11 +87,11 @@ Game_state_machine ────────┐
    场地/碰撞/           HUD/菜单/
    幽灵/智能提示        结算/UI特效
         │                  │
-        ├──────► sound ──► game_audio_pcm ──► hdmi_audio_packets ──► hdmi
+        ├──────► sound/audio_synth + music + story_comms/voice_player
         │                  │
-        │                  └──────► buzz_else（蜂鸣器对照）
+        │                  └──► game_audio_pcm/audio_mixer ──► HDMI音频包
         │
-        └──────► net_screen_tx ─────► UDP 画面
+        └── frame像素 ──► net_screen_tx ──► UDP画面
 ```
 
 ## 目录结构

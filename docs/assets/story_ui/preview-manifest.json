@@ -1,0 +1,80 @@
+{
+  "kind": "rtl_fixed_test_fixture_not_hardware_capture",
+  "frames": {
+    "comms_opening.png": {
+      "ppm_sha256": "ea252fcfa212d4d59a34374c5cd94550cacc74e9d0722785ed423bc9d5b5e3fe",
+      "png_sha256": "80b066b43b2eaf1ab81e2b596c029c0fbe2b9b3c675b2926d21f4728aec53102"
+    },
+    "scene_duo0_phase0_state0.png": {
+      "ppm_sha256": "8141ce0463c4ce93a16b274eeb8dc4711d7d6582378bbeae468bded63af0cf31",
+      "png_sha256": "06db5e0eb5494394854bcbc577adbe0ec5b1389e1ecdf7e08be390be526b45f4"
+    },
+    "scene_duo1_phase0_state0.png": {
+      "ppm_sha256": "66b248ac0373770dcf4607ddb2b40c91ca64cf1c9205cd531ee20a5a3c8ce464",
+      "png_sha256": "c8d5c3f5fa828c35f31e88e92ffc7ddef6ad393c1f9d25d0e7a6d46d377ceaa6"
+    },
+    "scene_duo1_phase0_state1.png": {
+      "ppm_sha256": "29dbb7a5df01cb2c477151d9c62b4c38d0f9424b436ed322eb0f066807acfc10",
+      "png_sha256": "e48728e68dc0ef9bf7cb69bb9c3f31a800d30cfb74bf821c8630c4435a2dc186"
+    },
+    "scene_duo1_phase0_state2.png": {
+      "ppm_sha256": "127b740be0df1069c156c6cf99cfb7a225f343864abe3940b429cc30366eff98",
+      "png_sha256": "56b2408ae0544c9c1f53301aac9782aee6c656b6c4f35803e819e6b1077b01e3"
+    },
+    "scene_duo1_phase1_state0.png": {
+      "ppm_sha256": "171043e7ca7a8a64d02b80495e0a5b8794493dde4e8824ca0ae860a842f9bc39",
+      "png_sha256": "26ef164fc365878745e2ff904c06251e865ef7fa87d0b9b6d47d9d7f5640e441"
+    },
+    "scene_duo1_phase1_state7.png": {
+      "ppm_sha256": "360a78846bf317cf079cdd1a01b456e1612bb879c6892d875887ce85731fcdf3",
+      "png_sha256": "66a4fc6963d5b6a7a4d5cccc4f36e763221880c629e05ea951a03de8534b3054"
+    },
+    "scene_duo1_phase2_state0.png": {
+      "ppm_sha256": "139a211a17d1602821f39c711fb3daf9706fd8a96f7f3ef72cdb0b2f96f92df5",
+      "png_sha256": "a82670141a139a3018359ca32d42c9ee67bedefa4d9d328d6aa14dd7275924b8"
+    },
+    "scene_duo1_phase3_state0.png": {
+      "ppm_sha256": "39674089b4daad03dbc078baed6284ff5a3ac1dc613574f48dc4e4a7fc4f3d8d",
+      "png_sha256": "0d2674bcc6b80b2a28ed747bc8ea9118563015cf1ab2b0ac45278b75b59f31bd"
+    },
+    "scene_duo1_phase3_state3.png": {
+      "ppm_sha256": "50f02a518e81299596878966f071b1348d1076bf5c4e684bc4d7d7f696cf3dd0",
+      "png_sha256": "2b7c12610c54a405bbf759aad245a4519416669f510d3ba0f7d4944a9246d2df"
+    },
+    "scene_duo1_phase3_state4.png": {
+      "ppm_sha256": "293327368624598240713332600b8f555e67c06df73b0acbd5fcdba8dd69a908",
+      "png_sha256": "e51c2c5e29fab0b1e1548f697c91a6779741426b06ac58603f7199d31b637942"
+    },
+    "scene_duo1_phase3_state5.png": {
+      "ppm_sha256": "fbe5604aacd4f3151e2853a42b6a499030a461327dbdb48fc7236ea41a102828",
+      "png_sha256": "94f58d95e07a17fbf3b66154d6fb47f3dbfe14e95a56161cde826dac6cdaa518"
+    },
+    "scene_duo1_phase3_state8.png": {
+      "ppm_sha256": "60267bb0cf656b63ddee342ea875a8649e42e2df9e389df816b48d95d83575e7",
+      "png_sha256": "d984785978c97405c552caced80afd0b5d27e915491e3f6875367ed7832612eb"
+    }
+  },
+  "rtl_source_sha256": {
+    "Tetris.srcs/sources_1/new/story_audio_priority.vh": "c85db84422628b74524d9c705343edd612c3cd1963618c02e15cb10326e13310",
+    "Tetris.srcs/sources_1/new/story_comms.v": "1f16df35eabde9a004c4225b3020a0e56e59b7371c12444085567a140b29265e",
+    "Tetris.srcs/sources_1/new/story_controller.v": "2ede1cdb0396c4e1336f4e5820489d71c2d3ff9c5333c052257eee6cea021320",
+    "Tetris.srcs/sources_1/new/story_feedback.v": "d6f15905e41a681fe53484dd68db330b863e21eeb01413b090b350e4ed10ff21",
+    "Tetris.srcs/sources_1/new/story_font.mem": "e3e4db20c21e0f77e2543bb03820330a4b3b50532b1fa0060cebac44a683c621",
+    "Tetris.srcs/sources_1/new/story_layout.vh": "645e424fd2b0b8f8cd3d1fba8581ef1e20dead8e44e533b3dabcc486e49e93f2",
+    "Tetris.srcs/sources_1/new/story_palette.vh": "57804c0cb903b288a9da7c0ad4d7e1f8b2586eb91596bed1c1a309245b685acc",
+    "Tetris.srcs/sources_1/new/story_pixel_frontend.v": "9afbd89b088c1a177a87304181c6f908d92b7708c23b58e139ead1b8c64527a9",
+    "Tetris.srcs/sources_1/new/story_pixel_mapper.v": "23fc7e046595e8e66a917bd9b5a7d1cb3b5d1a2a67d1c1df2a57b84905ce89f2",
+    "Tetris.srcs/sources_1/new/story_presentation.v": "32b9c28f1b7677d93375ba5c9ce45a0e13ba5d3fa94f1273a568b9baa3fe3158",
+    "Tetris.srcs/sources_1/new/story_scene.v": "7c8a494c224d6418bfa18e3fe8b7d1d9105e1d8c6c56c1a22031c1c7ce69b57a",
+    "Tetris.srcs/sources_1/new/story_sprites.mem": "aad6020785d71531d9c6bc41ac800df7af70d8c2a35f24bbb8bb9938ef02a1b4",
+    "Tetris.srcs/sources_1/new/story_text_ids.vh": "d72d6dc64dcd49dd30f97d8846ecc3206c56caf8d77863c5908546b3e5f3c6fa",
+    "Tetris.srcs/sources_1/new/story_ui.v": "ceff8d90b7d146acac66457da4aed30aa8dc6b2555f417aa1220b95c3a54631d",
+    "Tetris.srcs/sources_1/new/story_voice.mem": "263bc5b5b07c5efc97f5abe24449d800c1bb4837cd5714c2853a113b2fabeda4",
+    "Tetris.srcs/sources_1/new/story_voice_config.vh": "cfd0171e83d75b4d5e020410b16549b6f68f1862577067a22c7241f20d6d7106",
+    "Tetris.srcs/sources_1/new/story_voice_ids.vh": "d4cf77fe4b06c216b772db65b2a22aedef639c1707d5b069a4537df7a11f85bd",
+    "Tetris.srcs/sources_1/new/core_renderer.v": "57a81dbfa34564ce4873abbf064df390103c5e11e2fa1ff0040b9af038f01fee",
+    "Tetris.srcs/sources_1/new/hud_text.v": "6f53cb4fd7617531930cf6c66b5ccb924c3714f8341ca0c716ccf0e8cc31a007",
+    "Tetris.srcs/sources_1/new/hud_font_rom.v": "741b49e7e567632c7df623597a0713987e2c8b530050339dd7b28e1df7f56ea4",
+    "Tetris.srcs/sources_1/new/scene_sprite_rom.v": "f38f4508e5f04eb9a716129577f8e22cb29dbc3bdb53b320a9237dc6ea20fae4"
+  }
+}

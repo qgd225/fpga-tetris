@@ -26,11 +26,11 @@ module render_tb;
         2:lines_bcd=duo?20'h00024:20'h00020;
         3:lines_bcd=duo?20'h00036:20'h00030;
         endcase
-        Idle=state==1;choose=state==2;Finalize=state==3 || state==4;Playing=!Idle && !choose && !Finalize;
-        success=state==3;result_ready=Finalize;
+        Idle=state==1;choose=state==2;Finalize=state==3 || state==4 || state==8;Stop=state==7;Playing=!Idle && !choose && !Finalize && !Stop;
+        success=state==3 || state==8;result_ready=Finalize && state!=8;
         if(success)begin locked=8;phase=3;speed=7;lines_bcd=duo?20'h00040:20'h00032;end
         if(state==6)comms_visible=1;
-        if(state==5)begin danger=2;for(n=0;n<18;n=n+1)tile(n,2,n%7,n%2);end
+        if(state==5)begin danger=2;animation=22;for(n=0;n<18;n=n+1)tile(n,2,n%7,n%2);end
         repeat(3)@(negedge clk);rst=1;
         if($test$plusargs("render"))begin
             if(state==6)filename="comms_opening.ppm";
@@ -62,10 +62,10 @@ module render_tb;
             feedback_lock=1;sample(353,601,palette[16]);sample(362,610,palette[1]);feedback_lock=0;
             feedback_hard_left=1;sample(352,619,palette[16]);sample(362,610,palette[1]);feedback_hard_left=0;
             feedback_hard_right=1;sample(373,619,palette[16]);feedback_hard_right=0;
-            feedback_clear=1;sample(362,600,palette[16]);feedback_inset=4;sample(362,600,palette[37]);
-            feedback_inset=8;sample(362,600,palette[21]);feedback_clear=0;feedback_inset=0;
+            feedback_clear=1;sample(362,600,palette[42]);feedback_inset=4;sample(362,600,palette[41]);
+            feedback_inset=8;sample(362,600,palette[43]);feedback_clear=0;feedback_inset=0;
             feedback_sides=9;sample(342,164,palette[37]);sample(934,184,palette[38]);feedback_sides=0;
-            sample(194,482,palette[37]);sample(250,482,palette[38]);
+            sample(194,482,palette[47]);sample(250,482,palette[47]);
             for(m=0;m<5;m=m+1)begin
                 choose=m==1;Idle=m==2;Finalize=m>=3;success=m==3;result_ready=Finalize;
                 for(yy=0;yy<720;yy=yy+53)begin

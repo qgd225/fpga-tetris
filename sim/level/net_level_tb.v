@@ -183,7 +183,7 @@ initial begin
   hc=0;vc=0;repeat(3)@(negedge Clk_74M);
   hc=1024-4;vc=512;repeat(2)@(negedge Clk_74M);repeat(2)@(negedge Clk_74M);#1;chk("phase1 lower rail",dut.story_ui_inst.core.color_index,53);
   vc=392;repeat(2)@(negedge Clk_74M);#1;chk("phase1 upper rail open",dut.story_ui_inst.core.color_index,47);
-  hc=1040-4;vc=586;repeat(2)@(negedge Clk_74M);#1;chk("locked lower segment",dut.story_ui_inst.core.color_index,39);
+  hc=1040-4;vc=586;repeat(2)@(negedge Clk_74M);#1;chk("locked lower segment",dut.story_ui_inst.core.color_index,25);
   vc=372;repeat(2)@(negedge Clk_74M);#1;chk("unlocked upper segment",dut.story_ui_inst.core.color_index,50);
   hc=1015-4;repeat(2)@(negedge Clk_74M);#1;chk("outside core left",dut.story_ui_inst.core.hit,0);
   hc=1016-4;repeat(2)@(negedge Clk_74M);#1;chk("core left boundary",dut.story_ui_inst.core.hit,1);

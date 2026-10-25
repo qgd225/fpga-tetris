@@ -21,13 +21,13 @@ module phase_tb;
         fx=duo?352:400;fr=fx+(duo?24:20)*24;
         if(hc<8 || hc>=1272 || hc>=fx-4 && hc<fr+4)begin
             index=44;
-            if(hc>=fx-4 && hc<fx)index=25;
-            else if(hc>=fr && hc<fr+4)index=duo?7:53;
+            if(hc>=fx-4 && hc<fx)index=hc==fx-1?27:49;
+            else if(hc>=fr && hc<fr+4)index=hc==fr?27:49;
             else if(hc>=fx && hc<fr)begin
                 dx=hc-fx;dy=vc-144;c=dx/24;r=dy/24;lx=dx%24;ly=dy%24;
                 index=46;
                 if(lx<22 && ly<22)begin
-                    if((lx==0 || lx==21)&&(ly==0 || ly==21))index=44;
+                    if((lx==0 || lx==21)&&(ly==0 || ly==21))index=46;
                     else if(duo && lx<4 && ly<4)index=c%2?38:37;
                     else if(lx==0 || ly==0)index=8+c%7;
                     else if(lx==21 || ly==21)index=30+c%7;

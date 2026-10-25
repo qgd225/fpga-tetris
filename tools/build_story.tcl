@@ -106,7 +106,14 @@ set status [catch {
         set audio_delta [expr {$luts-$baseline_lut}]
         set audio_budget [expr {$audio_delta <= [lindex [gate_numbers $gates R3] 0]}]
     }
-    set budget [expr {$luts <= $lut_limit && $bram <= $bram_limit && $registers <= $register_limit && $latches <= 12 && $dsp == 0 && $audio_budget}]
+    set ui_budget 1
+    set ui_delta 0
+    if {[regexp {^story_r3_ui} $round]} {
+        set ui_limits [gate_numbers $gates U1]
+        set ui_delta [expr {$luts-[lindex $ui_limits 0]}]
+        set ui_budget [expr {$bram<=$bram_target && $latches<=3}]
+    }
+    set budget [expr {$luts <= $lut_limit && $bram <= $bram_limit && $registers <= $register_limit && $latches <= 12 && $dsp == 0 && $audio_budget && $ui_budget}]
     set font_gate 1
     if {[regexp {^story_r(2b|2c|[3-6])} $round]} {
         set font_tiles 0.0
@@ -131,7 +138,7 @@ set status [catch {
     set visual_budget [expr {![regexp {^story_r[23]} $round] || $luts <= $visual_limit}]
     set result [open [file join $output gate-summary.txt] w]
     puts $result "LUT=$luts REGISTERS=$registers BRAM=$bram LATCHES=$latches DSP=$dsp"
-    puts $result "WNS=$wns WHS=$whs TARGET=$timing_target GREEN=$green BUDGET=$budget TARGET_BUDGET=$target_budget VISUAL_BUDGET=$visual_budget FONT_GATE=$font_gate AUDIO_NET=$audio_delta AUDIO_BUDGET=$audio_budget PUBLISH_REQUESTED=$publish"
+    puts $result "WNS=$wns WHS=$whs TARGET=$timing_target GREEN=$green BUDGET=$budget TARGET_BUDGET=$target_budget VISUAL_BUDGET=$visual_budget FONT_GATE=$font_gate AUDIO_NET=$audio_delta AUDIO_BUDGET=$audio_budget UI_NET=$ui_delta UI_BUDGET=$ui_budget PUBLISH_REQUESTED=$publish"
     close $result
     report_timing -max_paths 20 -file [file join $output setup_paths.rpt]
     if {$wns<0 || $whs<0} {error "Candidate timing failed"}
