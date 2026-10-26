@@ -1,0 +1,7 @@
+TIMING_PASS WNS 0.280 WHS 0.075 TNS 0.000 THS 0
+LIMITS TIMING_MIN_WNS_NS 0.000 TIMING_MIN_WHS_NS 0.000 TIMING_MAX_TNS_NS 0.000 TIMING_MAX_THS_NS 0.000
+LATCHES 3
+LATCH frame_inst/Playfield_inst/counter_c2_reg[3]_LDC
+LATCH frame_inst/Playfield_inst/counter_c2_reg[4]_LDC
+LATCH frame_inst/Playfield_inst/counter_c_reg[0]_LDC
+DSP frame_inst/initial_debris/base0

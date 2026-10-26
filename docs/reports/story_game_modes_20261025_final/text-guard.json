@@ -1,0 +1,25 @@
+{
+  "fsm_encoding": {
+    "MENU": 0,
+    "INIT": 3,
+    "PLAY": 5,
+    "PAUSE": 4,
+    "RESULT": 1,
+    "SELECT": 2
+  },
+  "checks": 272,
+  "failures": [],
+  "nodes": 462,
+  "primitive_types": {
+    "LUT5": 29,
+    "LUT2": 156,
+    "LUT6": 35,
+    "FDCE": 40,
+    "LUT4": 43,
+    "LUT3": 79,
+    "CARRY4": 44,
+    "GND": 2,
+    "VCC": 1,
+    "LUT1": 33
+  }
+}

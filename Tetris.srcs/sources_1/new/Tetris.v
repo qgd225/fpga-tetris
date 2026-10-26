@@ -174,7 +174,7 @@ wire solo_hold_long;
     wire [1:0]story_phase;
     wire choose;
     wire [3:0]choose_cnt;
-    wire duo = (choose_cnt == 4'd1);
+    wire duo = (choose_cnt == 4'd1) || (choose_cnt == 4'd3);
     assign buzz_main=1'b0;
     assign buzz_else=1'b0;
 hold_gesture hold_gesture_inst(
@@ -223,6 +223,9 @@ control_route control_route_inst(
 .p2_right_held(p2_right_held)
 );
 
+    wire mode_campaign,ship_select,run_ready;
+    wire [1:0] level_id,result_option;
+    wire core_half_event,core_online_event,debris_clear_event;
     wire sw_short;
     wire sw_long;
 
@@ -234,6 +237,8 @@ control_route control_route_inst(
     .switch_r_flag(switch_r_f),
     .switch_en(switch_e),
     .over(over | mission_win),
+    .success(mission_success),.run_ready(run_ready),.campaign(mode_campaign),
+    .ship_select(ship_select),.level_id(level_id),.result_option(result_option),
 
     .sw_short(sw_short),
     .sw_long(sw_long),
@@ -275,7 +280,7 @@ control_route control_route_inst(
     wire clear;
     wire [2:0]speed_level;
     wire [19:0]score;
-    wire [15:0]lines;
+    wire [19:0]lines;
     wire [13:0]time_sec;
     wire snd_land1;
     wire snd_land2;
@@ -362,7 +367,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .Idle(Idle),
     .choose(choose),
     .choose_cnt(choose_cnt),
-    .duo(duo),
+    .duo(duo),.campaign(mode_campaign),.ship_select(ship_select),.level_id(level_id),.result_option(result_option),.run_ready(run_ready),
     .left_p_flag2(p2_left_move),
     .right_p_flag2(p2_right_move),
     .drop_r_flag2(p2_drop_r),
@@ -380,7 +385,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .score(score),
     .lines(lines),
     .time_sec(time_sec),
-    .snd_land1(snd_land1),
+    .snd_land1(snd_land1),.core_half_event(core_half_event),.core_online_event(core_online_event),.debris_clear_event(debris_clear_event),
     .snd_land2(snd_land2),
     .snd_hard1(snd_hard1),
     .snd_hard2(snd_hard2),
@@ -411,7 +416,14 @@ wire solo_hint_show = !duo && solo_hint_latched;
         if(!Reset_n)audio_menu_d<=0;else audio_menu_d<=Idle || choose;
     end
     wire audio_reset_event=((Idle || choose) && !audio_menu_d) || (Finalize && switch_r_f);
+    // Isolate the combinational collision path from the audio event arbiter.
+    reg [5:0] audio_reject;
+    always @(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)audio_reject<=0;
+        else audio_reject<={blk_rot2,blk_rot1,blk_r2,blk_l2,blk_r1,blk_l1};
+    end
     sound sound_inst(
+    .core_half(core_half_event),.core_online(core_online_event),.debris_clear(debris_clear_event),
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
     .over(over),
@@ -438,8 +450,8 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .soft2(snd_soft2),
     .hold2(snd_hold2),
     .blk2(blk_l2 || blk_r2),
-    .blk_rot1(blk_rot1),
-    .blk_rot2(blk_rot2),
+    .blk_rot1(audio_reject[4]),
+    .blk_rot2(audio_reject[5]),
     .danger1(danger1_pulse),
     .danger2(story_alarm2),
 

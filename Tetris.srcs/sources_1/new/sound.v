@@ -11,6 +11,7 @@ module sound(
     input clear,
     input [2:0]clr_n,
     input lvl_up,
+    input core_half,core_online,debris_clear,
     input danger1,
     input danger2,
     input sw_short,
@@ -58,6 +59,7 @@ module sound(
     wire over_rise = over && !over_d;
     `include "story_audio_priority.vh"
     reg alert_pending,level_pending;
+    reg [1:0] core_pending;reg debris_pending;
     reg [6:0] block_cooldown;
     wire protected_clear=en>=11 && en<=14;
     wire preempt_result=over_rise;
@@ -112,23 +114,27 @@ module sound(
 // 终局立即替换；严重告警可替换普通音，但消行五音保持原子性。
     always @(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
-            en<=0;clear_seen<=0;over_d<=0;alert_pending<=0;level_pending<=0;block_cooldown<=0;
+            en<=0;clear_seen<=0;over_d<=0;alert_pending<=0;level_pending<=0;core_pending<=0;debris_pending<=0;block_cooldown<=0;
         end else if(cancel)begin
-            en<=0;clear_seen<=0;over_d<=over;alert_pending<=0;level_pending<=0;block_cooldown<=0;
+            en<=0;clear_seen<=0;over_d<=over;alert_pending<=0;level_pending<=0;core_pending<=0;debris_pending<=0;block_cooldown<=0;
         end else begin
             over_d<=over;
             if(!clear)clear_seen<=0;
             if(danger2)alert_pending<=1;
             if(lvl_up)level_pending<=1;
+            if(core_online)core_pending<=2;else if(core_half && core_pending!=2)core_pending<=1;
+            if(debris_clear)debris_pending<=1;
             if(ms_tick && block_cooldown!=0)block_cooldown<=block_cooldown-1'b1;
-            if(preempt_result)begin en<=16;alert_pending<=0;level_pending<=0;end
+            if(preempt_result)begin en<=16;alert_pending<=0;level_pending<=0;core_pending<=0;debris_pending<=0;end
             else if(preempt_alert)begin en<=20;alert_pending<=0;end
             else if(tick)en<=0;
             else if(en==0)begin
-                if(alert_pending)begin en<=20;alert_pending<=0;end
+                if(core_pending!=0)begin en<=core_pending==2?22:21;core_pending<=0;end
+                else if(alert_pending)begin en<=20;alert_pending<=0;end
                 else if(clear && !clear_seen && clr_n!=0)begin
                     en<=clr_n==1?11:(clr_n==2?12:(clr_n==3?13:14));clear_seen<=1;
                 end else if(lvl_up || level_pending)begin en<=10;level_pending<=0;end
+                else if(debris_pending)begin en<=23;debris_pending<=0;end
                 else if(sw_long)en<=17;
                 else if(sw_short)en<=15;
                 else if(danger1)en<=19;
@@ -148,6 +154,9 @@ module sound(
 //    每条音效的末音符编号
     always@(*)begin
     case(en)
+    5'd21: st_last=4'd1;
+    5'd22: st_last=4'd2;
+    5'd23: st_last=4'd0;
     5'd17: st_last = 4'd1;
     5'd16: st_last = 4'd3;
     5'd15: st_last = 4'd1;
@@ -175,6 +184,9 @@ module sound(
     always@(*)begin
     note_id = 4'd0;
     case(en)
+    5'd21: note_id=st==0?4'd4:4'd6;
+    5'd22: note_id=st==0?4'd4:st==1?4'd6:4'd9;
+    5'd23: note_id=4'd3;
     5'd17: case(st)
         4'd0: note_id = 4'd8;
         4'd1: note_id = 4'd4;
@@ -272,6 +284,9 @@ module sound(
     always@(*)begin
     cnt = 9'd0;
     case(en)
+    5'd21: cnt=9'd90;
+    5'd22: cnt=9'd100;
+    5'd23: cnt=9'd35;
     5'd17: case(st)
         4'd0: cnt = 9'd60;
         4'd1: cnt = 9'd90;

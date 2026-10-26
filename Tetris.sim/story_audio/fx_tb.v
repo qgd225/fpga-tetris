@@ -21,7 +21,7 @@ module fx_tb;
    check(click>= -512 && click<=512 && double_pulse>= -512 && double_pulse<=512,"bounded mechanical candidates");
   end
   $fclose(h1);$fclose(h2);check(count1==0 && count2>500,"short click chosen, double pulse retained only as test comparison");
-  for(e=2;e<=20;e=e+1)begin
+  for(e=2;e<=23;e=e+1)begin
    id=e;step=0;key=8;active=1;
    for(n=0;n<2500;n=n+1)begin cycle;check(click>= -512 && click<=512,"every FX peak bounded");end
   end

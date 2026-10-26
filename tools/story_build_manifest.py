@@ -3,6 +3,7 @@ import hashlib
 import json
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,8 +24,17 @@ def inputs():
         }
         build = name.startswith("tools/") and p.suffix in {".tcl", ".py", ".ps1", ".bat"}
         asset = name.startswith("assets/") and p.suffix in {".json", ".wav", ".ima"}
-        if hardware or build or asset or name == "AGENTS.md":
-            result[name] = hashlib.sha256(p.read_bytes()).hexdigest()
+        if hardware or build or asset or name in {"AGENTS.md", "Tetris.xpr"}:
+            content = p.read_bytes()
+            if name == "Tetris.xpr":
+                # The candidate build disables only the publisher hook, then restores it.
+                # Keep all source registration, part, strategy, constraint and clock inputs.
+                project = ET.fromstring(content)
+                hook = project.find("./Runs/Run[@Id='impl_1']/Strategy/Step[@Id='write_bitstream']")
+                if hook is not None:
+                    hook.attrib.pop("PostStepTclHook", None)
+                content = ET.tostring(project, encoding="utf-8")
+            result[name] = hashlib.sha256(content).hexdigest()
     return result
 
 
@@ -38,6 +48,7 @@ def main():
                 ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
             ).strip(),
             "inputs": current,
+            "project_normalization": "Only impl_1/write_bitstream PostStepTclHook is excluded; it publishes files and is disabled during candidate builds.",
         }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(f"BUILD_INPUTS_SAVED {len(current)}")
     elif mode == "verify":

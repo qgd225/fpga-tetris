@@ -29,7 +29,7 @@ module audio_synth #(parameter BLOCK_STYLE=1)(input clk,reset_n,sample_ce,active
         endcase end
     endfunction
     wire blocked=event_id==4 || event_id==18;
-    wire impact=blocked || event_id==8 || event_id==9 || event_id==16;
+    wire impact=blocked || event_id==8 || event_id==9 || event_id==16 || event_id==23;
     wire [19:0] increment=impact?20'd3208:(event_id==5?20'd4282:pitch(note_id));
     wire [5:0] ramp=position[19]?~position[18:13]:position[18:13];
     wire signed [8:0] triangle=$signed({2'b00,ramp,1'b0})-9'sd63;

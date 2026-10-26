@@ -20,6 +20,8 @@ module letter(input clka, input ena, input [10:0] addra, output [19:0] douta);
 endmodule
 
 module frame_duo_tb;
+    reg campaign=1;
+
     reg Clk=0,Rst=0;
     reg [10:0] hc=0,vc=0;
     reg duo=0,choose=0,Idle=1,Playing=0,Stop=0,Finalize=0,hint_show=0,sw=0;
@@ -36,7 +38,7 @@ module frame_duo_tb;
     reg [10:0] drift_snapshot;
     always #6.734 Clk=~Clk;
     frame #(.EFF_TICK(21'd8),.SUCCESS_TICKS(4)) dut(
-        .Clk_74M(Clk),.Reset_n(Rst),.hcounter(hc),.vcounter(vc),.video_de(1'b1),
+        .campaign(campaign),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.Clk_74M(Clk),.Reset_n(Rst),.hcounter(hc),.vcounter(vc),.video_de(1'b1),
         .left_p_flag(1'b0),.right_p_flag(1'b0),.drop_r_flag(1'b0),.drop_en(1'b0),.rotate_p_flag(1'b0),
         .switch_r_flag(sw),.hold_p_flag(1'b0),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
         .choose(choose),.choose_cnt(duo?4'd1:4'd0),.duo(duo),
@@ -50,7 +52,7 @@ module frame_duo_tb;
         input integer x,y;
         begin
             // 固定坐标探针补偿四拍行内前取；逐时钟相位另由 VGA 联合台验证。
-            @(negedge Clk);hc=x-4;vc=y;repeat(6)@(negedge Clk);
+            @(negedge Clk);hc=x-6;vc=y;repeat(8)@(negedge Clk);
         end
     endtask
     task frame_edge;
@@ -139,7 +141,7 @@ module frame_duo_tb;
         duo=1;look(454,270);check(rgb===24'h131D26,"duo hides solo hint");
         hint_show=0;release dut.hint_valid;release dut.hint_c0;release dut.hint_c1;release dut.hint_c2;release dut.hint_c3;
         release dut.hint_r0;release dut.hint_r1;release dut.hint_r2;release dut.hint_r3;
-        force dut.story_phase=phase_value;force dut.core_locked=locked_value;
+        force dut.story_phase=phase_value;force dut.core_locked=locked_value;force dut.display_debris=7'd0;
         phase_value=0;locked_value=0;frame_edge;
         look(1014,520);check(rgb===24'h3A4A58,"phase0 rail interrupted");
         phase_value=1;locked_value=2;repeat(3)@(negedge Clk);
@@ -161,7 +163,7 @@ module frame_duo_tb;
         Finalize=0;Idle=1;repeat(30)@(negedge Clk);Idle=0;
         force dut.result_valid=1;force dut.mission_success=0;Finalize=1;frame_edge;
         glyph(500,264,12,3,24'hD8442E);
-        release dut.result_valid;release dut.mission_success;release dut.story_phase;release dut.core_locked;
+        release dut.result_valid;release dut.mission_success;release dut.story_phase;release dut.core_locked;release dut.display_debris;
         Finalize=0;choose=1;duo=0;glyph(736,288,19,2,24'hE8EEF2);
         duo=1;glyph(736,360,4,2,24'hE8EEF2);
         choose=0;Idle=1;glyph(512,264,18,2,24'hE8EEF2);
@@ -174,6 +176,14 @@ module frame_duo_tb;
         Stop=0;phase_value=2;drift_snapshot=dut.star_drift;repeat(600)@(negedge Clk);
         check(dut.star_drift==drift_snapshot,"stable phase holds attained star position");
         release dut.story_phase;
+        // Full frame transition must replace the campaign mask with an empty endless board.
+        choose=0;Finalize=0;Playing=0;Idle=1;campaign=1;
+        repeat(100)@(negedge Clk);
+        check(dut.debris_remaining!=0 && dut.state!=0,"campaign initializes residual debris");
+        Idle=0;Playing=1;repeat(8)@(negedge Clk);
+        Idle=1;Playing=0;campaign=0;repeat(100)@(negedge Clk);
+        check(dut.debris_remaining==0 && dut.debris_mask==0 && dut.state==0,"campaign to endless reloads empty board");
+        check(dut.run_ready,"cross-mode initialization becomes ready");
         if(errors==0)$display("=== ALL PASS: STORY FRAME %0d checks ===",checks);
         else $display("=== FAILED STORY FRAME %0d ===",errors);
         $finish;

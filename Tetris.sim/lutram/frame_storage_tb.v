@@ -23,7 +23,7 @@ module frame_storage_tb;
     wire [23:0]rgb;
     always #6.734 clk=~clk;
     frame dut(
-        .Clk_74M(clk), .Reset_n(rst), .hcounter(11'd0), .vcounter(11'd0),
+        .campaign(1'b1),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.Clk_74M(clk), .Reset_n(rst), .hcounter(11'd0), .vcounter(11'd0),
         .left_p_flag(1'b0), .right_p_flag(1'b0), .drop_r_flag(1'b0), .drop_en(1'b0),
         .rotate_p_flag(1'b0), .switch_r_flag(1'b0), .hold_p_flag(1'b0),
         .Idle(1'b0), .Playing(1'b1), .Stop(1'b0), .Finalize(1'b0),

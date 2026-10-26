@@ -1,0 +1,9 @@
+{
+  "changed": [
+    "AGENTS.md"
+  ],
+  "build_rules_sha256": "3de0e04f3122fbc5933e6cea2e1d34332764f429281955818ada136b8208f74b",
+  "release_rules_sha256": "6494fab10907732ea7286458fa3acf88fbdbad17feb0dc2f263f3147d9e0e35e",
+  "unchanged_hardware_build_asset_inputs": 129,
+  "说明": "构建已通过旧的 +0.050 ns 门槛；用户随后将规则改为非负余量。其余硬件、工具、工程与资产输入完全相同，最终路由检查点按新规则复核，无需重复综合。"
+}

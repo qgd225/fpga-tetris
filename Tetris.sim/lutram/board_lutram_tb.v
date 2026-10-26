@@ -18,7 +18,7 @@ module board_lutram_tb;
     reg [23:0]test_data;
     always #6.734 clk=~clk;
     Playfield #(.MCNT_LAND(20_000_000), .CLEAR_STEP(4)) dut(
-  .mission_hold(1'b0), .story_speed(3'd0),
+  .init_load(1'b0),.initial_mask(480'd0),.initial_total(7'd0),.mission_hold(1'b0), .story_speed(3'd0),
         .Clk_74M(clk), .Reset_n(rst), .hcounter(11'd0), .vcounter(11'd0),
         .left_p_flag(1'b0), .right_p_flag(1'b0), .drop_r_flag(1'b0), .drop_en(1'b0),
         .rotate_p_flag(1'b0), .switch_r_flag(switch_key), .Idle(idle),

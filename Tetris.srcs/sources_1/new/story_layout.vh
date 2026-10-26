@@ -14,5 +14,5 @@
 `define STORY_CORE_Y 352
 `define STORY_CORE_W 80
 `define STORY_CORE_H 256
-`define STORY_LOOKAHEAD 4
+`define STORY_LOOKAHEAD 6
 `endif

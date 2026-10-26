@@ -28,9 +28,10 @@ module timer(
     wire lit_minute_units;
     wire lit_minute_tens;
 
+    `include "game_mode_params.vh"
     parameter SECOND_CYCLES = 74_218_750;
     reg [26:0]counter;
-    wire sec_tick = Playing && !Stop && !Finalize && (counter == SECOND_CYCLES-1);
+    wire sec_tick = (bcd != MODE_TIME_BCD_MAX) && Playing && !Stop && !Finalize && (counter == SECOND_CYCLES-1);
     reg [3:0]counter0;
     reg [3:0]counter1;
     reg [3:0]counter2;

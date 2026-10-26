@@ -16,7 +16,7 @@ module story_tb;
  wire pf_credit,pf_done,pf_quiet,pf_over,pf_clear_time;
  wire [4:0]pf_n;wire [2:0]pf_speed;
  wire [479:0]board;
- wire [15:0]lines;
+ wire [19:0]lines;
  wire [2:0]speed;
  wire [1:0]phase;
  wire [3:0]locked;
@@ -39,13 +39,13 @@ module story_tb;
  integer saved_lines,saved_counter;
  always #5 clk=~clk;
  story_controller controller(.clk(clk),.reset_n(rst),.new_run(restart),
-  .playing(playing),.paused(paused),.duo(duo),.row_credit(credit),
+  .playing(playing),.paused(paused),.duo(duo),.campaign(1'b1),.level_id(2'd2),.debris_remaining(7'd0),.row_credit(credit),
   .batch_done(done),.engine_quiescent(quiet),.over_raw(over),
   .lines_total(lines),.story_speed(speed),.story_phase(phase),.core_locked(locked),
   .phase_enter(phase_enter),.charge_pulse(charge),.batch_commit(commit),
   .finish_pending(finish_pending),.result_valid(valid),.result_success(success));
  Playfield #(.CLEAR_STEP(3),.MCNT_LAND(10000000),.MCNT_Drop(10000000)) pf(
-  .Clk_74M(clk),.Reset_n(rst),.hcounter(0),.vcounter(0),
+  .init_load(1'b0),.initial_mask(480'd0),.initial_total(7'd0),.Clk_74M(clk),.Reset_n(rst),.hcounter(0),.vcounter(0),
   .left_p_flag(left),.right_p_flag(right),.rotate_p_flag(rot),
   .drop_r_flag(drop),.drop_en(drop),.hold_p_flag(hold),.switch_r_flag(0),
   .Idle(pf_idle),.Playing(playing),.Stop(paused),.Finalize(valid),
@@ -73,8 +73,8 @@ module story_tb;
  end endtask
  function integer expected_speed;input integer n;input mode;
  begin
-  if(mode) expected_speed=n>=35?7:n>=30?6:n>=23?5:n>=16?4:n>=11?3:n>=6?2:n>=3?1:0;
-  else expected_speed=n>=28?7:n>=24?6:n>=18?5:n>=12?4:n>=8?3:n>=4?2:n>=2?1:0;
+  expected_speed=2+n/(mode?5:4);
+  if(expected_speed>7)expected_speed=7;
  end endfunction
  task credit_batch;input integer n;
  begin
@@ -111,7 +111,7 @@ module story_tb;
     credit_batch(1);
     check("exact mission credit",lines,line);
     check("exact speed threshold",speed,expected_speed(line,k));
-    check("phase is speed pair",phase,expected_speed(line,k)/2);
+    check("phase follows independent core",phase,(8*line/(k?40:32)>6)?3:(8*line/(k?40:32)>4)?2:(8*line/(k?40:32)>2)?1:0);
     check("finish only at target",valid,line==(k?40:32));
    end
    check("eight core units on success",locked,8);
@@ -143,13 +143,13 @@ module story_tb;
   check("real clear timer freezes",pf.clear_cnt,saved_counter);
   @(negedge clk);paused=0;wait_batch;
   check("eight-row batch credits exactly eight",lines,8);
-  check("eight-row batch score once",score,128);
+  check("eight-row batch score once",score,384);
   rows(20);wait_batch;
   check("twenty-row batch no counter wrap",lines,28);
-  check("twenty-row batch captured old speed",score,3328);
+  check("twenty-row batch captured old speed",score,4384);
   rows(4);wait_batch;
   check("real solo succeeds at32",success,1);
-  check("real solo final score",score,3584);
+  check("real solo final score",score,4640);
   snapshot=board;piece_snapshot={pf.counter_c,pf.counter_r,pf.rot,pf.type,pf.type_t,pf.counter_c2,pf.counter_r2,pf.rot2,pf.type2,pf.type_t2};@(negedge clk);left=1;right=1;rot=1;drop=1;hold=1;
   repeat(50)tick;
   check("success rejects new board writes",board===snapshot,1);

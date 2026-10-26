@@ -2,7 +2,17 @@
 
 > 当前维护规则只见 [AGENTS.md](AGENTS.md)。故事设定见 [世界观与各模式故事](docs/CORE-07_世界观与各模式故事.md)，UI 以 [当前参考图](docs/参考图/当前UI参考图.png) 为准。下文旧门禁和资源预算链接仅供历史追溯，不再作为执行要求。
 
-> 2026-10-25 完成故事音频和UI：四阶段配乐、机械音、七句通信及同步字幕均走HDMI；机械像素卡座、场地、四支路核心、阶段背景与结算已实施。17套回归、13场景RTL预览与完整布线通过。资源 **10,286 LUT / 4,760 寄存器 / 25 BRAM / 0 DSP**，WNS **+0.204** / WHS **+0.065 ns**。新UI实屏与整合音频试听未测，按用户要求不等待反馈。[实施报告](<D:/vivado_project/Tetris/docs/reports/story_r3_ui_complete/build-summary.txt>) · [四阶段预览](<D:/vivado_project/Tetris/docs/assets/story_ui/four_phases.png>)。
+> 历史基线（四模式改造前，2026-10-25）：故事音频和UI已实现，四阶段配乐、机械音、七句通信及同步字幕均走HDMI；机械像素卡座、场地、四支路核心、阶段背景与结算已实施。17套回归、13场景RTL预览与完整布线通过。资源 **10,286 LUT / 4,760 寄存器 / 25 BRAM / 0 DSP**，WNS **+0.204** / WHS **+0.065 ns**。新UI实屏与整合音频试听未测，按用户要求不等待反馈。[实施报告](<D:/vivado_project/Tetris/docs/reports/story_r3_ui_complete/build-summary.txt>) · [四阶段预览](<D:/vivado_project/Tetris/docs/assets/story_ui/four_phases.png>)。
+
+## 当前四模式（2026-10-26）
+
+已实现 `SOLO ENDLESS`、`DUO ENDLESS`、`SOLO CAMPAIGN`、`DUO CAMPAIGN`。闯关先选 `SHIP 01`～`SHIP 04`，四关全部开放；无尽持续计分，最高速度后继续。双人仍共享场地、HOLD、核心和成绩。
+
+菜单／选关／结算使用左右切换、短按 `switch` 确认；游戏中短按暂停／恢复，长按返回对应菜单。成功前 3 关可选 `RETRY / NEXT / SELECT`，末关和失败可返回选择；无尽失败为 `RETRY / MENU`。
+
+当前自动验证：18 组完整回归、64 套残骸布局清除见证、12 场景 RTL 预览及完整整机布线通过。资源 14,152 LUT／6,179 寄存器／27 BRAM／1 DSP；WNS **+0.280 ns**、WHS **+0.075 ns**，TNS／THS 均为 0。上板、PC 实际收流和人工试听待用户完成。
+
+[最新 bit](bit/Tetris.bit) · [实施与验证报告](docs/reports/story_game_modes_20261025_final/build-summary.md) · [预览总览](docs/reports/story_game_modes_20261025_final/previews/contact-sheet.png) · [玩法规格](docs/计划书/游戏模式_玩法规格.md)。本次实施结果未再次提交，也未推送 GitHub。上方故事 UI 数值为四模式改造前的历史基线。
 
 ## 比特流存放规则
 

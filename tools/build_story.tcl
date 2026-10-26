@@ -33,20 +33,22 @@ if {[file isfile [file join $root assets story_voice.json]]} {
     puts [exec python [file join $root tools prepare_story_voice.py]]
     puts [exec python [file join $root tools build_voice_assets.py]]
 }
-puts [exec python [file join $root tools story_build_manifest.py] write [file join $output source-manifest.json]]
 open_project [file join $root Tetris.xpr]
 foreach stale {voice_v0.mem voice_v0_config.vh} {set entries [get_files -quiet *$stale];if {[llength $entries]} {remove_files $entries}}
 set_property include_dirs [list [file join $root Tetris.srcs sources_1 new]] [get_filesets sources_1]
-foreach name {story_pixel_frontend story_pixel_mapper story_ui story_scene story_presentation story_feedback story_controller bin_to_bcd hud_text hud_font_rom core_renderer scene_sprite_rom audio_synth audio_mixer ima_adpcm_decoder story_comms voice_player voice_adpcm_rom} {
+foreach name {story_debris story_pixel_frontend story_pixel_mapper story_ui story_scene story_presentation story_feedback story_controller bin_to_bcd hud_text hud_font_rom core_renderer scene_sprite_rom audio_synth audio_mixer ima_adpcm_decoder story_comms voice_player voice_adpcm_rom} {
     set source [file join $root Tetris.srcs sources_1 new ${name}.v]
     if {[file isfile $source] && [llength [get_files -quiet $source]] == 0} {
         add_files -norecurse $source
     }
 }
-foreach name {story_font.mem story_sprites.mem story_voice.mem story_voice_config.vh story_voice_ids.vh story_audio_priority.vh story_layout.vh story_text_ids.vh story_palette.vh} {
+foreach name {game_mode_params.vh story_debris_percent.mem story_debris.mem story_font.mem story_sprites.mem story_voice.mem story_voice_config.vh story_voice_ids.vh story_audio_priority.vh story_layout.vh story_text_ids.vh story_palette.vh} {
     set source [file join $root Tetris.srcs sources_1 new $name]
     if {[file isfile $source] && [llength [get_files -quiet $source]] == 0} {add_files -norecurse $source}
 }
+close_project
+open_project [file join $root Tetris.xpr]
+puts [exec python [file join $root tools story_build_manifest.py] write [file join $output source-manifest.json]]
 set hook [get_property STEPS.WRITE_BITSTREAM.TCL.POST [get_runs impl_1]]
 set_property STEPS.WRITE_BITSTREAM.TCL.POST {} [get_runs impl_1]
 set status [catch {
@@ -67,7 +69,6 @@ set status [catch {
     report_bus_skew -file [file join $output bus_skew.rpt]
     source [file join $root tools check_lutram_pins.tcl]
     check_lutram_pins [file join $output lutram_pins.rpt]
-    puts [exec python [file join $root tools story_build_manifest.py] verify [file join $output source-manifest.json]]
     set utilization [report_utilization -return_string]
     set luts [used_resource $utilization {Slice LUTs}]
     set registers [used_resource $utilization {Slice Registers}]
@@ -89,14 +90,16 @@ set status [catch {
     close $result
     report_timing -max_paths 20 -file [file join $output setup_paths.rpt]
     if {!$green} {error "Candidate timing margin failed"}
-    if {$publish} {
+
+} problem]
+set_property STEPS.WRITE_BITSTREAM.TCL.POST $hook [get_runs impl_1]
+close_project
+puts [exec python [file join $root tools story_build_manifest.py] verify [file join $output source-manifest.json]]
+if {$status} {error $problem}
+if {$publish} {
         source [file join $root tools publish_bitstream.tcl]
-        publish_bitstream [file join [get_property DIRECTORY [get_runs impl_1]] Tetris.bit] $root
+        publish_bitstream [file join $root Tetris.runs impl_1 Tetris.bit] $root
     } else {
         puts "STORY_CANDIDATE_ONLY: published bitstream unchanged"
     }
     puts "STORY_BUILD_PASS $round"
-} problem]
-set_property STEPS.WRITE_BITSTREAM.TCL.POST $hook [get_runs impl_1]
-close_project
-if {$status} {error $problem}

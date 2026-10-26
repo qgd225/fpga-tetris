@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "template_version": 1,
+  "score_max": 999999,
+  "lines_max": 999999,
+  "seconds_max": 5999,
+  "endless_step": [
+    4,
+    5
+  ],
+  "levels": [
+    {
+      "ship": 1,
+      "height": 2,
+      "bottom_blocks": [
+        13,
+        16
+      ],
+      "initial_speed": 0,
+      "target": [
+        24,
+        30
+      ],
+      "step": [
+        4,
+        5
+      ],
+      "half_threshold_override": [
+        13,
+        16
+      ]
+    },
+    {
+      "ship": 2,
+      "height": 3,
+      "bottom_blocks": [
+        14,
+        17
+      ],
+      "initial_speed": 1,
+      "target": [
+        28,
+        35
+      ],
+      "step": [
+        4,
+        5
+      ],
+      "half_threshold_override": null
+    },
+    {
+      "ship": 3,
+      "height": 4,
+      "bottom_blocks": [
+        15,
+        18
+      ],
+      "initial_speed": 2,
+      "target": [
+        32,
+        40
+      ],
+      "step": [
+        4,
+        5
+      ],
+      "half_threshold_override": null
+    },
+    {
+      "ship": 4,
+      "height": 5,
+      "bottom_blocks": [
+        16,
+        19
+      ],
+      "initial_speed": 3,
+      "target": [
+        36,
+        45
+      ],
+      "step": [
+        4,
+        5
+      ],
+      "half_threshold_override": null
+    }
+  ]
+}

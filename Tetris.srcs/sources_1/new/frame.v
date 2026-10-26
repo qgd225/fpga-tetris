@@ -26,6 +26,7 @@ module frame(
     input choose,
     input [3:0]choose_cnt,
     input duo,
+    input campaign,ship_select,input [1:0] level_id,result_option,output wire run_ready,
     input left_p_flag2,
     input right_p_flag2,
     input drop_r_flag2,
@@ -39,8 +40,9 @@ module frame(
     output clear,
     output [2:0]speed_level,
     output [19:0]score,
-    output [15:0]lines,
+    output [19:0]lines,
     output [13:0]time_sec,
+    output reg core_half_event,core_online_event,debris_clear_event,
     output snd_land1,
     output snd_land2,
     output snd_hard1,
@@ -123,7 +125,7 @@ module frame(
     wire [4:0]hint_c0, hint_c1, hint_c2, hint_c3;
     wire [4:0]hint_r0, hint_r1, hint_r2, hint_r3;
 
-    wire [15:0]lines_total;
+    wire [19:0]lines_total;
     wire over_raw, batch_done, engine_quiescent;
     wire [4:0]batch_n;
     wire [2:0]batch_speed;
@@ -131,13 +133,30 @@ module frame(
     wire finish_pending, result_valid;
     wire [3:0]core_locked;
     wire phase_enter, charge_pulse;
+    `include "game_mode_params.vh"
+    wire [479:0] initial_mask,debris_mask;
+    wire [6:0] debris_remaining;
+    wire debris_ready;reg debris_ready_d,idle_seed_d;
+    reg [15:0] frame_seed;
+    always @(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin frame_seed<=0;debris_ready_d<=0;idle_seed_d<=0;end
+        else begin
+            if(video_de && hcounter==0 && vcounter==0)frame_seed<=frame_seed+1'b1;
+            debris_ready_d<=debris_ready;idle_seed_d<=Idle;
+        end
+    end
+    story_debris initial_debris(.clk(Clk_74M),.reset_n(Reset_n),.start(Idle && !idle_seed_d),
+        .campaign(campaign),.duo(duo),.level_id(level_id),.seed(frame_seed),
+        .ready(debris_ready),.initial_mask(initial_mask),.debris_seed(),.layout_id());
+    wire debris_load=debris_ready && !debris_ready_d;
+    assign run_ready=debris_ready && debris_ready_d && engine_quiescent;
     wire new_run = Idle || choose || (Finalize && switch_r_flag);
     assign mission_hold = finish_pending || result_valid;
     assign mission_win = result_valid && mission_success;
     assign over = result_valid && !mission_success && !Finalize;
     story_controller story_inst(
         .clk(Clk_74M),.reset_n(Reset_n),.new_run(new_run),
-        .playing(Playing),.paused(Stop),.duo(duo),
+        .playing(Playing),.paused(Stop),.duo(duo),.campaign(campaign),.level_id(level_id),.debris_remaining(debris_remaining),
         .row_credit(clear_t_t),.batch_done(batch_done),
         .engine_quiescent(engine_quiescent),.over_raw(over_raw),
         .lines_total(lines_total),.story_speed(speed_level),
@@ -147,10 +166,34 @@ module frame(
         .result_success(mission_success)
     );
 
+    (* rom_style="block" *) reg [6:0] debris_percent_rom[0:1023];
+    initial $readmemh("D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_debris_percent.mem",debris_percent_rom);
+    reg [6:0] debris_percent;
+    always @(posedge Clk_74M)debris_percent<=debris_percent_rom[{duo,level_id,debris_remaining}];
+    reg [6:0] debris_event_d,audio_debris_d;
+    always @(posedge Clk_74M or negedge Reset_n)begin
+      if(!Reset_n)begin debris_event_d<=0;audio_debris_d<=0;end
+      else if(new_run)begin
+       debris_event_d<=campaign?mode_total(duo,level_id):0;
+       audio_debris_d<=campaign?mode_total(duo,level_id):0;
+      end else begin
+       if(batch_commit)debris_event_d<=debris_remaining;
+       if(Playing && !Stop)audio_debris_d<=debris_event_d;
+      end
+    end
+    always @(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin core_half_event<=0;core_online_event<=0;debris_clear_event<=0;end
+        else if(new_run)begin core_half_event<=0;core_online_event<=0;debris_clear_event<=0;end
+        else begin
+            core_online_event<=Playing && campaign && !mission_success && audio_debris_d!=0 && debris_event_d==0;
+            core_half_event<=Playing && campaign && !mission_success && debris_event_d!=0 && debris_event_d<=mode_half(duo,level_id) && audio_debris_d>mode_half(duo,level_id);
+            debris_clear_event<=Playing && campaign && !mission_success && debris_event_d<audio_debris_d;
+        end
+    end
     assign lines = lines_total;
 
-    wire [19:0]lines_bcd;
-    bin_to_bcd line_digits(.clk(Clk_74M),.reset_n(Reset_n),
+    wire [23:0]lines_bcd;
+    bin_to_bcd #(.WIDTH(20),.DIGITS(6)) line_digits(.clk(Clk_74M),.reset_n(Reset_n),
                           .value(lines_total),.bcd(lines_bcd));
 
     wire [4:0]cc_t [0:3];
@@ -177,10 +220,12 @@ module frame(
 
 //    取格行字: 20 行, 每行 24 列(state) / 24x3 位(颜色号) / owner; 纯连线, 0 LUT
     wire [23:0]row_f[0:19];
+    wire [23:0] debris_rows[0:19];
     genvar gr, gc;
     generate for(gr = 0; gr < 20; gr = gr + 1)begin : gen_rowf
         for(gc = 0; gc < 24; gc = gc + 1)begin : gen_colf
             assign row_f[gr][gc] = state[gc*20+gr];
+            assign debris_rows[gr][gc] = debris_mask[gc*20+gr];
         end
     end endgenerate
 
@@ -227,7 +272,7 @@ module frame(
     .Finalize(Finalize),
     .score(score),
     .time_sec(time_sec),
-    .duo(duo),
+    .duo(duo),.init_load(debris_load),.initial_mask(initial_mask),.initial_total(campaign?mode_total(duo,level_id):8'd0),.debris_mask(debris_mask),.debris_remaining(debris_remaining),
     .left_p_flag2(left_p_flag2),
     .right_p_flag2(right_p_flag2),
     .drop_r_flag2(drop_r_flag2),
@@ -395,16 +440,16 @@ module frame(
     reg [3:0] display_locked;
     reg display_success;
     reg [2:0] display_speed;
-    reg [19:0] display_lines;
+    reg [23:0] display_lines;
     reg [23:0] display_score;
-    reg [15:0] display_time;
+    reg [15:0] display_time;reg [6:0] display_debris;
     always @(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)begin
             display_phase<=0;display_danger<=0;display_locked<=0;display_success<=0;
-            display_speed<=0;display_lines<=0;display_score<=0;display_time<=0;
+            display_speed<=0;display_lines<=0;display_score<=0;display_time<=0;display_debris<=0;
         end else if(video_de && hcounter==0 && vcounter==0)begin
             display_phase<=story_phase;display_danger<=danger_lvl;display_locked<=core_locked;display_success<=mission_success;
-            display_speed<=speed_level;display_lines<=lines_bcd;display_score<=score_bcd;display_time<=time_bcd;
+            display_speed<=speed_level;display_lines<=lines_bcd;display_score<=score_bcd;display_time<=time_bcd;display_debris<=batch_commit?debris_remaining:debris_event_d;
         end
     end
     wire [4:0] feedback_clear_age;
@@ -446,8 +491,8 @@ module frame(
     end
     story_ui story_ui_inst(
         .clk(Clk_74M),.reset_n(Reset_n),.x(render_h),.y(render_v),
-        .comms_visible(comms_visible),.comms_id(comms_id),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),.choose_cnt(choose_cnt),
-        .phase(display_phase),.danger(display_danger),.locked(display_locked),.success(display_success),.result_ready(result_ready),
+        .comms_visible(comms_visible),.comms_id(comms_id),.duo(duo),.campaign(campaign),.ship_select(ship_select),.level_id(level_id),.result_option(result_option),.debris_percent(debris_percent),.debris_left(display_debris),.debris_cell((R_num<20 && C_num<24)?debris_rows[R_num][C_num]:1'b0),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),.choose_cnt(choose_cnt),
+        .success_age(success_age),.phase(display_phase),.danger(display_danger),.locked(display_locked),.success(display_success),.result_ready(result_ready),
         .speed(display_speed),.lines_bcd(display_lines),.score_bcd(display_score),.time_bcd(display_time),
         .feedback_lock(feedback_lock),.feedback_hard_left(feedback_hard_left),.feedback_hard_right(feedback_hard_right),
         .bounds1(bounds1),.bounds2(bounds2),.star_drift(star_drift),.feedback_clear_age(feedback_clear_age),.feedback_clear_row(feedback_clear_row),

@@ -7,6 +7,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
+    from build_game_mode_assets import generate, TARGET
+    for asset_name, asset_bytes in generate().items():
+        (TARGET / asset_name).write_bytes(asset_bytes)
     data = json.loads((ROOT / "assets/story_ui.json").read_text(encoding="utf-8"))
     chars = data["characters"]
     font = data["font_rows"]

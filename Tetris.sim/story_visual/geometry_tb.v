@@ -35,7 +35,7 @@ wire [23:0] rgb;
 reg board[0:479];reg [2:0] board_type[0:479];reg board_owner[0:479];
 reg [23:0] palette[0:55];
 integer bi;
-story_ui dut(.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
+story_ui dut(.debris_percent(7'd50),.success_age(7'd72),.campaign(1'b1),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.debris_left(7'd0),.debris_cell(1'b0),.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
     .comms_visible(comms_visible),.comms_id(comms_id),.choose_cnt(duo?4'd1:4'd0),.phase(phase),.danger(danger),.locked(locked),.success(success),.result_ready(result_ready),
     .bounds1({11'd241,11'd213,(duo?11'd545:11'd593),(duo?11'd445:11'd493)}),
     .bounds2({11'd289,11'd237,11'd833,11'd757}),.star_drift(11'd0),.feedback_clear_age(5'd0),.feedback_clear_row(feedback_clear),
@@ -110,9 +110,9 @@ endtask
  reg expected;
  task check;input condition;input [511:0] label;
  begin checks=checks+1;if(condition!==1'b1)begin errors=errors+1;if(errors<16)$display("FAIL UI geometry %0s x=%0d y=%0d",label,x,y);end end endtask
- task position;input integer ax,ay;begin @(negedge clk);set_pixel(ax,ay);#1;end endtask
+ task position;input integer ax,ay;begin @(negedge clk);set_pixel(ax,ay);@(posedge clk);#1;end endtask
  task rgb_check;input integer ax,ay,index;input [511:0] label;
- begin position(ax,ay);repeat(4)@(negedge clk);check(rgb===palette[index],label);end endtask
+ begin position(ax,ay);repeat(6)@(negedge clk);check(rgb===palette[index],label);end endtask
  task text_check;input integer ax,ay,w,h,style;
  begin
   for(dy=0;dy<h;dy=dy+1)for(dx=0;dx<w;dx=dx+1)begin
@@ -176,7 +176,7 @@ endtask
    Finalize=1;result_ready=1;success=1;
    rgb_check(fx+10,610,30,"result darkens only field material");
    rgb_check(fx,634,53,"detached nameplate removed");
-   text_check(420,264,440,36,3);text_check(448,360,384,24,1);text_check(448,400,384,24,1);text_check(448,440,384,24,1);text_check(580,496,120,12,0);text_check(556,544,168,12,0);
+   text_check(420,264,440,36,3);text_check(448,360,384,24,1);text_check(448,400,384,24,1);text_check(448,440,384,24,1);text_check(500,496,280,12,0);text_check(556,544,168,12,0);
    position(448+23*16,344);check(!dut.text_valid,"unused score row removed");
    success=0;text_check(500,264,280,36,3);
    position(430,250);check(dut.foreground_index==27,"result panel unchanged anchor");
@@ -186,7 +186,7 @@ endtask
   choose=1;Finalize=0;Playing=0;
   text_check(320,152,224,36,3);text_check(656,212,352,24,1);
   text_check(736,288,336,24,1);text_check(736,360,336,24,1);
-  position(680,426);check(!dut.menu_entry,"unimplemented third mode hidden");
+  position(680,426);check(dut.menu_entry,"implemented third mode visible");
   position(900,214);check(dut.text_length==11 && dut.text_column>=dut.text_length,"menu subtitle cannot read into next text");
   if(errors==0)$display("ALL PASS UI GEOMETRY checks=%0d",checks);else $display("FAILED UI GEOMETRY errors=%0d",errors);
   $finish;

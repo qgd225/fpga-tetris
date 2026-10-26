@@ -27,6 +27,8 @@ module Playfield(
     input [19:0]score,
     input [13:0]time_sec,
     input duo,
+    input init_load,input [479:0] initial_mask,input [6:0] initial_total,
+    output reg [479:0] debris_mask,output reg [6:0] debris_remaining,
     input left_p_flag2,
     input right_p_flag2,
     input drop_r_flag2,
@@ -282,6 +284,8 @@ module Playfield(
     wire new_piece1 = (counter_r == 5'd0) && (counter_r_d1 != 5'd0);
     wire new_piece2 = (counter_r2 == 5'd0) && (counter_r2_d1 != 5'd0);
     reg row_we;
+    reg [1:0] debris_pending;
+    reg mask_we_q;reg [4:0] mask_row_q;reg [23:0] mask_data_q;
     wire field_chg = row_we || lock_we || lock_we2 || clear_pulse || clear_t_t;
     wire ghost_restart1 = en_rotate || left_p_flag || right_p_flag || new_piece1 || hold_up || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved1);
     wire ghost_restart2 = en_rotate2 || left_p_flag2 || right_p_flag2 || new_piece2 || hold_up2 || (Finalize && switch_r_flag) || clear_down || field_chg || (duo && other_moved2);
@@ -301,6 +305,7 @@ module Playfield(
     integer y;
     integer m;
     integer c;
+    integer debris_col,debris_i,debris_j;
     integer o;
     integer p;
     integer k;
@@ -318,7 +323,7 @@ module Playfield(
     reg lock_pending2;
     reg [4:0]row_addr;
     reg [23:0]row_data;
-    wire restart_board = (Idle && !idle_d) || (Finalize && switch_r_flag);
+    wire restart_board = init_load || (Idle && !idle_d) || (Finalize && switch_r_flag);
     wire board_busy = board_init || move_active || restart_board;
     reg [1:0] rotation_settle;
     always @(posedge Clk_74M or negedge Reset_n)begin
@@ -328,9 +333,10 @@ module Playfield(
     end
     wire player_stop = Stop || mission_hold || clear_time || (|rotation_settle);
     reg batch_active;
+    wire move_start;
     wire clear_cancel = Idle || restart_board;
     assign batch_done = clear_down && batch_active;
-    assign engine_quiescent = !board_busy && !lock_we && !lock_we2 &&
+    assign engine_quiescent = !mask_we_q && !(|debris_pending) && !move_start && !board_busy && !lock_we && !lock_we2 &&
                               !lock_pending2 && !clear_time;
     always @(posedge Clk_74M or negedge Reset_n) begin
         if(!Reset_n) begin batch_active<=0; batch_n<=0; batch_speed<=0; end
@@ -343,7 +349,7 @@ module Playfield(
     wire lock_valid2 = duo && lock_we2 && cc_t2[lock_idx2] < COL && rr_t2[lock_idx2] < 20;
     assign lock_commit1 = !board_busy && !Idle && !Finalize && lock_valid1;
     assign lock_commit2 = !board_busy && !Idle && !Finalize && !lock_we && lock_valid2;
-    wire move_start = !board_init && !restart_board && !Idle && !Finalize &&
+    assign move_start = !board_init && !restart_board && !Idle && !Finalize &&
                       !lock_we && !(duo && lock_we2) && clear_time && !clear_t && !clear_pulse && !move_active;
     assign move_we = !board_init && !restart_board && (move_active || move_start);
     assign move_row = move_active ? move_ptr : clear_row;
@@ -355,6 +361,7 @@ module Playfield(
         if(board_init || restart_board)begin
             row_we = 1'b1;
             row_addr = restart_board ? 5'd0 : init_row;
+            for(debris_col=0;debris_col<24;debris_col=debris_col+1)row_data[debris_col]=initial_mask[debris_col*20+row_addr];
         end
         else if(lock_commit1)begin
             row_we = 1'b1;
@@ -906,6 +913,32 @@ module Playfield(
 //    场地状态与消行
 //============================================================
 //    Canonical mirror and replicas consume the same single-row transaction.
+    reg [23:0] debris_row_q;
+    reg [6:0] debris_removed;
+    reg [6:0] debris_popcount;
+    always @(*)begin
+        debris_popcount=0;
+        for(debris_i=0;debris_i<24;debris_i=debris_i+1)
+            debris_popcount=debris_popcount+debris_row_q[debris_i];
+    end
+    always @(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)begin debris_mask<=0;debris_remaining<=0;debris_row_q<=0;debris_removed<=0;debris_pending<=0;mask_we_q<=0;mask_row_q<=0;mask_data_q<=0;end
+        else begin
+            debris_pending<={debris_pending[0],move_start};
+            if(move_start)for(debris_j=0;debris_j<24;debris_j=debris_j+1)
+                debris_row_q[debris_j]<=debris_mask[debris_j*20+clear_row];
+            if(debris_pending[0])debris_removed<=debris_popcount;
+            if(restart_board)begin debris_remaining<=initial_total;debris_pending<=0;end
+            else if(debris_pending[1])debris_remaining<=debris_remaining>=debris_removed?debris_remaining-debris_removed:0;
+            mask_we_q<=row_we;mask_row_q<=row_addr;
+            for(debris_j=0;debris_j<24;debris_j=debris_j+1)begin
+                if(board_init || restart_board)mask_data_q[debris_j]<=initial_mask[debris_j*20+row_addr];
+                else if(move_we)mask_data_q[debris_j]<=row_addr==0?1'b0:debris_mask[debris_j*20+row_addr-1'b1];
+                else mask_data_q[debris_j]<=debris_mask[debris_j*20+row_addr];
+                if(mask_we_q)debris_mask[debris_j*20+mask_row_q]<=mask_data_q[debris_j];
+            end
+        end
+    end
     always@(posedge Clk_74M or negedge Reset_n)begin
         if(!Reset_n)
         state <= 480'd0;

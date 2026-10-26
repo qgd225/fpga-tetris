@@ -38,7 +38,7 @@ wire [23:0] rgb;
 reg board[0:479];reg [2:0] board_type[0:479];reg board_owner[0:479];
 reg [23:0] palette[0:55];
 integer bi;
-story_ui dut(.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
+story_ui dut(.debris_percent(7'd50),.success_age(7'd72),.campaign(1'b1),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.debris_left(7'd0),.debris_cell(1'b0),.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
     .comms_visible(comms_visible),.comms_id(comms_id),.choose_cnt(duo?4'd1:4'd0),.phase(phase),.danger(danger),.locked(locked),.success(success),.result_ready(result_ready),
     .bounds1({11'd241,11'd213,(duo?11'd545:11'd593),(duo?11'd445:11'd493)}),
     .bounds2({11'd289,11'd237,11'd833,11'd757}),.star_drift(11'd0),.feedback_clear_age(5'd0),.feedback_clear_row(feedback_clear),

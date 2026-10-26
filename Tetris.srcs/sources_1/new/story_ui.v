@@ -4,10 +4,11 @@
 module story_ui(
     input clk,reset_n,input [10:0] x,y,
     input duo,choose,Idle,Playing,Stop,Finalize,
+    input [6:0] debris_percent,success_age,input campaign,ship_select,debris_cell,input [1:0] level_id,result_option,input [6:0] debris_left,
     input comms_visible,input [2:0] comms_id,
     input [3:0] choose_cnt,input [1:0] phase,danger,
     input [3:0] locked,input success,result_ready,
-    input [2:0] speed,input [19:0] lines_bcd,input [23:0] score_bcd,input [15:0] time_bcd,
+    input [2:0] speed,input [23:0] lines_bcd,input [23:0] score_bcd,input [15:0] time_bcd,
     input [7:0] animation,input [10:0] star_drift,input [4:0] charge_left,
     input [43:0] bounds1,bounds2,input [4:0] feedback_clear_age,input feedback_clear_row,
     input feedback_lock,feedback_hard_left,feedback_hard_right,feedback_clear,
@@ -22,6 +23,17 @@ module story_ui(
 );
     `include "story_text_ids.vh"
     `include "story_palette.vh"
+    `include "game_mode_params.vh"
+    wire [3:0] result_mode_id={2'd0,campaign,duo};
+    wire [10:0] result_mode_x=campaign?(duo?11'd592:11'd588):(duo?11'd596:11'd592);
+    wire [10:0] result_mode_width=campaign?(duo?11'd96:11'd104):(duo?11'd88:11'd96);
+    wire [3:0] menu_choice=ship_select?{2'd0,level_id}:choose_cnt;
+    wire [7:0] target_lines=mode_target(duo,level_id);
+    wire [7:0] card_target=mode_target(duo,level_id);
+    wire [7:0] card_total=mode_total(duo,level_id);
+    wire [9:0] status_address=!campaign?TXT_ACTIVE:debris_left==0?TXT_ONLINE:debris_left<=mode_half(duo,level_id)?TXT_HALF:TXT_LOCKED;
+    wire [6:0] status_length=!campaign?LEN_ACTIVE:debris_left==0?LEN_ONLINE:debris_left<=mode_half(duo,level_id)?LEN_HALF:LEN_LOCKED;
+
     wire [10:0] field_x=duo?`STORY_FIELD_X_DUO:`STORY_FIELD_X_SOLO;
     // 两种布局在编译期求边界，避免模式选择后再做乘加。
     wire [10:0] field_right=duo?(`STORY_FIELD_X_DUO+24*`STORY_CELL):(`STORY_FIELD_X_SOLO+20*`STORY_CELL);
@@ -30,8 +42,8 @@ module story_ui(
     wire core_hit;
     story_scene scene(.clk(clk),.reset_n(reset_n),.x(x),.y(y),.field_right(field_right),
         .phase(phase),.choose(choose),.star_drift(star_drift),.success(success),.failed(Finalize && !success),.animation(animation),.charge_left(charge_left),.color_index(background_index));
-    core_renderer core(.x(x),.y(y),.phase(phase),.danger(danger),.locked(locked),
-        .success(success),.failed(Finalize && !success),.charging(charge_left!=0),.animation(animation),.hit(core_hit),.color_index(core_index));
+    core_renderer core(.blocked(campaign && debris_left>mode_half(duo,level_id)),.half_power(campaign && debris_left!=0 && debris_left<=mode_half(duo,level_id)),.x(x),.y(y),.phase(phase),.danger(danger),.locked(locked),
+        .success(success),.failed(Finalize && !success),.charging(charge_left!=0),.animation(success?(success_age<4?8'd4:8'd0):animation),.hit(core_hit),.color_index(core_index));
     function box;
         input [10:0] px,py,bx,by,w,h;
         begin box=px>=bx && px<bx+w && py>=by && py<by+h;end
@@ -113,7 +125,7 @@ module story_ui(
     wire progress_fastener=(progress_local>=5 && progress_local<8 || progress_local>=(duo?60:48) && progress_local<(duo?63:51)) && (y==102 || y==111);
     wire progress_glass=y>=104 && y<110 && progress_local>=11 && progress_local<(duo?60:48);
     wire progress_stand=y>=114 && progress_local>=(duo?32:26) && progress_local<(duo?40:34);
-    wire [3:0] menu_first=choose_cnt>=3?choose_cnt-2:0;
+    wire [3:0] menu_first=menu_choice>=3?menu_choice-2:0;
     wire [1:0] menu_row=y>=412?2'd2:y>=340?2'd1:2'd0;
     wire [3:0] menu_id=menu_first+menu_row;
     wire [10:0] menu_y=11'd268+({9'd0,menu_row}<<6)+({9'd0,menu_row}<<3);
@@ -135,7 +147,7 @@ module story_ui(
         (x>=696 && x<710 && y>=menu_y+24 && y<menu_y+38) ||
         (x>=696 && x<710 && y>=menu_y+8 && y<menu_y+22));
     wire menu_scroll=x>=1112 && x<1116 && y>=268 && y<476;
-    wire [3:0] menu_selected=choose_cnt-menu_first;
+    wire [3:0] menu_selected=menu_choice-menu_first;
     wire [10:0] menu_scroll_y=11'd268+({7'd0,menu_selected}<<6)+({7'd0,menu_selected}<<3);
     wire menu_handle=x>=1110 && x<1118 && y>=menu_scroll_y && y<menu_scroll_y+64;
     wire [10:0] arrow_x=x>=872?x-872:872-x;
@@ -156,6 +168,9 @@ module story_ui(
                 if(cell_visible)begin
                     if(piece1)begin material_kind=1;material_type=type1;end
                     else if(piece2 && duo)begin material_kind=1;material_type=type2;material_owner=1;end
+                    else if(occupied && debris_cell)begin
+                        material_kind=0;foreground_index=(local_x==0 || local_y==0)?6'd22:((local_x==local_y || local_x+local_y==21)?6'd21:6'd23);
+                    end
                     else if(occupied)begin material_kind=1;material_type=cell_type;material_owner=owner;material_marked=duo;end
                     else if(ghost1 || (duo && ghost2) || hint_hit)begin
                         material_kind=2;material_type=ghost1?type1:type2;material_owner=!ghost1;
@@ -209,8 +224,8 @@ module story_ui(
             if(menu_window)begin foreground=1;foreground_index=51;end
             if(menu_bolts)begin foreground=1;foreground_index=45;end
             if(box(x,y,394,400,12,12))begin foreground=1;foreground_index=39;end
-            if(menu_entry)begin foreground=1;foreground_index=menu_border?(menu_id==choose_cnt?6'd25:6'd21):6'd50;end
-            if(menu_icon)begin foreground=1;foreground_index=menu_id==choose_cnt?6'd1:6'd31;end
+            if(menu_entry)begin foreground=1;foreground_index=menu_border?(menu_id==menu_choice?6'd25:6'd21):6'd50;end
+            if(menu_icon)begin foreground=1;foreground_index=menu_id==menu_choice?6'd1:6'd31;end
             if(menu_scroll || menu_arrows)begin foreground=1;foreground_index=22;end
             if(menu_handle)begin foreground=1;foreground_index=25;end
         end
@@ -219,9 +234,9 @@ module story_ui(
             foreground_index=(x==800 || x==1247 || y==24 || y==119)?6'd37:6'd44;
         end
     end
-    wire [33:0] text_regions;
+    wire [35:0] text_regions;
     wire text_silent=Finalize && success && !result_ready;
-    wire text_valid=(|text_regions) && !text_silent;
+    wire text_valid=((|text_regions) || (campaign && !choose && !Idle && box(x,y,984,632,208,16))) && !text_silent;
     reg direct_mode;
     reg [9:0] text_base;
     reg [10:0] text_x,text_y;
@@ -257,21 +272,23 @@ module story_ui(
     assign text_regions[16]=(!choose && Idle) && box(x,y,512,264,LEN_OBJECTIVE*16,24);
     assign text_regions[17]=(!choose && Idle) && box(x,y,440,304,LEN_HELP*16,24);
     assign text_regions[18]=(!choose && !Idle && Finalize && result_ready) && box(x,y,(success?420:500),264,(success?440:280),36);
-    assign text_regions[19]=(!choose && !Idle && Finalize && result_ready) && box(x,y,(duo?600:596),312,(duo?80:88),12);
+    assign text_regions[19]=(!choose && !Idle && Finalize && result_ready) && box(x,y,result_mode_x,312,result_mode_width,12);
     assign text_regions[20]=(!choose && !Idle && Finalize && result_ready) && box(x,y,448,360,384,24);
     assign text_regions[21]=(!choose && !Idle && Finalize && result_ready) && box(x,y,448,400,384,24);
     assign text_regions[22]=(!choose && !Idle && Finalize && result_ready) && box(x,y,448,440,384,24);
-    assign text_regions[23]=(!choose && !Idle && Finalize && result_ready) && box(x,y,580,496,120,12);
+    assign text_regions[23]=(!choose && !Idle && Finalize && result_ready) && box(x,y,500,496,280,12);
     assign text_regions[24]=(!choose && !Idle && Finalize && result_ready) && box(x,y,556,544,168,12);
     assign text_regions[25]=(!choose && !Idle && !Finalize) && box(x,y,field_x,72,288,24);
     assign text_regions[26]=(!choose && !Idle && !Finalize) && box(x,y,field_x+304,80,24,12);
     assign text_regions[27]=(!choose && !Idle && !Finalize) && box(x,y,field_x+336,72,48,24);
-    assign text_regions[28]=(!choose && !Idle && !Finalize) && box(x,y,field_x,116,88,12);
-    assign text_regions[29]=(!choose && !Idle && !Finalize) && box(x,y,560,634,160,24);
+    assign text_regions[28]=(!choose && !Idle && !Finalize) && box(x,y,field_x,116,304,12);
+    assign text_regions[29]=(1'b0) && box(x,y,560,634,160,24);
     assign text_regions[30]=(!choose && !Idle && !Finalize && Stop) && box(x,y,592,304,LEN_PAUSE*16,24);
     assign text_regions[31]=(comms_allowed) && box(x,y,816,28,80,24);
     assign text_regions[32]=(comms_allowed) && box(x,y,816,56,416,24);
     assign text_regions[33]=(comms_allowed) && box(x,y,816,88,416,24);
+    assign text_regions[34]=!choose && !Idle && box(x,y,400,668,512,24);
+    assign text_regions[35]=!choose && !Idle && box(x,y,984,616,208,16);
     always @(*)begin
         direct_mode=0;text_base=0;text_x=0;text_y=0;text_ink=0;dynamic_kind=0;text_style=0;text_length=0;
         text_x=text_x | ({11{text_regions[0]}} & (64));
@@ -292,28 +309,28 @@ module story_ui(
         dynamic_kind=dynamic_kind | ({4{text_regions[1]}} & (0));
         text_x=text_x | ({11{text_regions[2]}} & (656));
         text_y=text_y | ({11{text_regions[2]}} & (212));
-        text_base=text_base | ({10{text_regions[2]}} & (TXT_MENU_TITLE));
+        text_base=text_base | ({10{text_regions[2]}} & (ship_select?(duo?TXT_SELECT_DUO:TXT_SELECT_SOLO):TXT_MENU_TITLE));
         text_style=text_style | ({3{text_regions[2]}} & (1));
         text_ink=text_ink | ({6{text_regions[2]}} & (6'd52));
-        text_length=text_length | ({7{text_regions[2]}} & (LEN_MENU_TITLE));
+        text_length=text_length | ({7{text_regions[2]}} & (ship_select?(duo?LEN_SELECT_DUO:LEN_SELECT_SOLO):LEN_MENU_TITLE));
         direct_mode=direct_mode | ({1{text_regions[2]}} & (0));
         dynamic_kind=dynamic_kind | ({4{text_regions[2]}} & (0));
         text_x=text_x | ({11{text_regions[3]}} & (736));
         text_y=text_y | ({11{text_regions[3]}} & (menu_y+20));
         text_base=text_base | ({10{text_regions[3]}} & (story_mode_text(menu_id)));
         text_style=text_style | ({3{text_regions[3]}} & (1));
-        text_ink=text_ink | ({6{text_regions[3]}} & (menu_id==choose_cnt?6'd16:6'd51));
-        text_length=text_length | ({7{text_regions[3]}} & (story_mode_length(menu_id)));
-        direct_mode=direct_mode | ({1{text_regions[3]}} & (0));
-        dynamic_kind=dynamic_kind | ({4{text_regions[3]}} & (0));
+        text_ink=text_ink | ({6{text_regions[3]}} & (menu_id==menu_choice?6'd16:6'd51));
+        text_length=text_length | ({7{text_regions[3]}} & (ship_select?7'd16:story_mode_length(menu_id)));
+        direct_mode=direct_mode | ({1{text_regions[3]}} & (ship_select));
+        dynamic_kind=dynamic_kind | ({4{text_regions[3]}} & (ship_select?9:0));
         text_x=text_x | ({11{text_regions[4]}} & (656));
         text_y=text_y | ({11{text_regions[4]}} & (548));
         text_base=text_base | ({10{text_regions[4]}} & (TXT_MENU_HINT));
         text_style=text_style | ({3{text_regions[4]}} & (0));
         text_ink=text_ink | ({6{text_regions[4]}} & (6'd51));
-        text_length=text_length | ({7{text_regions[4]}} & (LEN_MENU_HINT));
-        direct_mode=direct_mode | ({1{text_regions[4]}} & (0));
-        dynamic_kind=dynamic_kind | ({4{text_regions[4]}} & (0));
+        text_length=text_length | ({7{text_regions[4]}} & (ship_select?7'd32:LEN_MENU_HINT));
+        direct_mode=direct_mode | ({1{text_regions[4]}} & (ship_select));
+        dynamic_kind=dynamic_kind | ({4{text_regions[4]}} & (ship_select?10:0));
         text_x=text_x | ({11{text_regions[5]}} & (176));
         text_y=text_y | ({11{text_regions[5]}} & (156));
         text_base=text_base | ({10{text_regions[5]}} & (TXT_NEXT));
@@ -426,12 +443,12 @@ module story_ui(
         text_length=text_length | ({7{text_regions[18]}} & (success?LEN_WIN:LEN_LOSE));
         direct_mode=direct_mode | ({1{text_regions[18]}} & (0));
         dynamic_kind=dynamic_kind | ({4{text_regions[18]}} & (0));
-        text_x=text_x | ({11{text_regions[19]}} & ((duo?600:596)));
+        text_x=text_x | ({11{text_regions[19]}} & (result_mode_x));
         text_y=text_y | ({11{text_regions[19]}} & (312));
-        text_base=text_base | ({10{text_regions[19]}} & (duo?TXT_DUO:TXT_SOLO));
+        text_base=text_base | ({10{text_regions[19]}} & (story_mode_text(result_mode_id)));
         text_style=text_style | ({3{text_regions[19]}} & (0));
         text_ink=text_ink | ({6{text_regions[19]}} & (6'd51));
-        text_length=text_length | ({7{text_regions[19]}} & (duo?LEN_DUO:LEN_SOLO));
+        text_length=text_length | ({7{text_regions[19]}} & (story_mode_length(result_mode_id)));
         direct_mode=direct_mode | ({1{text_regions[19]}} & (0));
         dynamic_kind=dynamic_kind | ({4{text_regions[19]}} & (0));
         text_x=text_x | ({11{text_regions[20]}} & (448));
@@ -441,7 +458,7 @@ module story_ui(
         text_ink=text_ink | ({6{text_regions[20]}} & (6'd16));
         text_length=text_length | ({7{text_regions[20]}} & (7'd24));
         direct_mode=direct_mode | ({1{text_regions[20]}} & (1));
-        dynamic_kind=dynamic_kind | ({4{text_regions[20]}} & (4));
+        dynamic_kind=dynamic_kind | ({4{text_regions[20]}} & (2));
         text_x=text_x | ({11{text_regions[21]}} & (448));
         text_y=text_y | ({11{text_regions[21]}} & (400));
         text_base=text_base | ({10{text_regions[21]}} & (0));
@@ -458,28 +475,28 @@ module story_ui(
         text_length=text_length | ({7{text_regions[22]}} & (7'd24));
         direct_mode=direct_mode | ({1{text_regions[22]}} & (1));
         dynamic_kind=dynamic_kind | ({4{text_regions[22]}} & (1));
-        text_x=text_x | ({11{text_regions[23]}} & (580));
+        text_x=text_x | ({11{text_regions[23]}} & (500));
         text_y=text_y | ({11{text_regions[23]}} & (496));
         text_base=text_base | ({10{text_regions[23]}} & (0));
         text_style=text_style | ({3{text_regions[23]}} & (0));
         text_ink=text_ink | ({6{text_regions[23]}} & (6'd51));
-        text_length=text_length | ({7{text_regions[23]}} & (7'd15));
+        text_length=text_length | ({7{text_regions[23]}} & (7'd32));
         direct_mode=direct_mode | ({1{text_regions[23]}} & (1));
-        dynamic_kind=dynamic_kind | ({4{text_regions[23]}} & (7));
+        dynamic_kind=dynamic_kind | ({4{text_regions[23]}} & (11));
         text_x=text_x | ({11{text_regions[24]}} & (556));
         text_y=text_y | ({11{text_regions[24]}} & (544));
-        text_base=text_base | ({10{text_regions[24]}} & (TXT_RETRY));
+        text_base=text_base | ({10{text_regions[24]}} & (result_option==0?TXT_RETRY:campaign?(success && level_id!=3 && result_option==1?TXT_NEXT_LEVEL:TXT_RETURN):TXT_MENU));
         text_style=text_style | ({3{text_regions[24]}} & (0));
         text_ink=text_ink | ({6{text_regions[24]}} & (animation[5]?6'd51:6'd22));
-        text_length=text_length | ({7{text_regions[24]}} & (LEN_RETRY));
+        text_length=text_length | ({7{text_regions[24]}} & (result_option==0?LEN_RETRY:campaign?(success && level_id!=3 && result_option==1?LEN_NEXT_LEVEL:LEN_RETURN):LEN_MENU));
         direct_mode=direct_mode | ({1{text_regions[24]}} & (0));
         dynamic_kind=dynamic_kind | ({4{text_regions[24]}} & (0));
         text_x=text_x | ({11{text_regions[25]}} & (field_x));
         text_y=text_y | ({11{text_regions[25]}} & (72));
-        text_base=text_base | ({10{text_regions[25]}} & (phase_address));
+        text_base=text_base | ({10{text_regions[25]}} & (campaign?phase_address:TXT_ACTIVE));
         text_style=text_style | ({3{text_regions[25]}} & (2));
         text_ink=text_ink | ({6{text_regions[25]}} & (6'd52));
-        text_length=text_length | ({7{text_regions[25]}} & (phase_length));
+        text_length=text_length | ({7{text_regions[25]}} & (campaign?phase_length:LEN_ACTIVE));
         direct_mode=direct_mode | ({1{text_regions[25]}} & (0));
         dynamic_kind=dynamic_kind | ({4{text_regions[25]}} & (0));
         text_x=text_x | ({11{text_regions[26]}} & (field_x+304));
@@ -503,7 +520,7 @@ module story_ui(
         text_base=text_base | ({10{text_regions[28]}} & (0));
         text_style=text_style | ({3{text_regions[28]}} & (0));
         text_ink=text_ink | ({6{text_regions[28]}} & (6'd51));
-        text_length=text_length | ({7{text_regions[28]}} & (7'd11));
+        text_length=text_length | ({7{text_regions[28]}} & (7'd32));
         direct_mode=direct_mode | ({1{text_regions[28]}} & (1));
         dynamic_kind=dynamic_kind | ({4{text_regions[28]}} & (6));
         text_x=text_x | ({11{text_regions[29]}} & (560));
@@ -546,8 +563,24 @@ module story_ui(
         text_length=text_length | ({7{text_regions[33]}} & (7'd26));
         direct_mode=direct_mode | ({1{text_regions[33]}} & (0));
         dynamic_kind=dynamic_kind | ({4{text_regions[33]}} & (0));
+        if(text_regions[34])begin text_x=400;text_y=668;text_style=1;text_base=0;text_ink=51;text_length=32;direct_mode=1;dynamic_kind=12;end
+        if(text_regions[35])begin text_x=984;text_y=616;text_style=0;text_base=status_address;text_ink=37;text_length=status_length;direct_mode=0;dynamic_kind=0;end
+        if(campaign && !choose && !Idle && box(x,y,984,632,208,16))begin text_x=984;text_y=632;text_style=0;text_base=0;text_ink=51;text_length=10;direct_mode=1;dynamic_kind=13;end
     end
     wire [10:0] text_dx=x-text_x,text_dy=y-text_y;
+    reg [10:0] text_dx_p,text_dy_p;
+    reg [2:0] text_style_p;reg [5:0] text_ink_p;reg [3:0] dynamic_kind_p,menu_id_p;
+    reg [9:0] text_base_p;reg [6:0] text_length_p;reg direct_mode_p,text_valid_p;
+    always @(posedge clk or negedge reset_n)begin
+      if(!reset_n)begin
+       text_dx_p<=0;text_dy_p<=0;text_style_p<=0;text_ink_p<=0;dynamic_kind_p<=0;menu_id_p<=0;
+       text_base_p<=0;text_length_p<=0;direct_mode_p<=0;text_valid_p<=0;
+      end else begin
+       text_dx_p<=text_dx;text_dy_p<=text_dy;text_style_p<=text_style;text_ink_p<=text_ink;
+       dynamic_kind_p<=dynamic_kind;menu_id_p<=menu_id;text_base_p<=text_base;text_length_p<=text_length;
+       direct_mode_p<=direct_mode;text_valid_p<=text_valid;
+      end
+    end
     reg [5:0] text_column;
     reg [3:0] glyph_row;
     reg [2:0] glyph_column;
@@ -590,88 +623,159 @@ module story_ui(
         endcase end
     endfunction
     always @(*)begin
-        text_column=text_dx[9:4];glyph_column=text_dx[3:1];glyph_row=text_dy[4:1];glyph_area=1;glyph_local=0;
-        case(text_style)
-        0:begin text_column=text_dx[8:3];glyph_column=text_dx[2:0];glyph_row=text_dy[3:0];end
+        text_column=text_dx_p[9:4];glyph_column=text_dx_p[3:1];glyph_row=text_dy_p[4:1];glyph_area=1;glyph_local=0;
+        case(text_style_p)
+        0:begin text_column=text_dx_p[8:3];glyph_column=text_dx_p[2:0];glyph_row=text_dy_p[3:0];end
         2:begin
-            text_column=div3(text_dx[8:3]);glyph_local=text_dx-((text_column<<4)+(text_column<<3));
+            text_column=div3(text_dx_p[8:3]);glyph_local=text_dx_p-((text_column<<4)+(text_column<<3));
             glyph_column=glyph_local[3:1];glyph_area=glyph_local<16;
           end
-        3:begin text_column=text_dx[10:5];glyph_local={6'd0,text_dx[4:0]};glyph_column=div3(glyph_local[5:0]);glyph_row=div3(text_dy[5:0]);glyph_area=glyph_local<24;end
-        4:begin text_column=div5(text_dx[6:1]);glyph_local=text_dx-((text_column<<3)+(text_column<<1));glyph_column=glyph_local[2:0];glyph_row=text_dy[3:0];glyph_area=glyph_local<8;end
+        3:begin text_column=text_dx_p[10:5];glyph_local={6'd0,text_dx_p[4:0]};glyph_column=div3(glyph_local[5:0]);glyph_row=div3(text_dy_p[5:0]);glyph_area=glyph_local<24;end
+        4:begin text_column=div5(text_dx_p[6:1]);glyph_local=text_dx_p-((text_column<<3)+(text_column<<1));glyph_column=glyph_local[2:0];glyph_row=text_dy_p[3:0];glyph_area=glyph_local<8;end
         default:begin end
         endcase
     end
+    reg [5:0] text_column_q,ink_q;
+    reg [3:0] glyph_row_q,dynamic_kind_q,menu_id_q;
+    reg [2:0] glyph_column_q;
+    reg glyph_area_q,text_valid_q,direct_mode_q;
+    reg [9:0] text_base_q;reg [6:0] text_length_q;
+    always @(posedge clk or negedge reset_n)begin
+      if(!reset_n)begin
+       text_column_q<=0;ink_q<=0;glyph_row_q<=0;dynamic_kind_q<=0;menu_id_q<=0;glyph_column_q<=0;
+       glyph_area_q<=0;text_valid_q<=0;direct_mode_q<=0;text_base_q<=0;text_length_q<=0;
+      end else begin
+       text_column_q<=text_column;ink_q<=text_ink_p;glyph_row_q<=glyph_row;dynamic_kind_q<=dynamic_kind_p;menu_id_q<=menu_id_p;
+       glyph_column_q<=glyph_column;glyph_area_q<=glyph_area;text_valid_q<=text_valid_p;direct_mode_q<=direct_mode_p;
+       text_base_q<=text_base_p;text_length_q<=text_length_p;
+      end
+    end
+    function [5:0] label_char;
+      input [255:0] value;input [5:0] column;reg [7:0] a;
+      begin
+       a=column<32?value[255-column*8 -:8]:8'd32;
+       if(a>=65 && a<=90)label_char=a-64;
+       else if(a>=48 && a<=57)label_char=a-21;
+       else if(a==47)label_char=CHAR_SLASH;
+       else if(a==58)label_char=CHAR_COLON;
+       else label_char=CHAR_SPACE;
+      end
+    endfunction
     reg [5:0] direct_char;
     reg [5:0] selected_ink;
     always @(*)begin
-        direct_char=CHAR_SPACE;selected_ink=text_ink;
-        case(dynamic_kind)
+        direct_char=CHAR_SPACE;selected_ink=ink_q;
+        case(dynamic_kind_q)
         1,8:begin
-            case(text_column)
+            case(text_column_q)
             0:direct_char=CHAR_T;1:direct_char=CHAR_I;2:direct_char=CHAR_M;3:direct_char=CHAR_E;
             default:direct_char=CHAR_SPACE;
             endcase
-            if(dynamic_kind==8)begin
-                case(text_column)
+            if(dynamic_kind_q==8)begin
+                case(text_column_q)
                 5:direct_char=CHAR_0+time_bcd[15:12];6:direct_char=CHAR_0+time_bcd[11:8];7:direct_char=CHAR_COLON;
                 8:direct_char=CHAR_0+time_bcd[7:4];9:direct_char=CHAR_0+time_bcd[3:0];default:begin end
                 endcase
             end else begin
-                case(text_column)
+                case(text_column_q)
                 19:direct_char=CHAR_0+time_bcd[15:12];20:direct_char=CHAR_0+time_bcd[11:8];21:direct_char=CHAR_COLON;
                 22:direct_char=CHAR_0+time_bcd[7:4];23:direct_char=CHAR_0+time_bcd[3:0];default:begin end
                 endcase
             end
           end
-        3:begin
-            case(text_column)
-            0:direct_char=CHAR_L;1:direct_char=CHAR_I;2:direct_char=CHAR_N;3:direct_char=CHAR_E;4:direct_char=CHAR_S;
-            19:direct_char=CHAR_0+lines_bcd[7:4];20:direct_char=CHAR_0+lines_bcd[3:0];21:direct_char=CHAR_SLASH;
-            22:direct_char=duo?CHAR_4:CHAR_3;23:direct_char=duo?CHAR_0:CHAR_2;default:begin end
-            endcase
+        2:begin
+            direct_char=label_char("SCORE                           ",text_column_q);
+            if(text_column_q>=18 && text_column_q<24)direct_char=CHAR_0+((score_bcd>>((23-text_column_q)*4))&4'hf);
           end
-        4:case(text_column)
+        3:begin
+            direct_char=label_char("LINES                           ",text_column_q);
+            if(text_column_q>=15 && text_column_q<21)direct_char=CHAR_0+((lines_bcd>>((20-text_column_q)*4))&4'hf);
+            if(campaign)begin
+             if(text_column_q==21)direct_char=CHAR_SLASH;
+             if(text_column_q==22)direct_char=CHAR_0+target_lines/10;
+             if(text_column_q==23)direct_char=CHAR_0+target_lines%10;
+            end
+          end
+        4:case(text_column_q)
             0:direct_char=CHAR_S;1:direct_char=CHAR_P;2:direct_char=CHAR_D;
             21:direct_char=CHAR_0+{3'd0,speed}+1'b1;22:direct_char=CHAR_SLASH;23:direct_char=CHAR_8;default:begin end
           endcase
-        5:case(text_column)
+        5:case(text_column_q)
             0:direct_char=CHAR_0+{3'd0,speed}+1'b1;1:direct_char=CHAR_SLASH;2:direct_char=CHAR_8;default:begin end
           endcase
-        6:case(text_column)
-            0:direct_char=CHAR_L;1:direct_char=CHAR_I;2:direct_char=CHAR_N;3:direct_char=CHAR_E;4:direct_char=CHAR_S;
-            6:direct_char=CHAR_0+lines_bcd[7:4];7:direct_char=CHAR_0+lines_bcd[3:0];8:direct_char=CHAR_SLASH;
-            9:direct_char=duo?CHAR_4:CHAR_3;10:direct_char=duo?CHAR_0:CHAR_2;default:begin end
-          endcase
-        7:case(text_column)
+        6:begin
+            direct_char=label_char("LINES                           ",text_column_q);
+            if(text_column_q>=6 && text_column_q<12)direct_char=CHAR_0+((lines_bcd>>((11-text_column_q)*4))&4'hf);
+            if(campaign)begin
+             if(text_column_q==12)direct_char=CHAR_SLASH;
+             if(text_column_q==13)direct_char=CHAR_0+target_lines/10;
+             if(text_column_q==14)direct_char=CHAR_0+target_lines%10;
+             if(text_column_q>=17 && text_column_q<22)direct_char=label_char("SHIP                            ",text_column_q-17);
+             if(text_column_q==22)direct_char=CHAR_0+level_id+1'b1;
+            end
+          end
+        7:case(text_column_q)
             0:direct_char=CHAR_C;1:direct_char=CHAR_O;2:direct_char=CHAR_R;3:direct_char=CHAR_E;
             5:direct_char=CHAR_0+locked;6:direct_char=CHAR_SLASH;7:direct_char=CHAR_8;
             9:direct_char=CHAR_S;10:direct_char=CHAR_E;11:direct_char=CHAR_A;12:direct_char=CHAR_L;13:direct_char=CHAR_E;14:direct_char=CHAR_D;
             default:begin end
           endcase
+        9:begin
+            direct_char=label_char("SHIP 0   LEVEL 0                ",text_column_q);
+            if(text_column_q==6 || text_column_q==15)direct_char=CHAR_0+menu_id_q+1'b1;
+          end
+        10:begin
+            direct_char=label_char("LINES 00 DEBRIS 00 SPD 0        ",text_column_q);
+            if(text_column_q==6)direct_char=CHAR_0+card_target/10;
+            if(text_column_q==7)direct_char=CHAR_0+card_target%10;
+            if(text_column_q==16)direct_char=CHAR_0+card_total/10;
+            if(text_column_q==17)direct_char=CHAR_0+card_total%10;
+            if(text_column_q==23)direct_char=CHAR_0+mode_initial(duo,level_id)+1'b1;
+          end
+        11:begin
+            direct_char=label_char("SPD 0 REMOVED 000 PCT           ",text_column_q);
+            if(text_column_q==4)direct_char=CHAR_0+speed+1'b1;
+            if(text_column_q>=6 && !campaign)direct_char=CHAR_SPACE;
+            if(text_column_q==14)direct_char=campaign?CHAR_0+debris_percent/100:CHAR_SPACE;
+            if(text_column_q==15)direct_char=campaign?CHAR_0+(debris_percent/10)%10:CHAR_SPACE;
+            if(text_column_q==16)direct_char=campaign?CHAR_0+debris_percent%10:CHAR_SPACE;
+          end
+        12:begin
+            direct_char=label_char("SCORE 000000  TIME 00:00        ",text_column_q);
+            if(text_column_q>=6 && text_column_q<12)direct_char=CHAR_0+((score_bcd>>((11-text_column_q)*4))&4'hf);
+            if(text_column_q==19)direct_char=CHAR_0+time_bcd[15:12];
+            if(text_column_q==20)direct_char=CHAR_0+time_bcd[11:8];
+            if(text_column_q==22)direct_char=CHAR_0+time_bcd[7:4];
+            if(text_column_q==23)direct_char=CHAR_0+time_bcd[3:0];
+          end
+        13:begin
+            direct_char=label_char("DEBRIS 00                       ",text_column_q);
+            if(text_column_q==7)direct_char=CHAR_0+debris_left/10;
+            if(text_column_q==8)direct_char=CHAR_0+debris_left%10;
+          end
         default:begin end
         endcase
-        if(Finalize && result_ready && dynamic_kind>=1 && dynamic_kind<=4)selected_ink=text_column<5?6'd22:6'd16;
+        if(Finalize && result_ready && dynamic_kind_q>=1 && dynamic_kind_q<=4)selected_ink=text_column_q<5?6'd22:6'd16;
     end
     // 底层铭牌遮挡独立流水，与字形的两拍读取对齐，不进入字形请求链。
-    wire bottom_text_hidden=!choose && y>=610 && y<622 &&
+    wire bottom_text_hidden=!choose && in_field && y>=610 && y<622 &&
         (occupied || piece1 || (duo && piece2) || ghost1 || (duo && ghost2) || hint_hit);
-    reg [1:0] text_hidden;
+    reg [3:0] text_hidden;
     always @(posedge clk or negedge reset_n)begin
         if(!reset_n)text_hidden<=0;
-        else text_hidden<={text_hidden[0],bottom_text_hidden};
+        else text_hidden<={text_hidden[2:0],bottom_text_hidden};
     end
     wire font_valid,font_lit;
     wire [5:0] font_ink;
-    wire text_padding=text_column>=text_length;
-    hud_text text_layer(.clk(clk),.reset_n(reset_n),.request_valid(text_valid && glyph_area),.use_direct(direct_mode || text_padding),
-        .text_address(text_base+{4'd0,text_column}),.direct_char(text_padding?CHAR_SPACE:direct_char),.ink(selected_ink),
-        .glyph_row(glyph_row),.glyph_column(glyph_column),
+    wire text_padding=text_column_q>=text_length_q;
+    hud_text text_layer(.clk(clk),.reset_n(reset_n),.request_valid(text_valid_q && glyph_area_q),.use_direct(direct_mode_q || text_padding),
+        .text_address(text_base_q+{4'd0,text_column_q}),.direct_char(text_padding?CHAR_SPACE:direct_char),.ink(selected_ink),
+        .glyph_row(glyph_row_q),.glyph_column(glyph_column_q),
         .pixel_valid(font_valid),.pixel_lit(font_lit),.pixel_ink(font_ink));
     reg [4:0] material_fx_d;
     reg [3:0] clear_inset_d;
     reg foreground_d;
-    reg [5:0] foreground_d_index,scene_q2;
+    reg [5:0] foreground_d_index,scene_q2,scene_q3,scene_q4;
     reg [1:0] material_kind_d;
     reg [2:0] material_type_d;
     reg [4:0] material_x_d,material_y_d;
@@ -711,7 +815,7 @@ module story_ui(
     end
     always @(posedge clk or negedge reset_n)begin
         if(!reset_n)begin
-            material_floor_d<=46;material_dim_d<=0;material_fx_d<=0;clear_inset_d<=0;foreground_d<=0;foreground_d_index<=0;scene_q2<=0;rgb<=0;
+            material_floor_d<=46;material_dim_d<=0;material_fx_d<=0;clear_inset_d<=0;foreground_d<=0;foreground_d_index<=0;scene_q2<=0;scene_q3<=0;scene_q4<=0;rgb<=0;
             material_kind_d<=0;material_type_d<=0;material_x_d<=0;material_y_d<=0;
             material_marked_d<=0;material_owner_d<=0;material_ghost_d<=0;material_hint_d<=0;
         end
@@ -721,7 +825,8 @@ module story_ui(
             material_kind_d<=material_kind;material_type_d<=material_type;material_x_d<=material_x;material_y_d<=material_y;
             material_marked_d<=material_marked;material_owner_d<=material_owner;material_ghost_d<=material_ghost;material_hint_d<=material_hint;
             scene_q2<=foreground_d?material_index:background_index;
-            rgb<=story_palette(font_valid && font_lit && !text_hidden[1]?font_ink:scene_q2);
+            scene_q3<=scene_q2;scene_q4<=scene_q3;
+            rgb<=story_palette(font_valid && font_lit && !text_hidden[3]?font_ink:scene_q4);
         end
     end
 endmodule

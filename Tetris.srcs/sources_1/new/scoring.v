@@ -24,6 +24,7 @@ module scoring(
     output lit
     );
 
+    `include "game_mode_params.vh"
     parameter SCORE_UNIT = 2;
 
 //    分数最右一位的基准 X: 让分数右端贴住场地右边界(双人 1085, 单人 950)
@@ -88,7 +89,7 @@ module scoring(
     counter <= counter;
     else if(Playing)begin
         if(clear_t_t)
-        counter <= counter + score_gain;
+        counter <= ({1'b0,counter}+{1'b0,score_gain}>{1'b0,MODE_SCORE_MAX})?MODE_SCORE_MAX:counter+score_gain;
         end
     else
     counter <= 20'd0;

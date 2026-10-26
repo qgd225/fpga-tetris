@@ -3,7 +3,7 @@
 // 厚壁分段核心：八格能量舱、双轨、侧卡扣及四路实体接头。
 module core_renderer(
  input [10:0] x,y,input [1:0] phase,danger,input [3:0] locked,
- input success,failed,charging,input [7:0] animation,
+ input success,failed,charging,blocked,half_power,input [7:0] animation,
  output hit,output reg [5:0] color_index
 );
  wire [10:0] cx=x-`STORY_CORE_X,cy=y-`STORY_CORE_Y;
@@ -32,10 +32,12 @@ module core_renderer(
   if(body)color_index=(cx==22 || cx==57)?6'd22:6'd49;
   if(seam)color_index=cy[4:0]==29?6'd22:6'd45;
   if(channel)begin
-   if(from_bottom<locked)color_index=success?6'd16:(front_cap?6'd37:(cx<32?6'd37:6'd25));
+   if(from_bottom<locked)color_index=success?(animation[2]?6'd16:6'd37):(locked==8?(animation[5]?6'd37:6'd25):(front_cap?6'd37:(cx<32?6'd37:6'd25)));
    else if(from_bottom==locked)color_index=failed?6'd43:(rising || cy[4:0]<7?6'd42:(cx<32?6'd42:6'd41));
    else color_index=(cx==29 || cy[4:0]==5)?6'd21:6'd50;
   end
+  if(channel && blocked)color_index=6'd50;
+  else if(channel && half_power && locked==4 && front_cap)color_index=6'd42;
   if(cap || socket)color_index=cap?(cx<18 || cx>=62?6'd21:6'd22):6'd23;
   if(clamp)color_index=cy[5:0]<14?6'd22:6'd21;
   if(bolt)color_index=6'd45;

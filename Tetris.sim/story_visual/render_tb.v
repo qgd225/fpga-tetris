@@ -6,6 +6,11 @@ module render_tb;
     // Shared fixture expanded during directory migration.
 // 固定局面是测试输入，绘制器/字形/小图块均使用正式RTL和真实初始化文件。
 reg [10:0] x=0,y=0;
+reg debris_cell=0,use_debris=0;reg [6:0] debris_percent=50;
+reg [23:0] template_rows[0:1279],kept_rows[0:4];
+integer base_index,preview_total,preview_count,preview_kept,preview_sum,prr,pcc,preview_lines,preview_target,preview_score,preview_speed,ss;
+reg [1:0] result_choice=0;
+reg campaign=1,ship_select=0;reg [1:0] ship=2;reg [6:0] debris_left=0;
 reg duo=1,choose=0,Idle=0,Playing=1,Stop=0,Finalize=0;
 reg [1:0] phase=0,danger=0;
 reg [3:0] locked=1;
@@ -37,8 +42,8 @@ wire [23:0] rgb;
 reg board[0:479];reg [2:0] board_type[0:479];reg board_owner[0:479];
 reg [23:0] palette[0:55];
 integer bi;
-story_ui dut(.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
-    .comms_visible(comms_visible),.comms_id(comms_id),.choose_cnt(duo?4'd1:4'd0),.phase(phase),.danger(danger),.locked(locked),.success(success),.result_ready(result_ready),
+story_ui dut(.debris_percent(debris_percent),.success_age(7'd72),.campaign(campaign),.ship_select(ship_select),.level_id(ship),.result_option(result_choice),.debris_left(debris_left),.debris_cell(debris_cell),.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
+    .comms_visible(comms_visible),.comms_id(comms_id),.choose_cnt({2'd0,campaign,duo}),.phase(phase),.danger(danger),.locked(locked),.success(success),.result_ready(result_ready),
     .bounds1({11'd241,11'd213,(duo?11'd545:11'd593),(duo?11'd445:11'd493)}),
     .bounds2({11'd289,11'd237,11'd833,11'd757}),.star_drift(11'd0),.feedback_clear_age(5'd0),.feedback_clear_row(feedback_clear),
     .feedback_lock(feedback_lock),.feedback_hard_left(feedback_hard_left),.feedback_hard_right(feedback_hard_right),.feedback_clear(feedback_clear),
@@ -71,7 +76,7 @@ task set_pixel;
     integer fx,dx,dy,c,r,ax,ay,pc,pr;
     begin
         x=px;y=py;fx=duo?352:400;dx=px-fx;dy=py-144;
-        occupied=0;piece1=0;piece2=0;ghost1=0;ghost2=0;hint_hit=0;cell_type=0;owner=0;
+        occupied=0;debris_cell=0;piece1=0;piece2=0;ghost1=0;ghost2=0;hint_hit=0;cell_type=0;owner=0;
 `ifndef PHASE_STRESS
         in_field=px>=fx && px<fx+(duo?24:20)*24 && py>=144 && py<624;
         local_x=dx%24;local_y=dy%24;
@@ -82,7 +87,7 @@ task set_pixel;
 `ifdef PHASE_STRESS
             occupied=1;cell_type=c%7;owner=c%2;
 `else
-            occupied=board[r*24+c] && !Idle;cell_type=board_type[r*24+c];owner=board_owner[r*24+c];
+            occupied=board[r*24+c] && !Idle;debris_cell=use_debris && board[r*24+c];cell_type=board_type[r*24+c];owner=board_owner[r*24+c];
             if(!Idle && !Finalize)begin
                 piece1=r==3 && c>=4 && c<=7;
                 piece2=duo && (r==4 && c>=18 && c<=19 || r==5 && c>=17 && c<=18);
@@ -113,13 +118,18 @@ endtask
     task sample;
         input integer px,py;input [23:0] expected;
         begin
-            @(negedge clk);set_pixel(px,py);repeat(4)@(negedge clk);
+            @(negedge clk);set_pixel(px,py);repeat(6)@(negedge clk);
             checks=checks+1;
             if(rgb!==expected)begin errors=errors+1;if(errors<8)$display("FAIL scene pixel x=%0d y=%0d rgb=%h expected=%h",px,py,rgb,expected);end
         end
     endtask
     initial begin
         $readmemh("palette_reference.mem",palette);initialize_board;
+        if($value$plusargs("campaign=%d",arg))campaign=arg;
+        if($value$plusargs("result_option=%d",arg))result_choice=arg;
+        if($value$plusargs("ship_select=%d",arg))ship_select=arg;
+        if($value$plusargs("ship=%d",arg))ship=arg;
+        if($value$plusargs("debris=%d",arg))debris_left=arg;
         if($value$plusargs("phase=%d",arg))phase=arg;
         if($value$plusargs("duo=%d",arg))duo=arg;
         if($value$plusargs("state=%d",arg))state=arg;
@@ -132,19 +142,61 @@ endtask
         endcase
         Idle=state==1;choose=state==2;Finalize=state==3 || state==4 || state==8;Stop=state==7;Playing=!Idle && !choose && !Finalize && !Stop;
         success=state==3 || state==8;result_ready=Finalize && state!=8;
+        if(!campaign)locked=8;
         if(success)begin locked=8;phase=3;speed=7;lines_bcd=duo?20'h00040:20'h00032;end
         if(state==6)comms_visible=1;
         if(state==5)begin danger=2;animation=22;for(n=0;n<18;n=n+1)tile(n,2,n%7,n%2);end
+        if($test$plusargs("render"))begin
+            $readmemh("D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_debris.mem",template_rows);
+            base_index=((duo?4:0)+ship)*8*20;preview_total=0;preview_kept=0;preview_sum=0;
+            for(prr=0;prr<20;prr=prr+1)begin
+                preview_count=0;
+                for(pcc=0;pcc<(duo?24:20);pcc=pcc+1)preview_count=preview_count+template_rows[base_index+prr][pcc];
+                preview_total=preview_total+preview_count;
+                if(preview_count!=0 && preview_sum+preview_count<=debris_left)begin
+                    kept_rows[preview_kept]=template_rows[base_index+prr];
+                    preview_kept=preview_kept+1;preview_sum=preview_sum+preview_count;
+                end
+            end
+            if(campaign && debris_left!=0)begin
+                use_debris=1;
+                if(preview_sum!=debris_left)begin errors=errors+1;$display("FAIL preview residual count");end
+                for(bi=0;bi<480;bi=bi+1)begin board[bi]=0;board_type[bi]=0;board_owner[bi]=0;end
+                for(prr=0;prr<preview_kept;prr=prr+1)for(pcc=0;pcc<(duo?24:20);pcc=pcc+1)
+                    board[(20-preview_kept+prr)*24+pcc]=kept_rows[prr][pcc];
+                if(debris_left>(ship==0?(duo?16:13):(2*preview_total+4)/5))locked=0;
+                else if(locked>4)locked=4;
+            end
+            if(campaign)debris_percent=(preview_total-debris_left)*100/preview_total;
+            preview_target=duo?30+ship*5:24+ship*4;
+            preview_lines=success?preview_target:phase==0?(duo?5:4):phase==1?(duo?15:12):phase==2?(duo?25:20):(duo?35:28);
+            lines_bcd=0;lines_bcd[7:4]=preview_lines/10;lines_bcd[3:0]=preview_lines%10;
+            preview_score=0;
+            for(ss=0;ss<preview_lines;ss=ss+1)begin
+                preview_speed=(campaign?ship:0)+ss/(duo?5:4);if(preview_speed>7)preview_speed=7;
+                preview_score=preview_score+2*(preview_speed+1);
+            end
+            score_bcd=0;
+            for(ss=0;ss<6;ss=ss+1)begin score_bcd[ss*4 +:4]=preview_score%10;preview_score=preview_score/10;end
+            preview_speed=(campaign?ship:0)+preview_lines/(duo?5:4);speed=preview_speed>7?7:preview_speed;
+            if(campaign)begin
+                locked=8*preview_lines/preview_target;
+                if(debris_left>(ship==0?(duo?16:13):(2*preview_total+4)/5))locked=0;
+                else if(debris_left!=0 && locked>4)locked=4;
+                else if(!success && locked>7)locked=7;
+                phase=locked>6?3:locked>4?2:locked>2?1:0;
+            end else begin locked=8;phase=0;end
+        end
         repeat(3)@(negedge clk);rst=1;
         if($test$plusargs("render"))begin
             if(state==6)filename="comms_opening.ppm";
-            else $sformat(filename,"scene_duo%0d_phase%0d_state%0d.ppm",duo,phase,state);
+            else $sformat(filename,"scene_campaign%0d_select%0d_ship%0d_debris%0d_duo%0d_phase%0d_state%0d.ppm",campaign,ship_select,ship,debris_left,duo,phase,state);
             handle=$fopen(filename,"wb");$fwrite(handle,"P6\n1280 720\n255\n");
-            for(n=0;n<921602;n=n+1)begin
+            for(n=0;n<921604;n=n+1)begin
                 @(negedge clk);
                 if(n<921600)set_pixel(n%1280,n/1280);else set_pixel(0,0);
                 @(posedge clk);#1;
-                if(n>=2)begin
+                if(n>=4)begin
                     if((^rgb)===1'bx)errors=errors+1;
                     if((dut.text_regions & (dut.text_regions-1'b1))!=0)begin errors=errors+1;if(errors<8)$display("FAIL overlapping text rectangles x=%d y=%d",x,y);end
                     $fwrite(handle,"%c%c%c",rgb[23:16],rgb[15:8],rgb[7:0]);
@@ -179,7 +231,19 @@ endtask
                 sample(0,0,palette[44]);sample(1200,100,palette[44]);sample(500,200,palette[46]);
                 Stop=1;Playing=0;sample(0,0,palette[44]);Stop=0;Playing=1;
             end
-            duo=1;
+            for(m=0;m<4;m=m+1)begin
+                duo=m%2;campaign=m/2;choose=0;Idle=0;Playing=0;Stop=0;Finalize=1;success=1;result_ready=1;
+                set_pixel(m>=2?(duo?592:588):(duo?596:592),312);repeat(6)@(posedge clk);#1;
+                checks=checks+1;
+                if(dut.text_base_p!==(m==0?dut.TXT_SOLO:m==1?dut.TXT_DUO:m==2?dut.TXT_SOLO_CAMPAIGN:dut.TXT_DUO_CAMPAIGN) || dut.text_length_p!==(m==0?7'd12:m==1?7'd11:m==2?7'd13:7'd12))begin errors=errors+1;$display("FAIL result mode subtitle m=%0d",m);end
+                set_pixel((m>=2?(duo?592:588):(duo?596:592))+(m==0?12:m==1?11:m==2?13:12)*8-1,323);#1;checks=checks+1;
+                if(!dut.text_regions[19])begin errors=errors+1;$display("FAIL last subtitle character clipped m=%0d",m);end
+                for(arg=0;arg<3;arg=arg+1)begin
+                    result_choice=arg;set_pixel(556,544);repeat(6)@(posedge clk);#1;checks=checks+1;
+                    if(dut.text_base_p!==(arg==0?dut.TXT_RETRY:m<2?dut.TXT_MENU:arg==1?dut.TXT_NEXT_LEVEL:dut.TXT_RETURN))begin errors=errors+1;$display("FAIL result option text m=%0d option=%0d",m,arg);end
+                end
+            end
+            duo=1;campaign=1;result_choice=0;
             for(m=0;m<5;m=m+1)begin
                 choose=m==1;Idle=m==2;Finalize=m>=3;success=m==3;result_ready=Finalize;
                 for(yy=0;yy<720;yy=yy+53)begin

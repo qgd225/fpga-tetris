@@ -1,0 +1,179 @@
+{
+  "groups": [
+    {
+      "group": "duo",
+      "pass": true,
+      "sha256": "185a7d7377835cc82d6eff0a5c32ef0af45d7e0a6dca98f78c39e24cae1aa495",
+      "checks": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "frame_duo",
+      "pass": true,
+      "sha256": "f57edca45ca42f00c65f3791da068434472fb6b294a434930d2bf7e462d527cd",
+      "checks": [
+        "=== ALL PASS: STORY FRAME 44 checks ==="
+      ]
+    },
+    {
+      "group": "game_modes",
+      "pass": true,
+      "sha256": "a4a782d5cb88253987e6219777ece7b2ea1b36af84dca79d5e7aeb8488d1ca1d",
+      "checks": [
+        "ALL PASS GAME_MODES: 18480 checks",
+        "ALL PASS MODE_FLOW",
+        "ALL PASS MODE_STATISTICS",
+        "ALL PASS DEBRIS_INTEGRATION layouts=64"
+      ]
+    },
+    {
+      "group": "hdmi_audio",
+      "pass": true,
+      "sha256": "8f8e917d9a2b7d119ebd977d1c5404508b86165224e93b6186932d4376792db2",
+      "checks": [
+        "ALL PASS HDMI audio: 7848263 checks, 1632 samples, 407 audio packets, 32 ACR"
+      ]
+    },
+    {
+      "group": "hold_gesture",
+      "pass": true,
+      "sha256": "251c3de5f01d0d6086652dd2df5ab0ca1b13c1d27bc9c01f389e06feffa62e06",
+      "checks": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "horizontal_repeat",
+      "pass": true,
+      "sha256": "522de45c4965bfe69768008102ca07f6c9c631b47f49119bc251f69d16c53c8d",
+      "checks": [
+        "=== ALL PASS: 30 checks ==="
+      ]
+    },
+    {
+      "group": "input_route",
+      "pass": true,
+      "sha256": "105004427f69ecc72699394e7090de2eec2b6c7289634bba8e386ad64ffd6b8f",
+      "checks": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "level",
+      "pass": true,
+      "sha256": "305bb65eeddc3f548ba2ec33480f149d33d62e72ae0b592971f0067b662855ec",
+      "checks": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "lutram",
+      "pass": true,
+      "sha256": "70785188c7a27348b4c6834bdea7ac12acf92b411613510369b0f7b3c6b813a7",
+      "checks": [
+        "=== ALL PASS: LUTRAM ===",
+        "=== ALL PASS: LUTRAM ===",
+        "=== ALL PASS: LUTRAM FRAME ==="
+      ]
+    },
+    {
+      "group": "net_keyboard",
+      "pass": true,
+      "sha256": "ab51f75f8db5a49a8b506c3216854645555aaf4a9e678e2a8bd1750792546570",
+      "checks": [
+        "=== ALL PASS: NET KEYBOARD ==="
+      ]
+    },
+    {
+      "group": "optimization",
+      "pass": true,
+      "sha256": "30ee1eea13be2cc6b56ff6c9a657cbb85185c4f8181d3fd9fa963eda3bff2ff7",
+      "checks": [
+        "=== ALL PASS: PLAYFIELD EQUIVALENCE ===",
+        "=== ALL PASS: HINT EQUIVALENCE ===",
+        "=== ALL PASS: METADATA ===",
+        "=== ALL PASS: METADATA ===",
+        "=== ALL PASS: STORY FRAME 44 checks ===",
+        "=== ALL PASS: LUTRAM FRAME ===",
+        "=== ALL PASS: OPTIMIZATION ==="
+      ]
+    },
+    {
+      "group": "rgb_palette",
+      "pass": true,
+      "sha256": "ec8eb6d5f87c65205f8832e117740b4c4beb1b0b1f930a01d83b4a24c7b43320",
+      "checks": [
+        "=== ALL PASS: 56 checks ==="
+      ]
+    },
+    {
+      "group": "solo_hint",
+      "pass": true,
+      "sha256": "0ca3bfdd601b5bc299f89ec39740c20315f48052e306baeab81f88d32006e78b",
+      "checks": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "sound",
+      "pass": true,
+      "sha256": "859b2f785e67f2dbb9e461f1545b2252eb3d79083eac51905952ba0fb5ca7a5f",
+      "checks": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "story",
+      "pass": true,
+      "sha256": "783d2f11a16100cbea7509c92a2ce8c5386191730dcd887a2bcf840b52701cf1",
+      "checks": [
+        "ALL PASS STORY: 337 checks"
+      ]
+    },
+    {
+      "group": "story_audio",
+      "pass": true,
+      "sha256": "ef542b2d3bd267fb4f73ae8634664a0b83d884bcc2664158b0e7d7c1adfbc940",
+      "checks": [
+        "ALL PASS IMA DECODER checks=73314 cases=9968 stream_samples=6748",
+        "ALL PASS VOICE PLAYER checks=199436 complete_samples=48168",
+        "ALL PASS VOICE PACK checks=2008318 source_samples=111572",
+        "ALL PASS STORY COMMS checks=18",
+        "ALL PASS STORY FX checks=51504",
+        "ALL PASS STORY MUSIC checks=768012",
+        "ALL PASS STORY AUDIO"
+      ]
+    },
+    {
+      "group": "story_layout",
+      "pass": true,
+      "sha256": "4cc2c762dc7c1b711f391cfc52cee1092b0be91dcc91f5d17ac14a5dd918ef22",
+      "checks": [
+        "ALL PASS STORY MAPPER checks=16777216"
+      ]
+    },
+    {
+      "group": "story_visual",
+      "pass": true,
+      "sha256": "224333fe8627dcf1f3b4a93d8ff057adaeb113152dde4b1ffc6e316704cebf15",
+      "checks": [
+        "ALL PASS UI ASSETS colors=56 projection_bits=8 font_bytes=2048 sprite_pixels=4096",
+        "ALL PASS UI TEXT EXTENTS static_regions=13",
+        "ALL PASS STORY FONT checks=139778",
+        "ALL PASS STORY SCENE checks=551 rendered=0",
+        "ALL PASS VGA STORY PHASE checks=4416",
+        "ALL PASS STORY FEEDBACK checks=26",
+        "ALL PASS UI GEOMETRY checks=7726095",
+        "ALL PASS STORY VISUAL"
+      ]
+    }
+  ],
+  "count": 18,
+  "说明": "第八候选完整回归，对应最终硬件源码；无每轮全量复验的长期要求。",
+  "补验": {
+    "sound": "regression-logs/sound-final.log",
+    "story_audio": "regression-logs/story_audio-final.log",
+    "说明": "最终硬件不变，新增测试覆盖事件21/22/23的触发、优先级、取消和幅度边界；其余完整回归证据继续有效。"
+  }
+}

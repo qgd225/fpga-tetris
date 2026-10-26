@@ -1,0 +1,9 @@
+{
+  "path": "bit/Tetris.bit",
+  "sha256": "f55aa4827e42e78d42f0906e0036d513118991e813c866ebe55cb8d393e25455",
+  "candidate": "temporary/game_modes_20261025/Tetris-r8-verified-candidate.bit",
+  "archive": "bit/Tetris_20261026_122654_8328a8c1bc18.bit",
+  "build_inputs": "build-source-manifest.json",
+  "release_inputs": "source-manifest.json",
+  "policy_transition": "policy-transition.json"
+}

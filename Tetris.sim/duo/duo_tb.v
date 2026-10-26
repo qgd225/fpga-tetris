@@ -56,7 +56,7 @@ wire blk_l2, blk_rot2;
 always #6.734 Clk_74M = ~Clk_74M;
 
 Playfield dut(
-  .mission_hold(1'b0), .story_speed(test_story_speed),
+  .init_load(1'b0),.initial_mask(480'd0),.initial_total(7'd0),.mission_hold(1'b0), .story_speed(test_story_speed),
   .Clk_74M(Clk_74M), .Reset_n(Rst), .hcounter(hc), .vcounter(vc),
   .left_p_flag(left1), .right_p_flag(right1), .drop_r_flag(drop1), .drop_en(drop_en1),
   .rotate_p_flag(rot1), .switch_r_flag(sw1), .hold_p_flag(hold1),
