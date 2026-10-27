@@ -42,6 +42,7 @@
     localparam [5:0] CHAR_DOT = 6'd40;
     localparam [5:0] CHAR_BANG = 6'd41;
     localparam [5:0] CHAR_QUESTION = 6'd42;
+    localparam [5:0] CHAR_PLUS = 6'd43;
     localparam [9:0] TXT_CORE = 10'd0;
     localparam [6:0] LEN_CORE = 7'd7;
     localparam [9:0] TXT_SOLO = 10'd7;
@@ -140,6 +141,12 @@
     localparam [6:0] LEN_MENU = 7'd4;
     localparam [9:0] TXT_NEXT_LEVEL = 10'd829;
     localparam [6:0] LEN_NEXT_LEVEL = 7'd4;
+    localparam [9:0] TXT_RESERVE = 10'd833;
+    localparam [6:0] LEN_RESERVE = 7'd7;
+    localparam [9:0] TXT_MAX = 10'd840;
+    localparam [6:0] LEN_MAX = 7'd3;
+    localparam [9:0] TXT_HINT = 10'd843;
+    localparam [6:0] LEN_HINT = 7'd4;
     localparam [4:0] STORY_MODE_COUNT = 5'd4;
     function [9:0] story_mode_text;
     input [3:0] id;

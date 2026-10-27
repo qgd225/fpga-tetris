@@ -1,0 +1,38 @@
+{
+  "modules": [
+    {
+      "old_path": "third_party/hdl_util_hdmi/src/audio_info_frame.sv",
+      "new_path": "Tetris.srcs/sources_1/new/audio_info_frame.sv",
+      "sha256": "dedd552fa988d9e2875bdadc54f3c08d5041d54637da1ff565d46078eeb2ea89",
+      "content_unchanged": true
+    },
+    {
+      "old_path": "third_party/hdl_util_hdmi/src/audio_sample_packet.sv",
+      "new_path": "Tetris.srcs/sources_1/new/audio_sample_packet.sv",
+      "sha256": "0e3a35ccb3e934eecfcd3916c5dac9ef269abea21472d66ebd2660a9d25e6a13",
+      "content_unchanged": true
+    },
+    {
+      "old_path": "third_party/hdl_util_hdmi/src/auxiliary_video_information_info_frame.sv",
+      "new_path": "Tetris.srcs/sources_1/new/auxiliary_video_information_info_frame.sv",
+      "sha256": "c151e2675ad97ef36254044e42657f2d758512d305040137859f9b8806135f64",
+      "content_unchanged": true
+    },
+    {
+      "old_path": "third_party/hdl_util_hdmi/src/packet_assembler.sv",
+      "new_path": "Tetris.srcs/sources_1/new/packet_assembler.sv",
+      "sha256": "00d143e3b4226cb8ac7418bab35b9ea6f3a963e81fd0f2f7f3109844f4bde2c6",
+      "content_unchanged": true
+    },
+    {
+      "old_path": "third_party/hdl_util_hdmi/src/tmds_channel.sv",
+      "new_path": "Tetris.srcs/sources_1/new/tmds_channel.sv",
+      "sha256": "1e45e87703e2ab1790c13235822e8889fb016ad4c11cd9e5def0980d26a24637",
+      "content_unchanged": true
+    }
+  ],
+  "provenance_directory": "docs/技术说明/第三方来源/hdl_util_hdmi",
+  "upstream_commit": "83b1c9543a91b776671a44e68e130f81cae437b7",
+  "original_bit_sha256": "446726a44cfa92830ccf00cef2cf6653e280513e15de37a1882335cdd414ef89",
+  "current_bit_sha256": "446726a44cfa92830ccf00cef2cf6653e280513e15de37a1882335cdd414ef89"
+}

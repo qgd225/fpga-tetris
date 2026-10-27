@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-26",
+  "core_directory": "docs",
+  "core_files": [
+    "AGENTS.md",
+    "CORE-07_世界观与各模式故事.md",
+    "README.md",
+    "游戏模式_玩法规格.md",
+    "资料索引.md"
+  ],
+  "plan_count": 18,
+  "history_documents_moved": 8,
+  "unchanged_protected_files": 780,
+  "protected_errors": [],
+  "link_count": 212,
+  "broken_links": [],
+  "preserved_snapshots": 2,
+  "script_checks": {
+    "canonical_rules_reading": "PASS",
+    "missing_canonical_rules_rejected": "PASS",
+    "timing_boundaries_6_cases": "PASS",
+    "existing_routed_timing_report": "PASS",
+    "tcl_structure": "PASS",
+    "actual_build_rules_snapshot": "PASS",
+    "rules_fingerprint_and_drift_rejection": "PASS",
+    "hardware_and_asset_inputs_reused": {
+      "status": "PASS",
+      "previous_inputs": 138,
+      "current_inputs": 139,
+      "changed_flow_inputs": [
+        "AGENTS.md",
+        "docs/AGENTS.md",
+        "tools/build_story.tcl",
+        "tools/project_policy.tcl",
+        "tools/story_build_manifest.py"
+      ]
+    }
+  },
+  "original_to_current_paths": {
+    "docs/资料索引.md": "docs/资料索引.md",
+    "docs/CORE-07_世界观与各模式故事.md": "docs/CORE-07_世界观与各模式故事.md",
+    "docs/计划书/游戏模式_玩法规格.md": "docs/游戏模式_玩法规格.md",
+    "docs/HDMI音效测试.md": "docs/历史资料/HDMI音效测试.md",
+    "docs/lutram-retry.md": "docs/历史资料/lutram-retry.md",
+    "docs/optimization-rounds.md": "docs/历史资料/optimization-rounds.md",
+    "docs/story-g4-audio-acceptance.md": "docs/历史资料/story-g4-audio-acceptance.md",
+    "docs/story-implementation-rounds.md": "docs/历史资料/story-implementation-rounds.md",
+    "docs/story-m1-acceptance.md": "docs/历史资料/story-m1-acceptance.md",
+    "docs/story-review-decisions-20261025.md": "docs/历史资料/story-review-decisions-20261025.md",
+    "docs/workspace-unification.md": "docs/历史资料/workspace-unification.md",
+    "docs/source-encoding.md": "docs/技术说明/source-encoding.md"
+  },
+  "root_navigation_files": [
+    "AGENTS.md",
+    "README.md"
+  ],
+  "commit_git": false,
+  "push_github": false,
+  "authorized_flow_changes": [
+    ".gitattributes",
+    "tools/build_story.tcl",
+    "tools/project_policy.tcl",
+    "tools/story_build_manifest.py"
+  ]
+}

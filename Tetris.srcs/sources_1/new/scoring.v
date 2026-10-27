@@ -60,10 +60,13 @@ module scoring(
       endcase
     end
     endfunction
-    wire [19:0] score_base = square_lines(c_clear)*SCORE_UNIT;
-    wire [19:0] score_gain = score_base + (speed_level[0] ? score_base : 20'd0) +
-                            (speed_level[1] ? score_base<<1 : 20'd0) +
-                            (speed_level[2] ? score_base<<2 : 20'd0);
+    reg pending_score;reg [4:0] pending_lines;reg [2:0] pending_speed;
+    wire [4:0] credited_lines=pending_score?pending_lines:c_clear;
+    wire [2:0] credited_speed=pending_score?pending_speed:speed_level;
+    wire [19:0] score_base = square_lines(credited_lines)*SCORE_UNIT;
+    wire [19:0] score_gain = score_base + (credited_speed[0] ? score_base : 20'd0) +
+                            (credited_speed[1] ? score_base<<1 : 20'd0) +
+                            (credited_speed[2] ? score_base<<2 : 20'd0);
 
 
     reg [3:0]counter0;
@@ -77,22 +80,17 @@ module scoring(
     assign bcd = {counter5,counter4,counter3,counter2,counter1,counter0};
 
     always@(posedge Clk_74M or negedge Reset_n)begin
-    if(!Reset_n)
-    counter <= 20'd0;
-    else if(Finalize)begin
-        if(switch_r_flag)
-        counter <= 20'd0;
-        else
-        counter <= counter;
-        end
-    else if(Stop)
-    counter <= counter;
-    else if(Playing)begin
-        if(clear_t_t)
-        counter <= ({1'b0,counter}+{1'b0,score_gain}>{1'b0,MODE_SCORE_MAX})?MODE_SCORE_MAX:counter+score_gain;
-        end
-    else
-    counter <= 20'd0;
+     if(!Reset_n)begin counter<=0;pending_score<=0;pending_lines<=0;pending_speed<=0;end
+     else if(Idle || (Finalize && switch_r_flag) || (!Playing && !Stop && !Finalize))begin counter<=0;pending_score<=0;end
+     else begin
+      if(clear_t_t && Stop && !Finalize)begin pending_score<=1;pending_lines<=c_clear;pending_speed<=speed_level;end
+      if((Playing && !Stop) || Finalize)begin
+       if(clear_t_t || pending_score)begin
+        counter<=({1'b0,counter}+{1'b0,score_gain}>{1'b0,MODE_SCORE_MAX})?MODE_SCORE_MAX:counter+score_gain;
+        pending_score<=0;
+       end
+      end
+     end
     end
 
 //    分数 -> BCD(串行双 dabble): 一拍只做一次"每位数比较+加3, 再左移一位", 20 拍出一轮结果

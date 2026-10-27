@@ -11,6 +11,7 @@ reg Clk_74M = 0;
 reg Reset_n = 0;
 reg over = 0;
 reg core_half=0,core_online=0,debris_clear=0,cancel_fx=0;
+reg rhythm_reject=0,rhythm_expire=0,rhythm_recharge=0,rhythm_tick=0;
 reg clear = 0;
 reg [2:0]clr_n = 0;
 reg lvl_up = 0;
@@ -53,7 +54,7 @@ wire [3:0]sm_choose_cnt;
 
 sound #(
     .MS_MAX(17'd31)
-) dut(
+) dut(.rhythm_reject(rhythm_reject),.rhythm_expire(rhythm_expire),.rhythm_recharge(rhythm_recharge),.rhythm_tick(rhythm_tick),
     .core_half(core_half),.core_online(core_online),.debris_clear(debris_clear),.Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
     .cancel(cancel_fx),
@@ -135,6 +136,7 @@ endtask
 
 task clear_all;
 begin
+    rhythm_reject=0;rhythm_expire=0;rhythm_recharge=0;rhythm_tick=0;
     over = 0;
     core_half=0;core_online=0;debris_clear=0;cancel_fx=0;
     clear = 0;
@@ -522,6 +524,20 @@ initial begin
     chk("exit cancels new audio and pending cues",dut.en,0);chk("core queue cleared on exit",dut.core_pending,0);chk("debris queue cleared on exit",dut.debris_pending,0);
     do_reset;core_online=1;debris_clear=1;over=1;one_pulse;
     chk("result preempts new cues",dut.en,16);chk("result cancels core queue",dut.core_pending,0);chk("result cancels debris queue",dut.debris_pending,0);
+    $display("=== 15) reserve and HOLD cue contracts ===");
+    do_reset;rhythm_reject=1;one_pulse;repeat(2)begin @(posedge Clk_74M);#1;end
+    chk("rhythm reject delivered",dut.en,24);wait_done;
+    do_reset;rhythm_expire=1;one_pulse;repeat(2)begin @(posedge Clk_74M);#1;end
+    chk("rhythm expire delivered",dut.en,25);wait_done;
+    do_reset;rhythm_recharge=1;one_pulse;repeat(2)begin @(posedge Clk_74M);#1;end
+    chk("rhythm recharge delivered",dut.en,26);wait_done;
+    do_reset;rhythm_tick=1;one_pulse;repeat(2)begin @(posedge Clk_74M);#1;end
+    chk("rhythm warning tick delivered",dut.en,27);wait_done;
+    do_reset;menu_l=1;one_pulse;rhythm_expire=1;rhythm_recharge=1;one_pulse;
+    cancel_fx=1;@(posedge Clk_74M);#1;cancel_fx=0;repeat(20)@(posedge Clk_74M);#1;
+    chk("exit clears rhythm queue",dut.rhythm_pending,0);chk("exit stops rhythm sound",dut.en,0);
+    do_reset;rhythm_tick=1;rhythm_recharge=1;over=1;one_pulse;
+    chk("result preempts rhythm cues",dut.en,16);chk("result clears rhythm queue",dut.rhythm_pending,0);
     if(bad == 0)
         $display("=== ALL PASS ===");
     else

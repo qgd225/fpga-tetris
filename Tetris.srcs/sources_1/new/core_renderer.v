@@ -3,18 +3,22 @@
 // 厚壁分段核心：八格能量舱、双轨、侧卡扣及四路实体接头。
 module core_renderer(
  input [10:0] x,y,input [1:0] phase,danger,input [3:0] locked,
- input success,failed,charging,blocked,half_power,input [7:0] animation,
+ input success,failed,charging,blocked,half_power,reserve_mode,reserve_pulse,input [7:0] reserve_fill,input [1:0] reserve_alarm,input [7:0] animation,
  output hit,output reg [5:0] color_index
 );
  wire [10:0] cx=x-`STORY_CORE_X,cy=y-`STORY_CORE_Y;
  wire [2:0] segment=cy[7:5];
  wire [3:0] from_bottom=4'd7-{1'b0,segment};
+ wire [7:0] reserve_depth=({from_bottom,4'b0}+{from_bottom,3'b0})+(5'd19-cy[4:0]);
+ wire locked_cover=!reserve_mode && (blocked || (half_power && from_bottom>=4));
+ wire lock_bar=locked_cover && cx>=24 && cx<56 && (cy[4:0]>=12 && cy[4:0]<17);
  wire [1:0] branch=2'd3-cy[7:6];
  wire [10:0] cap_y=success?11'd6:(phase==3?11'd4:11'd0);
  wire rail=(cx>=14 && cx<18 || cx>=62 && cx<66) && cy>=12 && cy<248;
  wire rail_enabled=phase>=2 || phase==1 && cy>=128 || phase==0 && !segment[0];
  wire body=cx>=22 && cx<58 && cy>=12 && cy<248;
  wire channel=cx>=28 && cx<52 && cy[4:0]>=4 && cy[4:0]<28 && cy>=12 && cy<248;
+ wire shutter=channel && locked_cover;
  wire front_cap=locked!=0 && from_bottom==locked-1 && cy[4:0]>=4 && cy[4:0]<7;
  wire rising=!failed && !success && danger==0 && !charging && cy[4:0]==(5'd27-animation[4:0]);
  wire cap=cx>=14 && cx<66 && (cy>=cap_y && cy<cap_y+6 || cy>=248 && cy<254);
@@ -36,7 +40,11 @@ module core_renderer(
    else if(from_bottom==locked)color_index=failed?6'd43:(rising || cy[4:0]<7?6'd42:(cx<32?6'd42:6'd41));
    else color_index=(cx==29 || cy[4:0]==5)?6'd21:6'd50;
   end
-  if(channel && blocked)color_index=6'd50;
+  if(rail && reserve_mode && reserve_alarm!=0)color_index=reserve_pulse?(reserve_alarm==2?6'd54:6'd42):6'd21;
+  if(channel && reserve_mode)color_index=reserve_depth<reserve_fill?(reserve_alarm==2?6'd54:reserve_alarm==1?6'd42:6'd37):6'd50;
+  if(shutter)color_index=cy[4:0]<8?6'd22:6'd49;
+  if(lock_bar)color_index=cx<28 || cx>=52?6'd43:6'd21;
+  if(channel && blocked)color_index=lock_bar?(cx<28 || cx>=52?6'd43:6'd21):(cy[4:0]<8?6'd22:6'd49);
   else if(channel && half_power && locked==4 && front_cap)color_index=6'd42;
   if(cap || socket)color_index=cap?(cx<18 || cx>=62?6'd21:6'd22):6'd23;
   if(clamp)color_index=cy[5:0]<14?6'd22:6'd21;

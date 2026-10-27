@@ -1,0 +1,84 @@
+{
+  "exe_sha256": "f04753edd23cd03cbf4d112f8f103e7141c6245d40869f46bac8a27d0fbf80ed",
+  "exe_bytes": 18547446,
+  "machine": "Windows AMD64",
+  "standalone_directory": "D:\\vivado_project\\Tetris\\temporary\\pc_portable_20261026\\独立 发布测试 (含中文)",
+  "python_paths_removed": true,
+  "version": "PASS",
+  "frozen_loopback": {
+    "datagrams": 9,
+    "bytes": 10312,
+    "line_packets": 8,
+    "palette_packets": 1,
+    "invalid_packets": 0,
+    "sources": [
+      "127.0.0.1"
+    ],
+    "protocol_sources": [
+      "127.0.0.1"
+    ],
+    "passed": true,
+    "mode": "loopback",
+    "bind": "127.0.0.1",
+    "port": 63165,
+    "version": "2026.10.27.3",
+    "errors": [],
+    "physical_network_verified": false,
+    "conclusion": "本机 UDP 发送、接收与 Tetris 协议解析通过；不代表网线、物理网口或防火墙入站已验证。"
+  },
+  "native_powershell_in_frozen_app": {
+    "passed": true,
+    "read_only": true,
+    "adapters": 5,
+    "connection": {
+      "index": null,
+      "name": null,
+      "how": null,
+      "local_ip": null,
+      "ready": false
+    }
+  },
+  "frozen_tk_pillow_keyboard_and_palette": {
+    "passed": true,
+    "palette_entries": 56,
+    "palette_sha256": "bf90ef220473f5a05c241ccdb2088c40a108192d0a6045b472abb11363322bfe",
+    "tk_version": "8.6.12",
+    "keyboard_backend": "pynput.keyboard",
+    "network_configuration_changed": false
+  },
+  "two_frozen_processes_udp": {
+    "datagrams": 6,
+    "bytes": 6451,
+    "line_packets": 5,
+    "palette_packets": 1,
+    "invalid_packets": 0,
+    "sources": [
+      "127.0.0.1"
+    ],
+    "protocol_sources": [
+      "127.0.0.1"
+    ],
+    "passed": true,
+    "mode": "listen",
+    "bind": "127.0.0.1",
+    "port": 57768,
+    "version": "2026.10.27.3",
+    "external_sources": [],
+    "physical_network_verified": false,
+    "external_datagrams_received": false,
+    "conclusion": "收到本机来源的 Tetris UDP；外部网口入站仍未验证。"
+  },
+  "noise_not_false_pass": "PASS",
+  "no_data_not_false_pass": "PASS",
+  "occupied_port_error": "PASS",
+  "invalid_args": "PASS",
+  "bundled_module_source_equivalence": [
+    "net_screen_view",
+    "set_static_arp",
+    "network_selftest",
+    "pc_protocol",
+    "pc_runtime",
+    "tetris_pc_launcher"
+  ],
+  "passed": true
+}

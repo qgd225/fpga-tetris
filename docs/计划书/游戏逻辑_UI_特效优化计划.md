@@ -1,3 +1,5 @@
+> 方案与执行资料：当前采用的玩法见 [核心玩法规格](../游戏模式_玩法规格.md)，故事见 [核心故事文件](../CORE-07_世界观与各模式故事.md)，工程规则见 [AGENTS.md](../AGENTS.md)。本文保留提议、实施步骤及当时取舍；执行采用后同步核心文件，未实施内容不表示当前已有。
+
 > 历史实施资料：维护规则只见工程根目录 AGENTS.md；本稿中的旧资源预算、门禁和画风要求不再作为执行规则。当前故事及 UI 分别见独立故事设定与当前参考图。
 
 # FPGA Tetris 游戏逻辑、UI 与特效优化计划
@@ -24,7 +26,7 @@
 
 ### 2.1 主界面信息层级
 
-![主界面布局](<D:/vivado_project/Tetris/docs/参考图/游戏优化参考图/01_ui_layout_1280x720.png>)
+![主界面布局](<D:/vivado_project/Tetris/docs/参考图/废案/20261021_彩色像素UI/游戏优化参考图/01_ui_layout_1280x720.png>)
 
 - P1/P2 共用一块 24×20 场地，中间没有分隔缝；P1 从左侧出生，P2 从右侧出生。
 - 比分、等级、消行、连击和时间是共享状态；左右侧栏只承载各自独立的 NEXT 和 HOLD。
@@ -35,7 +37,7 @@
 
 ### 2.2 消行反馈时间轴
 
-![消行分镜](<D:/vivado_project/Tetris/docs/参考图/游戏优化参考图/02_line_clear_storyboard_1280x720.png>)
+![消行分镜](<D:/vivado_project/Tetris/docs/参考图/废案/20261021_彩色像素UI/游戏优化参考图/02_line_clear_storyboard_1280x720.png>)
 
 - 完整管道上限 300 ms，下一块在 `T+300ms` 才进入可操作状态。
 - 动画期间仍接收并缓存移动、旋转和硬降输入。
@@ -44,7 +46,7 @@
 
 ### 2.3 反馈分级
 
-![反馈分镜](<D:/vivado_project/Tetris/docs/参考图/游戏优化参考图/03_feedback_storyboard_1280x720.png>)
+![反馈分镜](<D:/vivado_project/Tetris/docs/参考图/废案/20261021_彩色像素UI/游戏优化参考图/03_feedback_storyboard_1280x720.png>)
 
 - 移动与硬降只使用场地内的短线、拖影和边缘变化。
 - 锁定时只有局部边缘反馈，不移动 HUD。
@@ -53,13 +55,13 @@
 
 ### 2.4 调色板
 
-![调色板](<D:/vivado_project/Tetris/docs/参考图/游戏优化参考图/00_palette_swatch.png>)
+![调色板](<D:/vivado_project/Tetris/docs/参考图/废案/20261021_彩色像素UI/游戏优化参考图/00_palette_swatch.png>)
 
 实现时应从现有 RGB 常量派生颜色，不新增独立调色板 RAM。参考图是视觉验收目标，不直接作为位图资源烧入 FPGA。
 
 ### 2.5 基于当前实机画面
 
-![实机 UI 优化](<D:/vivado_project/Tetris/docs/参考图/游戏优化参考图/04_current_ui_optimized.png>)
+![实机 UI 优化](<D:/vivado_project/Tetris/docs/参考图/废案/20261021_彩色像素UI/游戏优化参考图/04_current_ui_optimized.png>)
 
 - 保留当前共享场地、左右 NEXT/HOLD 和右侧排行榜结构。
 - 发布界面隐藏网络包、帧率和统计调试行，调试信息改成按需显示的开发图层。

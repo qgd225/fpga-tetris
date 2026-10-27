@@ -1,0 +1,121 @@
+{
+  "kind": "real_rtl_fixed_fixture_not_hardware_capture",
+  "frames": {
+    "duo_critical": {
+      "ppm_sha256": "ee98464f78a4a8d2d9eb8c232ce4c485e0edd13e0e7f9be7e21e19a76d45c2d2",
+      "png_sha256": "ad1058dda2ecc9dd836b5bfd6b9c14f1a67ebfee158a2c708c68f04164f3068f",
+      "render_log_sha256": "4c6ffa3a28bad61fdcdef898c3e1a1680f76a55762f5560069d94d817ade2729",
+      "pass": true
+    },
+    "duo_full_paused": {
+      "ppm_sha256": "57dc04d3d6ca8de0429c52c4b38ce6629cd265c4a05db491dc8f7a187f0e9e0f",
+      "png_sha256": "b8e0b1d0d416bb1064b2a790c7cdc7a1213988f366e3276ceccfca65ebbd6fdc",
+      "render_log_sha256": "d101042aa6078481a445798c735dafaff76d4881855dc61f57e4d66479aed845",
+      "pass": true
+    },
+    "duo_l4_locked": {
+      "ppm_sha256": "815b78c2e23c7a18645f597fa992dba66a585ad7eef97ebf464e328f68cea75a",
+      "png_sha256": "0d0a117c363117741f9dc6e40312980003e071aaf5db39eb71af6f46759a459c",
+      "render_log_sha256": "c7f41e50553323e94bf7162338bbc9d127e1b07533b5b59dc7ba8978053d030d",
+      "pass": true
+    },
+    "duo_low": {
+      "ppm_sha256": "21260c68f03ca8d433dcf32601a6fb0c3a2842603af26248133097432c9e25a4",
+      "png_sha256": "797cf2008de27f4925325426d7ff2a0742e2f71a6f7b6cc8f43801185c0801f5",
+      "render_log_sha256": "ba08a3d71f63a688572b031d0fc32cc58c5b78e7d079e586c740c8df78484c90",
+      "pass": true
+    },
+    "duo_online": {
+      "ppm_sha256": "3c08d90b10978252f4d29fd85aaaabaf4e4025974992fae4568331158e5aa5dc",
+      "png_sha256": "137ace39538f09bcb175aa81ba2ff985f96a7514a7403747ef28445254e32385",
+      "render_log_sha256": "e7dc07b28a006f3dd60d82e306a26f95127d712b88ac095cda3fb777774d468b",
+      "pass": true
+    },
+    "duo_success": {
+      "ppm_sha256": "426e1806e5a77c99d85179cebff5fa3e1bbe22981599943d8948af55b14b882e",
+      "png_sha256": "eb6b8116bd165707faf5c1e8523acf2d14309dfafe831a02b66af75e63e76ff0",
+      "render_log_sha256": "d6ba106b9c4932fac0e6abc9edb0c0864d9b6d7076aa347ea19da540021e53e5",
+      "pass": true
+    },
+    "hold_expire": {
+      "ppm_sha256": "eb1bc821af5f49f35ba5cf3acb668f679b37d023b43a624f1a7ccb0c5cd5744e",
+      "png_sha256": "95cb4e10fd0d9745a972a543bd02dfd6b816d632596fff0a04605ae0e6d9a78e",
+      "render_log_sha256": "6ac3164cc2fb3a7fea3110c91f83c78779a316966f3d48ef2e5b95704603c7cf",
+      "pass": true
+    },
+    "hold_reject": {
+      "ppm_sha256": "797e446f96f23eb8ff657d07781ed18656bd921241c87c26ae23502ed6132a43",
+      "png_sha256": "7ccdadfb6b875762c3f5797c4637c7416f7475df4c5862894a7a507bf2618585",
+      "render_log_sha256": "8386b8f594ce59eeede268e2ccb279dd8298c6901ad2cf7b10f50fbb90a2e4dd",
+      "pass": true
+    },
+    "menu_fourth": {
+      "ppm_sha256": "6d23323990f41efc11f1509fe423791ebfcc5c4c0c08417965abd1766b2312ce",
+      "png_sha256": "8e46fa9564fe9ae93da20382ac4596cf32d5a910ab5646dfeae15c09d3144dc5",
+      "render_log_sha256": "94c7f8814c98c599d98286a06fc29403056a10c6c02988420c5ddc9354dea2f6",
+      "pass": true
+    },
+    "select_fourth": {
+      "ppm_sha256": "88f45c1c6264c49e2a61ec47847c33fcb62d4e4a4dd2425bc9e4231a2daf75df",
+      "png_sha256": "33090c54aaf1a9b786cab5e022cfd88dc1393e3b136cb07f2a55a64a0446015f",
+      "render_log_sha256": "3a044d10919118d5338f6a633d6d196722e2503d8e10c36d1928e1e1ef1bcc51",
+      "pass": true
+    },
+    "select_second": {
+      "ppm_sha256": "c5e07c233754f7e29dd028afc3be4865ea289378f7d77690b522352404fe999b",
+      "png_sha256": "d3deb377806289b49490dfb575e296d87f3ddbe8d0577cc97759d1de3bf6aaef",
+      "render_log_sha256": "f7172ff9cc73ea1a376e1e56918400fb81931117a9e23ba9f4bc421260ab3047",
+      "pass": true
+    },
+    "select_third": {
+      "ppm_sha256": "20e6b840dadc41f5ec84c77dd56a4020706274b40cfc714b532ade071f346e65",
+      "png_sha256": "25cbbf1a98e3ac6a1cba7e914d451e7c58b4a565263df5b95a9322d1f994d2cf",
+      "render_log_sha256": "3cd8206d9b58f02349cc9289b521d28b66ec2168053c00290dac62f520b32817",
+      "pass": true
+    },
+    "solo_failure": {
+      "ppm_sha256": "77786a823f3f666963a1d8b26daf60fb6c341271378831fc5f27d838055dc2a8",
+      "png_sha256": "ab0ac843609528ea5df27d690c1d8b8d88d27404aa1ed292932fb0b6028e8b9f",
+      "render_log_sha256": "52868a8832db69ccdeeee4337f21ce1bc0084c81e33e2a9a837551fbac59a952",
+      "pass": true
+    },
+    "solo_half_charged": {
+      "ppm_sha256": "063eef27869985650880e7ab776dd7d7b31a156a58a9f482b99be9512fb7ddb3",
+      "png_sha256": "efc62c33647d38c51ae7d5e979d04907dbd59bb71e78fd6fce8db6c6fea0a6b1",
+      "render_log_sha256": "524c1ec7c239ca12a1ed1ae3d956b9dba447b402821fad774bab33e5750ccefa",
+      "pass": true
+    },
+    "solo_half_empty": {
+      "ppm_sha256": "db76203b4deba1d7790da1afddec7e521c20def6a40923b75fe314621292311e",
+      "png_sha256": "d337bfab7769f09cfde2313816c95e8ae7beeccf71fae86779e20d1bef3d0b86",
+      "render_log_sha256": "8d4086a6bc6b32d6eef8a931e5b530c9746a21cb40f7d6534f25bb0f450c9252",
+      "pass": true
+    },
+    "solo_initial": {
+      "ppm_sha256": "22b9ff7cddf008f38d6e9e5b07a45ea4a309fb05c9ffd1d1fa74d421c3aabcdf",
+      "png_sha256": "be5c2907b0090441a9d83e2f5a973dbabd8f56b4241bd4570cc10e678a83540a",
+      "render_log_sha256": "e9a689df6067433f05a323016b78cfa59243e841b42b03e5095fa100ccd1bc02",
+      "pass": true
+    },
+    "solo_locked": {
+      "ppm_sha256": "9875f7cff976e8e5b5e3550b835497ebaac87b00fd54070b359c10e1fa4306c4",
+      "png_sha256": "5af16d18cfcf2e34ab4b1ffc4187cd2f89c86b197eba96b4f5fd34d25bd20100",
+      "render_log_sha256": "72c0f096717334f1838177f90faa232ea4a7276801ad1168291d539bf1352a05",
+      "pass": true
+    }
+  },
+  "inputs": {
+    "Tetris.sim/story_visual/render_tb.v": "a9e2c038bc93bbe52a949bfbb69d9dfa3d76fa32d4852d3ebc83db2372707a6d",
+    "Tetris.srcs/sources_1/new/story_ui.v": "1c1ea677821dad94f641fbb458223ee1fd0fcc5547d4100e15221821b6d0216d",
+    "Tetris.srcs/sources_1/new/core_renderer.v": "c93c4b5c7cd37d85d413a25968f58440e020e412f8f836e829d4fab30dd6ac49",
+    "Tetris.srcs/sources_1/new/hud_text.v": "6f53cb4fd7617531930cf6c66b5ccb924c3714f8341ca0c716ccf0e8cc31a007",
+    "Tetris.srcs/sources_1/new/hud_font_rom.v": "741b49e7e567632c7df623597a0713987e2c8b530050339dd7b28e1df7f56ea4",
+    "Tetris.srcs/sources_1/new/story_scene.v": "26e20c7b1a02972fce453c99ee0c18c3760a8fd5992c882e68a7ec40e40f90cd",
+    "Tetris.srcs/sources_1/new/scene_sprite_rom.v": "f38f4508e5f04eb9a716129577f8e22cb29dbc3bdb53b320a9237dc6ea20fae4",
+    "Tetris.srcs/sources_1/new/story_font.mem": "ec90f815bbe06601adf3dbac39f98f1590aee668f796877e9b4d42644a6b2cd9",
+    "Tetris.srcs/sources_1/new/story_sprites.mem": "aad6020785d71531d9c6bc41ac800df7af70d8c2a35f24bbb8bb9938ef02a1b4",
+    "Tetris.srcs/sources_1/new/story_palette.vh": "57804c0cb903b288a9da7c0ad4d7e1f8b2586eb91596bed1c1a309245b685acc",
+    "Tetris.srcs/sources_1/new/story_text_ids.vh": "b200c1c23990be2c27bbad2eece79256d0b64ffa9e483aadce6f24bd506d2560",
+    "Tetris.srcs/sources_1/new/story_debris.mem": "6d560588e11720c58b174ba41b68705679dd65319137848f97c344c240d496dc"
+  }
+}

@@ -38,13 +38,13 @@ module story_tb;
  reg [63:0]piece_snapshot;
  integer saved_lines,saved_counter;
  always #5 clk=~clk;
- story_controller controller(.clk(clk),.reset_n(rst),.new_run(restart),
+ story_controller controller(.batch_n(manual?5'd1:pf_n),.endless_speed(3'd0),.clk(clk),.reset_n(rst),.new_run(restart),
   .playing(playing),.paused(paused),.duo(duo),.campaign(1'b1),.level_id(2'd2),.debris_remaining(7'd0),.row_credit(credit),
   .batch_done(done),.engine_quiescent(quiet),.over_raw(over),
   .lines_total(lines),.story_speed(speed),.story_phase(phase),.core_locked(locked),
   .phase_enter(phase_enter),.charge_pulse(charge),.batch_commit(commit),
   .finish_pending(finish_pending),.result_valid(valid),.result_success(success));
- Playfield #(.CLEAR_STEP(3),.MCNT_LAND(10000000),.MCNT_Drop(10000000)) pf(
+ Playfield #(.CLEAR_STEP(3),.MCNT_LAND(10000000),.MCNT_Drop(10000000)) pf(.ui_tick(1'b1),
   .init_load(1'b0),.initial_mask(480'd0),.initial_total(7'd0),.Clk_74M(clk),.Reset_n(rst),.hcounter(0),.vcounter(0),
   .left_p_flag(left),.right_p_flag(right),.rotate_p_flag(rot),
   .drop_r_flag(drop),.drop_en(drop),.hold_p_flag(hold),.switch_r_flag(0),
@@ -154,7 +154,7 @@ module story_tb;
   repeat(50)tick;
   check("success rejects new board writes",board===snapshot,1);
   check("success freezes both pieces and previews",{pf.counter_c,pf.counter_r,pf.rot,pf.type,pf.type_t,pf.counter_c2,pf.counter_r2,pf.rot2,pf.type2,pf.type_t2}===piece_snapshot[35:0],1);
-  check("success retains progress",lines,32);
+  check("success retains credited progress including four-row bonus",lines,34);
   fresh(1);rows(20);wait_batch;rows(20);wait_batch;
   check("real duo succeeds at40",success,1);
   fresh(0);rows(4);repeat(8)tick;

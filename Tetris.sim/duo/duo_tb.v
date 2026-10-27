@@ -55,7 +55,7 @@ wire blk_l2, blk_rot2;
 
 always #6.734 Clk_74M = ~Clk_74M;
 
-Playfield dut(
+Playfield dut(.ui_tick(1'b1),
   .init_load(1'b0),.initial_mask(480'd0),.initial_total(7'd0),.mission_hold(1'b0), .story_speed(test_story_speed),
   .Clk_74M(Clk_74M), .Reset_n(Rst), .hcounter(hc), .vcounter(vc),
   .left_p_flag(left1), .right_p_flag(right1), .drop_r_flag(drop1), .drop_en(drop_en1),
@@ -318,11 +318,14 @@ initial begin
   p_hold1; repeat(2) @(posedge Clk_74M);
   chk("P1 存 -> 槽=P1 的块", dut.hold_type, 3);
   p_hold2; repeat(2) @(posedge Clk_74M);
-  chk("P2 存 -> 槽=P2 的块", dut.hold_type, 5);
+  chk("P2 claim keeps original bank", dut.hold_type, 3);
+  chk("P2 may claim during store cooldown", dut.hold_reserved && dut.hold_owner2, 1);
   p_hold2; repeat(2) @(posedge Clk_74M);
-  chk("P2 取 -> 槽进入 P2 下一块", dut.type_t2, 5);
+  chk("P2 cancels claim without swapping", dut.hold_reserved, 0);
   p_hold1; repeat(2) @(posedge Clk_74M);
-  chk("P1 取 -> 槽进入 P1 下一块", dut.type_t, 5);
+  chk("P1 may claim without exchanging active", dut.hold_type, 3);
+  p_hold1; repeat(2) @(posedge Clk_74M);
+  chk("cancel P1 claim before normal NEXT test", dut.hold_reserved, 0);
   release dut.type; release dut.type2;
   repeat(4) @(posedge Clk_74M);
 
@@ -462,13 +465,16 @@ initial begin
     end
     chk("Playing 时不加搅动", d2, 0);
     Idle = 1'b1; Playing = 1'b0; repeat(4) @(posedge Clk_74M);
-    d1 = 0;
-    for(q = 0; q < 8; q = q + 1)begin
-      exp_ns = {dut.rnd[30:0], dut.rnd[31]^dut.rnd[21]^dut.rnd[1]^dut.rnd[0]};
-      @(posedge Clk_74M);
-      if(dut.rnd !== exp_ns) d1 = d1 + 1;
+    // Pin one known stirring input instead of relying on a random eight-clock window.
+    force dut.rnd_cnt=16'h0008;
+    d1=0;
+    for(q=0;q<8;q=q+1)begin
+      @(negedge Clk_74M);
+      exp_ns={dut.rnd[30:0],dut.rnd[31]^dut.rnd[21]^dut.rnd[1]^dut.rnd[0]^1'b1};
+      @(posedge Clk_74M);#1;if(dut.rnd!==exp_ns)d1=d1+1;
     end
-    chk("Idle 搅动生效", (d1 > 0), 1);
+    chk("Idle stirring follows selected counter bit exactly",d1,0);
+    release dut.rnd_cnt;
     Idle = 1'b0; Playing = 1'b1; repeat(2) @(posedge Clk_74M);
     force dut.rnd = 32'h000000F0; force dut.rnd_cnt = 16'h0000;
     repeat(2) @(posedge Clk_74M);

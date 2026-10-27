@@ -29,7 +29,7 @@ integer bad, m, sp;
 
 always #6.734 Clk_74M = ~Clk_74M;
 
-frame #(.EFF_TICK(21'd8)) dut(
+frame #(.EFF_TICK(21'd8)) dut(.menu_window(2'd0),
   .campaign(1'b1),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.Clk_74M(Clk_74M), .Reset_n(Rst), .hcounter(hc), .vcounter(vc), .video_de(1'b1), .choose(1'b0), .choose_cnt(4'd0),
   .left_p_flag(left_p), .right_p_flag(right_p), .drop_r_flag(drop_r), .drop_en(drop_en),
   .rotate_p_flag(rotate_p), .switch_r_flag(switch_r), .hold_p_flag(hold_p),
@@ -66,20 +66,16 @@ endtask
 task set_time;
 input integer s;
 begin
-  force dut.timer_inst.counter3 = s / 600;
-  force dut.timer_inst.counter2 = (s % 600) / 60;
-  force dut.timer_inst.counter1 = (s % 60) / 10;
-  force dut.timer_inst.counter0 = s % 10;
+  force dut.game_clock.seconds=s;
+  force dut.game_clock.time_bcd = ((s / 600)<<12) | (((s % 600) / 60)<<8) | (((s % 60) / 10)<<4) | (s % 10);
   repeat(4) @(posedge Clk_74M);
 end
 endtask
 
 task rel_time;
 begin
-  release dut.timer_inst.counter3;
-  release dut.timer_inst.counter2;
-  release dut.timer_inst.counter1;
-  release dut.timer_inst.counter0;
+  release dut.game_clock.seconds;
+  release dut.game_clock.time_bcd;
   repeat(4) @(posedge Clk_74M);
 end
 endtask
@@ -135,9 +131,8 @@ initial begin
   end
   release dut.story_inst.story_speed;
   @(negedge Clk_74M);Stop=1;
-  dut.timer_inst.counter=74218749;
-  dut.timer_inst.counter0=0;dut.timer_inst.counter1=0;
-  dut.timer_inst.counter2=0;dut.timer_inst.counter3=0;
+  dut.eff_cnt=dut.EFF_TICK;dut.game_clock.fraction=59;dut.game_clock.elapsed_ticks=59;dut.game_clock.seconds=0;
+  dut.game_clock.time_bcd=0;
   repeat(4)@(negedge Clk_74M);chk("pause at exact second does not carry",time_sec,0);
   Stop=0;@(negedge Clk_74M);chk("resume carries once",time_sec,1);
   repeat(4)@(negedge Clk_74M);chk("second boundary not repeated",time_sec,1);

@@ -1,0 +1,219 @@
+{
+  "version": 2,
+  "source_size": [
+    1672,
+    941
+  ],
+  "source_sha256": "2ec45276d0ec937a5df04bdd2ce6becabd165b7adf8e0e32b14eb35b89e1ead2",
+  "appearance_policy": "Use exact source pixels; no redraw; native crops are authoritative. Geometry changes belong to layout only.",
+  "modules": [
+    {
+      "id": "01_管道",
+      "label": "管道",
+      "source_rect_xyxy": [
+        1311,
+        87,
+        1476,
+        344
+      ],
+      "crop_size": [
+        165,
+        257
+      ],
+      "native_asset": "modules/01_管道.png",
+      "allowed_changes": [
+        "translation",
+        "uniform_scaling",
+        "dynamic_masks"
+      ],
+      "forbidden_changes": [
+        "redraw_contour",
+        "replace_font",
+        "change_texture",
+        "nonuniform_scale_whole_module"
+      ]
+    },
+    {
+      "id": "02_核心",
+      "label": "核心",
+      "source_rect_xyxy": [
+        1340,
+        269,
+        1474,
+        823
+      ],
+      "crop_size": [
+        134,
+        554
+      ],
+      "native_asset": "modules/02_核心.png",
+      "allowed_changes": [
+        "translation",
+        "uniform_scaling",
+        "dynamic_masks"
+      ],
+      "forbidden_changes": [
+        "redraw_contour",
+        "replace_font",
+        "change_texture",
+        "nonuniform_scale_whole_module"
+      ]
+    },
+    {
+      "id": "03_刻度",
+      "label": "刻度",
+      "source_rect_xyxy": [
+        1468,
+        346,
+        1595,
+        652
+      ],
+      "crop_size": [
+        127,
+        306
+      ],
+      "native_asset": "modules/03_刻度.png",
+      "allowed_changes": [
+        "translation",
+        "uniform_scaling",
+        "dynamic_masks"
+      ],
+      "forbidden_changes": [
+        "redraw_contour",
+        "replace_font",
+        "change_texture",
+        "nonuniform_scale_whole_module"
+      ]
+    },
+    {
+      "id": "04_船况头",
+      "label": "船况头",
+      "source_rect_xyxy": [
+        237,
+        55,
+        1323,
+        175
+      ],
+      "crop_size": [
+        1086,
+        120
+      ],
+      "native_asset": "modules/04_船况头.png",
+      "allowed_changes": [
+        "translation",
+        "uniform_scaling",
+        "dynamic_masks"
+      ],
+      "forbidden_changes": [
+        "redraw_contour",
+        "replace_font",
+        "change_texture",
+        "nonuniform_scale_whole_module"
+      ]
+    },
+    {
+      "id": "05_P1_NEXT",
+      "label": "P1 NEXT",
+      "source_rect_xyxy": [
+        229,
+        199,
+        447,
+        419
+      ],
+      "crop_size": [
+        218,
+        220
+      ],
+      "native_asset": "modules/05_P1_NEXT.png",
+      "allowed_changes": [
+        "translation",
+        "uniform_scaling",
+        "dynamic_masks"
+      ],
+      "forbidden_changes": [
+        "redraw_contour",
+        "replace_font",
+        "change_texture",
+        "nonuniform_scale_whole_module"
+      ]
+    },
+    {
+      "id": "06_P2_NEXT",
+      "label": "P2 NEXT",
+      "source_rect_xyxy": [
+        1156,
+        201,
+        1343,
+        396
+      ],
+      "crop_size": [
+        187,
+        195
+      ],
+      "native_asset": "modules/06_P2_NEXT.png",
+      "allowed_changes": [
+        "translation",
+        "uniform_scaling",
+        "dynamic_masks"
+      ],
+      "forbidden_changes": [
+        "redraw_contour",
+        "replace_font",
+        "change_texture",
+        "nonuniform_scale_whole_module"
+      ]
+    },
+    {
+      "id": "07_HOLD",
+      "label": "共享 HOLD",
+      "source_rect_xyxy": [
+        232,
+        432,
+        445,
+        674
+      ],
+      "crop_size": [
+        213,
+        242
+      ],
+      "native_asset": "modules/07_HOLD.png",
+      "allowed_changes": [
+        "translation",
+        "uniform_scaling",
+        "dynamic_masks"
+      ],
+      "forbidden_changes": [
+        "redraw_contour",
+        "replace_font",
+        "change_texture",
+        "nonuniform_scale_whole_module"
+      ]
+    }
+  ],
+  "runtime": {
+    "canvas": [
+      1280,
+      720
+    ],
+    "field_grid": [
+      24,
+      20
+    ],
+    "field_cell": [
+      24,
+      24
+    ],
+    "field_size": [
+      576,
+      480
+    ],
+    "core_segments": 8,
+    "phase_order_bottom_to_top": [
+      "RECONNECT",
+      "REBUILD",
+      "STABILIZE",
+      "RECHARGE"
+    ],
+    "hint_in_duo": false
+  }
+}

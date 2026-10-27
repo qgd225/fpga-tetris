@@ -1,0 +1,14 @@
+[
+  "campaign=0 duo=0 phase=0 state=2 ship=0 debris=0",
+  "campaign=1 duo=0 phase=0 state=2 ship=3 ship_select=1 debris=0",
+  "campaign=1 duo=1 phase=0 state=2 ship=3 ship_select=1 debris=0",
+  "campaign=0 duo=0 phase=3 state=0 ship=0 debris=0",
+  "campaign=0 duo=1 phase=3 state=0 ship=0 debris=0",
+  "campaign=1 duo=0 phase=0 state=0 ship=2 debris=54",
+  "campaign=1 duo=1 phase=1 state=0 ship=2 debris=15",
+  "campaign=1 duo=1 phase=2 state=0 ship=2 debris=0",
+  "campaign=1 duo=1 phase=3 state=3 ship=2 debris=0 result_option=1",
+  "campaign=0 duo=0 phase=3 state=4 ship=0 debris=0 result_option=1",
+  "campaign=1 duo=0 phase=1 state=4 ship=2 debris=12 result_option=1",
+  "campaign=1 duo=0 phase=2 state=7 ship=2 debris=0"
+]

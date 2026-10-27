@@ -1,0 +1,261 @@
+{
+  "pass": true,
+  "groups": 15,
+  "results": [
+    {
+      "group": "duo",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/duo.log",
+      "log_sha256": "02d216c208c666f7dab50de96260e92ad1c904b07707c710d0b81f4f063cd629",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "frame_duo",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/frame_duo.log",
+      "log_sha256": "8b31a102a7d7bda5dd5cfb52a66d90b21819ac3aca0e9467cf19f24abe55d691",
+      "markers": [
+        "=== ALL PASS: STORY FRAME 44 checks ==="
+      ]
+    },
+    {
+      "group": "level",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/level.log",
+      "log_sha256": "a7d44ae1c9a9689e4b202b58a7f948754c781e11f36811576d8b42d3d9bca6d9",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "sound",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/sound.log",
+      "log_sha256": "ed19fcabfda031086c734221f78e34193dbd891bba7299f689336f348b5c7c84",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "input_route",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/input_route.log",
+      "log_sha256": "047f1338b3b003a8fae71da5cd01f5efbbcdbe6e7204568927ad7b5ad61f8466",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "net_keyboard",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/net_keyboard.log",
+      "log_sha256": "e230c7a367d780c55bba6ab5e6f5173279a48115109ca5d2a6b324125463347b",
+      "markers": [
+        "=== ALL PASS: NET KEYBOARD ==="
+      ]
+    },
+    {
+      "group": "horizontal_repeat",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/horizontal_repeat.log",
+      "log_sha256": "112b86aabb8322b3c3bb52db974f5c64202ef9e8e9a49ad4554916a78c62840c",
+      "markers": [
+        "=== ALL PASS: 30 checks ==="
+      ]
+    },
+    {
+      "group": "hold_gesture",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/hold_gesture.log",
+      "log_sha256": "07e069a68fd07a766322528d94681b8a827d877c501a1b3ddca132a654e9b62b",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "solo_hint",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/solo_hint.log",
+      "log_sha256": "f8ca60f87188ea32c0a23d5a09bfd86c3188218df2a2d8fcb9fa8d9a69bae648",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "rgb_palette",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/rgb_palette.log",
+      "log_sha256": "07f0fdc295eb8b14a1ac12a3c11e92011059aacf152a9eb76c5483e87aa211da",
+      "markers": [
+        "=== ALL PASS: 56 checks ==="
+      ]
+    },
+    {
+      "group": "lutram",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/lutram.log",
+      "log_sha256": "54f6fde439374c3b95a0a569e5e41171118cbc55fb86e0129630884d90af3657",
+      "markers": [
+        "=== ALL PASS: LUTRAM ===",
+        "=== ALL PASS: LUTRAM ===",
+        "=== ALL PASS: LUTRAM FRAME ==="
+      ]
+    },
+    {
+      "group": "optimization",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/optimization.log",
+      "log_sha256": "18a6867574c90e0690fd6bb885014ad4ed78ee180f0ac944729d4b06c173fe14",
+      "markers": [
+        "=== ALL PASS: PLAYFIELD EQUIVALENCE ===",
+        "=== ALL PASS: HINT EQUIVALENCE ===",
+        "=== ALL PASS: METADATA ===",
+        "=== ALL PASS: METADATA ===",
+        "=== ALL PASS: STORY FRAME 44 checks ===",
+        "=== ALL PASS: LUTRAM FRAME ===",
+        "=== ALL PASS: OPTIMIZATION ==="
+      ]
+    },
+    {
+      "group": "story",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/story.log",
+      "log_sha256": "c2f8aa3e59596b04c8ace98e40df389bccd52024303f87d1714c5105d2d02b78",
+      "markers": [
+        "ALL PASS STORY: 337 checks"
+      ]
+    },
+    {
+      "group": "game_modes",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/game_modes.log",
+      "log_sha256": "c5e30cfafb5f45d65255bc53c6bd45069cf4c5976ea719a41c7386052a05cf18",
+      "markers": [
+        "ALL PASS GAME_MODES: 18480 checks",
+        "ALL PASS MODE_FLOW",
+        "ALL PASS MODE_STATISTICS",
+        "ALL PASS DEBRIS_INTEGRATION layouts=64 version=2 final_hold_limits=active"
+      ]
+    },
+    {
+      "group": "rhythm",
+      "pass": true,
+      "exit_code": 0,
+      "log": "temporary/hold_ui_20261026/functional-final2/rhythm.log",
+      "log_sha256": "011b083c13f4d93692962b616a968d7a61b8d107222ac77bd725b81c0365aeb8",
+      "markers": [
+        "ALL PASS RHYTHM checks=47",
+        "ALL PASS MISSION_RANK",
+        "ALL PASS HOLD_CLAIM",
+        "ALL PASS HOLD_ENGINE",
+        "ALL PASS UI_CONTRACT",
+        "ALL PASS CORE_ENERGY visible_rows=174",
+        "ALL PASS SCORE_PAUSE",
+        "ALL PASS ENDLESS_INTEGRATION seconds=341 pieces=231 batches=42 lines=42 min_energy_ticks=4966"
+      ]
+    }
+  ],
+  "test_inputs": {
+    "Tetris.sim/duo/duo_tb.v": "9b4e7e69846a394f436326a2df9f7060e92476862ba1ebd07003c5d1ff982431",
+    "Tetris.sim/frame_duo/frame_duo_tb.v": "ce89e6b8fa0cafd31f708c8d582cbaaa6b35ed6e6bdbaacbf2d684eb7018bc2d",
+    "Tetris.sim/game_modes/debris_integration_tb.v": "4d75676e336c81780159652cdeda21f5c5ab410a8196292394758033ea20fdf3",
+    "Tetris.sim/game_modes/game_modes_tb.v": "c6f80b9becad04af9b7e2fb0eefc7f3176a0b064c2ace0dab892e2236e64de51",
+    "Tetris.sim/game_modes/mode_flow_tb.v": "892144ee6a8aff2b9527966fe7e962ed1b240b8fde703ccb9c05e57fae9db52c",
+    "Tetris.sim/game_modes/mode_statistics_tb.v": "ceced6f2adaa0e5fe0036c68c576085879ed5077e1fc07b670e59295d44ace90",
+    "Tetris.sim/hdmi_audio/hdmi_audio_tb.sv": "aef30cfc47deb439fad1cd16748b09c6755872dea01d3c04b26ef3a46b7c0b11",
+    "Tetris.sim/hold_gesture/hold_gesture_tb.v": "f6147ec9f1aea184a7bc353ae5bab0bfd233b080c22a52513b03cbf6f38a338b",
+    "Tetris.sim/horizontal_repeat/horizontal_repeat_tb.v": "432f54bb4304fc29e56072e937716e80aec9b90883c150bdb8ab4ef38073da25",
+    "Tetris.sim/input_route/input_route_tb.v": "d7f5c564847be888190b19bed53b9ad93c6eb8b7332a21bbbb243bec3ac3791b",
+    "Tetris.sim/level/net_level_tb.v": "674cff4609be54db256c1dcb704ac8e4718e657a14dffce9a473c5fc5be750ac",
+    "Tetris.sim/lutram/board_lutram_tb.v": "ad3516b506a7c57f4a70fb5da0cb0405a8c6c587ce8262a9b6f3550630304826",
+    "Tetris.sim/lutram/frame_storage_tb.v": "9f4b1999793ac8776d34e8ee5d467a6a17c90cee12e951415f2d3c8b5d7fcbe7",
+    "Tetris.sim/net_keyboard/net_keyboard_tb.v": "b929fbd84f184e8d9fb2472d700554f2777464289ed90a41586bb480d7a18aec",
+    "Tetris.sim/optimization/frame_equivalence_tb.v": "366f9fe1d1b4c391bd7f07b5d3f511e6359f141783692b2faf9ddbfbaa266109",
+    "Tetris.sim/optimization/hint_equivalence_tb.v": "c01c3b483ca1e43fb94656ce01754a9eae69be358160bf7174483ab70166d0b6",
+    "Tetris.sim/optimization/metadata_tb.v": "b4b62f6cdfbca7f1eb58637a60dcfa8ad175c3351cd51f78216861c1bdd21d2d",
+    "Tetris.sim/optimization/playfield_equivalence_tb.v": "467009bdd78e640b205cec3a0415101722ab48a53aad9c10f12719ed3110ab2b",
+    "Tetris.sim/rgb_palette/rgb_palette_tb.v": "8bfab77992d59b9efce5cff34c0a2ab358e904462ea8428f8ffcb15151972460",
+    "Tetris.sim/rhythm/core_energy_tb.v": "35960912aa8af496b0aecdb5ae07dc35745da4843ea9e0c1a1d69b13de03363b",
+    "Tetris.sim/rhythm/endless_integration_tb.v": "88b90c63818d89929dd9ce9d87c7f225f630fd69e805ef9348045a0462f95072",
+    "Tetris.sim/rhythm/hold_engine_tb.v": "74efe19d2b8f1c07f57dee1a90f466a3936e5cc6fc454ef9468add70d9e49478",
+    "Tetris.sim/rhythm/hold_swap_tb.v": "88f10dc4d07c243ff212c166586937698471128f3583506f1a74249e620fb157",
+    "Tetris.sim/rhythm/mission_rank_tb.v": "d2a30be21479992f13cd696f6f6a5a7ffa2cca22d6ee6ec02e6c8d4a25720656",
+    "Tetris.sim/rhythm/rhythm_tb.v": "87744f95f747c72e4c4c8395a5c1e2e426239741154bd87c1bbc08c6b789a3de",
+    "Tetris.sim/rhythm/score_pause_tb.v": "8fe6de798b8dc82046a7aafa5526da36338664a05de43924cf86a1539c3c4572",
+    "Tetris.sim/rhythm/ui_contract_tb.v": "e825a8f730daef150d1772c73ce59b8cc84ce46aa784bd511a92f0f94e6cdb4b",
+    "Tetris.sim/solo_hint/solo_hint_tb.v": "70c0b5ad6e455ad098032934c24fdcf55c45b7725bf19abc313070493d0a0267",
+    "Tetris.sim/sound/sound_tb.v": "dd37e0ee93d820aef0bb1d3ef4ed9a32c5abadee6ecbd9e185eb16582ff74255",
+    "Tetris.sim/story/story_tb.v": "ce4849ea00e2087156586cffe9e5d71171680492516109dcc20f1c55452ee06c",
+    "Tetris.sim/story_audio/comms_tb.v": "b68cc62bc324b0c889a03eb4449b71728b6a65433b7569578f03dd3a80311777",
+    "Tetris.sim/story_audio/decoder_tb.v": "0d525978ece787a99c5f68dbe9cdcf43f2a0696401c4657ffa006510222df1a3",
+    "Tetris.sim/story_audio/fx_tb.v": "04cf0bd3152314e867c389e6f61b3184d241b32d95c44dbc25dede8b534a4de2",
+    "Tetris.sim/story_audio/music_tb.v": "ce03be71c60344573d742652bee6bd12bb4e62d7ef25fb36b97de2edd668eb86",
+    "Tetris.sim/story_audio/player_tb.v": "e8a8cfd79b981dcd35829939f096325cb06cb5966f8f889c6827326efa93b632",
+    "Tetris.sim/story_audio/voice_pack_tb.v": "1fc56ac346bdc2f50b4dcfc8f5db23d1496eae3d43070c0880a45d0ca6b0276f",
+    "Tetris.sim/story_layout/mapper_tb.v": "1eca39d67d589497f3ba2ec530c386c63bc369f78f0f88610e4af355132b54ed",
+    "Tetris.sim/story_visual/feedback_tb.v": "3d546a5fc36bd9aa6380092fbc9767c50a63308ff011b566597e86a711fcdca5",
+    "Tetris.sim/story_visual/font_tb.v": "c19338501e7844b4dccad610d69343632b1e8807ac40d8bcda5844a87fea56cd",
+    "Tetris.sim/story_visual/geometry_tb.v": "da502a606947cc85dd97cb4c71dfa3710a71e6133d0f1920b8e8901038413ea7",
+    "Tetris.sim/story_visual/phase_tb.v": "e068940f6240beeed01c1f5b5d27dd54ad013679a306211f138a331986652801",
+    "Tetris.sim/story_visual/render_tb.v": "51936e8ac4f079ba98d207148f056ac9afde5c283af743781caf11e5b23058ca",
+    "temporary/sim/run_all.bat": "1e395ea3dfe81d666843b4f7c9605d8b6f0ac85125f6e8a963e939889145ad7d",
+    "temporary/sim/duo/run.bat": "c29273a2fda0cfa85406abb066e259aaec2998a73507b16584ada91200249174",
+    "temporary/sim/frame_duo/run.bat": "59466ff0bcf8c10dd19091f5c3072fb3d18b6e92b300ec7cec6a14600f0f526a",
+    "temporary/sim/game_modes/run.bat": "c1bef47562d91ae6a530dea5771da006f8ea82bf7b364b6c19ea4c1109458bbf",
+    "temporary/sim/hdmi_audio/run.bat": "ba1be0d32de2e79118c74c749ede27ee664f10f1a1133c9066ccfa22816ccc5a",
+    "temporary/sim/hold_gesture/run.bat": "c538a4c8e1a6761a41358f59ef7ec7f5ba17d0df0ad376d30e76f96273ab7c4d",
+    "temporary/sim/horizontal_repeat/run.bat": "872e50c5b0082525d4d1dafceb6c22565d5cab13ca5702867274189e60c77a88",
+    "temporary/sim/input_route/run.bat": "2a22ce019fb6d9ca77f9da090e3ff383b66c0a0453e8d9191673eb6dc1692b17",
+    "temporary/sim/level/run.bat": "b131fc4b893d1af6720ef0ad7309c50fa689e89c5e507d3268b03b7d532705e0",
+    "temporary/sim/lutram/run.bat": "451ecb080d52cec6476c42036c123f1b31745efa4b535aaff41d1991fd47fd4c",
+    "temporary/sim/net_keyboard/run.bat": "d931186580042d594c60d1d3691761b5e4e2b9d3cd9f4def952e4696ad544847",
+    "temporary/sim/optimization/run.bat": "0ce923da01a02fa721ae9b3c165b1292d7ccdc953396c63602612d34c64ac0ba",
+    "temporary/sim/optimization/run.ps1": "f23c5c0c7583e05c78fa7fc70e5ad77ce3d0ebe9f7477f2eb1105d5f656ec4d8",
+    "temporary/sim/optimization/run_frame.ps1": "02ba0885e442d561cd1623c64359d1c265229deae09ba7e952014f9ebaeaa3c3",
+    "temporary/sim/optimization/run_hint.ps1": "f50a1587db2b2c26be10b8e6cec3a50f8ec28147838f269c27057ec7b4af5d57",
+    "temporary/sim/optimization/run_metadata.ps1": "376cd391d73339cc346a8ffa09f7a1afeb0b9d78f30c3e110f3e0c766b25b404",
+    "temporary/sim/optimization/run_storage.ps1": "35f9d640c566cd5ae2d0301e24cdab69bce80a1fdb5cf2c2e4bcda1886801a86",
+    "temporary/sim/rgb_palette/run.bat": "60bc928b892a3837f5f135b350bb02c179db3f4e2aefe40c99b60c8ba4d08caf",
+    "temporary/sim/rhythm/run.bat": "da6398731447ddd90dc9b6ffa2c7e3f2801c47b4efadf776c584979c23436d4c",
+    "temporary/sim/solo_hint/run.bat": "860011eb7d5ccb047cd4b52eb9bb1884cb9978120b9bbe517eae04d0c8c423cc",
+    "temporary/sim/sound/run.bat": "3038240e617bbe50065e3bb9cc0a28a56751a2f6a76c0a38bb5e17b1cf831724",
+    "temporary/sim/story/run.bat": "af6d88f11fc3c529b9eb5079e07774c416701ab470d01d8b4cb9d23abc886f02",
+    "temporary/sim/story_audio/export_audio_preview.py": "a1622f37ca88288830be3562bbb0aecca82d930884194a4c43b0313445083fe4",
+    "temporary/sim/story_audio/prepare_signal_candidate.py": "f0bc79b674d8625882384bd7dfadab6438613fd9254911a831b85c2ba577bbf8",
+    "temporary/sim/story_audio/reference_vectors.py": "d3ef35c17869a0715144c722bf5bea57ecc706d26af6acd9bc856f9787c563f1",
+    "temporary/sim/story_audio/run.bat": "297f2a473cfa9f7d541a53a1d3428096084344420e3b643e9d5394391aa552cd",
+    "temporary/sim/story_audio/run.ps1": "24c1bec5078b6a94f660318568472a16bc1ba7922a7f41a3602bb5c05d4f94f2",
+    "temporary/sim/story_audio/run_music.ps1": "43aaa1e67ce315a53b181e7a886b86b645c112257feb38fa0493f5f84c5da377",
+    "temporary/sim/story_layout/mapper_measure.v": "01bd92303445d8acc341778cdfa068ef0830fd203f014d9bf1016342a909e8fa",
+    "temporary/sim/story_layout/run.bat": "e16af8fa46a9991edfa92bd35647c6845b82096894e77d2c7f55ab798f6fb39e",
+    "temporary/sim/story_visual/check_assets.py": "7070857d4ecf2e910c53fa781f4df140564189ed6dcd0c1339ccba125a3ffd3d",
+    "temporary/sim/story_visual/check_text_netlist.py": "82426cf989bf79c2b5fabd98a6b3b5533850fae343ed149436828e693f053137",
+    "temporary/sim/story_visual/export_previews.py": "0cf2f624f8593f29b37a4fd0216e8cef58e06d9eb98981c325d4e5fed2b2e7f8",
+    "temporary/sim/story_visual/run.bat": "297f2a473cfa9f7d541a53a1d3428096084344420e3b643e9d5394391aa552cd",
+    "temporary/sim/story_visual/run.ps1": "a371070d7d941fc8127a92287fb80e80c6ec1d29058e6f022d21695405453958",
+    "temporary/sim/story_visual/scene_fixture.vh": "9d17ec697a12f4edb8a70c0c22d7a6d64da6a7d130396a7eb2ff8bd94722d804"
+  },
+  "changed_during_run": [],
+  "delegated_to_user": [
+    "RTL previews and actual display",
+    "game feel and supply balance",
+    "PC live reception",
+    "HDMI display and listening"
+  ]
+}

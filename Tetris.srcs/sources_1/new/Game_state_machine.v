@@ -4,12 +4,14 @@ module Game_state_machine(
  input success,run_ready,
  output wire Choose,Idle,Playing,Stop,Finalize,sw_short,sw_long,
  output reg [3:0] choose_cnt,output wire ship_select,
- output reg [1:0] level_id,output wire campaign,output wire [1:0] result_option
+ output reg [1:0] level_id,output wire campaign,output wire [1:0] result_option,output wire [1:0] menu_window
 );
  parameter MCNT = 74_250_000;
  parameter [3:0]CHOOSE_MAX = 4'd3;
  localparam MENU=0,SELECT=1,INIT=2,PLAY=3,PAUSE=4,RESULT=5;
  reg [2:0] state;reg [26:0] counter;reg short_press_ok;
+ reg menu_start,ship_start;
+ assign menu_window=ship_select?{1'b0,ship_start}:{1'b0,menu_start};
  reg [1:0] option;reg [6:0] init_wait;
  wire hold_pulse=(counter==MCNT)&&short_press_ok;
  wire short_press=short_press_ok && switch_r_flag;
@@ -27,17 +29,18 @@ module Game_state_machine(
   end
  end
  always @(posedge Clk_74M or negedge Reset_n)begin
-  if(!Reset_n)begin state<=MENU;choose_cnt<=0;level_id<=0;option<=0;init_wait<=0;end
+  if(!Reset_n)begin state<=MENU;menu_start<=0;ship_start<=0;choose_cnt<=0;level_id<=0;option<=0;init_wait<=0;end
   else begin
    if(state!=INIT)init_wait<=0;else if(init_wait!=127)init_wait<=init_wait+1'b1;
    case(state)
     MENU:begin
-     if(left_p)choose_cnt<=choose_cnt==0?CHOOSE_MAX:{2'b00,choose_cnt[1:0]-2'd1};
-     else if(right_p)choose_cnt<=choose_cnt==CHOOSE_MAX?0:{2'b00,choose_cnt[1:0]+2'd1};
-     if(short_press)begin level_id<=0;option<=0;state<=campaign?SELECT:INIT;end
+     if(left_p && choose_cnt!=0)begin choose_cnt<={2'b00,choose_cnt[1:0]-2'd1};if(choose_cnt==1)menu_start<=0;end
+     else if(right_p && choose_cnt!=CHOOSE_MAX)begin choose_cnt<={2'b00,choose_cnt[1:0]+2'd1};if(choose_cnt==2)menu_start<=1;end
+     if(short_press)begin level_id<=0;ship_start<=0;option<=0;state<=campaign?SELECT:INIT;end
     end
     SELECT:begin
-     if(left_p)level_id<=level_id-1'b1;else if(right_p)level_id<=level_id+1'b1;
+     if(left_p && level_id!=0)begin level_id<=level_id-1'b1;if(level_id==1)ship_start<=0;end
+     else if(right_p && level_id!=3)begin level_id<=level_id+1'b1;if(level_id==2)ship_start<=1;end
      if(hold_pulse)state<=MENU;else if(short_press)begin option<=0;state<=INIT;end
     end
     INIT:if(hold_pulse)state<=campaign?SELECT:MENU;
@@ -53,7 +56,7 @@ module Game_state_machine(
      if(hold_pulse)state<=campaign?SELECT:MENU;
      else if(short_press)begin
       if(option==0)state<=INIT;
-      else if(campaign && success && level_id!=3 && option==1)begin level_id<=level_id+1'b1;state<=INIT;end
+      else if(campaign && success && level_id!=3 && option==1)begin level_id<=level_id+1'b1;if(level_id==2)ship_start<=1;state<=INIT;end
       else state<=campaign?SELECT:MENU;
      end
     end

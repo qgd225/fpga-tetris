@@ -1,0 +1,102 @@
+{
+  "passed": true,
+  "groups": [
+    {
+      "group": "duo",
+      "passed": true,
+      "sha256": "f3aee9ebb2b54996883307bafd375c3fceac83efcfa9598d3c1380590dfbc7fd"
+    },
+    {
+      "group": "frame_duo",
+      "passed": true,
+      "sha256": "bb020b3e5b5817e0171970734ac910987f64d1e5fb3ec9ca6170029a13c9a86a"
+    },
+    {
+      "group": "level",
+      "passed": true,
+      "sha256": "a070ce6db5f3b90a637f2f47074dba8d6abb85c0c4654a95d029e1102fd33bca"
+    },
+    {
+      "group": "sound",
+      "passed": true,
+      "sha256": "31873d26687574c85deb6a5dfb1fe292f27c37cddf6eddb587e6b9da27b39eca"
+    },
+    {
+      "group": "input_route",
+      "passed": true,
+      "sha256": "905434397e6108192ea89ae9736bf54ccd1ba6f6949a309a2cf6b657765be3a1"
+    },
+    {
+      "group": "net_keyboard",
+      "passed": true,
+      "sha256": "c605b1ec7a482f445e2a859ce16fe05f320f0e700e8cfe807676db483397678d"
+    },
+    {
+      "group": "horizontal_repeat",
+      "passed": true,
+      "sha256": "0e027929b225c7c9ffec94b4aca43a773a1da9d4466b78c3aa6a1f0680e18efc"
+    },
+    {
+      "group": "hold_gesture",
+      "passed": true,
+      "sha256": "bd9e361826144353f12be6e85c934e9209696c41098c074d5eaef93df051e110"
+    },
+    {
+      "group": "solo_hint",
+      "passed": true,
+      "sha256": "7cb9402cc1872482364de7f849985568e965f60c4313a2b3f11b1c9b6cb3f3dd"
+    },
+    {
+      "group": "rgb_palette",
+      "passed": true,
+      "sha256": "da76a7e6b61e60c6e3df00201e35e6b78040e3e8f26c6be8b6b601a053dbae0c"
+    },
+    {
+      "group": "lutram",
+      "passed": true,
+      "sha256": "2183c1cc709737667b81a4f6cc460b4f9165a059210a496d0d54ad44af99b373"
+    },
+    {
+      "group": "optimization",
+      "passed": true,
+      "sha256": "3b6b203b22ea3b7bb25c002ffb18bb00f77c51aaaf28b8a6317e486560387e0b"
+    },
+    {
+      "group": "hdmi_audio",
+      "passed": true,
+      "sha256": "6f5bdb743f5073c4ee459bf3b134a025a84a9fcb3371bef010c22e30c5b59270"
+    },
+    {
+      "group": "story",
+      "passed": true,
+      "sha256": "637ee68b018829c0d7e0298817fb7cafd1cb2d9d5a542e5639435f69b7eee2c5"
+    },
+    {
+      "group": "story_layout",
+      "passed": true,
+      "sha256": "12351d9a3bb2355629c29aaa88b0d6815ebfcc4fa581707cce588d7808950d78"
+    },
+    {
+      "group": "story_visual",
+      "passed": true,
+      "sha256": "d7434ceed917c42d72952d29124afd85006388d287df27e5018c7f037623f499"
+    },
+    {
+      "group": "story_audio",
+      "passed": true,
+      "sha256": "2e489b6b175c0d97b89c35e424d14928c2dd6d99bb81ada5f86ee1a3e9fcb778"
+    },
+    {
+      "group": "game_modes",
+      "passed": true,
+      "sha256": "14369d736e6761e886aa5a7861c0d5c5d35955d75c2c94828061ad59268a7236"
+    },
+    {
+      "group": "rhythm",
+      "passed": true,
+      "sha256": "75f2129f584a58a1d479c755398a4248e01b58dd3a2a60b34f57d8a77e3a6575"
+    }
+  ],
+  "elapsed_seconds_including_project_check": 568.0,
+  "local_logs": "temporary/source_integration_20261026/regression-logs/"
+}

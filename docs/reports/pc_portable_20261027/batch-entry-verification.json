@@ -1,0 +1,12 @@
+{
+  "网口自测.bat": {
+    "passed": true,
+    "version": "2026.10.27.3",
+    "python_not_on_path": true
+  },
+  "Python备用启动_需要Python.bat": {
+    "passed": true,
+    "arguments_forwarded": true,
+    "python_not_on_path": true
+  }
+}

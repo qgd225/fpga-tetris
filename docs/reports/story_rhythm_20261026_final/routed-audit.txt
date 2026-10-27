@@ -1,0 +1,13 @@
+LATCHES 3
+LATCH frame_inst/Playfield_inst/counter_c2_reg[3]_LDC LDCE
+LATCH frame_inst/Playfield_inst/counter_c2_reg[4]_LDC LDCE
+LATCH frame_inst/Playfield_inst/counter_c_reg[0]_LDC LDCE
+CLOCK hdmi_inst/hdmi_pll_inst/inst/clk_in1 20.000
+CLOCK clkfbout_hdmi_pll 80.000
+CLOCK clk_out1_hdmi_pll 13.474
+CLOCK clk_out2_hdmi_pll 2.695
+CLOCK rgmii_rx_clk_i 8.000
+CLOCK clkfbout_clk_wiz_0 8.000
+CLOCK clk_out1_clk_wiz_0 8.000
+CLOCK rgmii_tx_clk 8.000
+NO_NEW_CONSTRAINTS: original clock constraints preserved

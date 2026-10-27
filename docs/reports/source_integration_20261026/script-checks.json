@@ -1,0 +1,6 @@
+{
+  "hook_changes_remain_in_build_fingerprint": true,
+  "build_script_does_not_restore_hooks": true,
+  "python_syntax": "PASS",
+  "tcl_structure": "PASS"
+}

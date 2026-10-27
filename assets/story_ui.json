@@ -1,5 +1,5 @@
 {
-  "characters": " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:/.!?",
+  "characters": " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:/.!?+",
   "font_rows": [
     0,
     0,
@@ -692,12 +692,12 @@
     0,
     0,
     0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
+    24,
+    24,
+    126,
+    126,
+    24,
+    24,
     0,
     0,
     0,
@@ -1096,7 +1096,10 @@
     "SELECT_DUO": "DUO SELECT SHIP",
     "RETURN": "SELECT",
     "MENU": "MENU",
-    "NEXT_LEVEL": "NEXT"
+    "NEXT_LEVEL": "NEXT",
+    "RESERVE": "RESERVE",
+    "MAX": "MAX",
+    "HINT": "HINT"
   },
   "provenance": "项目自制字形，来自2026-10-24工作区草稿；固定文本按已批准的故事计划。",
   "palette_rgb": [

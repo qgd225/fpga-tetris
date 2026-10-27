@@ -5,7 +5,7 @@ module hdmi_audio_tb;
     reg reset=1, menu_left=0;
     wire active,urgent;wire [4:0] event_id;wire [3:0] step_id,note_id;
     wire signed [15:0] fx;
-    sound effects(.core_half(1'b0),.core_online(1'b0),.debris_clear(1'b0),.Clk_74M(clk),.Reset_n(!reset),
+    sound effects(.rhythm_reject(1'b0),.rhythm_expire(1'b0),.rhythm_recharge(1'b0),.rhythm_tick(1'b0),.core_half(1'b0),.core_online(1'b0),.debris_clear(1'b0),.Clk_74M(clk),.Reset_n(!reset),
         .over(1'b0),.clear(1'b0),.clr_n(3'd0),.lvl_up(1'b0),.danger1(1'b0),.danger2(1'b0),
         .sw_short(1'b0),.sw_long(1'b0),.menu_l(menu_left),.menu_r(1'b0),
         .land1(1'b0),.land2(1'b0),.lft1(1'b0),.rgt1(1'b0),.rot1(1'b0),

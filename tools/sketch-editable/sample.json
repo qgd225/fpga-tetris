@@ -1,0 +1,12 @@
+{
+  "title": "我的设计工作台",
+  "subtitle": "文字、形状、按钮和图片均为独立图层，可在导入后继续修改。",
+  "accent": "#5260E8",
+  "font": "MicrosoftYaHei",
+  "primaryButton": "创建新设计",
+  "secondaryButton": "查看全部",
+  "cards": [
+    { "title": "界面设计", "description": "调整卡片颜色、文字与布局。", "tag": "可编辑形状", "color": "#E9ECFF" },
+    { "title": "素材管理", "description": "图片为独立图层，可移动或替换。", "tag": "独立图片层", "color": "#E5F4EF" }
+  ]
+}

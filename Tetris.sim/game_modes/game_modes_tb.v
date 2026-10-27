@@ -1,17 +1,17 @@
 `timescale 1ns/1ps
 module game_modes_tb;
  reg clk=0,rst=0,start=0,campaign=0,duo=0,paused=0,playing=1;
- reg [1:0] level=0;
+ reg [1:0] level=0;reg [2:0] time_speed=0;
  reg [15:0] seed=0;
  wire ready;wire [479:0] mask;wire [15:0] actual_seed;wire [2:0] layout;
- reg credit=0,done=0,over=0,quiet=1;reg [6:0] left=0;
+ reg [4:0] unit_n=0;reg credit=0,done=0,over=0,quiet=1;reg [6:0] left=0;
  wire [19:0] lines;wire [2:0] speed;wire [1:0] phase;wire [3:0] core;
  wire valid,success,commit,pending;
  integer bad=0,checks=0,i,j,k,c,y,total,count,expected,seen;
  reg [479:0] saved[0:7];
  always #5 clk=~clk;
  story_debris loader(clk,rst,start,campaign,duo,level,seed,ready,mask,actual_seed,layout);
- story_controller ctl(.clk(clk),.reset_n(rst),.new_run(start),.playing(playing),.paused(paused),
+ story_controller ctl(.batch_n(unit_n),.endless_speed(time_speed),.clk(clk),.reset_n(rst),.new_run(start),.playing(playing),.paused(paused),
   .duo(duo),.campaign(campaign),.level_id(level),.debris_remaining(left),.row_credit(credit),
   .batch_done(done),.engine_quiescent(quiet),.over_raw(over),.lines_total(lines),.story_speed(speed),
   .story_phase(phase),.core_locked(core),.phase_enter(),.charge_pulse(),.batch_commit(commit),
@@ -22,7 +22,7 @@ module game_modes_tb;
  endtask
  task fresh;begin @(negedge clk);start=1;tick;check(!ready,"new run deasserts ready even across modes");@(negedge clk);start=0;repeat(26)tick;end endtask
  task batch;input integer n;
-  begin for(j=0;j<n;j=j+1)begin @(negedge clk);credit=1;tick;end
+  begin unit_n=n;for(j=0;j<n;j=j+1)begin @(negedge clk);credit=1;tick;end
    @(negedge clk);credit=0;done=1;tick;@(negedge clk);done=0;tick;
   end
  endtask
@@ -49,10 +49,10 @@ module game_modes_tb;
    for(k=0;k<4;k=k+1)for(c=0;c<(duo?24:20);c=c+1)for(y=0;y<20;y=y+1)
     check(saved[k][c*20+y]==saved[k+4][((duo?24:20)-1-c)*20+y],"mirror pairs");
   end
-  campaign=0;duo=0;seed=0;fresh;
+  campaign=0;duo=0;seed=0;time_speed=7;fresh;
   check(mask==0 && core==8,"endless empty field and active core");
   batch(20);batch(20);batch(20);
-  check(lines==60 && speed==7 && !valid && !pending,"endless passes old target and remains live at maximum speed");
+  check(lines==60 && speed==7 && !valid && !pending,"endless passes old target using supplied time speed, never task success");
   @(negedge clk);ctl.lines_total=999998;batch(4);
   check(lines==999999 && !valid,"endless line counter saturates without ending game");
   @(negedge clk);over=1;tick;check(valid && !success,"endless real top-out fails");over=0;

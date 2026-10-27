@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "status": "implementation_reference_candidate",
+  "canvas": [
+    1280,
+    720
+  ],
+  "bounds_convention": "[x,y,w,h], half-open [x,x+w) and [y,y+h)",
+  "source": {
+    "file": "00_认可方向_原图.png",
+    "sha256": "b76a24ea09749e8ad964024ee82fe1a2516b9f5d316ae8d54cafffd35c9746b6"
+  },
+  "regions": {
+    "field": {
+      "rect": [
+        352,
+        144,
+        576,
+        480
+      ],
+      "cell": [
+        24,
+        24
+      ],
+      "grid": [
+        24,
+        20
+      ],
+      "z": 20
+    },
+    "header": {
+      "rect": [
+        352,
+        40,
+        576,
+        88
+      ],
+      "z": 10
+    },
+    "p1_next_panel": {
+      "rect": [
+        156,
+        148,
+        136,
+        164
+      ],
+      "z": 10
+    },
+    "p1_next_slot": {
+      "rect": [
+        168,
+        192,
+        112,
+        112
+      ],
+      "z": 30
+    },
+    "p2_next_panel": {
+      "rect": [
+        972,
+        148,
+        136,
+        164
+      ],
+      "z": 10
+    },
+    "p2_next_slot": {
+      "rect": [
+        984,
+        192,
+        112,
+        112
+      ],
+      "z": 30
+    },
+    "hold_panel": {
+      "rect": [
+        156,
+        332,
+        136,
+        174
+      ],
+      "z": 10
+    },
+    "hold_slot": {
+      "rect": [
+        168,
+        368,
+        112,
+        112
+      ],
+      "z": 30
+    },
+    "hold_conditions": {
+      "rect": [
+        212,
+        490,
+        25,
+        5
+      ],
+      "z": 30
+    },
+    "speed": {
+      "rect": [
+        984,
+        320,
+        112,
+        24
+      ],
+      "z": 30
+    },
+    "core": {
+      "rect": [
+        1120,
+        352,
+        64,
+        256
+      ],
+      "segments": 8,
+      "pitch": 32,
+      "segment_height": 28,
+      "fill_direction": "bottom_to_top",
+      "z": 40
+    },
+    "core_state": {
+      "rect": [
+        1112,
+        624,
+        128,
+        24
+      ],
+      "z": 40
+    },
+    "phase": {
+      "rect": [
+        1192,
+        388,
+        80,
+        204
+      ],
+      "order_bottom_to_top": [
+        "RECONNECT",
+        "REBUILD",
+        "STABILIZE",
+        "RECHARGE"
+      ],
+      "baseline_y_bottom_to_top": [
+        582,
+        518,
+        454,
+        390
+      ],
+      "z": 40
+    },
+    "time": {
+      "rect": [
+        512,
+        660,
+        256,
+        32
+      ],
+      "z": 30
+    },
+    "feedback": {
+      "rect": [
+        352,
+        540,
+        576,
+        84
+      ],
+      "z": 50
+    }
+  },
+  "pipe": {
+    "centerline": [
+      [
+        928,
+        68
+      ],
+      [
+        1084,
+        68
+      ],
+      [
+        1104,
+        88
+      ],
+      [
+        1104,
+        138
+      ],
+      [
+        1116,
+        150
+      ],
+      [
+        1116,
+        414
+      ],
+      [
+        1120,
+        418
+      ]
+    ],
+    "outer_width": 12,
+    "orange_width": 6,
+    "z": 10
+  },
+  "palette_current_rtl": {
+    "I": "#38B6C8",
+    "T": "#9B6BB5",
+    "O": "#D9B23C",
+    "Z": "#C2453A",
+    "S": "#4FA86B",
+    "L": "#D97B33",
+    "J": "#3E6FBF"
+  },
+  "sample": {
+    "mode": "DUO CAMPAIGN",
+    "ship": 2,
+    "credit": 15,
+    "target": 35,
+    "debris": 18,
+    "half_threshold": 20,
+    "core_segments": 3,
+    "phase": "REBUILD",
+    "time": "02:18",
+    "hint_visible": false,
+    "debris_cells": 18,
+    "ghost_rows": [
+      16,
+      13
+    ]
+  },
+  "layer_order": [
+    "01_static_shell",
+    "02_field",
+    "03_preview",
+    "04_pieces_and_ghosts",
+    "05_core_and_phase",
+    "06_feedback"
+  ],
+  "geometry_checks": {
+    "bounds": "pass",
+    "field_24x20": "pass",
+    "slots_112_square": "pass",
+    "core_8x32": "pass",
+    "phase_bottom_to_top": "pass",
+    "sample_charge_debris": "pass",
+    "ghost_collision": "pass"
+  }
+}

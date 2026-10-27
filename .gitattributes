@@ -1,4 +1,4 @@
-# RTL 工作区使用 GBK, Git 提交内容转换为 UTF-8; 详见 docs/source-encoding.md
+# RTL 工作区使用 GBK, Git 提交内容转换为 UTF-8; 详见 docs/技术说明/source-encoding.md
 *.v text eol=lf working-tree-encoding=GBK
 *.vh text eol=lf working-tree-encoding=GBK
 *.sv text eol=lf working-tree-encoding=GBK
@@ -16,8 +16,12 @@
 # PC 便携启动程序为 Windows 二进制
 *.exe binary
 
-# 保留第三方 HDL 的原始 UTF-8 编码
-third_party/hdl_util_hdmi/src/*.sv text eol=lf working-tree-encoding=UTF-8
+# 保留已纳入正式源码的上游 HDL 原始 UTF-8 编码
+Tetris.srcs/sources_1/new/audio_info_frame.sv text eol=lf working-tree-encoding=UTF-8
+Tetris.srcs/sources_1/new/audio_sample_packet.sv text eol=lf working-tree-encoding=UTF-8
+Tetris.srcs/sources_1/new/auxiliary_video_information_info_frame.sv text eol=lf working-tree-encoding=UTF-8
+Tetris.srcs/sources_1/new/packet_assembler.sv text eol=lf working-tree-encoding=UTF-8
+Tetris.srcs/sources_1/new/tmds_channel.sv text eol=lf working-tree-encoding=UTF-8
 docs/reports/hdmi_audio/*.rpt text eol=lf
 
 # Generated asset tables keep deterministic LF bytes.

@@ -5,8 +5,10 @@ cd [file join $root temporary]
 set round story_r2a
 if {$argc > 0} {set round [lindex $argv 0]}
 set publish 0
+set local_entry 0
 if {$argc > 1} {
-    if {[lindex $argv 1] ne "publish"} {error "Second argument must be publish"}
+    if {[lindex $argv 1] ni {publish local}} {error "Second argument must be publish or local"}
+    set local_entry [expr {[lindex $argv 1] eq "local"}]
     set publish 1
 }
 source [file join $root tools project_policy.tcl]
@@ -19,11 +21,11 @@ proc used_resource {text name} {
     return $value
 }
 if {![regexp {^story_[a-zA-Z0-9_]+$} $round]} {error "Invalid round name"}
-set output [file join $root docs reports $round]
+set output [file join $root temporary build_candidates $round]
 file mkdir $output
 set gate_snapshot [open [file join $output rules-at-build.md] w]
 fconfigure $gate_snapshot -encoding utf-8 -translation lf
-set rules_file [open [file join $root AGENTS.md] r]
+set rules_file [open [project_rules_file $root] r]
 fconfigure $rules_file -encoding utf-8
 puts -nonewline $gate_snapshot [read $rules_file]
 close $rules_file
@@ -36,21 +38,21 @@ if {[file isfile [file join $root assets story_voice.json]]} {
 open_project [file join $root Tetris.xpr]
 foreach stale {voice_v0.mem voice_v0_config.vh} {set entries [get_files -quiet *$stale];if {[llength $entries]} {remove_files $entries}}
 set_property include_dirs [list [file join $root Tetris.srcs sources_1 new]] [get_filesets sources_1]
-foreach name {story_debris story_pixel_frontend story_pixel_mapper story_ui story_scene story_presentation story_feedback story_controller bin_to_bcd hud_text hud_font_rom core_renderer scene_sprite_rom audio_synth audio_mixer ima_adpcm_decoder story_comms voice_player voice_adpcm_rom} {
+foreach name {run_clock reserve_timer hint_budget hold_limits story_debris story_pixel_frontend story_pixel_mapper story_ui story_scene story_presentation story_feedback story_controller bin_to_bcd hud_text hud_font_rom core_renderer scene_sprite_rom audio_synth audio_mixer ima_adpcm_decoder story_comms voice_player voice_adpcm_rom} {
     set source [file join $root Tetris.srcs sources_1 new ${name}.v]
     if {[file isfile $source] && [llength [get_files -quiet $source]] == 0} {
         add_files -norecurse $source
     }
 }
-foreach name {game_mode_params.vh story_debris_percent.mem story_debris.mem story_font.mem story_sprites.mem story_voice.mem story_voice_config.vh story_voice_ids.vh story_audio_priority.vh story_layout.vh story_text_ids.vh story_palette.vh} {
+foreach name {rhythm_params.vh reserve_fill.mem game_mode_params.vh story_debris_percent.mem story_debris.mem story_font.mem story_sprites.mem story_voice.mem story_voice_config.vh story_voice_ids.vh story_audio_priority.vh story_layout.vh story_text_ids.vh story_palette.vh} {
     set source [file join $root Tetris.srcs sources_1 new $name]
     if {[file isfile $source] && [llength [get_files -quiet $source]] == 0} {add_files -norecurse $source}
 }
+update_compile_order -fileset sources_1
 close_project
 open_project [file join $root Tetris.xpr]
+file copy -force [file join $root Tetris.xpr] [file join $output project-at-build.xpr]
 puts [exec python [file join $root tools story_build_manifest.py] write [file join $output source-manifest.json]]
-set hook [get_property STEPS.WRITE_BITSTREAM.TCL.POST [get_runs impl_1]]
-set_property STEPS.WRITE_BITSTREAM.TCL.POST {} [get_runs impl_1]
 set status [catch {
     update_compile_order -fileset sources_1
     reset_run synth_1
@@ -92,10 +94,18 @@ set status [catch {
     if {!$green} {error "Candidate timing margin failed"}
 
 } problem]
-set_property STEPS.WRITE_BITSTREAM.TCL.POST $hook [get_runs impl_1]
 close_project
-puts [exec python [file join $root tools story_build_manifest.py] verify [file join $output source-manifest.json]]
-if {$status} {error $problem}
+set input_status [catch {exec python [file join $root tools story_build_manifest.py] verify [file join $output source-manifest.json]} input_problem]
+puts $input_problem
+if {$status} {puts "STORY_BUILD_FAILURE: $problem";error $problem}
+if {$input_status} {error $input_problem}
+if {$local_entry} {
+    set regression [file join $root tools run_functional_regression.py]
+    if {![file isfile $regression]} {error "Missing local regression entry: $regression"}
+    # 完整回归失败即停止，不发布候选；详细输出由本机入口写入日志。
+    puts [exec python $regression --output [file join $output functional] 2>@1]
+    puts [exec python [file join $root tools story_build_manifest.py] verify [file join $output source-manifest.json]]
+}
 if {$publish} {
         source [file join $root tools publish_bitstream.tcl]
         publish_bitstream [file join $root Tetris.runs impl_1 Tetris.bit] $root

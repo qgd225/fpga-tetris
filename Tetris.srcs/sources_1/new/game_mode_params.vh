@@ -2,9 +2,6 @@
 localparam [19:0] MODE_SCORE_MAX=20'd999999;
 localparam [19:0] MODE_LINES_MAX=20'd999999;
 localparam [15:0] MODE_TIME_BCD_MAX=16'h9959;
-function [7:0] mode_endless_step; input two; begin
-mode_endless_step=two?8'd5:8'd4;
-end endfunction
 function [7:0] mode_target;
 input two; input [1:0] ship;
 begin case({two,ship})

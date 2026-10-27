@@ -1,0 +1,19 @@
+{
+  "build": "story_rhythm_20261026_final4",
+  "bit": "bit/Tetris.bit",
+  "bytes": 2192114,
+  "sha256": "446726a44cfa92830ccf00cef2cf6653e280513e15de37a1882335cdd414ef89",
+  "baseline_commit": "79eb16d589c84f537bc87f2bc06f561c5fe2e1e9",
+  "archive": "bit/Tetris_20261026_174445_f55aa4827e42.bit",
+  "regression_groups_passed": 19,
+  "rtl_previews_passed": 17,
+  "routed_text_checks_passed": 344,
+  "WNS_ns": 0.221,
+  "WHS_ns": 0.054,
+  "TNS_ns": 0,
+  "THS_ns": 0,
+  "hardware_inputs_match": 138,
+  "post_implementation_commit": false,
+  "github_used": false,
+  "hardware_test": "pending_user"
+}

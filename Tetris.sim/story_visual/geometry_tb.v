@@ -35,7 +35,7 @@ wire [23:0] rgb;
 reg board[0:479];reg [2:0] board_type[0:479];reg board_owner[0:479];
 reg [23:0] palette[0:55];
 integer bi;
-story_ui dut(.debris_percent(7'd50),.success_age(7'd72),.campaign(1'b1),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.debris_left(7'd0),.debris_cell(1'b0),.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
+story_ui dut(.hint_capacity(3'd1),.hint_life(10'd720),.hint_active(1'b0),.hold_reserved(1'b0),.hold_actor2(1'b0),.hold_conditions(3'b111),.rank(2'd0),.average_tenths(8'd0),.charge_done(1'b0),.charge_fill(5'd0),.debris_fill(5'd20),.menu_offset(2'd0),.reserve_fill(8'd102),.reserve_alarm(2'd0),.hold_blocks(2'd0),.hold_life(11'd1800),.hold_ready(1'b1),.hold_visible(1'b1),.hold_expire_flash(1'b0),.hold_reject_flash(1'b0),.hint_quota(3'd1),.recharge_age(6'd0),.recharge_units(10'd0),.speed_flash(6'd0),.reserve_pulse(1'b0),.recharge_capped(1'b0),.recharge_no_gain(1'b0),.debris_percent(7'd50),.success_age(7'd72),.campaign(1'b1),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.debris_left(7'd0),.debris_cell(1'b0),.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
     .comms_visible(comms_visible),.comms_id(comms_id),.choose_cnt(duo?4'd1:4'd0),.phase(phase),.danger(danger),.locked(locked),.success(success),.result_ready(result_ready),
     .bounds1({11'd241,11'd213,(duo?11'd545:11'd593),(duo?11'd445:11'd493)}),
     .bounds2({11'd289,11'd237,11'd833,11'd757}),.star_drift(11'd0),.feedback_clear_age(5'd0),.feedback_clear_row(feedback_clear),
@@ -166,7 +166,7 @@ endtask
    for(k=0;k<8;k=k+1)begin
     position(1040,352+k*32+16);check(dut.core.segment==k && dut.core.from_bottom==7-k,"eight core segment mapping");
    end
-   text_check(fx,72,288,24,2);text_check(fx+304,80,24,12,0);text_check(fx+336,72,48,24,1);
+   text_check(fx,72,288,24,1);text_check(fx+304,80,24,12,0);text_check(fx+336,72,48,24,1);
    text_check(fx,116,88,12,0);text_check(176,156,96,24,2);text_check(168,540,90,12,4);text_check(176,120,20,12,4);
    position(fx+10,610);check(dut.bottom_text_hidden,"bottom labels never cover occupied cells");
    comms_visible=1;position(fx+383,90);check(dut.text_x==fx+336,"speed remains outside COMMS");

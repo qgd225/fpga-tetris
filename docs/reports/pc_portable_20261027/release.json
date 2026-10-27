@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-27",
+  "version": "2026.10.27.3",
+  "path": "TetrisPC.exe",
+  "sha256": "f04753edd23cd03cbf4d112f8f103e7141c6245d40869f46bac8a27d0fbf80ed",
+  "bytes": 18547446,
+  "previous_sha256": "2b7d6da1ddd304747c447227ed3d07eb21fbe1a1c33b9d4420c245b0c391426f",
+  "old_exe_local_backup": "temporary/pc_portable_20261026/before/TetrisPC.exe",
+  "source_files": {
+    "pc/build_pc_exe.py": "ae668954c907fa25eed7fb12fdab6e3fb882c8ebc4281810055b2220c5980907",
+    "pc/network_selftest.py": "16d7238d515b89e820c2a7033f1ca7f702d82c714331d5c973f853e4fe39f12e",
+    "pc/net_screen_view.py": "af7fbe12d27ab73c71fcb272afa5c742c0cd850757b00ab93336aa9f79d96b66",
+    "pc/pc_protocol.py": "c4b63f3057ddf49eb577a54d98ee5a19139cc9a7c65c7df5ecd306e9ad87424a",
+    "pc/pc_runtime.py": "574aa426cfb9f38e29d15c506bf1aa42ecc4b04a906fd252aa8ca16814427ff4",
+    "pc/Python备用启动_需要Python.bat": "d876a363c1e76998094fadebff7e81ed8c90614af41b758b8515d75c6a533f44",
+    "pc/README.md": "222735d2167e6fad204f994d430e2c3b982a72888c6c71dbfd3702c897ced262",
+    "pc/requirements-build.txt": "edc1c28335bc1a22a65eec0e011025d6924fdfde6db004966ef1a81c2f99b330",
+    "pc/set_static_arp.py": "a4c4127cf0c016f14a0895c3008371a1cd19bc2935ccc1562808570bbba3ee46",
+    "pc/TetrisPC.spec": "380f93c701f5608d17bb240ded427812d0b5edcfa3e4a126e63da17b11284242",
+    "pc/tetris_pc_launcher.py": "d39e8fdc30542248fcce08d7c2da1e5ed1c17f2713a90ec5781e119c8461a41d",
+    "pc/网口自测.bat": "70dd0ee08456c5af6a84199f472bda038193a6da8483d96449924ec64f2282a3"
+  },
+  "target_platform": "Windows 10/11 x64",
+  "actual_test_platform": {
+    "windows_build": "10.0.26200",
+    "architecture": "AMD64"
+  },
+  "external_physical_ethernet_tested": false,
+  "other_physical_computer_tested": false,
+  "actual_network_configuration_modified": false,
+  "commit_git": false,
+  "push_github": false,
+  "other_protected_directory_changes_during_task": [
+    "Tetris.srcs\\sources_1\\new\\story_controller.v",
+    "Tetris.sim\\duo\\duo_tb.v",
+    "Tetris.sim\\rhythm\\hold_engine_tb.v",
+    "Tetris.sim\\story\\story_tb.v",
+    "tools\\build_story_assets.py",
+    "tools\\README.md",
+    "tools\\story_build_manifest.py",
+    "tools\\__pycache__\\story_build_manifest.cpython-311.pyc"
+  ]
+}

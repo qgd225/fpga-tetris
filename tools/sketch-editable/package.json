@@ -1,0 +1,8 @@
+{
+  "name": "editable-sketch-sample",
+  "version": "1.0.0",
+  "private": true,
+  "description": "生成供 Pixso 导入验证的可编辑 Sketch 小样",
+  "scripts": { "generate": "node generate.cjs" },
+  "dependencies": { "sketch-constructor": "1.26.0", "jszip": "3.10.1" }
+}

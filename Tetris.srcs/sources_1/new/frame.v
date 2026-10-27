@@ -26,7 +26,7 @@ module frame(
     input choose,
     input [3:0]choose_cnt,
     input duo,
-    input campaign,ship_select,input [1:0] level_id,result_option,output wire run_ready,
+    input campaign,ship_select,input [1:0] level_id,result_option,menu_window,output wire run_ready,
     input left_p_flag2,
     input right_p_flag2,
     input drop_r_flag2,
@@ -43,6 +43,7 @@ module frame(
     output [19:0]lines,
     output [13:0]time_sec,
     output reg core_half_event,core_online_event,debris_clear_event,
+    output rhythm_reject,rhythm_expire,rhythm_recharge,rhythm_warning,rhythm_critical,
     output snd_land1,
     output snd_land2,
     output snd_hard1,
@@ -130,10 +131,11 @@ module frame(
     wire [4:0]batch_n;
     wire [2:0]batch_speed;
     wire batch_commit;
-    wire finish_pending, result_valid;
+    wire finish_pending, result_valid,batch_pending;
     wire [3:0]core_locked;
     wire phase_enter, charge_pulse;
     `include "game_mode_params.vh"
+    `include "rhythm_params.vh"
     wire [479:0] initial_mask,debris_mask;
     wire [6:0] debris_remaining;
     wire debris_ready;reg debris_ready_d,idle_seed_d;
@@ -151,20 +153,52 @@ module frame(
     wire debris_load=debris_ready && !debris_ready_d;
     assign run_ready=debris_ready && debris_ready_d && engine_quiescent;
     wire new_run = Idle || choose || (Finalize && switch_r_flag);
-    assign mission_hold = finish_pending || result_valid;
+    wire [2:0] endless_speed;wire [18:0] elapsed_ticks;
+    wire [15:0] time_bcd;wire [13:0] reserve_ticks;
+    wire supply_wait,supply_failed,reserve_recharge,reserve_warning,reserve_critical;
+    wire [8:0] recharge_units;wire recharge_clipped,recharge_no_gain;
+    wire hint_active,hint_rejected,hint_recharged;wire [2:0] hint_quota,hint_capacity;wire [9:0] hint_life;
+    reg hint_show_d;
+    always @(posedge Clk_74M or negedge Reset_n)if(!Reset_n)hint_show_d<=0;else if(new_run)hint_show_d<=0;else hint_show_d<=hint_show;
+    run_clock game_clock(.clk(Clk_74M),.reset_n(Reset_n),.new_run(new_run),.playing(Playing),.paused(Stop),
+      .finished(result_valid),.tick(story_tick_60hz),.elapsed_ticks(elapsed_ticks),.seconds(time_sec),.time_bcd(time_bcd),.speed(endless_speed));
+    reserve_timer supply(.clk(Clk_74M),.reset_n(Reset_n),.new_run(new_run),.playing(Playing),.paused(Stop),
+      .campaign(campaign),.finished(result_valid),.tick(story_tick_60hz),.batch_commit(batch_commit),
+      .batch_inflight(clear_time || batch_done || batch_pending),.batch_n(batch_n),
+      .reserve_ticks(reserve_ticks),.waiting(supply_wait),.failed(supply_failed),.recharge(reserve_recharge),
+      .warning(reserve_warning),.critical_tick(reserve_critical),.recharge_units(recharge_units),.clipped(recharge_clipped),.no_gain(recharge_no_gain));
+    hint_budget prediction(.clk(Clk_74M),.reset_n(Reset_n),.new_run(new_run),.playing(Playing),.paused(Stop),
+      .finished(result_valid),.duo(duo),.campaign(campaign),.tick(story_tick_60hz),
+      .request((hint_show ^ hint_show_d) && !supply_wait && !supply_failed),.batch_commit(batch_commit),
+      .batch_n(batch_n),.core(core_locked),.active(hint_active),.quota(hint_quota),.rejected(hint_rejected),.recharged(hint_recharged),.quota_capacity(hint_capacity),.life_ticks(hint_life));
+    wire hold_valid,hold_ready,hold_expired,hold_rejected,hold_reserved,hold_owner2,hold_condition_player2;
+    wire [2:0] hold_store_conditions;
+    wire [19:0] real_lines,clear_count;wire [1:0] mission_grade;wire [7:0] average_tenths;
+    wire [1:0] hold_blocks_left;wire [6:0] hold_cooldown_ticks;wire [10:0] hold_life_ticks;
+    assign rhythm_reject=hint_rejected || hold_rejected;
+    assign rhythm_expire=hold_expired;
+    assign rhythm_recharge=reserve_recharge || hint_recharged;
+    assign rhythm_warning=reserve_warning;
+    assign rhythm_critical=reserve_critical || (Playing && !Stop && !mission_hold && hold_valid && !hold_reserved && hold_life_ticks<=180 && hold_life_ticks!=0 && story_tick_60hz && hold_life_ticks%30==0);
+
+
+    assign mission_hold = finish_pending || result_valid || supply_wait || supply_failed;
     assign mission_win = result_valid && mission_success;
     assign over = result_valid && !mission_success && !Finalize;
     story_controller story_inst(
         .clk(Clk_74M),.reset_n(Reset_n),.new_run(new_run),
         .playing(Playing),.paused(Stop),.duo(duo),.campaign(campaign),.level_id(level_id),.debris_remaining(debris_remaining),
-        .row_credit(clear_t_t),.batch_done(batch_done),
-        .engine_quiescent(engine_quiescent),.over_raw(over_raw),
+        .row_credit(clear_t_t),.batch_done(batch_done),.batch_n(batch_n),.real_lines(real_lines),.clear_count(clear_count),
+        .engine_quiescent(engine_quiescent),.over_raw(over_raw || supply_failed),.endless_speed(endless_speed),
         .lines_total(lines_total),.story_speed(speed_level),
         .story_phase(story_phase),.core_locked(core_locked),
         .phase_enter(phase_enter),.charge_pulse(charge_pulse),.batch_commit(batch_commit),
-        .finish_pending(finish_pending),.result_valid(result_valid),
+        .finish_pending(finish_pending),.result_valid(result_valid),.batch_pending(batch_pending),
         .result_success(mission_success)
     );
+
+
+    mission_rank grade_calc(.clk(Clk_74M),.reset_n(Reset_n),.new_run(new_run),.real_lines(real_lines),.clear_count(clear_count),.elapsed_ticks(elapsed_ticks),.rank(mission_grade),.average_tenths(average_tenths));
 
     (* rom_style="block" *) reg [6:0] debris_percent_rom[0:1023];
     initial $readmemh("D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_debris_percent.mem",debris_percent_rom);
@@ -267,7 +301,7 @@ module frame(
     .hold_p_flag(hold_p_flag),
     .Idle(Idle),
     .Playing(Playing),
-    .hint_enable(hint_show),
+    .hint_enable(hint_active),.ui_tick(story_tick_60hz),.hold_valid(hold_valid),.hold_ready(hold_ready),.hold_expired(hold_expired),.hold_rejected(hold_rejected),.hold_reserved(hold_reserved),.hold_owner2(hold_owner2),.hold_condition_player2(hold_condition_player2),.hold_store_conditions(hold_store_conditions),.hold_blocks_left(hold_blocks_left),.hold_cooldown_ticks(hold_cooldown_ticks),.hold_life_ticks(hold_life_ticks),
     .Stop(Stop),
     .Finalize(Finalize),
     .score(score),
@@ -343,25 +377,6 @@ module frame(
     .hint_r0(hint_r0), .hint_r1(hint_r1), .hint_r2(hint_r2), .hint_r3(hint_r3)
     );
 
-    wire time_lit;
-    wire [15:0]time_bcd;
-
-    timer timer_inst(
-    .Clk_74M(Clk_74M),
-    .Reset_n(Reset_n),
-    .hcounter(render_h),
-    .vcounter(render_v),
-    .switch_r_flag(switch_r_flag),
-    .Idle(Idle),
-    .Playing(Playing),
-    .Stop(Stop || mission_hold),
-    .Finalize(Finalize),
-
-    .lit(time_lit),
-    .bcd(time_bcd),
-    .seconds(time_sec)
-    );
-
     wire score_lit;
     wire [23:0]score_bcd;
 
@@ -400,7 +415,7 @@ module frame(
     wire occupied_now=(R_num<20 && C_num<24)?row_f[R_num][C_num]:1'b0;
     wire hint_match=(C_num==hint_c0 && R_num==hint_r0) || (C_num==hint_c1 && R_num==hint_r1) ||
                     (C_num==hint_c2 && R_num==hint_r2) || (C_num==hint_c3 && R_num==hint_r3);
-    wire hint_draw=hint_show && !duo && Playing && hint_valid && hint_match && !occupied_now && !Piece && !Piece2;
+    wire hint_draw=hint_active && !duo && Playing && hint_valid && hint_match && !occupied_now && !Piece && !Piece2;
     // 存储回归保留这些只读采样点；实际绘制使用同一P0像素的材质和归属。
     reg cell_r,owner_r;reg [2:0] sc_r;
     always @(posedge Clk_74M or negedge Reset_n)begin
@@ -436,6 +451,53 @@ module frame(
     story_presentation #(.SUCCESS_TICKS(SUCCESS_TICKS)) presentation(
         .clk(Clk_74M),.reset_n(Reset_n),.new_run(new_run),.ui_tick(eff_tick),
         .result_valid(result_valid),.result_success(mission_success),.result_ready(result_ready),.success_age(success_age));
+
+    (* rom_style="block" *) reg [7:0] reserve_fill_rom[0:RHYTHM_RESERVE_CAP];
+    initial $readmemh("D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/reserve_fill.mem",reserve_fill_rom);
+    reg [7:0] reserve_fill;reg [1:0] reserve_alarm;
+    always @(posedge Clk_74M)begin
+     reserve_fill<=reserve_fill_rom[reserve_ticks];
+     reserve_alarm<=reserve_ticks<=RHYTHM_RESERVE_CRITICAL?2:reserve_ticks<=RHYTHM_RESERVE_LOW?1:0;
+    end
+    reg [5:0] recharge_age,reject_age;reg expire_pending;
+    reg display_expire;reg [7:0] display_reserve_fill;
+    reg [1:0] display_reserve_alarm,display_hold_blocks;
+    reg [10:0] display_hold_life;reg display_hold_ready,display_hold_visible;
+    reg display_hold_reserved,display_hold_actor2,display_hint_active;reg [2:0] display_hold_conditions,display_hint_capacity;reg [9:0] display_hint_life;reg [1:0] display_grade;reg [7:0] display_average;reg display_charge_done;reg [4:0] display_charge_fill,display_debris_fill;reg [4:0] charge_fill,debris_fill;integer fill_i;
+    always @(*)begin charge_fill=0;debris_fill=0;for(fill_i=1;fill_i<=20;fill_i=fill_i+1)begin if({1'b0,lines_total}*21'd20>=fill_i*mode_target(duo,level_id))charge_fill=fill_i;if({5'd0,debris_remaining}*12'd20>=fill_i*mode_total(duo,level_id))debris_fill=fill_i;end end
+    reg [2:0] display_hint_quota;reg [5:0] display_recharge_age,display_reject_age;
+    reg [9:0] display_recharge_units;
+    reg [9:0] popup_units;reg popup_clipped,popup_no_gain;
+    reg [2:0] previous_speed;reg [5:0] speed_flash,warning_phase;
+    reg [5:0] display_speed_flash;reg display_reserve_pulse,display_recharge_clipped,display_recharge_no_gain;
+    wire [10:0] popup_sum={1'b0,popup_units}+recharge_units;
+    always @(posedge Clk_74M or negedge Reset_n)begin
+     if(!Reset_n)begin popup_units<=0;popup_clipped<=0;popup_no_gain<=0;previous_speed<=0;speed_flash<=0;warning_phase<=0;end
+     else if(new_run)begin popup_units<=0;popup_clipped<=0;popup_no_gain<=0;previous_speed<=speed_level;speed_flash<=0;warning_phase<=0;end
+     else if(Playing && !Stop)begin
+      previous_speed<=speed_level;
+      if(speed_level>previous_speed)speed_flash<=6;
+      else if(story_tick_60hz && speed_flash!=0)speed_flash<=speed_flash-1'b1;
+      if(story_tick_60hz)warning_phase<=warning_phase==59?0:warning_phase+1'b1;
+      if(reserve_recharge)begin
+       popup_units<=recharge_age==0?recharge_units:(popup_sum>999?999:popup_sum[9:0]);
+       popup_clipped<=recharge_clipped;popup_no_gain<=recharge_no_gain;
+      end
+     end
+    end
+    always @(posedge Clk_74M or negedge Reset_n)begin
+     if(!Reset_n)begin recharge_age<=0;reject_age<=0;expire_pending<=0;end
+     else if(new_run)begin recharge_age<=0;reject_age<=0;expire_pending<=0;end
+     else begin
+      if(video_de && hcounter==0 && vcounter==0)expire_pending<=0;
+      else if(hold_expired)expire_pending<=1;
+      if(rhythm_reject)reject_age<=6;
+      else if(story_tick_60hz && !Stop && reject_age!=0)reject_age<=reject_age-1'b1;
+      if(reserve_recharge)recharge_age<=48;
+      else if(story_tick_60hz && !Stop && recharge_age!=0)recharge_age<=recharge_age-1'b1;
+     end
+    end
+
     reg [1:0] display_phase,display_danger;
     reg [3:0] display_locked;
     reg display_success;
@@ -447,8 +509,11 @@ module frame(
         if(!Reset_n)begin
             display_phase<=0;display_danger<=0;display_locked<=0;display_success<=0;
             display_speed<=0;display_lines<=0;display_score<=0;display_time<=0;display_debris<=0;
+            display_reserve_fill<=104;display_hold_reserved<=0;display_hold_actor2<=0;display_hold_conditions<=7;display_hint_capacity<=1;display_hint_life<=0;display_hint_active<=0;display_grade<=0;display_average<=0;display_charge_done<=0;display_charge_fill<=0;display_debris_fill<=20;display_reserve_alarm<=0;display_hold_blocks<=0;display_hold_life<=0;display_hold_ready<=1;display_hold_visible<=1;display_hint_quota<=1;display_recharge_age<=0;display_recharge_units<=0;display_reject_age<=0;display_expire<=0;display_speed_flash<=0;display_reserve_pulse<=0;display_recharge_clipped<=0;display_recharge_no_gain<=0;
         end else if(video_de && hcounter==0 && vcounter==0)begin
             display_phase<=story_phase;display_danger<=danger_lvl;display_locked<=core_locked;display_success<=mission_success;
+            display_reserve_fill<=reserve_fill;display_hold_reserved<=hold_reserved;display_hold_actor2<=hold_condition_player2;display_hold_conditions<=hold_store_conditions;display_hint_capacity<=hint_capacity;display_hint_life<=hint_life;display_hint_active<=hint_active;display_grade<=mission_grade;display_average<=average_tenths;display_charge_done<=lines_total>=mode_target(duo,level_id);display_charge_fill<=charge_fill;display_debris_fill<=debris_fill;display_reserve_alarm<=reserve_alarm;display_hold_blocks<=hold_blocks_left;display_hold_life<=hold_life_ticks;display_hold_ready<=hold_ready;display_hint_quota<=hint_quota;display_recharge_age<=recharge_age;display_recharge_units<=popup_units;display_recharge_clipped<=popup_clipped;display_recharge_no_gain<=popup_no_gain;display_speed_flash<=speed_flash;display_reserve_pulse<=reserve_alarm==2?(warning_phase<15 || (warning_phase>=30 && warning_phase<45)):warning_phase<30;display_reject_age<=reject_age;display_expire<=expire_pending || hold_expired;
+            display_hold_visible<=hold_reserved || hold_life_ticks>480 || (hold_life_ticks>180?(hold_life_ticks%30<15):(hold_life_ticks%10<5));
             display_speed<=speed_level;display_lines<=lines_bcd;display_score<=score_bcd;display_time<=time_bcd;display_debris<=batch_commit?debris_remaining:debris_event_d;
         end
     end
@@ -491,7 +556,8 @@ module frame(
     end
     story_ui story_ui_inst(
         .clk(Clk_74M),.reset_n(Reset_n),.x(render_h),.y(render_v),
-        .comms_visible(comms_visible),.comms_id(comms_id),.duo(duo),.campaign(campaign),.ship_select(ship_select),.level_id(level_id),.result_option(result_option),.debris_percent(debris_percent),.debris_left(display_debris),.debris_cell((R_num<20 && C_num<24)?debris_rows[R_num][C_num]:1'b0),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),.choose_cnt(choose_cnt),
+        .reserve_fill(display_reserve_fill),.reserve_alarm(display_reserve_alarm),.hold_blocks(display_hold_blocks),.hold_life(display_hold_life),.hold_ready(display_hold_ready),.hold_visible(display_hold_visible),.hold_expire_flash(display_expire),.hold_reject_flash(display_reject_age!=0),.hint_quota(display_hint_quota),.hint_capacity(display_hint_capacity),.hint_life(display_hint_life),.hint_active(display_hint_active),.hold_reserved(display_hold_reserved),.hold_actor2(display_hold_actor2),.hold_conditions(display_hold_conditions),.rank(display_grade),.average_tenths(display_average),.charge_done(display_charge_done),.charge_fill(display_charge_fill),.debris_fill(display_debris_fill),.recharge_age(display_recharge_age),.recharge_units(display_recharge_units),.speed_flash(display_speed_flash),.reserve_pulse(display_reserve_pulse),.recharge_capped(display_recharge_clipped),.recharge_no_gain(display_recharge_no_gain),
+        .comms_visible(comms_visible),.comms_id(comms_id),.duo(duo),.campaign(campaign),.ship_select(ship_select),.level_id(level_id),.result_option(result_option),.menu_offset(menu_window),.debris_percent(debris_percent),.debris_left(display_debris),.debris_cell((R_num<20 && C_num<24)?debris_rows[R_num][C_num]:1'b0),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),.choose_cnt(choose_cnt),
         .success_age(success_age),.phase(display_phase),.danger(display_danger),.locked(display_locked),.success(display_success),.result_ready(result_ready),
         .speed(display_speed),.lines_bcd(display_lines),.score_bcd(display_score),.time_bcd(display_time),
         .feedback_lock(feedback_lock),.feedback_hard_left(feedback_hard_left),.feedback_hard_right(feedback_hard_right),

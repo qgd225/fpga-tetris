@@ -8,8 +8,9 @@ module render_tb;
 reg [10:0] x=0,y=0;
 reg debris_cell=0,use_debris=0;reg [6:0] debris_percent=50;
 reg [23:0] template_rows[0:1279],kept_rows[0:4];
-integer base_index,preview_total,preview_count,preview_kept,preview_sum,prr,pcc,preview_lines,preview_target,preview_score,preview_speed,ss;
-reg [1:0] result_choice=0;
+integer base_index,preview_total,preview_count,preview_kept,preview_sum,prr,pcc,preview_lines,preview_target,preview_score,preview_speed,ss,elapsed_seconds=168;
+reg [7:0] reserve_pixels=92;reg [1:0] reserve_alert=0;reg [1:0] menu_offset=0;
+reg [1:0] result_choice=0;reg [1:0] hold_cooldown=0;reg [10:0] hold_lifetime=1800;reg hold_available=1,expire_flash=0,reject_flash=0;reg [2:0] quota=1;
 reg campaign=1,ship_select=0;reg [1:0] ship=2;reg [6:0] debris_left=0;
 reg duo=1,choose=0,Idle=0,Playing=1,Stop=0,Finalize=0;
 reg [1:0] phase=0,danger=0;
@@ -42,7 +43,7 @@ wire [23:0] rgb;
 reg board[0:479];reg [2:0] board_type[0:479];reg board_owner[0:479];
 reg [23:0] palette[0:55];
 integer bi;
-story_ui dut(.debris_percent(debris_percent),.success_age(7'd72),.campaign(campaign),.ship_select(ship_select),.level_id(ship),.result_option(result_choice),.debris_left(debris_left),.debris_cell(debris_cell),.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
+story_ui dut(.hint_capacity(3'd1),.hint_life(10'd720),.hint_active(1'b0),.hold_reserved(1'b0),.hold_actor2(1'b0),.hold_conditions(3'b111),.rank(2'd0),.average_tenths(8'd0),.charge_done(1'b0),.charge_fill(5'd0),.debris_fill(5'd20),.menu_offset(menu_offset),.reserve_fill(reserve_pixels),.reserve_alarm(reserve_alert),.hold_blocks(hold_cooldown),.hold_life(hold_lifetime),.hold_ready(hold_available),.hold_visible(1'b1),.hold_expire_flash(expire_flash),.hold_reject_flash(reject_flash),.hint_quota(quota),.recharge_age(6'd0),.recharge_units(10'd0),.speed_flash(6'd0),.reserve_pulse(1'b0),.recharge_capped(1'b0),.recharge_no_gain(1'b0),.debris_percent(debris_percent),.success_age(7'd72),.campaign(campaign),.ship_select(ship_select),.level_id(ship),.result_option(result_choice),.debris_left(debris_left),.debris_cell(debris_cell),.clk(clk),.reset_n(rst),.x(x),.y(y),.duo(duo),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
     .comms_visible(comms_visible),.comms_id(comms_id),.choose_cnt({2'd0,campaign,duo}),.phase(phase),.danger(danger),.locked(locked),.success(success),.result_ready(result_ready),
     .bounds1({11'd241,11'd213,(duo?11'd545:11'd593),(duo?11'd445:11'd493)}),
     .bounds2({11'd289,11'd237,11'd833,11'd757}),.star_drift(11'd0),.feedback_clear_age(5'd0),.feedback_clear_row(feedback_clear),
@@ -125,7 +126,16 @@ endtask
     endtask
     initial begin
         $readmemh("palette_reference.mem",palette);initialize_board;
+        if($value$plusargs("hold_blocks=%d",arg))hold_cooldown=arg;
+        if($value$plusargs("hold_life=%d",arg))hold_lifetime=arg;
+        if($value$plusargs("hold_ready=%d",arg))hold_available=arg;
+        if($value$plusargs("expire=%d",arg))expire_flash=arg;
+        if($value$plusargs("reject=%d",arg))reject_flash=arg;
+        if($value$plusargs("quota=%d",arg))quota=arg;
         if($value$plusargs("campaign=%d",arg))campaign=arg;
+        if($value$plusargs("elapsed=%d",arg))elapsed_seconds=arg;
+        if($value$plusargs("reserve=%d",arg))reserve_pixels=arg;
+        if($value$plusargs("alarm=%d",arg))reserve_alert=arg;
         if($value$plusargs("result_option=%d",arg))result_choice=arg;
         if($value$plusargs("ship_select=%d",arg))ship_select=arg;
         if($value$plusargs("ship=%d",arg))ship=arg;
@@ -170,15 +180,20 @@ endtask
             if(campaign)debris_percent=(preview_total-debris_left)*100/preview_total;
             preview_target=duo?30+ship*5:24+ship*4;
             preview_lines=success?preview_target:phase==0?(duo?5:4):phase==1?(duo?15:12):phase==2?(duo?25:20):(duo?35:28);
+            if($value$plusargs("lines=%d",arg))preview_lines=arg;
             lines_bcd=0;lines_bcd[7:4]=preview_lines/10;lines_bcd[3:0]=preview_lines%10;
             preview_score=0;
             for(ss=0;ss<preview_lines;ss=ss+1)begin
-                preview_speed=(campaign?ship:0)+ss/(duo?5:4);if(preview_speed>7)preview_speed=7;
+                preview_speed=campaign?ship+ss/(duo?5:4):(preview_lines==0?0:(elapsed_seconds*ss/preview_lines)/45);if(preview_speed>7)preview_speed=7;
                 preview_score=preview_score+2*(preview_speed+1);
             end
             score_bcd=0;
             for(ss=0;ss<6;ss=ss+1)begin score_bcd[ss*4 +:4]=preview_score%10;preview_score=preview_score/10;end
-            preview_speed=(campaign?ship:0)+preview_lines/(duo?5:4);speed=preview_speed>7?7:preview_speed;
+            preview_speed=campaign?ship+preview_lines/(duo?5:4):elapsed_seconds/45;speed=preview_speed>7?7:preview_speed;
+            if(!campaign)begin
+             time_bcd[15:12]=(elapsed_seconds/60)/10;time_bcd[11:8]=(elapsed_seconds/60)%10;
+             time_bcd[7:4]=(elapsed_seconds%60)/10;time_bcd[3:0]=elapsed_seconds%10;
+            end
             if(campaign)begin
                 locked=8*preview_lines/preview_target;
                 if(debris_left>(ship==0?(duo?16:13):(2*preview_total+4)/5))locked=0;
@@ -187,6 +202,8 @@ endtask
                 phase=locked>6?3:locked>4?2:locked>2?1:0;
             end else begin locked=8;phase=0;end
         end
+        menu_offset=ship_select && ship==3?1:0;
+        if($value$plusargs("menu_offset=%d",arg))menu_offset=arg;
         repeat(3)@(negedge clk);rst=1;
         if($test$plusargs("render"))begin
             if(state==6)filename="comms_opening.ppm";

@@ -1,13 +1,9 @@
 {
   "version": 1,
-  "template_version": 1,
+  "template_version": 2,
   "score_max": 999999,
   "lines_max": 999999,
   "seconds_max": 5999,
-  "endless_step": [
-    4,
-    5
-  ],
   "levels": [
     {
       "ship": 1,
@@ -84,5 +80,20 @@
       ],
       "half_threshold_override": null
     }
-  ]
+  ],
+  "rhythm": {
+    "speed_step_seconds": 45,
+    "reserve_initial": 90,
+    "reserve_max": 150,
+    "reserve_base_credit": 24,
+    "reserve_per_line": 12,
+    "hold_seconds": 30,
+    "hold_min_cooldown_seconds": 2,
+    "hint_seconds": 12,
+    "reserve_low": 15,
+    "reserve_critical": 5,
+    "reserve_fill_pixels": 174,
+    "reserve_four_bonus": 24
+  },
+  "campaign_four_bonus": 2
 }

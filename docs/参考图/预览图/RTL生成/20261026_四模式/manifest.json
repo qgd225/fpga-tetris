@@ -1,0 +1,27 @@
+{
+  "kind": "real_rtl_fixed_fixture_not_hardware_capture",
+  "source": "docs/reports/story_rhythm_20261026_final/previews",
+  "bit_sha256": "446726a44cfa92830ccf00cef2cf6653e280513e15de37a1882335cdd414ef89",
+  "copied": "2026-10-27",
+  "count": 18,
+  "files": {
+    "contact-sheet.png": "b77e442c5a3c8e2adc79bf461e722e99b61c05979ed64b9a0096735e76e324e4",
+    "duo_critical.png": "ad1058dda2ecc9dd836b5bfd6b9c14f1a67ebfee158a2c708c68f04164f3068f",
+    "duo_full_paused.png": "b8e0b1d0d416bb1064b2a790c7cdc7a1213988f366e3276ceccfca65ebbd6fdc",
+    "duo_l4_locked.png": "0d0a117c363117741f9dc6e40312980003e071aaf5db39eb71af6f46759a459c",
+    "duo_low.png": "797cf2008de27f4925325426d7ff2a0742e2f71a6f7b6cc8f43801185c0801f5",
+    "duo_online.png": "137ace39538f09bcb175aa81ba2ff985f96a7514a7403747ef28445254e32385",
+    "duo_success.png": "eb6b8116bd165707faf5c1e8523acf2d14309dfafe831a02b66af75e63e76ff0",
+    "hold_expire.png": "95cb4e10fd0d9745a972a543bd02dfd6b816d632596fff0a04605ae0e6d9a78e",
+    "hold_reject.png": "7ccdadfb6b875762c3f5797c4637c7416f7475df4c5862894a7a507bf2618585",
+    "menu_fourth.png": "8e46fa9564fe9ae93da20382ac4596cf32d5a910ab5646dfeae15c09d3144dc5",
+    "select_fourth.png": "33090c54aaf1a9b786cab5e022cfd88dc1393e3b136cb07f2a55a64a0446015f",
+    "select_second.png": "d3deb377806289b49490dfb575e296d87f3ddbe8d0577cc97759d1de3bf6aaef",
+    "select_third.png": "25cbbf1a98e3ac6a1cba7e914d451e7c58b4a565263df5b95a9322d1f994d2cf",
+    "solo_failure.png": "ab0ac843609528ea5df27d690c1d8b8d88d27404aa1ed292932fb0b6028e8b9f",
+    "solo_half_charged.png": "efc62c33647d38c51ae7d5e979d04907dbd59bb71e78fd6fce8db6c6fea0a6b1",
+    "solo_half_empty.png": "d337bfab7769f09cfde2313816c95e8ae7beeccf71fae86779e20d1bef3d0b86",
+    "solo_initial.png": "be5c2907b0090441a9d83e2f5a973dbabd8f56b4241bd4570cc10e678a83540a",
+    "solo_locked.png": "5af16d18cfcf2e34ab4b1ffc4187cd2f89c86b197eba96b4f5fd34d25bd20100"
+  }
+}

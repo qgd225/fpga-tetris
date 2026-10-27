@@ -1,0 +1,213 @@
+{
+  "hardware_build": "story_rhythm_20261026_final4",
+  "groups": 19,
+  "pass": true,
+  "provenance": "18 groups from final4 complete regression; game_modes rerun after correcting only testbench legal movement clearance. Hardware/constraints/assets unchanged.",
+  "results": [
+    {
+      "group": "duo",
+      "pass": true,
+      "source_log": "temporary/sim/logs/duo.log",
+      "log_sha256": "cf2eb87cf9873f3d23a4a65f4850ebc4edaca370ba3df6401badc2e5b6a675fd",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "frame_duo",
+      "pass": true,
+      "source_log": "temporary/sim/logs/frame_duo.log",
+      "log_sha256": "d4d241a6b0f2ff58678af33cf299b1aab34980fa740041fc0c3c62a75a2359f4",
+      "markers": [
+        "=== ALL PASS: STORY FRAME 44 checks ==="
+      ]
+    },
+    {
+      "group": "level",
+      "pass": true,
+      "source_log": "temporary/sim/logs/level.log",
+      "log_sha256": "d143b278828035b1d16f584d0939997267560a9075bac46d37a14f8514b0df21",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "sound",
+      "pass": true,
+      "source_log": "temporary/sim/logs/sound.log",
+      "log_sha256": "fe954d87592fe04373160fe009bffb0975ac5e20fc6c6e2fddf0a9b22e88c84f",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "input_route",
+      "pass": true,
+      "source_log": "temporary/sim/logs/input_route.log",
+      "log_sha256": "39730d95a93e711cfbe1564f7cc35141c330c1adb7b7eaaca455332a548302b7",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "net_keyboard",
+      "pass": true,
+      "source_log": "temporary/sim/logs/net_keyboard.log",
+      "log_sha256": "d7327959d59725eff8c452b07224bb4aa134cd2239e5d4b2075687204c2f110f",
+      "markers": [
+        "=== ALL PASS: NET KEYBOARD ==="
+      ]
+    },
+    {
+      "group": "horizontal_repeat",
+      "pass": true,
+      "source_log": "temporary/sim/logs/horizontal_repeat.log",
+      "log_sha256": "ca9aa41c125b3ce6de0a298d72e4338f73e7d4b973d7d30ae52fdbfd85a2fe0a",
+      "markers": [
+        "=== ALL PASS: 30 checks ==="
+      ]
+    },
+    {
+      "group": "hold_gesture",
+      "pass": true,
+      "source_log": "temporary/sim/logs/hold_gesture.log",
+      "log_sha256": "71e3d22bd8aa635d698be629a2435bf0184ce6383ac200d8eb1280089160f17e",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "solo_hint",
+      "pass": true,
+      "source_log": "temporary/sim/logs/solo_hint.log",
+      "log_sha256": "bfdfc18483866e2cb74790c567a09cf6e6eb9e1d4d4c8ba1954303d416e07603",
+      "markers": [
+        "=== ALL PASS ==="
+      ]
+    },
+    {
+      "group": "rgb_palette",
+      "pass": true,
+      "source_log": "temporary/sim/logs/rgb_palette.log",
+      "log_sha256": "f0fd7429bd29884d3443854e8829bf7b6327ad0bb4d4e0061ed449e4da35905d",
+      "markers": [
+        "=== ALL PASS: 56 checks ==="
+      ]
+    },
+    {
+      "group": "lutram",
+      "pass": true,
+      "source_log": "temporary/sim/logs/lutram.log",
+      "log_sha256": "831e20312977a2046b7c9b2c7756546a0088a7062eb5478c45dc53aa9be2dcdf",
+      "markers": [
+        "=== ALL PASS: LUTRAM ===",
+        "=== ALL PASS: LUTRAM ===",
+        "=== ALL PASS: LUTRAM FRAME ==="
+      ]
+    },
+    {
+      "group": "optimization",
+      "pass": true,
+      "source_log": "temporary/sim/logs/optimization.log",
+      "log_sha256": "58777f8948e27736ed7ddd9c2e27114c593441688bf7c7c02cac1698a855704f",
+      "markers": [
+        "=== ALL PASS: PLAYFIELD EQUIVALENCE ===",
+        "=== ALL PASS: HINT EQUIVALENCE ===",
+        "=== ALL PASS: METADATA ===",
+        "=== ALL PASS: METADATA ===",
+        "=== ALL PASS: STORY FRAME 44 checks ===",
+        "=== ALL PASS: LUTRAM FRAME ===",
+        "=== ALL PASS: OPTIMIZATION ==="
+      ]
+    },
+    {
+      "group": "hdmi_audio",
+      "pass": true,
+      "source_log": "temporary/sim/logs/hdmi_audio.log",
+      "log_sha256": "ae11b89eb9db21b045cc61909b5c11796c3219f99d999c4bc1b59a7bafb0fcb7",
+      "markers": [
+        "ALL PASS HDMI audio: 7848263 checks, 1632 samples, 407 audio packets, 32 ACR"
+      ]
+    },
+    {
+      "group": "story",
+      "pass": true,
+      "source_log": "temporary/sim/logs/story.log",
+      "log_sha256": "8894bbdb8c0583b80f4dcafbd502f44c909672f5f3c465a51fe879dde0ea6840",
+      "markers": [
+        "ALL PASS STORY: 337 checks"
+      ]
+    },
+    {
+      "group": "story_layout",
+      "pass": true,
+      "source_log": "temporary/sim/logs/story_layout.log",
+      "log_sha256": "e07d7c602d809474ae80508c14e6e5fb59f318d627569c396637084274a24352",
+      "markers": [
+        "ALL PASS STORY MAPPER checks=16777216"
+      ]
+    },
+    {
+      "group": "story_visual",
+      "pass": true,
+      "source_log": "temporary/sim/logs/story_visual.log",
+      "log_sha256": "2a2d83609e7c72e44feaed33ab015275f56301eade0401218ff54614a60d4190",
+      "markers": [
+        "ALL PASS UI ASSETS colors=56 projection_bits=8 font_bytes=2048 sprite_pixels=4096",
+        "ALL PASS UI TEXT EXTENTS static_regions=12",
+        "ALL PASS STORY FONT checks=139778",
+        "ALL PASS STORY SCENE checks=551 rendered=0",
+        "ALL PASS VGA STORY PHASE checks=4416",
+        "ALL PASS STORY FEEDBACK checks=26",
+        "ALL PASS UI GEOMETRY checks=7726095",
+        "ALL PASS STORY VISUAL"
+      ]
+    },
+    {
+      "group": "story_audio",
+      "pass": true,
+      "source_log": "temporary/sim/logs/story_audio.log",
+      "log_sha256": "17ce7d48c95c375c3021e34c504fd068454c5ee98f0e666950a1caea5e6ade21",
+      "markers": [
+        "ALL PASS IMA DECODER checks=73314 cases=9968 stream_samples=6748",
+        "ALL PASS VOICE PLAYER checks=199436 complete_samples=48168",
+        "ALL PASS VOICE PACK checks=2008318 source_samples=111572",
+        "ALL PASS STORY COMMS checks=18",
+        "ALL PASS STORY FX checks=69004",
+        "ALL PASS STORY MUSIC checks=768012",
+        "ALL PASS STORY AUDIO"
+      ]
+    },
+    {
+      "group": "game_modes",
+      "pass": true,
+      "source_log": "temporary/rhythm_20261026/game-modes-final-replay.log",
+      "log_sha256": "5e49ee1e2ec71b17bd94b1874430e687f9f3c17c374cfed9155005c23bad34bd",
+      "markers": [
+        "ALL PASS GAME_MODES: 18480 checks",
+        "ALL PASS MODE_FLOW",
+        "ALL PASS MODE_STATISTICS",
+        "ALL PASS DEBRIS_INTEGRATION layouts=64 version=2 final_hold_limits=active"
+      ]
+    },
+    {
+      "group": "rhythm",
+      "pass": true,
+      "source_log": "temporary/sim/logs/rhythm.log",
+      "log_sha256": "3f20a59b0e70e5a01e0dea414e693ef99566e4ece1dacf581857da555e190f6f",
+      "markers": [
+        "ALL PASS RHYTHM checks=46",
+        "ALL PASS HOLD_SWAP",
+        "ALL PASS CORE_ENERGY visible_rows=174",
+        "ALL PASS SCORE_PAUSE",
+        "ALL PASS ENDLESS_INTEGRATION seconds=341 pieces=231 batches=42 lines=42 min_energy_ticks=1867"
+      ]
+    }
+  ],
+  "ui_render": {
+    "pass": true,
+    "scenes": 17,
+    "manual_review": "completed: layout, labels, core shutters, energy fill, stable selection window and HOLD feedback"
+  },
+  "routed_text_checks": 344
+}

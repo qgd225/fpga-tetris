@@ -1,0 +1,9 @@
+{
+  "document_links_checked": 12,
+  "broken_links": [],
+  "palette_matches_fpga_asset": true,
+  "inputs_match": true,
+  "formal_exe_matches": true,
+  "git_commit": false,
+  "github_push": false
+}

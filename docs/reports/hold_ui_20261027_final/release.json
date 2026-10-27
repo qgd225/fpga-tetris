@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-27",
+  "build": "story_hold_ui_20261027_final2",
+  "bit": "bit/Tetris.bit",
+  "sha256": "851ba01534ee3aa60f0ba8c65514dbb7b1787050675f644cab1cadbaab5b7127",
+  "bytes": 2192114,
+  "archive": "bit/Tetris_20261027_011048_446726a44cfa.bit",
+  "previous_sha256": "446726a44cfa92830ccf00cef2cf6653e280513e15de37a1882335cdd414ef89",
+  "WNS_ns": 0.359,
+  "WHS_ns": 0.05,
+  "TNS_ns": 0,
+  "THS_ns": 0,
+  "LUT": 16352,
+  "registers": 6630,
+  "BRAM": 31,
+  "DSP": 16,
+  "functional_groups": 15,
+  "hardware_inputs_match": 138,
+  "git_commit": false,
+  "github_used": false,
+  "rtl_previews_generated": false,
+  "hardware_acceptance": "待用户上板验证"
+}

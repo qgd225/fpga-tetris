@@ -48,6 +48,8 @@ tools/scoreboard.csv
 # ===== 手动留存的比特流副本 =====
 /Tetris_*.bit
 tools/startup_error.log
+pc/startup_error.log
+pc/scoreboard.csv
 
 # ===== 本地发布压缩包 =====
 /Tetris*.zip

@@ -37,7 +37,7 @@ module frame_duo_tb;
     reg [3:0] locked_value;
     reg [10:0] drift_snapshot;
     always #6.734 Clk=~Clk;
-    frame #(.EFF_TICK(21'd8),.SUCCESS_TICKS(4)) dut(
+    frame #(.EFF_TICK(21'd8),.SUCCESS_TICKS(4)) dut(.menu_window(2'd0),
         .campaign(campaign),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.Clk_74M(Clk),.Reset_n(Rst),.hcounter(hc),.vcounter(vc),.video_de(1'b1),
         .left_p_flag(1'b0),.right_p_flag(1'b0),.drop_r_flag(1'b0),.drop_en(1'b0),.rotate_p_flag(1'b0),
         .switch_r_flag(sw),.hold_p_flag(1'b0),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),

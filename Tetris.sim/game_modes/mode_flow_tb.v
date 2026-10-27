@@ -2,14 +2,15 @@
 module mode_flow_tb;
  reg clk=0,rst=0,l=0,r=0,confirm=0,held=0,over=0,success=0,ready=0;
  wire choose,idle,playing,stop,finalize,short_p,long_p,select,campaign;
- wire [3:0] mode;wire [1:0] level,option;
+ wire [3:0] mode;wire [1:0] level,option,menu_window;
  integer bad=0,m,t;
  always #5 clk=~clk;
  Game_state_machine #(.MCNT(4)) dut(clk,rst,l,r,confirm,held,over,success,ready,
-  choose,idle,playing,stop,finalize,short_p,long_p,mode,select,level,campaign,option);
+  choose,idle,playing,stop,finalize,short_p,long_p,mode,select,level,campaign,option,menu_window);
  task tick;begin @(posedge clk);#1;end endtask
  task press;begin @(negedge clk);confirm=1;tick;@(negedge clk);confirm=0;tick;end endtask
  task right;begin @(negedge clk);r=1;tick;@(negedge clk);r=0;tick;end endtask
+ task left;begin @(negedge clk);l=1;tick;@(negedge clk);l=0;tick;end endtask
  task check;input pass;input [8*80-1:0] message;
  begin if(pass!==1)begin bad=bad+1;$display("FAIL %0s",message);end end endtask
  initial begin
@@ -17,7 +18,7 @@ module mode_flow_tb;
    rst=0;repeat(2)tick;rst=1;tick;ready=0;over=0;success=0;
    repeat(m)right;
    check(mode==m && campaign==(m>=2),"mode mapping");press;
-   if(m>=2)begin check(select && choose && !playing,"campaign must select ship first");repeat(3)right;check(level==3,"all ships available initially");press;end
+   if(m>=2)begin check(select && choose && !playing,"campaign must select ship first");repeat(3)right;check(level==3 && menu_window==1,"all ships available initially");left;check(level==2 && menu_window==1,"previous selection moves highlight within stable window");left;check(level==1 && menu_window==1,"second previous selection keeps window");left;check(level==0 && menu_window==0,"only crossing top edge scrolls window");left;check(level==0,"first ship does not wrap");repeat(3)right;press;end
    check(idle && !playing,"initialization gate");repeat(80)tick;
    check(!playing,"cannot start before loader ready");ready=1;repeat(3)tick;
    check(playing,"ready starts gameplay");press;check(stop,"pause");press;check(playing,"resume");

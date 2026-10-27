@@ -22,7 +22,7 @@ module playfield_equivalence_tb;
     wire [479:0]board,reference_board;
     integer failures=0,checks=0,n,k,seed=73517;
     always #6.734 clk=~clk;
-    Playfield dut(
+    Playfield dut(.ui_tick(1'b1),
   .init_load(1'b0),.initial_mask(480'd0),.initial_total(7'd0),.mission_hold(1'b0), .story_speed(3'd0),
         .Clk_74M(clk),.Reset_n(rst),.hcounter(hc),.vcounter(vc),
         .Idle(1'b0),.Playing(1'b1),.Stop(1'b0),.Finalize(1'b0),.duo(duo),

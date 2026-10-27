@@ -1,0 +1,8 @@
+{
+  "source_modules_unchanged": 5,
+  "licence_and_commit_files_unchanged": 3,
+  "unrelated_hardware_assets_bit_reports_unchanged": true,
+  "project_changes_exactly_match_requested_transformation": true,
+  "hook_attributes_remaining": 0,
+  "third_party_directory_remaining": false
+}

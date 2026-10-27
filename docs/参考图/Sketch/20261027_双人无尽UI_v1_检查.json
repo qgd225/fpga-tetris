@@ -1,0 +1,21 @@
+{
+  "文件": "D:\\vivado_project\\Tetris\\docs\\参考图\\Sketch\\20261027_双人无尽UI_v1.sketch",
+  "SHA256": "a82ff75b6d90273abdc3dd624c4b6a1c8f3474c7225958f01a83334745dfbcaa",
+  "画布": [
+    1280,
+    720
+  ],
+  "图层统计": {
+    "artboard": 1,
+    "group": 120,
+    "rectangle": 1290,
+    "text": 20
+  },
+  "全部未锁定": true,
+  "检查": "ZIP/UTF-8/页面引用/图层唯一性/图层边界/字体样式一致性/文字宽度/双NEXT/480格点/8段速度/3格HOLD/无HINT/TIME与SPD一致/幽灵落点：通过",
+  "视觉来源": "现行总览风格与 story_layout.vh 布局；设计稿，不是 RTL 截图。",
+  "预览": "由 Sketch 内的图层数据辅助绘制，不代表 Pixso 或 Sketch 的实际渲染。",
+  "Pixso导入验证": "待用户手动导入检查。",
+  "Git提交": false,
+  "GitHub推送": false
+}

@@ -223,7 +223,7 @@ control_route control_route_inst(
 .p2_right_held(p2_right_held)
 );
 
-    wire mode_campaign,ship_select,run_ready;
+    wire mode_campaign,ship_select,run_ready;wire [1:0] menu_window;wire rhythm_reject,rhythm_expire,rhythm_recharge,rhythm_warning,rhythm_critical;
     wire [1:0] level_id,result_option;
     wire core_half_event,core_online_event,debris_clear_event;
     wire sw_short;
@@ -238,7 +238,7 @@ control_route control_route_inst(
     .switch_en(switch_e),
     .over(over | mission_win),
     .success(mission_success),.run_ready(run_ready),.campaign(mode_campaign),
-    .ship_select(ship_select),.level_id(level_id),.result_option(result_option),
+    .ship_select(ship_select),.level_id(level_id),.result_option(result_option),.menu_window(menu_window),
 
     .sw_short(sw_short),
     .sw_long(sw_long),
@@ -363,11 +363,11 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .rotate_p_flag(rotate_p),
     .switch_r_flag(switch_r_f),
     .hold_p_flag(hold_p),
-    .hint_show(solo_hint_show),
+    .hint_show(solo_hint_show),.rhythm_reject(rhythm_reject),.rhythm_expire(rhythm_expire),.rhythm_recharge(rhythm_recharge),.rhythm_warning(rhythm_warning),.rhythm_critical(rhythm_critical),
     .Idle(Idle),
     .choose(choose),
     .choose_cnt(choose_cnt),
-    .duo(duo),.campaign(mode_campaign),.ship_select(ship_select),.level_id(level_id),.result_option(result_option),.run_ready(run_ready),
+    .duo(duo),.campaign(mode_campaign),.ship_select(ship_select),.level_id(level_id),.result_option(result_option),.menu_window(menu_window),.run_ready(run_ready),
     .left_p_flag2(p2_left_move),
     .right_p_flag2(p2_right_move),
     .drop_r_flag2(p2_drop_r),
@@ -423,7 +423,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
         else audio_reject<={blk_rot2,blk_rot1,blk_r2,blk_l2,blk_r1,blk_l1};
     end
     sound sound_inst(
-    .core_half(core_half_event),.core_online(core_online_event),.debris_clear(debris_clear_event),
+    .rhythm_reject(rhythm_reject),.rhythm_expire(rhythm_expire),.rhythm_recharge(rhythm_recharge),.rhythm_tick(rhythm_critical),.core_half(core_half_event),.core_online(core_online_event),.debris_clear(debris_clear_event),
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
     .over(over),

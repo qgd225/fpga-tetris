@@ -1,0 +1,1 @@
+"render_tb" -s "render_tb" --timescale "1ns/1ps" --nolog 

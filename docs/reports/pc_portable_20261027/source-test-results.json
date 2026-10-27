@@ -1,0 +1,14 @@
+{
+  "syntax": "PASS",
+  "valid_and_malformed_packets": "PASS",
+  "multi_adapter_readonly_and_elevation_paths": "PASS",
+  "actual_powershell_fallback_execution_without_network_changes": "PASS",
+  "real_loopback_udp": "PASS",
+  "exclusive_port_binding": "PASS",
+  "noise_is_not_a_protocol_pass": "PASS",
+  "independent_process_udp_send_and_receive": "PASS",
+  "production_receiver_and_palette": "PASS",
+  "wireless_is_not_wired": "PASS",
+  "native_stderr_preserves_fallback": "PASS",
+  "timer_release_on_exception": "PASS"
+}

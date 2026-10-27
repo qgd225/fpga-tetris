@@ -10,6 +10,10 @@ def main():
     from build_game_mode_assets import generate, TARGET
     for asset_name, asset_bytes in generate().items():
         (TARGET / asset_name).write_bytes(asset_bytes)
+    rhythm=json.loads((ROOT/"assets/game_modes.json").read_text(encoding="utf-8"))["rhythm"]
+    capacity=rhythm["reserve_max"]*60
+    fill_pixels=rhythm["reserve_fill_pixels"]
+    (TARGET / "reserve_fill.mem").write_text("".join(f"{(0 if n==0 else max(1,n*fill_pixels//capacity)):02x}\n" for n in range(capacity+1)),encoding="ascii")
     data = json.loads((ROOT / "assets/story_ui.json").read_text(encoding="utf-8"))
     chars = data["characters"]
     font = data["font_rows"]
@@ -20,7 +24,7 @@ def main():
     text = []
     header = ["// 由 tools/build_story_assets.py 生成，修改 assets/story_ui.json 后重建。"]
     names = {" ": "SPACE", "-": "DASH", ":": "COLON", "/": "SLASH",
-             ".": "DOT", "!": "BANG", "?": "QUESTION"}
+             ".": "DOT", "!": "BANG", "?": "QUESTION", "+": "PLUS"}
     for i, c in enumerate(chars):
         header.append(f"    localparam [5:0] CHAR_{names.get(c, c)} = 6'd{i};")
     for name, value in data["texts"].items():
@@ -96,12 +100,14 @@ endmodule
     source,n = re.subn(r"[56]'d(\d+):\s+pal_rgb\s*=\s*24'h[0-9A-Fa-f_]+;",pal_entry,source)
     assert n==56
     network.write_text(source,encoding="gbk",newline="\n")
-    pc=ROOT / "tools/net_screen_view.py"
-    source=pc.read_text(encoding="utf-8")
+    pc=ROOT / "pc/net_screen_view.py"
+    original_pc=pc.read_text(encoding="utf-8")
+    source=original_pc
     table="DEFAULT_PAL = {\n"+"".join(f"    {i}:({int(c[:2],16)},{int(c[2:4],16)},{int(c[4:],16)}),\n" for i,c in enumerate(palette))+"}"
     source,n=re.subn(r"DEFAULT_PAL = \{.*?\n\}",lambda m:table,source,flags=re.S)
     assert n==1
-    pc.write_text(source,encoding="utf-8",newline="\n")
+    if source!=original_pc:
+        pc.write_text(source,encoding="utf-8",newline="\n")
     sprites = json.loads((ROOT / "assets/story_sprites.json").read_text(encoding="utf-8"))["indices"]
     assert len(sprites)==4096 and all(0<=x<=3 for x in sprites)
     (target / "story_sprites.mem").write_text("".join(f"{x:x}\n" for x in sprites),encoding="ascii",newline="\n")

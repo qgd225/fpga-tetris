@@ -1,6 +1,12 @@
-# 工程策略只读取 AGENTS.md；不加载历史门禁。
+# 工程策略只读取 docs/AGENTS.md；根目录文件只提供导航。
+proc project_rules_file {root} {
+    set path [file join $root docs AGENTS.md]
+    if {![file isfile $path]} {error "Missing canonical rules file: $path"}
+    return $path
+}
+
 proc project_timing_limits {root} {
-    set stream [open [file join $root AGENTS.md] r]
+    set stream [open [project_rules_file $root] r]
     fconfigure $stream -encoding utf-8
     set text [read $stream]
     close $stream
