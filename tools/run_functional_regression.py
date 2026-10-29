@@ -28,6 +28,7 @@ def main():
         for p in base.rglob("*"):
             if p.is_file() and p.suffix in {".v", ".sv", ".bat", ".ps1", ".py", ".vh"} and not any(part in {"build", "build_music", "xsim.dir", "__pycache__", "logs", "functional_logs"} for part in p.relative_to(base).parts):
                 inputs[p.relative_to(ROOT).as_posix()] = hashlib.sha256(p.read_bytes()).hexdigest()
+    hardware_inputs = {p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/"Tetris.srcs").rglob("*") if p.is_file() and p.suffix in {".v",".sv",".vh",".mem",".xci",".xdc"}}
     results = []
     for group in groups:
         entry = ROOT / "temporary/sim" / group / "run.bat"
@@ -44,8 +45,9 @@ def main():
         results.append(result)
         print(("PASS " if result["pass"] else "FAIL ") + group, flush=True)
     drift = [name for name, digest in inputs.items() if not (ROOT/name).is_file() or hashlib.sha256((ROOT/name).read_bytes()).hexdigest() != digest]
-    passed = all(x["pass"] for x in results) and not drift
-    summary = {"pass": passed, "groups": len(groups), "results": results, "test_inputs": inputs, "changed_during_run": drift, "delegated_to_user": ["RTL previews and actual display", "game feel and supply balance", "PC live reception", "HDMI display and listening"]}
+    hardware_drift = [n for n,d in hardware_inputs.items() if not (ROOT/n).is_file() or hashlib.sha256((ROOT/n).read_bytes()).hexdigest()!=d]
+    passed = all(x["pass"] for x in results) and not drift and not hardware_drift
+    summary = {"pass": passed, "groups": len(groups), "results": results, "test_inputs": inputs, "changed_during_run": drift, "hardware_inputs":hardware_inputs,"hardware_changed_during_run":hardware_drift, "delegated_to_user": ["RTL previews and actual display", "game feel and supply balance", "PC live reception", "HDMI display and listening"]}
     (output/"summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     print(("ALL PASS" if passed else "FAILED") + " FUNCTIONAL_REGRESSION groups=" + str(len(groups)))
     return 0 if passed else 1

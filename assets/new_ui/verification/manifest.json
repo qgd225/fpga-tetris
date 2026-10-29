@@ -1,0 +1,5 @@
+{
+  "role": "pre-A2 RGB oracle for integration tests only; never synthesize this snapshot",
+  "sha256": "e0672c7106f91d52a48a102f732070748e041d969ad9da9bead4256db67f8d0b",
+  "source_before_sha256": "b473b9297ae7ecf7232863c073713ce7918a1565a97378f71591b59b6426198f"
+}

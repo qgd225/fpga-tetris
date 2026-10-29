@@ -1,0 +1,31 @@
+{
+  "pass": true,
+  "published": true,
+  "date": "2026-10-29T16:18:46.846679",
+  "bit_sha256": "df0f5c6ec93f742b2e324a3d26bf521a4ee24d31c47916d703286e2cf61a6b3c",
+  "pc_exe_sha256": "d0c40f1218daa98d58abb24126402e90d811e7e99f1256870570dbdbfe49fe72",
+  "LUT": 19135,
+  "free_LUT": 1665,
+  "BRAM": 49.5,
+  "timing_ns": {
+    "WNS": 0.063,
+    "WHS": 0.036,
+    "TNS": 0.0,
+    "THS": 0.0
+  },
+  "functional_groups": 15,
+  "rtl_frames": 38,
+  "priority_cuts": [
+    "沿用外围简化；本轮补一道静态流星、两颗远景小行星及连续船板接缝与嵌入通风槽"
+  ],
+  "dynamic_cuts": [],
+  "protected": "重点模块与现有动态沿用；修复旧面板侵入玻璃接头和橙管的残片；补流星、小行星远景和连续船板细节",
+  "board_pending": [
+    "HDMI实际显示相位与布局",
+    "核心、导管、消行与HOLD的实机反馈",
+    "PC物理网口收流与遥控",
+    "实际音频试听"
+  ],
+  "git_commit": false,
+  "git_push": false
+}

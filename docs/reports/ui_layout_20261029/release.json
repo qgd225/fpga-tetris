@@ -1,0 +1,31 @@
+{
+  "pass": true,
+  "published": true,
+  "date": "2026-10-29T15:16:59.271212",
+  "bit_sha256": "2a6643a9329276b3b4620f5a8cf9c97434f4195f0b7671ec82aff4790534de88",
+  "pc_exe_sha256": "d0c40f1218daa98d58abb24126402e90d811e7e99f1256870570dbdbfe49fe72",
+  "LUT": 19031,
+  "free_LUT": 1769,
+  "BRAM": 49.5,
+  "timing_ns": {
+    "WNS": 0.059,
+    "WHS": 0.079,
+    "TNS": 0.0,
+    "THS": 0.0
+  },
+  "functional_groups": 15,
+  "rtl_frames": 38,
+  "priority_cuts": [
+    "沿用外围简化；补静态星空、蓝色行星、灰色卫星、连续接缝、少量螺栓与通风槽"
+  ],
+  "dynamic_cuts": [],
+  "protected": "核心与完整飞船保持原生像素；导管补齐被旧面板遮住的槽壁，边框统一钢材色相并透明合成四角；四行选关、右上对白、向上箭头和行星背景按本轮反馈修正",
+  "board_pending": [
+    "HDMI实际显示相位与布局",
+    "核心、导管、消行与HOLD的实机反馈",
+    "PC物理网口收流与遥控",
+    "实际音频试听"
+  ],
+  "git_commit": false,
+  "git_push": false
+}

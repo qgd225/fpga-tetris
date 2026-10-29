@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "scope": "93 unconstrained endpoints exactly match previously published baseline; not a claim of zero unconstrained pins",
+  "baseline_report": "docs/reports/hold_ui_20261027_final/check-timing-verbose.rpt",
+  "baseline_sha256": "62e7a47de9224566f52ac7220ee66ef41d62c8bef6bebedd76996294c881fe0a",
+  "current_report": "temporary/new_ui_finish/routed/check-timing-verbose.rpt",
+  "current_sha256": "edcf4bad88ac64b1d81098c46f23a13a227503bedbdf9cc2cb793ac761bac098",
+  "unchanged_endpoints": 93,
+  "new_endpoints": []
+}

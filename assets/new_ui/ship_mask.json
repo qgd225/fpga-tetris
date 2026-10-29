@@ -1,0 +1,15 @@
+{
+  "source": "duo_campaign_material.png",
+  "source_rect": [
+    232,
+    48,
+    440,
+    128
+  ],
+  "destination": [
+    336,
+    288
+  ],
+  "visible_pixels": 7550,
+  "rgb": "unchanged header atlas lookup"
+}

@@ -1,0 +1,237 @@
+{
+  "kind": "real_rtl_fixed_ui_fixture_not_hardware_capture",
+  "tool": "Vivado XSim 2018.3",
+  "baseline_commit": "46745c1b5b9ff14e6fd3fa8c251e1552bba6e840",
+  "baseline_pushed_to": "origin/main",
+  "frame": [
+    1280,
+    720
+  ],
+  "scene": {
+    "mode": "DUO CAMPAIGN",
+    "ship": 2,
+    "charge": 15,
+    "target": 35,
+    "debris": 18,
+    "core_segments": 3,
+    "phase": "REBUILD",
+    "time": "02:18"
+  },
+  "actual_runtime_core_geometry": {
+    "x": 1130,
+    "y": 260,
+    "w": 54,
+    "h": 288,
+    "glass_x": 1157,
+    "glass_w": 26,
+    "pitch": 36
+  },
+  "rtl_source_sha256": {
+    "Tetris.srcs/sources_1/new/story_ui.v": "1c6441e02759b11012f537369e09d22a86b16ed20446f3ccf252041e003d204c",
+    "Tetris.srcs/sources_1/new/reference_ui_renderer.v": "83444937fdfc43f0b30e76ae92c4affc99bbfe4c8ae35abfca2c548ede375f7c",
+    "Tetris.srcs/sources_1/new/reference_ui_geometry.vh": "3465fe9db32768d488d1980dc004085b79351531655398735a2853dc64fe6d3f",
+    "Tetris.srcs/sources_1/new/reference_ui_skin.mem": "b0cc56ab6000f7b5b3f8c5081d52b850496ea48d494c9ca860ee7d793b169c6b",
+    "Tetris.srcs/sources_1/new/reference_ui_material.mem": "dfd53762c4090be7d6c48691a4368f8a39eb813c8cbc6eef324e0a8a48526bb5",
+    "Tetris.srcs/sources_1/new/reference_ui_digits.mem": "fba8a917d11150a34fca8e7a360810064dca6fcdf4d192b5e6614705fa33e68b",
+    "Tetris.srcs/sources_1/new/story_font.mem": "ec90f815bbe06601adf3dbac39f98f1590aee668f796877e9b4d42644a6b2cd9",
+    "Tetris.srcs/sources_1/new/story_layout.vh": "d2411bf4035254671ec6f01f7e9a72d6fb1a0fee7cb5518b9187e12b204c2e1d",
+    "Tetris.srcs/sources_1/new/story_palette.vh": "57804c0cb903b288a9da7c0ad4d7e1f8b2586eb91596bed1c1a309245b685acc",
+    "Tetris.srcs/sources_1/new/game_mode_params.vh": "34099850416d8a30c7c6087da1591d1541c5557e2a82dcf4450d278014821cde",
+    "Tetris.srcs/sources_1/new/hud_font_rom.v": "741b49e7e567632c7df623597a0713987e2c8b530050339dd7b28e1df7f56ea4",
+    "Tetris.srcs/sources_1/new/hud_text.v": "6f53cb4fd7617531930cf6c66b5ccb924c3714f8341ca0c716ccf0e8cc31a007",
+    "Tetris.srcs/sources_1/new/scene_sprite_rom.v": "f38f4508e5f04eb9a716129577f8e22cb29dbc3bdb53b320a9237dc6ea20fae4",
+    "Tetris.srcs/sources_1/new/story_scene.v": "26e20c7b1a02972fce453c99ee0c18c3760a8fd5992c882e68a7ec40e40f90cd",
+    "Tetris.srcs/sources_1/new/core_renderer.v": "c93c4b5c7cd37d85d413a25968f58440e020e412f8f836e829d4fab30dd6ac49",
+    "Tetris.srcs/sources_1/new/story_sprites.mem": "aad6020785d71531d9c6bc41ac800df7af70d8c2a35f24bbb8bb9938ef02a1b4",
+    "Tetris.sim/story_visual/ui_review_tb.v": "f68467ae1a95fdeb640c098e264011a309a73962c2731805c60cb9875384dc34",
+    "tools/build_reference_ui_assets.py": "909add6eb9ac356d08fe5c37dbaecc51a31f572b23d72a80655c440e81abbe55",
+    "assets/reference_ui/material_manifest.json": "0cf32c3a1132e875fb7b0ce2085f302c49e3bfdb26079d38c378cc451648b622",
+    "assets/reference_ui/source_core_pipe.png": "98bcb5e0cbea9aeace8a11324bdfd776eeaad2d688de2502cd2d54193d90b07f",
+    "assets/reference_ui/source_header_panels.png": "f3d3be45b53524dd16335f9c3322d0be4446fd409d8f5bfbe5b2b8807f09a736"
+  },
+  "gameplay_files_unchanged_since_baseline": [
+    "Game_state_machine.v",
+    "Playfield.v",
+    "Playfield_hold_controller.v",
+    "frame.v",
+    "scoring.v",
+    "story_controller.v",
+    "reserve_timer.v",
+    "hold_limits.v",
+    "hint_budget.v",
+    "Tetris.v"
+  ],
+  "validation_scope": "RTL frame compile/elaboration/export only; no regression, synthesis, routing or new bitstream",
+  "frame_sha256": "00883bf5469c8db1abb0ec485910ec53827d6c39e2f520d178303e01201fa531",
+  "baseline_bit_sha256": "851ba01534ee3aa60f0ba8c65514dbb7b1787050675f644cab1cadbaab5b7127",
+  "baseline_bit_is_not_this_ui_build": true,
+  "round": 5,
+  "changes": "依据 fig3_fix_prompts.md 细化：24px分层场地内框与固定件；NEXT/HOLD/SPD双层凹槽；右侧完整切角机壳替代拉伸补片；保留参考管道沟道和套口；动态四阶刻度；十段CHARGE槽；独立倒角时间牌。",
+  "pipe_channel": {
+    "sample_radius": 14,
+    "tube_radius": 6,
+    "source": "source_core_pipe.png",
+    "includes": [
+      "recess_floor",
+      "inner_shadow",
+      "steel_lip"
+    ]
+  },
+  "material_changes": {
+    "source_sha256": "2ec45276d0ec937a5df04bdd2ce6becabd165b7adf8e0e32b14eb35b89e1ead2",
+    "canvas": [
+      1280,
+      720
+    ],
+    "kind": "material_only_not_rtl_preview",
+    "fields": {
+      "charge_value": [
+        569,
+        57,
+        642,
+        80
+      ],
+      "debris_value": [
+        569,
+        92,
+        648,
+        114
+      ],
+      "charge_track": [
+        664,
+        59,
+        997,
+        80
+      ],
+      "debris_track": [
+        664,
+        95,
+        997,
+        114
+      ],
+      "charge_percent": [
+        1010,
+        57,
+        1048,
+        80
+      ],
+      "debris_percent": [
+        1010,
+        93,
+        1048,
+        116
+      ],
+      "ship_number": [
+        251,
+        43,
+        288,
+        72
+      ],
+      "time_value": [
+        651,
+        645,
+        779,
+        679
+      ]
+    },
+    "core": {
+      "x": 1130,
+      "y": 260,
+      "w": 54,
+      "h": 288,
+      "glass_x": 1157,
+      "glass_w": 26,
+      "pitch": 36
+    },
+    "atlas_words": 6896,
+    "core_logic_changed": false,
+    "scope": "duo_campaign_play_and_pause",
+    "component_sources": {
+      "pipe_core_phase": {
+        "file": "source_core_pipe.png",
+        "sha256": "98bcb5e0cbea9aeace8a11324bdfd776eeaad2d688de2502cd2d54193d90b07f"
+      },
+      "header_next_hold": {
+        "file": "source_header_panels.png",
+        "sha256": "f3d3be45b53524dd16335f9c3322d0be4446fd409d8f5bfbe5b2b8807f09a736"
+      }
+    },
+    "pipe_path": [
+      [
+        1064,
+        70
+      ],
+      [
+        1094,
+        70
+      ],
+      [
+        1110,
+        86
+      ],
+      [
+        1110,
+        130
+      ],
+      [
+        1118,
+        148
+      ],
+      [
+        1118,
+        310
+      ],
+      [
+        1132,
+        324
+      ]
+    ],
+    "block_style": "original block_index and story_palette; one-pixel bevel, clipped corners",
+    "debris_style": "original story_ui shader; gray-blue face with one-pixel X",
+    "field_edge_repair": {
+      "left": [
+        298,
+        132,
+        352,
+        632
+      ],
+      "right": [
+        928,
+        132,
+        970,
+        632
+      ],
+      "bezel_width": 24,
+      "facets": "three hard value steps; no global haze"
+    },
+    "finishing_brief": "art_review/fig3_fix_prompts.md zones 2,3,4,5,6,7; retain approved layout and original blocks/debris",
+    "phase_labels": "runtime glyphs and stateful rings; bottom-to-top RECONNECT REBUILD STABILIZE RECHARGE",
+    "time_plaque": [
+      466,
+      640,
+      880,
+      689
+    ],
+    "pipe_channel": {
+      "sample_radius": 14,
+      "tube_radius": 6,
+      "source": "source_core_pipe.png",
+      "includes": [
+        "recess_floor",
+        "inner_shadow",
+        "steel_lip"
+      ]
+    }
+  },
+  "review_sources": {
+    "C:\\Users\\qiguidie\\Documents\\ChatGPT\\FPGA学习\\art_review\\fig3_fix_prompts.md": "3276d660568748c350e98371783580786961be2194d67f205447a7d9bb6d648a",
+    "C:\\Users\\qiguidie\\Documents\\ChatGPT\\FPGA学习\\art_review\\fig3_zone_map.png": "0305afa68465e467e40d45f971c70171d4bfdbabd9e4b93e72165d8d2e6c5261"
+  },
+  "retained_constraints": [
+    "24x20 field; cell size 24; field origin (352,144)",
+    "8 core cells and real state-dependent fill",
+    "original block_index and thin-X debris style",
+    "original floor percentage computation; no fixed 43% / 38%",
+    "existing functional anchors retained; no global shrink"
+  ]
+}

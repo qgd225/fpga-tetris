@@ -1,0 +1,356 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Wed Oct 28 17:10:15 2026
+| Host         : qiguidei running 64-bit major release  (build 9200)
+| Command      : report_timing -max_paths 5 -file D:/vivado_project/Tetris/temporary/new_ui_a3/synthesis/ui_material_atlas_paths.rpt
+| Design       : ui_material_atlas
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+-------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             6.429ns  (required time - arrival time)
+  Source:                 bank4/lo_q_reg_0_1/CLKARDCLK
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Destination:            colors/lo_q_reg_0/ADDRARDADDR[14]
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Path Group:             pixel
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.473ns  (pixel rise@13.473ns - pixel rise@0.000ns)
+  Data Path Delay:        6.335ns  (logic 4.042ns (63.803%)  route 2.293ns (36.197%))
+  Logic Levels:           8  (CARRY4=4 LUT2=1 LUT3=1 LUT6=1 RAMB36E1=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 14.221 - 13.473 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock pixel rise edge)      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.787     0.787    bank4/clk
+                         RAMB36E1                                     r  bank4/lo_q_reg_0_1/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+                         RAMB36E1 (Prop_ramb36e1_CLKARDCLK_CASCADEOUTA)
+                                                      2.504     3.291 r  bank4/lo_q_reg_0_1/CASCADEOUTA
+                         net (fo=1, unplaced)         0.065     3.356    bank4/lo_q_reg_0_1_n_0
+                         RAMB36E1 (Prop_ramb36e1_CASCADEINA_DOADO[0])
+                                                      0.376     3.732 r  bank4/lo_q_reg_1_1/DOADO[0]
+                         net (fo=1, unplaced)         0.646     4.378    bank4/lo_q_reg[1]
+                         LUT3 (Prop_lut3_I2_O)        0.108     4.486 r  bank4/data[1]_INST_0/O
+                         net (fo=1, unplaced)         0.582     5.068    c[1]
+                         LUT6 (Prop_lut6_I0_O)        0.105     5.173 r  colors_i_16/O
+                         net (fo=1, unplaced)         0.347     5.520    p_0_out[1]
+                         LUT2 (Prop_lut2_I1_O)        0.105     5.625 r  colors_i_14/O
+                         net (fo=1, unplaced)         0.000     5.625    colors_i_14_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     6.082 r  colors_i_4/CO[3]
+                         net (fo=1, unplaced)         0.008     6.090    colors_i_4_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.188 r  colors_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000     6.188    colors_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.286 r  colors_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000     6.286    colors_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191     6.477 r  colors_i_1/O[0]
+                         net (fo=7, unplaced)         0.646     7.122    colors/address[12]
+                         RAMB36E1                                     r  colors/lo_q_reg_0/ADDRARDADDR[14]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock pixel rise edge)     13.473    13.473 r  
+                                                      0.000    13.473 r  clk (IN)
+                         net (fo=63, unset)           0.748    14.221    colors/clk
+                         RAMB36E1                                     r  colors/lo_q_reg_0/CLKARDCLK
+                         clock pessimism              0.000    14.221    
+                         clock uncertainty           -0.035    14.185    
+                         RAMB36E1 (Setup_ramb36e1_CLKARDCLK_ADDRARDADDR[14])
+                                                     -0.634    13.551    colors/lo_q_reg_0
+  -------------------------------------------------------------------
+                         required time                         13.551    
+                         arrival time                          -7.122    
+  -------------------------------------------------------------------
+                         slack                                  6.429    
+
+Slack (MET) :             6.429ns  (required time - arrival time)
+  Source:                 bank4/lo_q_reg_0_1/CLKARDCLK
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Destination:            colors/lo_q_reg_1/ADDRARDADDR[14]
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Path Group:             pixel
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.473ns  (pixel rise@13.473ns - pixel rise@0.000ns)
+  Data Path Delay:        6.335ns  (logic 4.042ns (63.803%)  route 2.293ns (36.197%))
+  Logic Levels:           8  (CARRY4=4 LUT2=1 LUT3=1 LUT6=1 RAMB36E1=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 14.221 - 13.473 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock pixel rise edge)      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.787     0.787    bank4/clk
+                         RAMB36E1                                     r  bank4/lo_q_reg_0_1/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+                         RAMB36E1 (Prop_ramb36e1_CLKARDCLK_CASCADEOUTA)
+                                                      2.504     3.291 r  bank4/lo_q_reg_0_1/CASCADEOUTA
+                         net (fo=1, unplaced)         0.065     3.356    bank4/lo_q_reg_0_1_n_0
+                         RAMB36E1 (Prop_ramb36e1_CASCADEINA_DOADO[0])
+                                                      0.376     3.732 r  bank4/lo_q_reg_1_1/DOADO[0]
+                         net (fo=1, unplaced)         0.646     4.378    bank4/lo_q_reg[1]
+                         LUT3 (Prop_lut3_I2_O)        0.108     4.486 r  bank4/data[1]_INST_0/O
+                         net (fo=1, unplaced)         0.582     5.068    c[1]
+                         LUT6 (Prop_lut6_I0_O)        0.105     5.173 r  colors_i_16/O
+                         net (fo=1, unplaced)         0.347     5.520    p_0_out[1]
+                         LUT2 (Prop_lut2_I1_O)        0.105     5.625 r  colors_i_14/O
+                         net (fo=1, unplaced)         0.000     5.625    colors_i_14_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     6.082 r  colors_i_4/CO[3]
+                         net (fo=1, unplaced)         0.008     6.090    colors_i_4_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.188 r  colors_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000     6.188    colors_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.286 r  colors_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000     6.286    colors_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191     6.477 r  colors_i_1/O[0]
+                         net (fo=7, unplaced)         0.646     7.122    colors/address[12]
+                         RAMB36E1                                     r  colors/lo_q_reg_1/ADDRARDADDR[14]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock pixel rise edge)     13.473    13.473 r  
+                                                      0.000    13.473 r  clk (IN)
+                         net (fo=63, unset)           0.748    14.221    colors/clk
+                         RAMB36E1                                     r  colors/lo_q_reg_1/CLKARDCLK
+                         clock pessimism              0.000    14.221    
+                         clock uncertainty           -0.035    14.185    
+                         RAMB36E1 (Setup_ramb36e1_CLKARDCLK_ADDRARDADDR[14])
+                                                     -0.634    13.551    colors/lo_q_reg_1
+  -------------------------------------------------------------------
+                         required time                         13.551    
+                         arrival time                          -7.122    
+  -------------------------------------------------------------------
+                         slack                                  6.429    
+
+Slack (MET) :             6.429ns  (required time - arrival time)
+  Source:                 bank4/lo_q_reg_0_1/CLKARDCLK
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Destination:            colors/lo_q_reg_2/ADDRARDADDR[14]
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Path Group:             pixel
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.473ns  (pixel rise@13.473ns - pixel rise@0.000ns)
+  Data Path Delay:        6.335ns  (logic 4.042ns (63.803%)  route 2.293ns (36.197%))
+  Logic Levels:           8  (CARRY4=4 LUT2=1 LUT3=1 LUT6=1 RAMB36E1=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 14.221 - 13.473 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock pixel rise edge)      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.787     0.787    bank4/clk
+                         RAMB36E1                                     r  bank4/lo_q_reg_0_1/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+                         RAMB36E1 (Prop_ramb36e1_CLKARDCLK_CASCADEOUTA)
+                                                      2.504     3.291 r  bank4/lo_q_reg_0_1/CASCADEOUTA
+                         net (fo=1, unplaced)         0.065     3.356    bank4/lo_q_reg_0_1_n_0
+                         RAMB36E1 (Prop_ramb36e1_CASCADEINA_DOADO[0])
+                                                      0.376     3.732 r  bank4/lo_q_reg_1_1/DOADO[0]
+                         net (fo=1, unplaced)         0.646     4.378    bank4/lo_q_reg[1]
+                         LUT3 (Prop_lut3_I2_O)        0.108     4.486 r  bank4/data[1]_INST_0/O
+                         net (fo=1, unplaced)         0.582     5.068    c[1]
+                         LUT6 (Prop_lut6_I0_O)        0.105     5.173 r  colors_i_16/O
+                         net (fo=1, unplaced)         0.347     5.520    p_0_out[1]
+                         LUT2 (Prop_lut2_I1_O)        0.105     5.625 r  colors_i_14/O
+                         net (fo=1, unplaced)         0.000     5.625    colors_i_14_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     6.082 r  colors_i_4/CO[3]
+                         net (fo=1, unplaced)         0.008     6.090    colors_i_4_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.188 r  colors_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000     6.188    colors_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.286 r  colors_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000     6.286    colors_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191     6.477 r  colors_i_1/O[0]
+                         net (fo=7, unplaced)         0.646     7.122    colors/address[12]
+                         RAMB36E1                                     r  colors/lo_q_reg_2/ADDRARDADDR[14]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock pixel rise edge)     13.473    13.473 r  
+                                                      0.000    13.473 r  clk (IN)
+                         net (fo=63, unset)           0.748    14.221    colors/clk
+                         RAMB36E1                                     r  colors/lo_q_reg_2/CLKARDCLK
+                         clock pessimism              0.000    14.221    
+                         clock uncertainty           -0.035    14.185    
+                         RAMB36E1 (Setup_ramb36e1_CLKARDCLK_ADDRARDADDR[14])
+                                                     -0.634    13.551    colors/lo_q_reg_2
+  -------------------------------------------------------------------
+                         required time                         13.551    
+                         arrival time                          -7.122    
+  -------------------------------------------------------------------
+                         slack                                  6.429    
+
+Slack (MET) :             6.429ns  (required time - arrival time)
+  Source:                 bank4/lo_q_reg_0_1/CLKARDCLK
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Destination:            colors/lo_q_reg_3/ADDRARDADDR[14]
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Path Group:             pixel
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.473ns  (pixel rise@13.473ns - pixel rise@0.000ns)
+  Data Path Delay:        6.335ns  (logic 4.042ns (63.803%)  route 2.293ns (36.197%))
+  Logic Levels:           8  (CARRY4=4 LUT2=1 LUT3=1 LUT6=1 RAMB36E1=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 14.221 - 13.473 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock pixel rise edge)      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.787     0.787    bank4/clk
+                         RAMB36E1                                     r  bank4/lo_q_reg_0_1/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+                         RAMB36E1 (Prop_ramb36e1_CLKARDCLK_CASCADEOUTA)
+                                                      2.504     3.291 r  bank4/lo_q_reg_0_1/CASCADEOUTA
+                         net (fo=1, unplaced)         0.065     3.356    bank4/lo_q_reg_0_1_n_0
+                         RAMB36E1 (Prop_ramb36e1_CASCADEINA_DOADO[0])
+                                                      0.376     3.732 r  bank4/lo_q_reg_1_1/DOADO[0]
+                         net (fo=1, unplaced)         0.646     4.378    bank4/lo_q_reg[1]
+                         LUT3 (Prop_lut3_I2_O)        0.108     4.486 r  bank4/data[1]_INST_0/O
+                         net (fo=1, unplaced)         0.582     5.068    c[1]
+                         LUT6 (Prop_lut6_I0_O)        0.105     5.173 r  colors_i_16/O
+                         net (fo=1, unplaced)         0.347     5.520    p_0_out[1]
+                         LUT2 (Prop_lut2_I1_O)        0.105     5.625 r  colors_i_14/O
+                         net (fo=1, unplaced)         0.000     5.625    colors_i_14_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     6.082 r  colors_i_4/CO[3]
+                         net (fo=1, unplaced)         0.008     6.090    colors_i_4_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.188 r  colors_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000     6.188    colors_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.286 r  colors_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000     6.286    colors_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191     6.477 r  colors_i_1/O[0]
+                         net (fo=7, unplaced)         0.646     7.122    colors/address[12]
+                         RAMB36E1                                     r  colors/lo_q_reg_3/ADDRARDADDR[14]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock pixel rise edge)     13.473    13.473 r  
+                                                      0.000    13.473 r  clk (IN)
+                         net (fo=63, unset)           0.748    14.221    colors/clk
+                         RAMB36E1                                     r  colors/lo_q_reg_3/CLKARDCLK
+                         clock pessimism              0.000    14.221    
+                         clock uncertainty           -0.035    14.185    
+                         RAMB36E1 (Setup_ramb36e1_CLKARDCLK_ADDRARDADDR[14])
+                                                     -0.634    13.551    colors/lo_q_reg_3
+  -------------------------------------------------------------------
+                         required time                         13.551    
+                         arrival time                          -7.122    
+  -------------------------------------------------------------------
+                         slack                                  6.429    
+
+Slack (MET) :             6.429ns  (required time - arrival time)
+  Source:                 bank4/lo_q_reg_0_1/CLKARDCLK
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Destination:            colors/lo_q_reg_4/ADDRARDADDR[14]
+                            (rising edge-triggered cell RAMB36E1 clocked by pixel  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Path Group:             pixel
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            13.473ns  (pixel rise@13.473ns - pixel rise@0.000ns)
+  Data Path Delay:        6.335ns  (logic 4.042ns (63.803%)  route 2.293ns (36.197%))
+  Logic Levels:           8  (CARRY4=4 LUT2=1 LUT3=1 LUT6=1 RAMB36E1=1)
+  Clock Path Skew:        -0.039ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    0.748ns = ( 14.221 - 13.473 ) 
+    Source Clock Delay      (SCD):    0.787ns
+    Clock Pessimism Removal (CPR):    0.000ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock pixel rise edge)      0.000     0.000 r  
+                                                      0.000     0.000 r  clk (IN)
+                         net (fo=63, unset)           0.787     0.787    bank4/clk
+                         RAMB36E1                                     r  bank4/lo_q_reg_0_1/CLKARDCLK
+  -------------------------------------------------------------------    -------------------
+                         RAMB36E1 (Prop_ramb36e1_CLKARDCLK_CASCADEOUTA)
+                                                      2.504     3.291 r  bank4/lo_q_reg_0_1/CASCADEOUTA
+                         net (fo=1, unplaced)         0.065     3.356    bank4/lo_q_reg_0_1_n_0
+                         RAMB36E1 (Prop_ramb36e1_CASCADEINA_DOADO[0])
+                                                      0.376     3.732 r  bank4/lo_q_reg_1_1/DOADO[0]
+                         net (fo=1, unplaced)         0.646     4.378    bank4/lo_q_reg[1]
+                         LUT3 (Prop_lut3_I2_O)        0.108     4.486 r  bank4/data[1]_INST_0/O
+                         net (fo=1, unplaced)         0.582     5.068    c[1]
+                         LUT6 (Prop_lut6_I0_O)        0.105     5.173 r  colors_i_16/O
+                         net (fo=1, unplaced)         0.347     5.520    p_0_out[1]
+                         LUT2 (Prop_lut2_I1_O)        0.105     5.625 r  colors_i_14/O
+                         net (fo=1, unplaced)         0.000     5.625    colors_i_14_n_0
+                         CARRY4 (Prop_carry4_S[1]_CO[3])
+                                                      0.457     6.082 r  colors_i_4/CO[3]
+                         net (fo=1, unplaced)         0.008     6.090    colors_i_4_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.188 r  colors_i_3/CO[3]
+                         net (fo=1, unplaced)         0.000     6.188    colors_i_3_n_0
+                         CARRY4 (Prop_carry4_CI_CO[3])
+                                                      0.098     6.286 r  colors_i_2/CO[3]
+                         net (fo=1, unplaced)         0.000     6.286    colors_i_2_n_0
+                         CARRY4 (Prop_carry4_CI_O[0])
+                                                      0.191     6.477 r  colors_i_1/O[0]
+                         net (fo=7, unplaced)         0.646     7.122    colors/address[12]
+                         RAMB36E1                                     r  colors/lo_q_reg_4/ADDRARDADDR[14]
+  -------------------------------------------------------------------    -------------------
+
+                         (clock pixel rise edge)     13.473    13.473 r  
+                                                      0.000    13.473 r  clk (IN)
+                         net (fo=63, unset)           0.748    14.221    colors/clk
+                         RAMB36E1                                     r  colors/lo_q_reg_4/CLKARDCLK
+                         clock pessimism              0.000    14.221    
+                         clock uncertainty           -0.035    14.185    
+                         RAMB36E1 (Setup_ramb36e1_CLKARDCLK_ADDRARDADDR[14])
+                                                     -0.634    13.551    colors/lo_q_reg_4
+  -------------------------------------------------------------------
+                         required time                         13.551    
+                         arrival time                          -7.122    
+  -------------------------------------------------------------------
+                         slack                                  6.429    
+
+
+
+

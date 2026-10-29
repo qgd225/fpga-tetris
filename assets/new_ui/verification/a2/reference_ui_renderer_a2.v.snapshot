@@ -1,0 +1,533 @@
+// Reference-driven visual layer. Reads game state only; no gameplay feedback.
+module reference_ui_renderer_a2(
+ input clk,reset_n,input [10:0] x,y,
+ input duo,campaign,choose,ship_select,Idle,input [3:0] choose_cnt,
+ input [7:0] reserve_fill,input [1:0] reserve_alarm,input [23:0] score_bcd,
+ input hint_active,hint_hit,input [2:0] hint_quota,hint_capacity,hint_type,input [9:0] hint_life,
+ input [1:0] level_id,phase,input [3:0] locked,input [6:0] debris_left,
+ input [2:0] speed,input [23:0] lines_bcd,input [15:0] time_bcd,
+ input [7:0] animation,input [4:0] charge_left,
+ input comms_visible,input [2:0] comms_id,
+ input Stop,success,hold_ready,hold_visible,hold_reserved,hold_actor2,
+ input hold_expire_flash,hold_reject_flash,input [2:0] hold_conditions,
+ input in_field,cell_visible,occupied,debris_cell,piece1,piece2,ghost1,ghost2,
+ input [4:0] local_x,local_y,input [2:0] type1,type2,cell_type,
+ input next1,next2,hold,input [2:0] next_type1,next_type2,hold_type,
+ input [4:0] next_x,next_y,hold_x,hold_y,
+ input [43:0] bounds1,bounds2,input feedback_clear,feedback_clear_row,
+ input [4:0] feedback_clear_age,
+ output [23:0] rgb
+);
+ `include "reference_ui_geometry.vh"
+ `include "game_mode_params.vh"
+ `include "story_palette.vh"
+ (* rom_style="block" *) reg [23:0] skin[0:4607999];
+ (* rom_style="block" *) reg [23:0] material[0:REF_MATERIAL_WORDS-1];
+ initial begin
+  $readmemh("a2_reference_ui_skin.mem",skin);
+  $readmemh("reference_ui_material.mem",material);
+ end
+ wire [2:0] skin_bank=choose?3'd4:duo?(campaign?3'd0:3'd3):(campaign?3'd1:3'd2);
+ wire [22:0] address=skin_bank*921600+y*1280+x;
+ wire [23:0] skin_pixel=(x<1280 && y<720)?skin[address]:24'd0;
+ function inside;
+  input integer bx,by,w,h;
+  begin inside=x>=bx && x<bx+w && y>=by && y<by+h;end
+ endfunction
+ function corner;
+  input [43:0] b;
+  reg [10:0] l,r,t,bot;
+  begin
+   l=b[10:0];r=b[21:11];t=b[32:22];bot=b[43:33];
+   corner=x>=l && x<=r && y>=t && y<=bot &&
+    (((x<l+2 || x+2>r) && (y<t+9 || y+9>bot)) ||
+     ((y<t+2 || y+2>bot) && (x<l+9 || x+9>r)));
+  end
+ endfunction
+ function [15:0] decimal2;
+  input integer n;
+  reg [7:0] a,b;
+  begin a=48+(n/10)%10;b=48+n%10;decimal2={a,b};end
+ endfunction
+ function [47:0] bcd6;
+  input [23:0] b;
+  integer i;reg started;reg [3:0] digit;
+  begin
+   bcd6=48'h202020202020;started=0;
+   for(i=5;i>=0;i=i-1)begin
+    digit=(b>>(i*4))&15;
+    if(digit!=0 || started || i==0)begin bcd6[i*8+:8]=8'd48+digit;started=1;end
+   end
+  end
+ endfunction
+ function [31:0] percent4;
+  input integer n;
+  begin percent4=n>=100?"100%":{8'd32,decimal2(n),8'd37};end
+ endfunction
+ // Four-cell outline used by the graphical solo landing-assist panel.
+ function hint_mino;
+  input [2:0] t;input integer c,r;
+  begin
+   hint_mino=0;
+   if(c>=0 && c<4 && r>=0 && r<2)begin
+    case(t)
+     0:hint_mino=r==0;
+     1:hint_mino=(r==0 && c<3) || (r==1 && c==1);
+     2:hint_mino=c<2;
+     3:hint_mino=(r==0 && c<2) || (r==1 && c>=1 && c<3);
+     4:hint_mino=(r==0 && c>=1 && c<3) || (r==1 && c<2);
+     5:hint_mino=(r==0 && c==2) || (r==1 && c<3);
+     6:hint_mino=(r==0 && c==0) || (r==1 && c<3);
+     default:hint_mino=0;
+    endcase
+   end
+  end
+ endfunction
+ // Axis-aligned cell shader: actual 26x32 pixels with 4px corner radii.
+ function [23:0] core_cell_face;
+  input integer px,py;
+  integer cx,cy,rr,gg,bb;
+  begin
+   cx=px<4?4:(px>21?21:px);
+   cy=py<4?4:(py>27?27:py);
+   rr=111-93*py/31;gg=245-46*py/31;bb=255-23*py/31;
+   core_cell_face={rr[7:0],gg[7:0],bb[7:0]};
+   if((px-cx)*(px-cx)+(py-cy)*(py-cy)>16)core_cell_face=24'h040c13;
+   else if(px==0 || px==25 || py==0 || py==31)core_cell_face=24'h0b839e;
+   else if((py==1 && px>=5 && px<=20) || (px==1 && py>=5 && py<=26))
+    core_cell_face=24'hbbfbff;
+  end
+ endfunction
+ // Dedicated 5x7 phase alphabet: no column loss in the narrow legend.
+ function phase_glyph;
+  input [7:0] ch;input integer px,py;
+  reg [34:0] bitmap;
+  begin
+   case(ch)
+    8'd65:bitmap=35'b01110100011000111111100011000110001;
+    8'd66:bitmap=35'b11110100011000111110100011000111110;
+    8'd67:bitmap=35'b01111100001000010000100001000001111;
+    8'd68:bitmap=35'b11110100011000110001100011000111110;
+    8'd69:bitmap=35'b11111100001000011110100001000011111;
+    8'd71:bitmap=35'b01111100001000010111100011000101111;
+    8'd72:bitmap=35'b10001100011000111111100011000110001;
+    8'd73:bitmap=35'b01110001000010000100001000010001110;
+    8'd76:bitmap=35'b10000100001000010000100001000011111;
+    8'd78:bitmap=35'b10001110011100110101100111001110001;
+    8'd79:bitmap=35'b01110100011000110001100011000101110;
+    8'd82:bitmap=35'b11110100011000111110101001001010001;
+    8'd83:bitmap=35'b01111100001000001110000010000111110;
+    8'd84:bitmap=35'b11111001000010000100001000010000100;
+    8'd85:bitmap=35'b10001100011000110001100011000101110;
+    8'd90:bitmap=35'b11111000010001000100010001000011111;
+    8'd80:bitmap=35'b11110100011000111110100001000010000;
+    8'd48:bitmap=35'b01110100011001110101110011000101110;
+    8'd49:bitmap=35'b00100011000010000100001000010001110;
+    8'd50:bitmap=35'b01110100010000100010001000100011111;
+    8'd51:bitmap=35'b11110000010000101110000010000111110;
+    8'd52:bitmap=35'b00010001100101010010111110001000010;
+    8'd53:bitmap=35'b11111100001000011110000010000111110;
+    8'd54:bitmap=35'b01110100001000011110100011000101110;
+    8'd55:bitmap=35'b11111000010001000100010000100001000;
+    8'd56:bitmap=35'b01110100011000101110100011000101110;
+    8'd57:bitmap=35'b01110100011000101111000010000101110;
+    8'd47:bitmap=35'b00001000010001000100010001000010000;
+    8'd70:bitmap=35'b11111100001000011110100001000010000;
+    8'd74:bitmap=35'b00111000100001000010000101001001100;
+    8'd75:bitmap=35'b10001100101010011000101001001010001;
+    8'd77:bitmap=35'b10001110111010110101100011000110001;
+    8'd81:bitmap=35'b01110100011000110001101011001001101;
+    8'd86:bitmap=35'b10001100011000110001100010101000100;
+    8'd87:bitmap=35'b10001100011000110101101011010101010;
+    8'd88:bitmap=35'b10001100010101000100010101000110001;
+    8'd89:bitmap=35'b10001100010101000100001000010000100;
+    8'd45:bitmap=35'b00000000000000011111000000000000000;
+    8'd58:bitmap=35'b00000001000010000000001000010000000;
+    8'd43:bitmap=35'b00000001000010011111001000010000000;
+    8'd46:bitmap=35'b00000000000000000000000000011000110;
+     8'd37:bitmap=35'b11001110100010000100001000101110011;
+    default:bitmap=35'd0;
+   endcase
+   phase_glyph=0;
+   if(px>=0 && px<5 && py>=0 && py<7)phase_glyph=bitmap[34-py*5-px];
+  end
+ endfunction
+
+ integer credits,target,total,charge_percent,debris_percent,slot,offset,i;
+ integer menu_row,menu_y,menu_selection,reserve_percent,lit_top;
+ integer dialog_x;
+ integer hint_cols,hint_left,hx,hy,hc,hr,hd;
+ reg [23:0] hint_ink;
+ integer mx,my,kind,mat_address,current_phase,phase_row;
+ integer text_x,text_y,text_scale,text_width,text_pitch,text_height,column,gx,gy,digit_index,digit_x,digit_y;
+ reg text_valid,compact_text;reg [255:0] message;reg [7:0] character;
+ reg [23:0] color,text_ink;
+ reg [23:0] p0,p1,p2,p3;
+ reg force_paint;
+ reg [23:0] ink0,ink1,ink2;
+ reg [2:0] force_pipe;
+ reg font_lit_q;
+ wire basic_hit,shared_font_lit;
+ wire [23:0] basic_rgb;
+ wire [9:0] shared_dx=x-text_x;
+ wire [5:0] shared_dy=y-text_y;
+ wire basic_enable=!choose && !(comms_visible && x>=(duo?368:416) && x<(duo?728:776) && y>=160 && y<264);
+ ui_basic_layer_a2 basic(
+  .clk(clk),.reset_n(reset_n),.enable(basic_enable),.duo(duo),.campaign(campaign),.x(x),.y(y),
+  .in_field(in_field),.cell_visible(cell_visible),.occupied(occupied),.debris_cell(debris_cell),
+  .piece1(piece1),.piece2(piece2),.ghost1(ghost1),.ghost2(ghost2),
+  .hint_active(hint_active),.hint_hit(hint_hit),.hint_type(hint_type),.type1(type1),.type2(type2),.cell_type(cell_type),
+  .local_x(local_x),.local_y(local_y),.next1(next1),.next2(next2),.hold(hold),.hold_visible(hold_visible),
+  .next_type1(next_type1),.next_type2(next_type2),.hold_type(hold_type),
+  .next_x(next_x),.next_y(next_y),.hold_x(hold_x),.hold_y(hold_y),.bounds1(bounds1),.bounds2(bounds2),
+  .hold_conditions(hold_conditions),.hold_reserved(hold_reserved),.hold_actor2(hold_actor2),
+  .hold_expire_flash(hold_expire_flash),.hold_reject_flash(hold_reject_flash),
+  .feedback_clear_row(feedback_clear_row),.feedback_clear(feedback_clear),.feedback_clear_age(feedback_clear_age),.animation(animation),
+  .rgb(basic_rgb),.hit(basic_hit));
+ ui_text_raster shared_text(
+  .clk(clk),.reset_n(reset_n),.enable(text_valid && x>=text_x && y>=text_y && x-text_x<1024 && y-text_y<64),
+  .message(message),.dx(shared_dx),.dy(shared_dy),
+  .pitch(text_pitch[5:0]),.height(text_height[5:0]),.length(text_width[5:0]),.lit(shared_font_lit));
+
+ reg ghosted,draw_piece,hinted;
+ always @(*)begin
+  dialog_x=duo?368:416;
+  credits=lines_bcd[3:0]+lines_bcd[7:4]*10+lines_bcd[11:8]*100+
+   lines_bcd[15:12]*1000+lines_bcd[19:16]*10000+lines_bcd[23:20]*100000;
+  target=mode_target(duo,level_id);total=mode_total(duo,level_id);
+  charge_percent=campaign?(credits>=target?100:credits*100/target):(speed+1)*100/8;
+  debris_percent=debris_left*100/total;
+  force_paint=0;color=skin_pixel;mx=0;my=0;kind=0;mat_address=0;draw_piece=0;ghosted=0;
+  current_phase=locked<3?0:locked<5?1:locked<7?2:3;
+  phase_row=0;slot=0;offset=0;i=0;hinted=0;
+  hint_cols=hint_type==0?4:hint_type==2?2:3;hint_left=1040-hint_cols*6;
+  hx=0;hy=0;hc=0;hr=0;hd=0;hint_ink=hint_active?24'h7fe3ec:(!campaign || hint_quota>0)?24'h587d91:24'h72542c;
+  menu_row=0;menu_y=172;menu_selection=ship_select?level_id:choose_cnt;
+  reserve_percent=reserve_fill>=174?100:reserve_fill*100/174;
+  lit_top=campaign?REF_CORE_Y+(8-locked)*REF_CORE_PITCH:REF_CORE_Y+REF_CORE_H-reserve_fill*REF_CORE_H/174;
+  if(!choose)begin
+
+  // Tracks are segmented material slots; status changes do not change credit.
+  if(inside(REF_CHARGE_TRACK_X,REF_CHARGE_TRACK_Y,REF_CHARGE_TRACK_W,REF_CHARGE_TRACK_H))begin
+   slot=(x-REF_CHARGE_TRACK_X)*(campaign?10:8)/REF_CHARGE_TRACK_W;
+   offset=(x-REF_CHARGE_TRACK_X)*(campaign?10:8)%REF_CHARGE_TRACK_W;
+   mat_address=6000+((x-REF_CHARGE_TRACK_X)*100<REF_CHARGE_TRACK_W*charge_percent?0:224)+
+    ((y-REF_CHARGE_TRACK_Y)*16/REF_CHARGE_TRACK_H)*14+offset*14/REF_CHARGE_TRACK_W;
+   color=offset<REF_CHARGE_TRACK_W-20?material[mat_address]:24'h081824;
+  end
+  if(campaign && inside(REF_DEBRIS_TRACK_X,REF_DEBRIS_TRACK_Y,REF_DEBRIS_TRACK_W,REF_DEBRIS_TRACK_H))begin
+   mat_address=6448+((x-REF_DEBRIS_TRACK_X)*100<REF_DEBRIS_TRACK_W*debris_percent?0:224)+
+    ((y-REF_DEBRIS_TRACK_Y)*16/REF_DEBRIS_TRACK_H)*14+(x-REF_DEBRIS_TRACK_X)%14;
+   color=material[mat_address];
+  end
+  // Local spill follows the real lit-cell height, and stays inside the mast.
+  if((campaign?(locked>0 && locked<=8):reserve_fill>0) && y>=lit_top &&
+     y<REF_CORE_Y+REF_CORE_H)begin
+   if(inside(1151,REF_CORE_Y,6,REF_CORE_H) || inside(1183,REF_CORE_Y,5,REF_CORE_H))begin
+    color={color[23:16]>>1,
+     (color[15:8]>>1)+8'd63,(color[7:0]>>1)+8'd76};
+   end
+  end
+  // Eight equal 36px slots. Each 26x32 face is inset 3px from the chamber wall.
+  if(inside(REF_CORE_GLASS_X,REF_CORE_Y,REF_CORE_GLASS_W,REF_CORE_H))begin
+   slot=(y-REF_CORE_Y)/REF_CORE_PITCH;my=(y-REF_CORE_Y)%REF_CORE_PITCH;mx=x-REF_CORE_GLASS_X;
+   color=24'h040c13;
+   if((7-slot)<locked && my>=2 && my<34)begin
+    color=core_cell_face(mx,my-2);
+    if(charge_left!=0 && animation[4] && my==3 && mx>=5 && mx<=20)
+     color=24'hd5ffff;
+   end else if(my==35 && mx>=2 && mx<24)color=24'h122937;
+  end
+  if(!campaign && inside(REF_CORE_GLASS_X,REF_CORE_Y,REF_CORE_GLASS_W,REF_CORE_H))begin
+   mx=x-REF_CORE_GLASS_X;my=y-REF_CORE_Y;
+   color=24'h040c13;
+   if(y>=lit_top)begin
+    color=reserve_alarm==2?24'hd8442e:reserve_alarm==1?24'hffc23a:24'h26d7ec;
+    if(mx==1)color=reserve_alarm==0?24'hb5fbff:24'hffe5a3;
+    if(y==lit_top || y==lit_top+1)color=24'hd5ffff;
+   end
+   if(my%36==35 && (mx<4 || mx>21))color=24'h607d91;
+  end
+  if(campaign && debris_left>mode_half(duo,level_id) && inside(1150,238,40,6))color=24'hd8442e;
+  // Stacked legend chosen by the user: identical 14px rings on a 2px spine.
+  if(campaign && inside(978,370,124,236))begin
+   phase_row=y<372?0:(y-372)/54;if(phase_row>3)phase_row=3;slot=3-phase_row;
+   mx=2*x+1-2080;my=2*y+1-2*(388+phase_row*54);
+   if(x>=1039 && x<1041 && y>=388 && y<=550)
+    color=24'h607d91;
+   // The full continuous spine is behind opaque name strips for legibility.
+   if(y>=400+phase_row*54 && y<414+phase_row*54)color=24'h0e1c28;
+   if(mx*mx+my*my<=196 && mx*mx+my*my>=100)
+    color=slot==current_phase?24'hf5a21f:(slot<current_phase?24'h35e0f5:24'hb3c8d8);
+   if(mx*mx+my*my<100)
+    color=slot==current_phase?24'hffc96b:(slot<current_phase?24'h35e0f5:24'h0e1c28);
+   offset=388+(3-current_phase)*54;
+   if(y>=offset-20 && y<=offset-14 &&
+      x>=1040-(offset-14-y)/2 && x<=1040+(offset-14-y)/2)
+    color=24'hf5a21f;
+  end
+
+  end
+  if(choose && inside(716,172,492,374))begin
+   menu_row=(y-172)/98;menu_y=172+menu_row*98;
+   if(y<menu_y+80 && menu_row<4 && menu_row==menu_selection)begin
+    if(x<720 || x>=1204 || y<menu_y+3 || y>=menu_y+77)color=24'h35e0f5;
+    else if(x>=768 && x<1200 && y>=menu_y+8 && y<menu_y+72)color=24'h0b2b39;
+   end
+  end
+   if(!choose && campaign && debris_left>mode_half(duo,level_id) &&
+      inside(REF_CHAIN_X,REF_CHAIN_Y,REF_CHAIN_W,REF_CHAIN_H))begin
+    mat_address=REF_CHAIN_OFFSET+(y-REF_CHAIN_Y)*REF_CHAIN_W+x-REF_CHAIN_X;
+    if(material[mat_address]!=24'hff00ff)color=material[mat_address];
+   end
+  text_valid=0;compact_text=0;message=0;text_x=0;text_y=0;text_scale=1;text_width=0;text_pitch=12;text_height=14;text_ink=24'he8eef2;
+  if(!choose)begin
+  if(campaign && inside(REF_CHARGE_VALUE_X,REF_CHARGE_VALUE_Y,REF_CHARGE_VALUE_W,REF_CHARGE_VALUE_H))begin
+   text_valid=1;text_x=REF_CHARGE_VALUE_X;text_y=61;text_width=5;text_pitch=12;
+   if(credits<100)message={decimal2(credits),8'd47,decimal2(target),216'd0};
+   else begin text_width=9;text_pitch=8;message={bcd6(lines_bcd),8'd47,decimal2(target),184'd0};end
+   text_ink=24'h7fe3ec;
+  end
+  if(campaign && inside(REF_DEBRIS_VALUE_X,REF_DEBRIS_VALUE_Y,REF_DEBRIS_VALUE_W,REF_DEBRIS_VALUE_H))begin
+   text_valid=1;text_x=REF_DEBRIS_VALUE_X;text_y=97;text_width=7;
+   message={decimal2(debris_left)," LEFT",200'd0};text_ink=24'hffc15b;
+  end
+  if(campaign && inside(REF_CHARGE_PERCENT_X,REF_CHARGE_PERCENT_Y,REF_CHARGE_PERCENT_W,REF_CHARGE_PERCENT_H))begin
+   text_valid=1;text_x=REF_CHARGE_PERCENT_X;text_y=61;text_width=4;
+   message={percent4(charge_percent),224'd0};text_ink=24'h7fe3ec;text_pitch=12;
+  end
+  if(campaign && inside(REF_DEBRIS_PERCENT_X,REF_DEBRIS_PERCENT_Y,REF_DEBRIS_PERCENT_W,REF_DEBRIS_PERCENT_H))begin
+   text_valid=1;text_x=REF_DEBRIS_PERCENT_X;text_y=97;text_width=4;
+   message={percent4(debris_percent),224'd0};text_ink=24'hffc15b;text_pitch=12;
+  end
+   if(campaign && inside(478,61,84,14))begin
+    text_valid=1;text_x=478;text_y=61;text_width=6;message={"CHARGE",208'd0};text_ink=24'h7fe3ec;
+   end
+   if(campaign && inside(478,97,84,14))begin
+    text_valid=1;text_x=478;text_y=97;text_width=6;message={"DEBRIS",208'd0};text_ink=24'hffc15b;
+   end
+   if(campaign && inside(170,45,126,21))begin
+    text_valid=1;text_x=170;text_y=45;text_width=7;text_pitch=18;text_height=21;
+    message={"SHIP ",decimal2(level_id+1),200'd0};
+   end
+  if(inside(986,324,112,18))begin
+   text_valid=1;compact_text=1;text_x=999;text_y=326;text_width=7;text_pitch=12;text_height=14;
+   message={"SPD ",8'd49+{5'd0,speed},"/8",200'd0};
+  end
+  if(inside(1120,624,84,24))begin
+   text_valid=1;text_x=1127;text_y=629;text_width=6;
+   if(!campaign)begin text_x=1121;text_width=7;text_pitch=12;message={"RESERVE",200'd0};text_ink=reserve_alarm==2?24'hd8442e:reserve_alarm==1?24'hffc15b:24'h7fe3ec;end
+   else if(debris_left>mode_half(duo,level_id))begin message={"LOCKED",208'd0};text_ink=24'hd8442e;end
+   else if(debris_left!=0)begin message={" HALF ",208'd0};text_ink=24'hffc15b;end
+   else begin message={"ONLINE",208'd0};text_ink=24'h7fe3ec;end
+  end
+   if(campaign && inside(986,372,108,216))begin
+    phase_row=(y-372)/54;slot=3-phase_row;
+    text_valid=1;text_y=400+phase_row*54;text_pitch=12;text_height=14;
+    text_ink=slot==current_phase?24'hffc15b:(slot<current_phase?24'h7fe3ec:24'hb3c8d8);
+    case(phase_row)
+     0:begin text_width=8;message={"RECHARGE",192'd0};end
+     1:begin text_width=9;message={"STABILIZE",184'd0};end
+     2:begin text_width=7;message={"REBUILD",200'd0};end
+     default:begin text_width=9;message={"RECONNECT",184'd0};end
+    endcase
+    text_x=1041-text_width*6;
+   end
+   if(inside(555,649,240,28))begin
+    text_valid=1;text_x=555;text_y=649;text_width=10;text_pitch=24;text_height=28;
+    message={"TIME ",8'd48+{4'd0,time_bcd[15:12]},8'd48+{4'd0,time_bcd[11:8]},8'd58,
+     8'd48+{4'd0,time_bcd[7:4]},8'd48+{4'd0,time_bcd[3:0]},176'd0};text_ink=24'hb9edf4;
+   end
+   if(inside(157,158,27,21))begin
+    text_valid=1;text_x=160;text_y=161;text_width=2;message={"P1",240'd0};text_ink=24'h05121c;
+   end
+   if(duo && inside(973,158,27,21))begin
+    text_valid=1;text_x=976;text_y=161;text_width=2;message={"P2",240'd0};text_ink=24'h05121c;
+   end
+   if(inside(196,153,74,26) || duo && inside(1012,153,74,26))begin
+    text_valid=1;text_x=x<900?201:1017;text_y=161;text_width=4;message={"NEXT",224'd0};
+   end
+   if(inside(196,334,74,21))begin
+    text_valid=1;text_x=201;text_y=338;text_width=4;message={"HOLD",224'd0};
+   end
+  if(Stop && inside(592,300,96,32))begin
+   text_valid=1;text_x=592;text_y=300;text_scale=2;text_width=5;message={"PAUSE",216'd0};
+  end
+  if((!campaign) && inside(176,44,115,32))begin
+   text_valid=1;compact_text=1;text_x=176;text_y=44;text_width=4;text_pitch=20;text_height=28;message=duo?{"DUO",232'd0}:{"SOLO",224'd0};text_ink=24'he6f0f7;
+  end
+  if((!campaign) && inside(174,88,120,18))begin
+   text_valid=1;compact_text=1;text_x=174;text_y=88;text_width=7;text_pitch=12;text_height=14;message={"ENDLESS",200'd0};text_ink=24'h7fe3ec;
+  end
+  if((!campaign) && inside(478,59,84,20))begin
+   text_valid=1;compact_text=1;text_x=478;text_y=61;text_width=5;text_pitch=12;text_height=14;message={"SPEED",216'd0};text_ink=24'h7fe3ec;
+  end
+  if((!campaign) && inside(569,57,73,23))begin
+   text_valid=1;compact_text=1;text_x=569;text_y=61;text_width=3;text_pitch=12;text_height=14;message={8'd49+{5'd0,speed},8'd47,8'd56,232'd0};text_ink=24'h7fe3ec;
+  end
+  if((!campaign) && inside(1000,57,48,23))begin
+   text_valid=1;compact_text=0;text_x=1000;text_y=61;text_width=4;text_pitch=12;text_height=14;message={percent4(charge_percent),224'd0};text_ink=24'h7fe3ec;
+  end
+  if((!campaign) && inside(478,94,70,18))begin
+   text_valid=1;compact_text=1;text_x=478;text_y=97;text_width=5;text_pitch=12;text_height=14;message={"SCORE",216'd0};text_ink=24'he6f0f7;
+  end
+  if((!campaign) && inside(566,92,144,24))begin
+   text_valid=1;compact_text=1;text_x=566;text_y=97;text_width=6;text_pitch=12;text_height=14;message={bcd6(score_bcd),208'd0};text_ink=24'he6f0f7;
+  end
+  if((!campaign) && inside(752,94,70,18))begin
+   text_valid=1;compact_text=1;text_x=752;text_y=97;text_width=5;text_pitch=12;text_height=14;message={"LINES",216'd0};text_ink=24'hffc15b;
+  end
+  if((!campaign) && inside(848,92,144,24))begin
+   text_valid=1;compact_text=1;text_x=848;text_y=97;text_width=6;text_pitch=12;text_height=14;message={bcd6(lines_bcd),208'd0};text_ink=24'hffc15b;
+  end
+  if((!campaign) && inside(998,390,84,14))begin
+   text_valid=1;compact_text=1;text_x=999;text_y=390;text_width=7;text_pitch=12;text_height=14;message={"RESERVE",200'd0};text_ink=24'h7fe3ec;
+  end
+  if((!campaign) && inside(1006,438,72,21))begin
+   text_valid=1;compact_text=1;text_x=1006;text_y=438;text_width=4;text_pitch=18;text_height=21;message={percent4(reserve_percent),224'd0};text_ink=reserve_alarm==2?24'hd8442e:reserve_alarm==1?24'hffc15b:24'h7fe3ec;
+  end
+  if((!campaign) && inside(1010,500,60,14))begin
+   text_valid=1;compact_text=1;text_x=1011;text_y=500;text_width=5;text_pitch=12;text_height=14;message={"POWER",216'd0};text_ink=24'he6f0f7;
+  end
+  if((!campaign) && inside(992,544,96,14))begin
+   text_valid=1;compact_text=1;text_x=reserve_alarm==2?993:reserve_alarm==1?1023:1005;text_y=544;text_width=8;text_pitch=12;text_height=14;message=reserve_alarm==2?{"CRITICAL",192'd0}:reserve_alarm==1?{"LOW",232'd0}:{"STABLE",208'd0};text_ink=reserve_alarm==2?24'hd8442e:reserve_alarm==1?24'hffc15b:24'h7fe3ec;
+  end
+  // Graphical landing assistance. No heading, status words or quota numerals.
+  if(!duo)begin
+   hx=x-1040;hy=y-166;
+   if(inside(1026,157,28,18) &&
+      (((x==1026 || x==1053) && (y<162 || y>169)) ||
+       ((y==157 || y==174) && (x<1032 || x>1047))))color=hint_ink;
+   if(hx*hx+hy*hy<=9)color=hint_ink;
+   // Solid falling piece, dashed vertical path, and matching hollow landing.
+   if(inside(hint_left,202,hint_cols*12,24))begin
+    hc=(x-hint_left)/12;hr=(y-202)/12;hx=(x-hint_left)%12;hy=(y-202)%12;
+    if(hint_mino(hint_type,hc,hr) && hx<10 && hy<10)begin
+     color=hint_ink;
+     if(hx==0 || hy==0)color=hint_active?24'hcbfbff:24'h7596a8;
+    end
+   end
+   if(x>=1038 && x<1040 && y>=232 && y<246 && y%6<3)color=hint_ink;
+   if(y>=243 && y<=250 && x>=1039-(250-y)/2 && x<=1039+(250-y)/2)color=hint_ink;
+   if(inside(hint_left,258,hint_cols*12,24))begin
+    hc=(x-hint_left)/12;hr=(y-258)/12;hx=(x-hint_left)%12;hy=(y-258)%12;
+    if(hint_mino(hint_type,hc,hr) && hx<10 && hy<10 &&
+       (hx==0 || hx==9 || hy==0 || hy==9))color=hint_active?24'hffe39c:24'h3c5364;
+   end
+   if(inside(1002,285,76,2))color=hint_active?24'h7fe3ec:24'h30495d;
+   if((x==1002 || x==1077) && y>=280 && y<287)color=hint_ink;
+   // Available, consumed and unopened campaign capacity is read from the budget.
+   if(campaign)begin
+    for(i=0;i<4;i=i+1)begin
+     if(inside(1006+i*18,292,10,6))begin
+      if(i<hint_quota)color=24'h35e0f5;
+      else if(x==1006+i*18 || x==1015+i*18 || y==292 || y==297)
+       color=i<hint_capacity?(hint_active?24'hffe39c:24'h607d91):24'h243949;
+      else color=24'h06121d;
+     end
+    end
+    if(hint_active && inside(995,301,90,2))
+     color=(x-995)*720<hint_life*90?24'h7fe3ec:24'h203747;
+   end else begin
+    // Linked loops are the unlimited-use symbol; no FREE text or fake quota.
+    hx=x-1040;hy=y-295;hd=(hx<0?hx+7:hx-7);
+    if(inside(1026,290,28,10) && hd*hd*16+hy*hy*49<=784 && hd*hd*16+hy*hy*49>=300)
+     color=hint_ink;
+   end
+  end
+  end
+  if((choose) && inside(212,88,310,42))begin
+   text_valid=1;compact_text=1;text_x=212;text_y=88;text_width=7;text_pitch=30;text_height=35;message={"CORE-07",200'd0};text_ink=24'he6f0f7;
+  end
+  if((choose) && inside(748,100,450,24))begin
+   text_valid=1;compact_text=1;text_x=748;text_y=100;text_width=11;text_pitch=18;text_height=21;message=ship_select?{"SELECT SHIP",168'd0}:{"SELECT MODE",168'd0};text_ink=24'h7fe3ec;
+  end
+  if((choose) && inside(232,188,420,30))begin
+   text_valid=1;compact_text=1;text_x=232;text_y=188;text_width=11;text_pitch=20;text_height=28;message=ship_select?{"SHIP ",decimal2(level_id+1),200'd0}:{"CORE REPAIR",168'd0};text_ink=24'h7fe3ec;
+  end
+  if((choose && !ship_select) && inside(232,478,420,18))begin
+   text_valid=1;compact_text=1;text_x=232;text_y=478;text_width=19;text_pitch=12;text_height=14;message={"RECONNECT / REBUILD",104'd0};text_ink=24'he6f0f7;
+  end
+  if((choose && !ship_select) && inside(232,510,430,18))begin
+   text_valid=1;compact_text=1;text_x=232;text_y=510;text_width=20;text_pitch=12;text_height=14;message={"STABILIZE / RECHARGE",96'd0};text_ink=24'he6f0f7;
+  end
+  if((choose && ship_select) && inside(232,478,300,18))begin
+   text_valid=1;compact_text=1;text_x=232;text_y=478;text_width=13;text_pitch=12;text_height=14;message={"CHARGE TARGET",152'd0};text_ink=24'h7fe3ec;
+  end
+  if((choose && ship_select) && inside(610,478,60,18))begin
+   text_valid=1;compact_text=1;text_x=610;text_y=478;text_width=2;text_pitch=16;text_height=14;message={decimal2(mode_target(duo,level_id)),240'd0};text_ink=24'h7fe3ec;
+  end
+  if((choose && ship_select) && inside(232,510,300,18))begin
+   text_valid=1;compact_text=1;text_x=232;text_y=510;text_width=6;text_pitch=12;text_height=14;message={"DEBRIS",208'd0};text_ink=24'hffc15b;
+  end
+  if((choose && ship_select) && inside(610,510,60,18))begin
+   text_valid=1;compact_text=1;text_x=610;text_y=510;text_width=2;text_pitch=16;text_height=14;message={decimal2(mode_total(duo,level_id)),240'd0};text_ink=24'hffc15b;
+  end
+  if((choose && ship_select) && inside(232,542,300,18))begin
+   text_valid=1;compact_text=1;text_x=232;text_y=542;text_width=11;text_pitch=12;text_height=14;message={"START SPEED",168'd0};text_ink=24'he6f0f7;
+  end
+  if((choose && ship_select) && inside(610,542,60,18))begin
+   text_valid=1;compact_text=1;text_x=610;text_y=542;text_width=3;text_pitch=16;text_height=14;message={8'd49+mode_initial(duo,level_id),8'd47,8'd56,232'd0};text_ink=24'he6f0f7;
+  end
+  if((choose) && inside(230,584,432,18))begin
+   text_valid=1;compact_text=1;text_x=230;text_y=584;text_width=25;text_pitch=12;text_height=14;message=ship_select?(duo?{"DUO CAMPAIGN",160'd0}:{"SOLO CAMPAIGN",152'd0}):{"ORBITAL RECOVERY TERMINAL",56'd0};text_ink=24'h7fe3ec;
+  end
+  if((choose) && inside(768,584,432,18))begin
+   text_valid=1;compact_text=1;text_x=768;text_y=584;text_width=14;text_pitch=14;text_height=14;message={"SELECT / START",144'd0};text_ink=24'he6f0f7;
+  end
+  if(choose && inside(768,172,432,374))begin
+   menu_row=(y-172)/98;menu_y=172+menu_row*98;
+   if(y>=menu_y+18 && y<menu_y+44)begin
+    text_valid=1;compact_text=1;text_x=780;text_y=menu_y+18;text_width=13;text_pitch=16;text_height=21;
+    text_ink=menu_row==menu_selection?24'h7fe3ec:24'he6f0f7;
+    if(ship_select)begin text_width=7;message={"SHIP ",decimal2(menu_row+1),200'd0};end
+    else case(menu_row)
+     0:begin text_width=12;message={"SOLO ENDLESS",160'd0};end
+     1:begin text_width=11;message={"DUO ENDLESS",168'd0};end
+     2:begin text_width=13;message={"SOLO CAMPAIGN",152'd0};end
+     default:begin text_width=12;message={"DUO CAMPAIGN",160'd0};end
+    endcase
+   end
+   if(y>=menu_y+50 && y<menu_y+68)begin
+    text_valid=1;compact_text=1;text_x=780;text_y=menu_y+50;text_width=20;text_pitch=12;text_height=14;text_ink=24'h8fabbf;
+    if(ship_select)message={"CHARGE ",decimal2(mode_target(duo,menu_row[1:0])),"  DEBRIS ",decimal2(mode_total(duo,menu_row[1:0])),96'd0};
+    else if(menu_row<2)message={"SURVIVE AND RECHARGE",96'd0};
+    else message={"RESTORE THE FLEET",120'd0};
+   end
+  end
+  if(choose && inside(565,649,240,28))begin
+   text_valid=1;compact_text=1;text_x=565;text_y=649;text_width=12;text_pitch=18;text_height=21;
+   message={"SYSTEM READY",160'd0};text_ink=24'h8ecad7;
+  end
+   if(!choose && comms_visible && inside(dialog_x,160,360,104))begin
+    text_valid=0;color=24'h091722;
+    if(x<dialog_x+2 || x>=dialog_x+358 || y<162 || y>=262)color=24'h607d91;
+    if(x>=dialog_x+5 && x<dialog_x+7 && y>=169 && y<254)color=24'h35e0f5;
+    if(y>=172 && y<186)begin
+     text_valid=1;text_x=dialog_x+18;text_y=172;text_width=5;text_pitch=12;text_height=14;
+     message={"COMMS",216'd0};text_ink=24'h7fe3ec;
+    end
+    if(y>=202 && y<216 || y>=230 && y<244)begin
+     text_valid=1;text_x=dialog_x+18;text_y=y<230?202:230;text_width=26;text_pitch=12;text_height=14;
+     message=ref_comms_line(comms_id,y>=230);text_ink=24'he8eef2;
+    end
+   end
+
+  if(!choose && campaign && credits>=target && inside(476,68,170,1))begin color=24'h7fe3ec;force_paint=1;end
+  if(!choose && campaign && debris_left==0 && inside(476,103,174,1))begin color=24'hffc15b;force_paint=1;end
+  if(x>=1280 || y>=720)begin color=0;force_paint=1;end
+ end
+ // Same four clocks as before: the atlas has three reads; the glyph has
+ // two. Register their final priority mux on clock four, then story_ui adds one.
+ always @(posedge clk or negedge reset_n)begin
+  if(!reset_n)begin
+   p0<=0;p1<=0;p2<=0;p3<=0;ink0<=0;ink1<=0;ink2<=0;force_pipe<=0;font_lit_q<=0;
+  end else begin
+   p0<=color;p1<=p0;p2<=p1;
+   ink0<=text_ink;ink1<=ink0;ink2<=ink1;
+   force_pipe<={force_pipe[1:0],force_paint};font_lit_q<=shared_font_lit;
+   p3<=force_pipe[2]?p2:font_lit_q?ink2:basic_hit?basic_rgb:p2;
+  end
+ end
+ assign rgb=p3;
+endmodule

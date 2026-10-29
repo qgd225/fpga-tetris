@@ -1,0 +1,8 @@
+{
+  "pass": true,
+  "unchanged_endpoints": 93,
+  "new_endpoints": [],
+  "baseline": "docs\\reports\\new_ui_final_20261028\\check-timing-verbose.rpt",
+  "baseline_sha256": "edcf4bad88ac64b1d81098c46f23a13a227503bedbdf9cc2cb793ac761bac098",
+  "current_sha256": "1d7beb79f224d9fd7474b055420a66a592cd83f49a27e671f2d49e46b6f2ae64"
+}

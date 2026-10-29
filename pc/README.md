@@ -1,6 +1,6 @@
 # 电脑端显示、控制与无板网口自测
 
-更新：2026-10-27。便携程序目标为 Windows 10／11 x64，根目录 `TetrisPC.exe` 自带 Python、Pillow、Tk 和键盘支持；运行该 EXE 无须另装 Python。版本与本次实际验证范围见 [PC 便携化验证](../docs/reports/pc_portable_20261027/build-summary.md)。
+更新：2026-10-29。便携程序目标为 Windows 10／11 x64，根目录 `TetrisPC.exe` 自带 Python、Pillow、Tk 和键盘支持；运行该 EXE 无须另装 Python。当前版本2026.10.29.1；本轮实际验证范围见[新UI最终报告](../docs/reports/new_ui_final_20261028/README.md)，原[PC便携化验证](../docs/reports/pc_portable_20261027/build-summary.md)保留为历史证据。
 
 ## 正常使用
 
@@ -56,7 +56,7 @@
 | 文件 | 职责 |
 | --- | --- |
 | `tetris_pc_launcher.py` | 启动、诊断、自测命令分流与错误报告 |
-| `net_screen_view.py` | 画面、键盘与接收线程；默认 56 色与 FPGA 资产一致 |
+| `net_screen_view.py` | 画面、键盘与接收线程；接收RGB888游程，兼容旧版56色索引与调色板包 |
 | `set_static_arp.py` | 有线网卡选择、只读诊断、原生 PowerShell 配置与复核 |
 | `pc_protocol.py` | 画面接收和自测共同使用的数据格式与长度校验 |
 | `network_selftest.py` | 回环、外部监听和对端发送 |
@@ -72,3 +72,10 @@
 运行错误和网络诊断日志存于 `%LOCALAPPDATA%/TetrisPC/Logs/`，该目录不可用时使用系统临时目录。无需向程序安装目录写日志；日志、个人数据与 Python 缓存不纳入 Git 或作品包。当前机器外的实际有线传输、驱动和防火墙环境需按上述双机方法验证，不把本机测试说成所有电脑均已实测。
 
 打包机制参考 [PyInstaller 官方说明](https://pyinstaller.org/en/stable/operating-mode.html)。
+
+
+## 新UI扩色链路
+
+新UI bit使用类型4的RGB888游程包，PC版本为2026.10.29.1。请配套使用本轮`TetrisPC.exe`；旧程序不识别新画面包。新程序继续兼容旧bit的行包和调色板，不再用56色限制新画面。
+
+每个UDP包最多1292字节，一行按最多320段游程分包；按实际区间累计覆盖，支持帧号回绕和旧帧拒收。协议实现见`pc_protocol.py`，硬件与PC绑定及本机测试记录见最终新UI报告。软件自测和图形依赖检查不代替板上物理网口验证。

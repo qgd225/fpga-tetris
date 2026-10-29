@@ -50,7 +50,7 @@ def inputs():
             ".v", ".sv", ".vh", ".xdc", ".xci", ".mem", ".coe"
         }
         build = name.startswith("tools/") and p.suffix in {".tcl", ".py", ".ps1", ".bat"}
-        asset = name.startswith("assets/") and p.suffix in {".json", ".wav", ".ima"}
+        asset = name.startswith("assets/") and p.suffix in {".json", ".wav", ".ima", ".png", ".in"}
         if hardware or build or asset or name == "pc/net_screen_view.py" or name in {"AGENTS.md", RULES_FILE, "Tetris.xpr"}:
             content = p.read_bytes()
             if name == "pc/net_screen_view.py":

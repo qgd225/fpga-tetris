@@ -1,0 +1,1649 @@
+{
+  "kind": "two_full_rtl_frames_and_41_component_state_crops",
+  "tool": "Vivado XSim 2018.3",
+  "baseline_commit": "46745c1b5b9ff14e6fd3fa8c251e1552bba6e840",
+  "baseline_pushed_to": "origin/main",
+  "frame": [
+    1280,
+    720
+  ],
+  "actual_runtime_core_geometry": {
+    "x": 1130,
+    "y": 260,
+    "w": 54,
+    "h": 288,
+    "glass_x": 1157,
+    "glass_w": 26,
+    "pitch": 36
+  },
+  "rtl_source_sha256": {
+    "Tetris.srcs/sources_1/new/story_ui.v": "d258e4986ace5cf792fa0f26fd425f5c3030fb830a9e87852ef0ef0c0bd37aee",
+    "Tetris.srcs/sources_1/new/reference_ui_renderer.v": "68a07c1a025ffe6d4555483d74b06dc8660231bd80332b1e58a8e1e168f6ffb9",
+    "Tetris.srcs/sources_1/new/reference_ui_geometry.vh": "3465fe9db32768d488d1980dc004085b79351531655398735a2853dc64fe6d3f",
+    "Tetris.srcs/sources_1/new/reference_ui_skin.mem": "dbb3c3a0d99b2b0e4840177be87d37f3f8ac2fd87aa6fcc2aef6d08e2287de49",
+    "Tetris.srcs/sources_1/new/reference_ui_material.mem": "2b12f1c0c3fe333b12dc2ffe47686d9b921df93ee3f97ff22f1fed0cd48fa771",
+    "Tetris.srcs/sources_1/new/reference_ui_digits.mem": "fba8a917d11150a34fca8e7a360810064dca6fcdf4d192b5e6614705fa33e68b",
+    "Tetris.srcs/sources_1/new/story_font.mem": "ec90f815bbe06601adf3dbac39f98f1590aee668f796877e9b4d42644a6b2cd9",
+    "Tetris.srcs/sources_1/new/story_layout.vh": "d2411bf4035254671ec6f01f7e9a72d6fb1a0fee7cb5518b9187e12b204c2e1d",
+    "Tetris.srcs/sources_1/new/story_palette.vh": "57804c0cb903b288a9da7c0ad4d7e1f8b2586eb91596bed1c1a309245b685acc",
+    "Tetris.srcs/sources_1/new/game_mode_params.vh": "34099850416d8a30c7c6087da1591d1541c5557e2a82dcf4450d278014821cde",
+    "Tetris.srcs/sources_1/new/hud_font_rom.v": "741b49e7e567632c7df623597a0713987e2c8b530050339dd7b28e1df7f56ea4",
+    "Tetris.srcs/sources_1/new/hud_text.v": "6f53cb4fd7617531930cf6c66b5ccb924c3714f8341ca0c716ccf0e8cc31a007",
+    "Tetris.srcs/sources_1/new/scene_sprite_rom.v": "f38f4508e5f04eb9a716129577f8e22cb29dbc3bdb53b320a9237dc6ea20fae4",
+    "Tetris.srcs/sources_1/new/story_scene.v": "26e20c7b1a02972fce453c99ee0c18c3760a8fd5992c882e68a7ec40e40f90cd",
+    "Tetris.srcs/sources_1/new/core_renderer.v": "c93c4b5c7cd37d85d413a25968f58440e020e412f8f836e829d4fab30dd6ac49",
+    "Tetris.srcs/sources_1/new/story_sprites.mem": "aad6020785d71531d9c6bc41ac800df7af70d8c2a35f24bbb8bb9938ef02a1b4",
+    "Tetris.sim/story_visual/ui_review_tb.v": "f68467ae1a95fdeb640c098e264011a309a73962c2731805c60cb9875384dc34",
+    "tools/build_reference_ui_assets.py": "a1090ac6773a9e6031ebfa34ba3f0878d9dd06224d0dce4dc48554e1efb876d2",
+    "assets/reference_ui/material_manifest.json": "994cbea03022200b6b9c90a9f2cdab504d82a1e0c40be956efddfb69e230e84d",
+    "assets/reference_ui/source_core_pipe.png": "98bcb5e0cbea9aeace8a11324bdfd776eeaad2d688de2502cd2d54193d90b07f",
+    "assets/reference_ui/source_header_panels.png": "f3d3be45b53524dd16335f9c3322d0be4446fd409d8f5bfbe5b2b8807f09a736",
+    "Tetris.sim/story_visual/ui_scenes_tb.v": "8aabe47f58fb8d3f70fe512707404d23142c8415b1b02548ebb93abf9d4bdc49",
+    "Tetris.sim/story_visual/ui_modes_refresh_tb.v": "ff3978942608fac3d9e3f3077be311909fc67403bb09e9248a8dc5359b7922c7",
+    "Tetris.sim/story_visual/ui_component_review_tb.v": "32b2483de0c73fb42687c2e165d71262e588a60a42059c48dcbdfda55877aec6"
+  },
+  "gameplay_files_unchanged_since_baseline": [
+    "Game_state_machine.v",
+    "Playfield.v",
+    "Playfield_hold_controller.v",
+    "frame.v",
+    "scoring.v",
+    "story_controller.v",
+    "reserve_timer.v",
+    "hold_limits.v",
+    "hint_budget.v",
+    "Tetris.v"
+  ],
+  "validation_scope": "RTL frame compile/elaboration/export only; no regression, synthesis, routing or new bitstream",
+  "baseline_bit_sha256": "851ba01534ee3aa60f0ba8c65514dbb7b1787050675f644cab1cadbaab5b7127",
+  "baseline_bit_is_not_this_ui_build": true,
+  "round": 12,
+  "pipe_channel": {
+    "sample_radius": 14,
+    "tube_radius": 6,
+    "source": "source_core_pipe.png",
+    "includes": [
+      "recess_floor",
+      "inner_shadow",
+      "steel_lip"
+    ]
+  },
+  "material_changes": {
+    "source_sha256": "2ec45276d0ec937a5df04bdd2ce6becabd165b7adf8e0e32b14eb35b89e1ead2",
+    "canvas": [
+      1280,
+      720
+    ],
+    "kind": "material_only_not_rtl_preview",
+    "fields": {
+      "charge_value": [
+        569,
+        57,
+        642,
+        80
+      ],
+      "debris_value": [
+        569,
+        92,
+        648,
+        114
+      ],
+      "charge_track": [
+        664,
+        59,
+        997,
+        80
+      ],
+      "debris_track": [
+        664,
+        95,
+        997,
+        114
+      ],
+      "charge_percent": [
+        1010,
+        57,
+        1048,
+        80
+      ],
+      "debris_percent": [
+        1010,
+        93,
+        1048,
+        116
+      ],
+      "ship_number": [
+        251,
+        43,
+        288,
+        72
+      ],
+      "time_value": [
+        651,
+        645,
+        779,
+        679
+      ]
+    },
+    "core": {
+      "x": 1130,
+      "y": 260,
+      "w": 54,
+      "h": 288,
+      "glass_x": 1157,
+      "glass_w": 26,
+      "pitch": 36
+    },
+    "atlas_words": 6896,
+    "core_logic_changed": false,
+    "scope": "four play modes, main menu and solo/duo ship selection",
+    "player_tabs": {
+      "p1_header": [
+        143,
+        148,
+        298,
+        184
+      ],
+      "p2_header": [
+        959,
+        148,
+        1114,
+        184
+      ],
+      "offset_x": 816,
+      "same_protruding_silhouette": true,
+      "p2_ink_source": "approved reference chip"
+    },
+    "skin_banks": [
+      "duo_campaign",
+      "solo_campaign",
+      "solo_endless",
+      "duo_endless",
+      "terminal"
+    ],
+    "component_sources": {
+      "pipe_core_phase": {
+        "file": "source_core_pipe.png",
+        "sha256": "98bcb5e0cbea9aeace8a11324bdfd776eeaad2d688de2502cd2d54193d90b07f"
+      },
+      "header_next_hold": {
+        "file": "source_header_panels.png",
+        "sha256": "f3d3be45b53524dd16335f9c3322d0be4446fd409d8f5bfbe5b2b8807f09a736"
+      }
+    },
+    "pipe_path": [
+      [
+        1064.0,
+        70.0
+      ],
+      [
+        1098.0,
+        70.0
+      ],
+      [
+        1098.3926738492125,
+        70.0038551903587
+      ],
+      [
+        1098.7851963151813,
+        70.01541927518554
+      ],
+      [
+        1099.1774160730238,
+        70.03468779630569
+      ],
+      [
+        1099.5691819145568,
+        70.06165332533745
+      ],
+      [
+        1099.9603428065911,
+        70.09630546655606
+      ],
+      [
+        1100.3507479491568,
+        70.13863086090147
+      ],
+      [
+        1100.7402468336393,
+        70.18861319112845
+      ],
+      [
+        1101.1286893008046,
+        70.24623318809725
+      ],
+      [
+        1101.515925598687,
+        70.31146863820217
+      ],
+      [
+        1101.9018064403226,
+        70.38429439193538
+      ],
+      [
+        1102.286183061301,
+        70.46468237358255
+      ],
+      [
+        1102.668907277118,
+        70.55260159204647
+      ],
+      [
+        1103.049831540303,
+        70.6480181527948
+      ],
+      [
+        1103.4288089973015,
+        70.75089527092706
+      ],
+      [
+        1103.8056935450893,
+        70.86119328535582
+      ],
+      [
+        1104.180339887499,
+        70.97886967409693
+      ],
+      [
+        1104.552603591234,
+        71.10387907066244
+      ],
+      [
+        1104.9223411415499,
+        71.23617328155032
+      ],
+      [
+        1105.2894099975829,
+        71.37570130482393
+      ],
+      [
+        1105.6536686473019,
+        71.52240934977426
+      ],
+      [
+        1106.0149766620627,
+        71.67624085765728
+      ],
+      [
+        1106.3731947507486,
+        71.83713652349837
+      ],
+      [
+        1106.728184813467,
+        72.00503431895557
+      ],
+      [
+        1107.079809994791,
+        72.17986951623264
+      ],
+      [
+        1107.42793473652,
+        72.3615747130329
+      ],
+      [
+        1107.7724248299392,
+        72.55007985854405
+      ],
+      [
+        1108.1131474675597,
+        72.74531228044417
+      ],
+      [
+        1108.449971294319,
+        72.94719671291816
+      ],
+      [
+        1108.78276645822,
+        73.15565532567427
+      ],
+      [
+        1109.111404660392,
+        73.37060775394909
+      ],
+      [
+        1109.4357592045521,
+        73.59197112948974
+      ],
+      [
+        1109.7557050458495,
+        73.81966011250105
+      ],
+      [
+        1110.0711188390715,
+        74.05358692454585
+      ],
+      [
+        1110.3818789861966,
+        74.2936613823851
+      ],
+      [
+        1110.687865683273,
+        74.53979093274526
+      ],
+      [
+        1110.9889609666036,
+        74.79188068799938
+      ],
+      [
+        1111.2850487582257,
+        75.04983346274807
+      ],
+      [
+        1111.5760149106588,
+        75.3135498112863
+      ],
+      [
+        1111.8617472509127,
+        75.58292806594162
+      ],
+      [
+        1112.142135623731,
+        75.85786437626905
+      ],
+      [
+        1112.4170719340584,
+        76.13825274908729
+      ],
+      [
+        1112.6864501887137,
+        76.42398508934116
+      ],
+      [
+        1112.950166537252,
+        76.71495124177437
+      ],
+      [
+        1113.2081193120007,
+        77.01103903339633
+      ],
+      [
+        1113.4602090672547,
+        77.31213431672708
+      ],
+      [
+        1113.7063386176148,
+        77.61812101380332
+      ],
+      [
+        1113.946413075454,
+        77.92888116092857
+      ],
+      [
+        1114.180339887499,
+        78.24429495415053
+      ],
+      [
+        1114.4080288705102,
+        78.56424079544776
+      ],
+      [
+        1114.6293922460509,
+        78.88859533960796
+      ],
+      [
+        1114.8443446743258,
+        79.21723354177999
+      ],
+      [
+        1115.0528032870818,
+        79.55002870568103
+      ],
+      [
+        1115.254687719556,
+        79.88685253244032
+      ],
+      [
+        1115.449920141456,
+        80.2275751700609
+      ],
+      [
+        1115.638425286967,
+        80.57206526348004
+      ],
+      [
+        1115.8201304837673,
+        80.92019000520907
+      ],
+      [
+        1115.9949656810445,
+        81.27181518653316
+      ],
+      [
+        1116.1628634765016,
+        81.62680524925143
+      ],
+      [
+        1116.3237591423426,
+        81.98502333793718
+      ],
+      [
+        1116.4775906502257,
+        82.3463313526982
+      ],
+      [
+        1116.624298695176,
+        82.710590002417
+      ],
+      [
+        1116.7638267184498,
+        83.07765885845014
+      ],
+      [
+        1116.8961209293375,
+        83.44739640876612
+      ],
+      [
+        1117.021130325903,
+        83.81966011250105
+      ],
+      [
+        1117.1388067146443,
+        84.19430645491076
+      ],
+      [
+        1117.249104729073,
+        84.57119100269851
+      ],
+      [
+        1117.3519818472053,
+        84.95016845969684
+      ],
+      [
+        1117.4473984079536,
+        85.33109272288189
+      ],
+      [
+        1117.5353176264175,
+        85.71381693869898
+      ],
+      [
+        1117.6157056080647,
+        86.09819355967744
+      ],
+      [
+        1117.688531361798,
+        86.48407440131291
+      ],
+      [
+        1117.7537668119028,
+        86.87131069919538
+      ],
+      [
+        1117.8113868088715,
+        87.25975316636064
+      ],
+      [
+        1117.8613691390985,
+        87.64925205084324
+      ],
+      [
+        1117.903694533444,
+        88.03965719340879
+      ],
+      [
+        1117.9383466746626,
+        88.43081808544311
+      ],
+      [
+        1117.9653122036943,
+        88.82258392697622
+      ],
+      [
+        1117.9845807248144,
+        89.21480368481863
+      ],
+      [
+        1117.9961448096412,
+        89.60732615078743
+      ],
+      [
+        1118.0,
+        90.0
+      ],
+      [
+        1118.0,
+        304.0
+      ],
+      [
+        1118.0038551903588,
+        304.39267384921254
+      ],
+      [
+        1118.0154192751856,
+        304.7851963151814
+      ],
+      [
+        1118.0346877963057,
+        305.1774160730238
+      ],
+      [
+        1118.0616533253374,
+        305.5691819145569
+      ],
+      [
+        1118.096305466556,
+        305.9603428065912
+      ],
+      [
+        1118.1386308609015,
+        306.35074794915676
+      ],
+      [
+        1118.1886131911285,
+        306.7402468336394
+      ],
+      [
+        1118.2462331880972,
+        307.12868930080464
+      ],
+      [
+        1118.311468638202,
+        307.5159255986871
+      ],
+      [
+        1118.3842943919353,
+        307.90180644032256
+      ],
+      [
+        1118.4646823735825,
+        308.286183061301
+      ],
+      [
+        1118.5526015920464,
+        308.66890727711814
+      ],
+      [
+        1118.6480181527947,
+        309.04983154030316
+      ],
+      [
+        1118.750895270927,
+        309.4288089973015
+      ],
+      [
+        1118.8611932853557,
+        309.80569354508924
+      ],
+      [
+        1118.978869674097,
+        310.180339887499
+      ],
+      [
+        1119.1038790706625,
+        310.5526035912339
+      ],
+      [
+        1119.2361732815502,
+        310.92234114154985
+      ],
+      [
+        1119.375701304824,
+        311.289409997583
+      ],
+      [
+        1119.5224093497743,
+        311.6536686473018
+      ],
+      [
+        1119.6762408576574,
+        312.01497666206285
+      ],
+      [
+        1119.8371365234984,
+        312.37319475074855
+      ],
+      [
+        1120.0050343189555,
+        312.72818481346684
+      ],
+      [
+        1120.1798695162327,
+        313.07980999479093
+      ],
+      [
+        1120.361574713033,
+        313.42793473651994
+      ],
+      [
+        1120.550079858544,
+        313.7724248299391
+      ],
+      [
+        1120.745312280444,
+        314.1131474675597
+      ],
+      [
+        1120.9471967129182,
+        314.44997129431897
+      ],
+      [
+        1121.1556553256742,
+        314.78276645822
+      ],
+      [
+        1121.3706077539491,
+        315.11140466039205
+      ],
+      [
+        1121.5919711294898,
+        315.43575920455226
+      ],
+      [
+        1121.819660112501,
+        315.7557050458495
+      ],
+      [
+        1122.053586924546,
+        316.07111883907146
+      ],
+      [
+        1122.2936613823852,
+        316.3818789861967
+      ],
+      [
+        1122.5397909327453,
+        316.6878656832729
+      ],
+      [
+        1122.7918806879993,
+        316.98896096660366
+      ],
+      [
+        1123.049833462748,
+        317.2850487582256
+      ],
+      [
+        1123.3135498112863,
+        317.57601491065884
+      ],
+      [
+        1123.5829280659416,
+        317.86174725091274
+      ],
+      [
+        1123.8578643762692,
+        318.14213562373095
+      ],
+      [
+        1124.1382527490873,
+        318.41707193405836
+      ],
+      [
+        1124.4239850893412,
+        318.6864501887137
+      ],
+      [
+        1124.7149512417743,
+        318.95016653725196
+      ],
+      [
+        1125.0110390333964,
+        319.20811931200063
+      ],
+      [
+        1125.312134316727,
+        319.46020906725477
+      ],
+      [
+        1125.6181210138034,
+        319.7063386176149
+      ],
+      [
+        1125.9288811609285,
+        319.94641307545413
+      ],
+      [
+        1126.2442949541505,
+        320.180339887499
+      ],
+      [
+        1126.5642407954479,
+        320.4080288705103
+      ],
+      [
+        1126.888595339608,
+        320.6293922460509
+      ],
+      [
+        1127.21723354178,
+        320.8443446743257
+      ],
+      [
+        1127.550028705681,
+        321.0528032870819
+      ],
+      [
+        1127.8868525324403,
+        321.2546877195558
+      ],
+      [
+        1128.2275751700608,
+        321.44992014145595
+      ],
+      [
+        1128.57206526348,
+        321.6384252869671
+      ],
+      [
+        1128.920190005209,
+        321.82013048376734
+      ],
+      [
+        1129.271815186533,
+        321.99496568104445
+      ],
+      [
+        1129.6268052492514,
+        322.1628634765016
+      ],
+      [
+        1129.9850233379373,
+        322.32375914234274
+      ],
+      [
+        1130.3463313526981,
+        322.47759065022575
+      ],
+      [
+        1130.710590002417,
+        322.6242986951761
+      ],
+      [
+        1131.0776588584501,
+        322.7638267184497
+      ],
+      [
+        1131.447396408766,
+        322.89612092933754
+      ],
+      [
+        1131.819660112501,
+        323.0211303259031
+      ],
+      [
+        1132.1943064549107,
+        323.13880671464415
+      ],
+      [
+        1132.5711910026985,
+        323.24910472907294
+      ],
+      [
+        1132.950168459697,
+        323.3519818472052
+      ],
+      [
+        1133.331092722882,
+        323.44739840795353
+      ],
+      [
+        1133.713816938699,
+        323.53531762641745
+      ],
+      [
+        1134.0981935596774,
+        323.6157056080646
+      ],
+      [
+        1134.484074401313,
+        323.68853136179786
+      ],
+      [
+        1134.8713106991954,
+        323.7537668119028
+      ],
+      [
+        1135.2597531663607,
+        323.81138680887153
+      ],
+      [
+        1135.6492520508432,
+        323.86136913909854
+      ],
+      [
+        1136.0396571934089,
+        323.90369453344397
+      ],
+      [
+        1136.4308180854432,
+        323.93834667466257
+      ],
+      [
+        1136.8225839269762,
+        323.96531220369434
+      ],
+      [
+        1137.2148036848187,
+        323.98458072481446
+      ],
+      [
+        1137.6073261507875,
+        323.9961448096413
+      ],
+      [
+        1138.0,
+        324.0
+      ],
+      [
+        1141.0,
+        324.0
+      ]
+    ],
+    "block_style": "original block_index and story_palette; one-pixel bevel, clipped corners",
+    "debris_style": "original story_ui shader; gray-blue face with one-pixel X",
+    "field_edge_repair": {
+      "left": [
+        298,
+        132,
+        352,
+        632
+      ],
+      "right": [
+        928,
+        132,
+        970,
+        632
+      ],
+      "bezel_width": 24,
+      "facets": "three hard value steps; no global haze"
+    },
+    "finishing_brief": "art_review/fig3_fix_prompts.md zones 2,3,4,5,6,7; retain approved layout and original blocks/debris",
+    "hint_panel": "solo only; falling-piece/projected-target diagram, reticle and arrow; campaign slots/time bar; endless infinity icon; no text",
+    "endless_pipe": "absent; pipe, recessed channel, collars and endpoints restored to clean underlay",
+    "phase_labels": "stacked circles above full labels, centered and 54px spaced; bottom-to-top RECONNECT REBUILD STABILIZE RECHARGE",
+    "legend_panel": [
+      1199,
+      272,
+      1277,
+      494
+    ],
+    "spd_plate": [
+      974,
+      312,
+      1110,
+      354
+    ],
+    "time_plaque": [
+      466,
+      640,
+      880,
+      689
+    ],
+    "core_mast_revision": {
+      "envelope": [
+        1124,
+        214,
+        1204,
+        570
+      ],
+      "layers": 3,
+      "axis_x": 1170,
+      "left_rail": "ladder",
+      "right_rail": "straight machined bar",
+      "chamber": [
+        1154,
+        258,
+        1186,
+        548
+      ],
+      "square_chamber": true,
+      "rung_pitch": 18,
+      "joint_rows": [
+        260,
+        332,
+        404,
+        476,
+        548
+      ],
+      "clamp_datum_y": 512,
+      "crown": "orange-gold dome and stepped collar",
+      "amber_base_is_not_charge_cell": true,
+      "runtime_cells": 8,
+      "scope": "energy mast only; original core glass coordinates retained"
+    },
+    "pipe_channel": {
+      "sample_radius": 15,
+      "tube_radius": 7,
+      "source": "analytic centerline; reference hardware palette",
+      "elbow_radius": 20,
+      "diameter": 14,
+      "fluid_segment": [
+        1118,
+        106,
+        1118,
+        154
+      ],
+      "interface_revision": {
+        "header_flange": [
+          1049,
+          53,
+          1079,
+          88
+        ],
+        "mast_seat": [
+          1140,
+          310,
+          1155,
+          339
+        ],
+        "shared_panel_edge": [
+          1102,
+          148,
+          1110,
+          354
+        ],
+        "glass_collars_y": [
+          106,
+          154
+        ],
+        "hull_tab_y": [
+          190,
+          270
+        ]
+      },
+      "includes": [
+        "recess_floor",
+        "inner_shadow",
+        "steel_lip"
+      ]
+    }
+  },
+  "review_sources": {
+    "C:\\Users\\qiguidie\\Documents\\ChatGPT\\FPGA学习\\art_review\\fig3_fix_prompts.md": "3276d660568748c350e98371783580786961be2194d67f205447a7d9bb6d648a",
+    "C:\\Users\\qiguidie\\Documents\\ChatGPT\\FPGA学习\\art_review\\fig3_zone_map.png": "0305afa68465e467e40d45f971c70171d4bfdbabd9e4b93e72165d8d2e6c5261",
+    "C:\\Users\\qiguidie\\Documents\\ChatGPT\\FPGA学习\\art_review\\ref_core_target.png": "008fe76b430d47dedf23ad3b17b7c7740c13ebcf89182f7b0da0bcd1c3aadbab",
+    "C:\\Users\\qiguidie\\Documents\\ChatGPT\\FPGA学习\\art_review\\warp_map.png": "09bb81399d7f96380c0b692d683ba84e304fa5db44103369520fe2e128420a26"
+  },
+  "retained_constraints": [
+    "24x20 field; cell size 24; field origin (352,144)",
+    "8 core cells and real state-dependent fill",
+    "original block_index and thin-X debris style",
+    "original floor percentage computation; no fixed 43% / 38%",
+    "existing functional anchors retained; no global shrink"
+  ],
+  "user_clarification": "保留八段动态显示，琥珀色作为机械底座；本轮主要改外壳",
+  "render_log_sha256": "8c2605778baf3c47bb521da5ea4ba38ce21c17dca0ced912c6c369bc886dc399",
+  "legend_choice": "图例改为圆环在上、名称在下，保持当前位置和完整文字",
+  "pipe_geometry": {
+    "diameter": 14,
+    "bend_radius": 20,
+    "angles": [
+      90,
+      90
+    ],
+    "glass_axis_x": 1118,
+    "glass_y": [
+      106,
+      154
+    ],
+    "max_glass_core_rgb": [
+      194,
+      249,
+      252
+    ],
+    "one_glass_segment": true,
+    "channel_radius": 15,
+    "interfaces": {
+      "header_flange": [
+        1049,
+        53,
+        1079,
+        88
+      ],
+      "mast_seat": [
+        1140,
+        310,
+        1155,
+        339
+      ],
+      "shared_panel_edge": [
+        1102,
+        148,
+        1110,
+        354
+      ],
+      "glass_collars_y": [
+        106,
+        154
+      ],
+      "hull_tab_y": [
+        190,
+        270
+      ]
+    }
+  },
+  "changes": "P2顶边直接沿用P1轮廓并外移至对应预览槽相同偏移，保留原P2字形和品红色；独立导出核心/储备/提示/HOLD/速度/任务六组状态。修正LOCKED红色锁带居中、储备告警文字颜色和任务完成划线，游戏核心逻辑不改。",
+  "outputs": [
+    {
+      "file": "20261027_双人闯关_RTL.png",
+      "kind": "full_rtl_frame",
+      "actual_changed_bbox": [
+        959,
+        148,
+        1110,
+        184
+      ],
+      "outside_tab_unchanged": true,
+      "sha256": "b48aa8e4659408ec5f3c35b52a7398d187e8fecb791ed1ef455eab90f1cabeab"
+    },
+    {
+      "file": "20261027_双人无尽_RTL.png",
+      "kind": "full_rtl_frame",
+      "actual_changed_bbox": [
+        959,
+        148,
+        1110,
+        184
+      ],
+      "outside_tab_unchanged": true,
+      "sha256": "63bf533b3bc5caefa0b5513ff169d924463f714c06ecbcd42a56894c283599c9"
+    },
+    {
+      "file": "原始状态帧/core_0.png",
+      "group": "core",
+      "state": 0,
+      "label": "锁定 LOCKED · 0/8",
+      "note": "记功保留15，残骸48",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "d3bd823de5c5f5530d03599c3448d4d491ef8a60391aa061132ba811c99f30f7"
+    },
+    {
+      "file": "原始状态帧/core_1.png",
+      "group": "core",
+      "state": 1,
+      "label": "HALF 刚解锁 · 0/8",
+      "note": "记功1，残骸18",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "2ac378f1e5f4d6d9c426821be7f27d1757ca94e485b6d5d180be8c4a3a21d6e0"
+    },
+    {
+      "file": "原始状态帧/core_2.png",
+      "group": "core",
+      "state": 2,
+      "label": "HALF · 3/8",
+      "note": "REBUILD 当前阶",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "ce0cbb564a359c2d49ef5f60e840bf82195247b7fdb153c797e5d1630611f803"
+    },
+    {
+      "file": "原始状态帧/core_3.png",
+      "group": "core",
+      "state": 3,
+      "label": "HALF 上限 · 4/8",
+      "note": "充能受半功率上限约束",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "bb149e3a9bf7ddc34f6edb4a9729efdf8f2a66749cc06bddaae21c5966b5129c"
+    },
+    {
+      "file": "原始状态帧/core_4.png",
+      "group": "core",
+      "state": 4,
+      "label": "ONLINE · 5/8",
+      "note": "STABILIZE 当前阶",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "789ef2c80b109c6c2fedc6ea7f26028bb55186cb494633e6d4a8c99ec1887b90"
+    },
+    {
+      "file": "原始状态帧/core_5.png",
+      "group": "core",
+      "state": 5,
+      "label": "ONLINE · 7/8",
+      "note": "未完成最多七段",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "01d7d008b403e0e52e8fa391330749ba80e3a61669e03adba2df123a08fd69f0"
+    },
+    {
+      "file": "原始状态帧/core_6.png",
+      "group": "core",
+      "state": 6,
+      "label": "成功 · 8/8",
+      "note": "第八段只在成功时亮起",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "d01997c2d7229bd231a7ebf44d02fe7c593f6c0fa6344daf7276d179d8f44955"
+    },
+    {
+      "file": "原始状态帧/core_7.png",
+      "group": "core",
+      "state": 7,
+      "label": "成功 · 高光采样",
+      "note": "同为八段，充能高光帧",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "01bfdb0d8dc2185cfac037ce1c96c5e33400dcfda95ae297f146e45ac0d95fc9"
+    },
+    {
+      "file": "原始状态帧/reserve_0.png",
+      "group": "reserve",
+      "state": 0,
+      "label": "满储备 · 100%",
+      "note": "reserve_fill=174",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "72a43227259eadd7b87d78fbaf408fe967a19e185143540b5980355ca9d44a6a"
+    },
+    {
+      "file": "原始状态帧/reserve_1.png",
+      "group": "reserve",
+      "state": 1,
+      "label": "正常 · 59%",
+      "note": "reserve_fill=104",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "c81640ebb850b89a07e2736891ece414963c56a70216f49be77bc143a3ef3976"
+    },
+    {
+      "file": "原始状态帧/reserve_2.png",
+      "group": "reserve",
+      "state": 2,
+      "label": "预警 · 琥珀",
+      "note": "reserve_alarm=1",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "9e3c3c64f8d4c4da36c260022257c17e3032f8fdffd50fa5cbc30bd5dfe0055a"
+    },
+    {
+      "file": "原始状态帧/reserve_3.png",
+      "group": "reserve",
+      "state": 3,
+      "label": "危急 · 红色",
+      "note": "reserve_alarm=2",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "ab5f0c0b030f80b4396b21840f967aef3eb03c7b30d6525209a609de74335516"
+    },
+    {
+      "file": "原始状态帧/reserve_4.png",
+      "group": "reserve",
+      "state": 4,
+      "label": "耗尽 · 0%",
+      "note": "空柱与危急反馈",
+      "frame_geometry": [
+        156,
+        456,
+        1124,
+        208
+      ],
+      "sha256": "dbaf5937b10da9759a4e4abb140da701920da7e73abfc86d69942ae689cfb480"
+    },
+    {
+      "file": "原始状态帧/hint_0.png",
+      "group": "hint",
+      "state": 0,
+      "label": "闯关 · 可用未开启",
+      "note": "1次可用，容量1",
+      "frame_geometry": [
+        140,
+        164,
+        968,
+        146
+      ],
+      "sha256": "d352e33c40780e0dabebd9bc18a45190a719f2d0b792b3b77e7b262bf95428d7"
+    },
+    {
+      "file": "原始状态帧/hint_1.png",
+      "group": "hint",
+      "state": 1,
+      "label": "闯关 · 已开启",
+      "note": "最后一次已用，仍有效",
+      "frame_geometry": [
+        140,
+        164,
+        968,
+        146
+      ],
+      "sha256": "884cb100c42150a7bec2450029442f070cb56da00de0408092d01ca318774f43"
+    },
+    {
+      "file": "原始状态帧/hint_2.png",
+      "group": "hint",
+      "state": 2,
+      "label": "闯关 · 扩容启用",
+      "note": "1次余量，容量3，短时效",
+      "frame_geometry": [
+        140,
+        164,
+        968,
+        146
+      ],
+      "sha256": "faf0c8ac04f461ed6c14feb9ade41016c61d1606fa41c38e47d99eb8aa429eed"
+    },
+    {
+      "file": "原始状态帧/hint_3.png",
+      "group": "hint",
+      "state": 3,
+      "label": "闯关 · 额度耗尽",
+      "note": "未开启，容量3",
+      "frame_geometry": [
+        140,
+        164,
+        968,
+        146
+      ],
+      "sha256": "2acf35a2eedd6c5c25143586f742abfc06ed43bde19bc8efc7011102d556f8ac"
+    },
+    {
+      "file": "原始状态帧/hint_4.png",
+      "group": "hint",
+      "state": 4,
+      "label": "闯关 · 容量4",
+      "note": "四格可用，未开启",
+      "frame_geometry": [
+        140,
+        164,
+        968,
+        146
+      ],
+      "sha256": "38110e4af3780d81a40dd4f40858cf5736d74035626bc921be57827d2b46f650"
+    },
+    {
+      "file": "原始状态帧/hint_5.png",
+      "group": "hint",
+      "state": 5,
+      "label": "无尽 · 关闭",
+      "note": "无限符号，图形降暗",
+      "frame_geometry": [
+        140,
+        164,
+        968,
+        146
+      ],
+      "sha256": "68164504cfc71d06fb6697a315c6d0f41285aed92c542ade152820585b02b72a"
+    },
+    {
+      "file": "原始状态帧/hint_6.png",
+      "group": "hint",
+      "state": 6,
+      "label": "无尽 · 开启",
+      "note": "无限符号，投影高亮",
+      "frame_geometry": [
+        140,
+        164,
+        968,
+        146
+      ],
+      "sha256": "4952ee9cacaeafdc7804639b6c9771111f6dcbe1dcc46b2b6375f66887f681cb"
+    },
+    {
+      "file": "原始状态帧/hold_0.png",
+      "group": "hold",
+      "state": 0,
+      "label": "空槽 · 可存入",
+      "note": "三个条件均满足",
+      "frame_geometry": [
+        148,
+        184,
+        150,
+        326
+      ],
+      "sha256": "6a9407867c537ec1ab86de4fde4b1423b9950ef80ff3c7b0ca9c8ceb2873ab65"
+    },
+    {
+      "file": "原始状态帧/hold_1.png",
+      "group": "hold",
+      "state": 1,
+      "label": "空槽 · 暂不可存入",
+      "note": "仅第一条件满足",
+      "frame_geometry": [
+        148,
+        184,
+        150,
+        326
+      ],
+      "sha256": "2ad159d7cea421d7e9fbfd4ea33e173a4f6738e41f574b177aeb8a56f904d9fc"
+    },
+    {
+      "file": "原始状态帧/hold_2.png",
+      "group": "hold",
+      "state": 2,
+      "label": "有块 · 未预约",
+      "note": "存入条件不影响取出预约",
+      "frame_geometry": [
+        148,
+        184,
+        150,
+        326
+      ],
+      "sha256": "c3275215349932b02eaaf5c68c5f0211c76baed4476d7eb7103992b489dd7410"
+    },
+    {
+      "file": "原始状态帧/hold_3.png",
+      "group": "hold",
+      "state": 3,
+      "label": "P1 预约",
+      "note": "青色边框与箭头",
+      "frame_geometry": [
+        148,
+        184,
+        150,
+        326
+      ],
+      "sha256": "faff98444fb33bbe65f646895eb9609f72b117cb94a0c80a5c34aa76cf28331b"
+    },
+    {
+      "file": "原始状态帧/hold_4.png",
+      "group": "hold",
+      "state": 4,
+      "label": "P2 预约",
+      "note": "品红边框与箭头",
+      "frame_geometry": [
+        148,
+        184,
+        150,
+        326
+      ],
+      "sha256": "42dcbbe5c8f00401320f5bc7bd1fb2cf3b3ed2f062f091219b1c71706dd34ade"
+    },
+    {
+      "file": "原始状态帧/hold_5.png",
+      "group": "hold",
+      "state": 5,
+      "label": "到期闪烁事件",
+      "note": "白色反馈边框",
+      "frame_geometry": [
+        148,
+        184,
+        150,
+        326
+      ],
+      "sha256": "b0ca276d41553426d06c69dea424ca29b1cf55a7eae8ec4ef5597bc891d03936"
+    },
+    {
+      "file": "原始状态帧/hold_6.png",
+      "group": "hold",
+      "state": 6,
+      "label": "拒绝反馈",
+      "note": "红色边框，保留槽状态",
+      "frame_geometry": [
+        148,
+        184,
+        150,
+        326
+      ],
+      "sha256": "643c3b00725a3ffb0cb3439549a38a2ca8f809f366338ec27e113bd222b74074"
+    },
+    {
+      "file": "原始状态帧/hold_7.png",
+      "group": "hold",
+      "state": 7,
+      "label": "已到期清空",
+      "note": "空槽与白色清空反馈",
+      "frame_geometry": [
+        148,
+        184,
+        150,
+        326
+      ],
+      "sha256": "94f7cb5329c7156e32ae74826581abe0e44d46e030bdcf5320d29a48ce9ca7b5"
+    },
+    {
+      "file": "原始状态帧/speed_0.png",
+      "group": "speed",
+      "state": 0,
+      "label": "1/8 速度档",
+      "note": "有效时间 00:00",
+      "frame_geometry": [
+        584,
+        36,
+        468,
+        48
+      ],
+      "sha256": "15e93a22466e43413ee393f64538c30890dd88336af2ec1ee113b385f07ef461"
+    },
+    {
+      "file": "原始状态帧/speed_1.png",
+      "group": "speed",
+      "state": 1,
+      "label": "2/8 速度档",
+      "note": "有效时间 00:45",
+      "frame_geometry": [
+        584,
+        36,
+        468,
+        48
+      ],
+      "sha256": "6b9d48837ae55da8d22593820219818f737a36f7785b2a3a893882012b835a52"
+    },
+    {
+      "file": "原始状态帧/speed_2.png",
+      "group": "speed",
+      "state": 2,
+      "label": "3/8 速度档",
+      "note": "有效时间 01:30",
+      "frame_geometry": [
+        584,
+        36,
+        468,
+        48
+      ],
+      "sha256": "3134eb2d6b84c59b24752fca28d599586f5738b9ea72c7880dcf3ee3e23854ab"
+    },
+    {
+      "file": "原始状态帧/speed_3.png",
+      "group": "speed",
+      "state": 3,
+      "label": "4/8 速度档",
+      "note": "有效时间 02:15",
+      "frame_geometry": [
+        584,
+        36,
+        468,
+        48
+      ],
+      "sha256": "a3448c8e1a76d8671e5cbcbced7013af5cb0927c5f7c38072d8ba1ce87ba9f54"
+    },
+    {
+      "file": "原始状态帧/speed_4.png",
+      "group": "speed",
+      "state": 4,
+      "label": "5/8 速度档",
+      "note": "有效时间 03:00",
+      "frame_geometry": [
+        584,
+        36,
+        468,
+        48
+      ],
+      "sha256": "40c71da68e06388240c5981157573b64b7131b47b6620911993597df332ae20c"
+    },
+    {
+      "file": "原始状态帧/speed_5.png",
+      "group": "speed",
+      "state": 5,
+      "label": "6/8 速度档",
+      "note": "有效时间 03:45",
+      "frame_geometry": [
+        584,
+        36,
+        468,
+        48
+      ],
+      "sha256": "439410a6abe14494d7d7b1f877455e3861f44c522c22edf05d26f1755cd2f86f"
+    },
+    {
+      "file": "原始状态帧/speed_6.png",
+      "group": "speed",
+      "state": 6,
+      "label": "7/8 速度档",
+      "note": "有效时间 04:30",
+      "frame_geometry": [
+        584,
+        36,
+        468,
+        48
+      ],
+      "sha256": "adf1a01c352c110c221f7c0427744fc5f3ae0cbed9bb95de6e2a8e251996c868"
+    },
+    {
+      "file": "原始状态帧/speed_7.png",
+      "group": "speed",
+      "state": 7,
+      "label": "8/8 速度档",
+      "note": "有效时间 05:15",
+      "frame_geometry": [
+        584,
+        36,
+        468,
+        48
+      ],
+      "sha256": "9c0eb4cb7ddcefe8ce1b09e2a8939de1b46578bd631f34d77d4cd1c356ac8f66"
+    },
+    {
+      "file": "原始状态帧/task_0.png",
+      "group": "task",
+      "state": 0,
+      "label": "任务初始",
+      "note": "记功0/35，残骸48",
+      "frame_geometry": [
+        590,
+        78,
+        464,
+        46
+      ],
+      "sha256": "865f4787aab6e8a04a3af2647dad4f275c207f91ffd2a1bda4e13ea96f59d7c3"
+    },
+    {
+      "file": "原始状态帧/task_1.png",
+      "group": "task",
+      "state": 1,
+      "label": "任务进行中",
+      "note": "记功15/35，残骸18",
+      "frame_geometry": [
+        590,
+        78,
+        464,
+        46
+      ],
+      "sha256": "7eea2fef325531979b1a6d5f6cc189bd0f555dd8dcecd1f15c455af1b65620ea"
+    },
+    {
+      "file": "原始状态帧/task_2.png",
+      "group": "task",
+      "state": 2,
+      "label": "记功达标，仍需清骸",
+      "note": "只划去CHARGE任务行",
+      "frame_geometry": [
+        590,
+        78,
+        464,
+        46
+      ],
+      "sha256": "ba18843a61d702326c1238bbf6285a6ff2362cf8dc25f311c58628a9d1c6902d"
+    },
+    {
+      "file": "原始状态帧/task_3.png",
+      "group": "task",
+      "state": 3,
+      "label": "清骸完成，记功未满",
+      "note": "只划去DEBRIS任务行",
+      "frame_geometry": [
+        590,
+        78,
+        464,
+        46
+      ],
+      "sha256": "a2bce866b66b8c49278b74c0ea022384cd810b3d9d09e35a00ea302aa22cdf16"
+    },
+    {
+      "file": "原始状态帧/task_4.png",
+      "group": "task",
+      "state": 4,
+      "label": "两项均完成",
+      "note": "CHARGE与DEBRIS均完成",
+      "frame_geometry": [
+        590,
+        78,
+        464,
+        46
+      ],
+      "sha256": "4c4d8a3f96ffb347c9d8cfea629fce4cd047f241a1b6967f46e74dde3250a2be"
+    }
+  ],
+  "sheets": [
+    {
+      "title": "核心柱_八状态",
+      "file": "20261027_核心柱_八状态_RTL.png",
+      "kind": "labelled_montage_of_native_rtl_crops"
+    },
+    {
+      "title": "储备柱_五状态",
+      "file": "20261027_储备柱_五状态_RTL.png",
+      "kind": "labelled_montage_of_native_rtl_crops"
+    },
+    {
+      "title": "智能落点_七状态",
+      "file": "20261027_智能落点_七状态_RTL.png",
+      "kind": "labelled_montage_of_native_rtl_crops"
+    },
+    {
+      "title": "HOLD_八状态",
+      "file": "20261027_HOLD_八状态_RTL.png",
+      "kind": "labelled_montage_of_native_rtl_crops"
+    },
+    {
+      "title": "无尽速度_八档",
+      "file": "20261027_无尽速度_八档_RTL.png",
+      "kind": "labelled_montage_of_native_rtl_crops"
+    },
+    {
+      "title": "船况任务_五状态",
+      "file": "20261027_船况任务_五状态_RTL.png",
+      "kind": "labelled_montage_of_native_rtl_crops"
+    }
+  ],
+  "state_scope": "read-only UI input snapshots; component crop scans use actual screen coordinates; not gameplay state-transition tests; success core is isolated before result overlay"
+}

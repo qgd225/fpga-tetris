@@ -1,0 +1,330 @@
+{
+  "date": "2026-10-28",
+  "scope": "A1 asset/transport audit and standalone lossless texture prototype; not an integrated UI build",
+  "source_sha256": {
+    "assets/reference_ui/duo_campaign_material.png": "4d7d1a4ae85acde472dbbf5e25465ff7681afd5590d0815afa5466296fa51f55",
+    "assets/reference_ui/solo_campaign_material.png": "0706b99dffd317b98f1d37df849e1e336afe42b020753f50422f503b541d2374",
+    "assets/reference_ui/solo_endless_material.png": "a15cf74ae00afbf19d0b4e5dbf387ce5f3d7d10817486902894baf26777458d6",
+    "assets/reference_ui/duo_endless_material.png": "4ed0031b54e6a8a5434e509ee798e93338dc88554426d73fb65f141051fae87c",
+    "assets/reference_ui/terminal_material.png": "cab602edc93b2676cd3a111bab7e317bcd565c86ee85a070cfe28366ea7e4815"
+  },
+  "scene_statistics": [
+    {
+      "name": "duo_campaign",
+      "colors": 49949,
+      "row_runs": 310747,
+      "deflate_rgb_bytes": 595564,
+      "note": "software DEFLATE is a comparison, not a hardware memory/throughput claim"
+    },
+    {
+      "name": "solo_campaign",
+      "colors": 49618,
+      "row_runs": 309932,
+      "deflate_rgb_bytes": 594638,
+      "note": "software DEFLATE is a comparison, not a hardware memory/throughput claim"
+    },
+    {
+      "name": "solo_endless",
+      "colors": 47323,
+      "row_runs": 296643,
+      "deflate_rgb_bytes": 572744,
+      "note": "software DEFLATE is a comparison, not a hardware memory/throughput claim"
+    },
+    {
+      "name": "duo_endless",
+      "colors": 47672,
+      "row_runs": 297503,
+      "deflate_rgb_bytes": 573986,
+      "note": "software DEFLATE is a comparison, not a hardware memory/throughput claim"
+    },
+    {
+      "name": "terminal",
+      "colors": 40068,
+      "row_runs": 217741,
+      "deflate_rgb_bytes": 426589,
+      "note": "software DEFLATE is a comparison, not a hardware memory/throughput claim"
+    }
+  ],
+  "lossless_schemes": [
+    {
+      "tile_size": 4,
+      "unique_tiles": 25016,
+      "map_entries": 288000,
+      "packed_map_bits": 4320000,
+      "packed_local_palette_bits": 8064056,
+      "packed_total_bits": 12384056,
+      "capacity_only_bram36_lower_bound": 336,
+      "local_index_bits_histogram": {
+        "0": 34,
+        "1": 459,
+        "2": 1057,
+        "3": 5553,
+        "4": 17913
+      },
+      "note": "algorithm cost only; BRAM port/width packing and decoder are not included"
+    },
+    {
+      "tile_size": 8,
+      "unique_tiles": 7235,
+      "map_entries": 72000,
+      "packed_map_bits": 936000,
+      "packed_local_palette_bits": 8146504,
+      "packed_total_bits": 9082504,
+      "capacity_only_bram36_lower_bound": 247,
+      "local_index_bits_histogram": {
+        "0": 22,
+        "1": 177,
+        "2": 321,
+        "3": 280,
+        "4": 580,
+        "5": 2247,
+        "6": 3608
+      },
+      "note": "algorithm cost only; BRAM port/width packing and decoder are not included"
+    },
+    {
+      "tile_size": 16,
+      "unique_tiles": 2375,
+      "map_entries": 18000,
+      "packed_map_bits": 216000,
+      "packed_local_palette_bits": 8926224,
+      "packed_total_bits": 9142224,
+      "capacity_only_bram36_lower_bound": 248,
+      "local_index_bits_histogram": {
+        "0": 17,
+        "1": 68,
+        "2": 153,
+        "3": 152,
+        "4": 70,
+        "5": 112,
+        "6": 347,
+        "7": 811,
+        "8": 645
+      },
+      "note": "algorithm cost only; BRAM port/width packing and decoder are not included"
+    },
+    {
+      "tile_size": 32,
+      "unique_tiles": 891,
+      "map_entries": 4600,
+      "packed_map_bits": 46000,
+      "packed_local_palette_bits": 11256816,
+      "packed_total_bits": 11302816,
+      "capacity_only_bram36_lower_bound": 307,
+      "local_index_bits_histogram": {
+        "0": 8,
+        "1": 23,
+        "2": 41,
+        "3": 101,
+        "4": 41,
+        "5": 14,
+        "6": 23,
+        "7": 106,
+        "8": 210,
+        "9": 223,
+        "10": 101
+      },
+      "note": "algorithm cost only; BRAM port/width packing and decoder are not included"
+    }
+  ],
+  "protected_probe": {
+    "rectangles": [
+      [
+        156,
+        32,
+        1064,
+        128
+      ],
+      [
+        143,
+        148,
+        298,
+        320
+      ],
+      [
+        154,
+        332,
+        294,
+        506
+      ],
+      [
+        959,
+        148,
+        1114,
+        354
+      ],
+      [
+        1124,
+        214,
+        1214,
+        570
+      ],
+      [
+        1049,
+        48,
+        1155,
+        339
+      ],
+      [
+        972,
+        364,
+        1108,
+        612
+      ],
+      [
+        1114,
+        618,
+        1210,
+        660
+      ],
+      [
+        466,
+        640,
+        880,
+        689
+      ],
+      [
+        328,
+        132,
+        352,
+        632
+      ],
+      [
+        928,
+        132,
+        952,
+        632
+      ],
+      [
+        328,
+        132,
+        952,
+        144
+      ],
+      [
+        328,
+        624,
+        952,
+        632
+      ]
+    ],
+    "note": "capacity probe only, not an approved cut UI or proof of optimal compression",
+    "cost": {
+      "tile_size": 8,
+      "unique_tiles": 2461,
+      "map_entries": 72000,
+      "packed_map_bits": 864000,
+      "packed_local_palette_bits": 2222072,
+      "packed_total_bits": 3086072,
+      "capacity_only_bram36_lower_bound": 84,
+      "local_index_bits_histogram": {
+        "0": 19,
+        "1": 136,
+        "2": 248,
+        "3": 259,
+        "4": 290,
+        "5": 632,
+        "6": 877
+      },
+      "note": "algorithm cost only; BRAM port/width packing and decoder are not included"
+    }
+  },
+  "prototypes": [
+    {
+      "name": "next",
+      "size": [
+        155,
+        172
+      ],
+      "origin": [
+        143,
+        148
+      ],
+      "unique_tiles": 207,
+      "unique_colors": 3106,
+      "tile_words": 256,
+      "palette_words": 4096,
+      "tile_bits": 8,
+      "color_bits": 12,
+      "map_words": 440,
+      "allocated_rom_bits": 298432,
+      "software_roundtrip_mismatches": 0,
+      "expected_rgb_sha256": "75717ac76e3a30c1c08ff88ca05ccfc104f03a02c344ff5fde78cd7056c48313",
+      "files_sha256": {
+        "expected.mem": "f560a8a7260dadcf86fbad144c400572a172c01af9347366cbef747c9454e9c9",
+        "map.mem": "3c94c2bd3662d42fba1f37a21fed3049e2e4799a26667bb7f58358ab203752fd",
+        "palette.mem": "7d6d074698748b35c481e0b1147dd39d3fb396a3a5d4c5ab12ee0f62e05d5d27",
+        "pixels.mem": "d8f99951ee320f40fee982f4e3d35927834f6e5647b9a5ca74f528dd26f0b7b1"
+      }
+    },
+    {
+      "name": "core",
+      "size": [
+        90,
+        356
+      ],
+      "origin": [
+        1124,
+        214
+      ],
+      "unique_tiles": 133,
+      "unique_colors": 68,
+      "tile_words": 256,
+      "palette_words": 128,
+      "tile_bits": 8,
+      "color_bits": 7,
+      "map_words": 540,
+      "allocated_rom_bits": 122080,
+      "software_roundtrip_mismatches": 0,
+      "expected_rgb_sha256": "703201c0c674e33d0c73bbcac358d59132531d044c524cabc8adbfad0cdbed90",
+      "files_sha256": {
+        "expected.mem": "ac19cc6fbba2697fe21cd56adbd23a1860e2411a39c830c5f536cab3518a3c90",
+        "map.mem": "3e4e60e91e594dbfd93b0cb833fcf1b7823e9a7c89cc25457608b28e84996f89",
+        "palette.mem": "a53f827ee7dcd212f09e00a4d2a38abdad2b029838b836a373a872983dcc1839",
+        "pixels.mem": "49f193501678c4118d2ec4d291e610d994baffde9fa24836997a3396938efda7"
+      }
+    }
+  ],
+  "transport_audit": {
+    "protocol_palette_size": 56,
+    "code_bits": 6,
+    "mapper": "current generated bit projection; collision-free only for original palette",
+    "source_files": {
+      "rgb_to_palette.v": "04d28879d08bb5d1bb1d18f2c61541976f234f0d864dd4d3790dea55da4e5b1e",
+      "net_screen_tx.v": "9d58a1391cd986dd449313a0c7b6862de40fbb9c412ef749ccdfbc08ac7ecd36"
+    },
+    "rgb_comparison": [
+      {
+        "name": "duo_campaign",
+        "pixels": 921600,
+        "rgb_mismatches": 917661,
+        "exact_ratio": 0.004274088541666667
+      },
+      {
+        "name": "solo_campaign",
+        "pixels": 921600,
+        "rgb_mismatches": 917692,
+        "exact_ratio": 0.004240451388888889
+      },
+      {
+        "name": "solo_endless",
+        "pixels": 921600,
+        "rgb_mismatches": 917693,
+        "exact_ratio": 0.0042393663194444445
+      },
+      {
+        "name": "duo_endless",
+        "pixels": 921600,
+        "rgb_mismatches": 917662,
+        "exact_ratio": 0.004273003472222222
+      },
+      {
+        "name": "terminal",
+        "pixels": 921600,
+        "rgb_mismatches": 918402,
+        "exact_ratio": 0.0034700520833333332
+      }
+    ],
+    "protocol_changed": false
+  }
+}

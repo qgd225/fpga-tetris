@@ -1,0 +1,428 @@
+{
+  "date": "2026-10-28",
+  "phase": "A3重点模块接入，待用户审核",
+  "frame_count": 21,
+  "compared_pixels": 5776228,
+  "mismatches": 0,
+  "atlas_pixels": 372032,
+  "atlas_nonsequential": 4096,
+  "latency_clocks": {
+    "reference_ui_renderer": 4,
+    "story_ui": 5
+  },
+  "resources_OOC_only": {
+    "ui_material_atlas": {
+      "LUT": 55,
+      "FF": 29,
+      "BRAM36": 31.5,
+      "DSP": 0,
+      "estimated_WNS_ns": 6.429,
+      "estimated_TNS_ns": 0.0,
+      "estimated_WHS_ns": -0.205,
+      "estimated_THS_ns": -14.558
+    },
+    "ui_mission_layer": {
+      "LUT": 936,
+      "FF": 62,
+      "BRAM36": 31.5,
+      "DSP": 0,
+      "estimated_WNS_ns": 0.389,
+      "estimated_TNS_ns": 0.0,
+      "estimated_WHS_ns": -0.01,
+      "estimated_THS_ns": -0.039
+    },
+    "ui_basic_layer": {
+      "LUT": 686,
+      "FF": 58,
+      "BRAM36": 0.0,
+      "DSP": 0,
+      "estimated_WNS_ns": 4.473,
+      "estimated_TNS_ns": 0.0,
+      "estimated_WHS_ns": -0.01,
+      "estimated_THS_ns": -0.039
+    }
+  },
+  "source_sha256": {
+    "Tetris.xpr": "12ed7e91fefd39e0e158cd0d3e0e088474d6636cc8ab1c4c643fb79ace3764f7",
+    "Tetris.sim/story_visual/ui_a3_integration_tb.v": "323146835245bf24acfc5524426ca124f8d27bc3f022d4e6ce65fc1732e2c0ca",
+    "Tetris.sim/story_visual/ui_material_atlas_tb.v": "697ad8072de9a1c735759536e0d1557c2b8f95e1af0d6dd2537de5b9452ad44b",
+    "Tetris.sim/story_visual/ui_scenes_tb.v": "8aabe47f58fb8d3f70fe512707404d23142c8415b1b02548ebb93abf9d4bdc49",
+    "Tetris.srcs/sources_1/new/reference_ui_renderer.v": "803e19702489150b1f516dc9982cf360c54c009db5dad1388c41efde1edf3417",
+    "Tetris.srcs/sources_1/new/story_ui.v": "d1846081d099bea6039b699e73ca6ef61b5bdc5b02da9724f9e5762afa55af50",
+    "Tetris.srcs/sources_1/new/ui_basic_layer.v": "9469d3994869d9da0dd785cc43c9caa31719625b377723006c06dc80920e8707",
+    "Tetris.srcs/sources_1/new/ui_mission_layer.v": "4047f4840f5dbb3ac060dc4f7eb3d5f8ae4150cb2f05534cba9a1dd265c2dc51",
+    "Tetris.srcs/sources_1/new/ui_material_atlas.v": "8135e9e5556751a88d005b757dafb39430c966adcf75ec42fd5e973723a2d208",
+    "Tetris.srcs/sources_1/new/ui_text_raster.v": "d61de53c61cf93acc869e3e849258cd0d52fff9de3469d5e56b814e0f0645455",
+    "Tetris.srcs/sources_1/new/ui_font_5x7.v": "1b7d8e67e4422320a598fec3ef7fc7455593c4862ea2de2c25770950a2af842b",
+    "Tetris.srcs/sources_1/new/hud_font_rom.v": "741b49e7e567632c7df623597a0713987e2c8b530050339dd7b28e1df7f56ea4",
+    "Tetris.srcs/sources_1/new/hud_text.v": "6f53cb4fd7617531930cf6c66b5ccb924c3714f8341ca0c716ccf0e8cc31a007",
+    "Tetris.srcs/sources_1/new/scene_sprite_rom.v": "f38f4508e5f04eb9a716129577f8e22cb29dbc3bdb53b320a9237dc6ea20fae4",
+    "Tetris.srcs/sources_1/new/story_scene.v": "26e20c7b1a02972fce453c99ee0c18c3760a8fd5992c882e68a7ec40e40f90cd",
+    "Tetris.srcs/sources_1/new/core_renderer.v": "c93c4b5c7cd37d85d413a25968f58440e020e412f8f836e829d4fab30dd6ac49",
+    "Tetris.srcs/sources_1/new/game_mode_params.vh": "34099850416d8a30c7c6087da1591d1541c5557e2a82dcf4450d278014821cde",
+    "Tetris.srcs/sources_1/new/reference_ui_geometry.vh": "0dfa06ca03af4cba1203426e52c4d93c90d6e86520e42b780e1af5f6c19b0cda",
+    "Tetris.srcs/sources_1/new/story_palette.vh": "57804c0cb903b288a9da7c0ad4d7e1f8b2586eb91596bed1c1a309245b685acc",
+    "Tetris.srcs/sources_1/new/reference_ui_skin.mem": "60fabe0bece39f642fe07a4a91843259536d6f332f395c7291c19c048115646a",
+    "Tetris.srcs/sources_1/new/reference_ui_material.mem": "c7593af2bf4036d04f2e46a88a31fae8f4a4abbd4226fc4017b3f443af7db13c",
+    "Tetris.srcs/sources_1/new/ui_font_5x7.mem": "68aee7fc64eb82e09b5392d7ecf660a0b9d9d09b313dd6c8e2647629eeaaf9fd",
+    "Tetris.srcs/sources_1/new/ui_panel_geometry.vh": "70e8b6962422d66ec469626a5c0c2ded829a25790e38876e81963c5ec3379e5e",
+    "Tetris.srcs/sources_1/new/ui_panel_map.mem": "09e779a5d66fc275209f6ebddf5e829767173b00ecf1a35a8e782d5505c2089e",
+    "Tetris.srcs/sources_1/new/ui_panel_pixels.mem": "14ab755e24d78669129e3d956531a108ae3eab3dabaaa320a538a6719117c86d",
+    "Tetris.srcs/sources_1/new/ui_panel_palette.mem": "57d8ed4a12fdcd8a92afc011a291b14568d4973a5cd0ed519ce3be1aa3b9ec59",
+    "Tetris.srcs/sources_1/new/story_font.mem": "ec90f815bbe06601adf3dbac39f98f1590aee668f796877e9b4d42644a6b2cd9",
+    "Tetris.srcs/sources_1/new/story_sprites.mem": "aad6020785d71531d9c6bc41ac800df7af70d8c2a35f24bbb8bb9938ef02a1b4",
+    "Tetris.srcs/sources_1/new/ui_material_map.mem": "3914190399c463e207ef8d29616a6b1a3f73acbd0c50386f54421418832b93e2",
+    "Tetris.srcs/sources_1/new/ui_material_map_hi.mem": "7ecc3c280051fe8c4d2844c763703bda3c93742fd961f6e4c3beff7c6814f373",
+    "Tetris.srcs/sources_1/new/ui_material_map_lo.mem": "71bc914e9d2bcc3b69c7923e654f2ce8ec0294e2ebb9e84e2501a3abb7c6238d",
+    "Tetris.srcs/sources_1/new/ui_material_p1.mem": "6a27e1e1396910627a219356486970539f59681ed53c44d8201d38e5c75b8a25",
+    "Tetris.srcs/sources_1/new/ui_material_p1_hi.mem": "24abebef927f111890ba0a484f28a06779dcf718f59b3176bc2f651283660785",
+    "Tetris.srcs/sources_1/new/ui_material_p1_lo.mem": "c73fb009708e4ef78895a1c9f8c2fbe798e417d08107e5b7bebdad08d832192b",
+    "Tetris.srcs/sources_1/new/ui_material_p2.mem": "71a3ec93f100c0e3fd92d65433f5d69370878fef108b84bc5c78d2099c087ffa",
+    "Tetris.srcs/sources_1/new/ui_material_p2_hi.mem": "c199829e4a889cea0696c1dfb120ee6d8032330ecbbb702447f17f8222bc0895",
+    "Tetris.srcs/sources_1/new/ui_material_p2_lo.mem": "35595c84a156d3c31bef99165b8152b45181095f78896a2240126f64ce4bcd44",
+    "Tetris.srcs/sources_1/new/ui_material_p4.mem": "51d9fe3e3e047c518d5ec3f3cef6cfeb4fe396aff85ab4d42f91ef4182ac231c",
+    "Tetris.srcs/sources_1/new/ui_material_p4_hi.mem": "5ba6ca7157c1d18c422220d8a70b3dfe6206f50f6f9489e0a026a5dcc4332990",
+    "Tetris.srcs/sources_1/new/ui_material_p4_lo.mem": "4c1393f2035d4d3177d0ad867608f48de1f44ab98dbee5ae4cbbb0509d94fcb8",
+    "Tetris.srcs/sources_1/new/ui_material_p8.mem": "84b8e0e757576f7a3446056c4f9a550b6da1e2a7b09b3d1a5f6c1efa970b9ee6",
+    "Tetris.srcs/sources_1/new/ui_material_p8_hi.mem": "943d790c5e24d3c017d6c89d2309de882a060ce5e1345cd47332a03e3bc4bd58",
+    "Tetris.srcs/sources_1/new/ui_material_p8_lo.mem": "002ddac5c06d3d5b0aa36367e1b13f79bd82758a5bcb5515c97cbe8b88651a1e",
+    "Tetris.srcs/sources_1/new/ui_material_palette.mem": "716d5c97ebe05cf12190fa18e5619b09f5bc26e67e7a3876622018ebb9ff266c",
+    "Tetris.srcs/sources_1/new/ui_material_palette_hi.mem": "9603087d5fa65a51f288324cefc2f2f1d2b1ced1aa2c7402b29e9e3ac2978841",
+    "Tetris.srcs/sources_1/new/ui_material_palette_lo.mem": "cff721fd983490cdcb4f1378dde7b4ad112e8b31f36666b86345437ee9cb8fdb",
+    "Tetris.srcs/sources_1/new/ui_material_geometry.vh": "21c8ef8029240ecc771bb2178f3ad4e80b7109899d89cd958d4ceb005e728909",
+    "Tetris.srcs/sources_1/new/ui_charge_x.mem": "4a2271a714723e45cfba00d4ae87ef5ecca90467105ec0af8e78c6cb32baaf3c",
+    "Tetris.srcs/sources_1/new/ui_charge_y.mem": "1882c3392242dac64c3df2b09a999482adb288ae6c1a3509618460b0a93d4d4e",
+    "Tetris.srcs/sources_1/new/ui_debris_x.mem": "5f0da82c8db28817c6fc6b1e26a7c1170a9679065b22087216e2ac90f55aa3e4",
+    "Tetris.srcs/sources_1/new/ui_debris_y.mem": "04d9e6744be221b1db86117f1c19860c293b08087d8cd9ae51366d834a743a84",
+    "Tetris.srcs/sources_1/new/ui_track_limit.mem": "585c7287c391ebf64c2bacba2dd4162e95938feb8645b84ed608a971de0eb5ad",
+    "Tetris.srcs/sources_1/new/ui_core_gradient.mem": "db1a5594b3f43d3d10cdeb4ba276955c5b3a2204d143934ea90eaa4fb1af46be",
+    "Tetris.srcs/sources_1/new/ui_legend_circle.mem": "22a15f64c34466164d2c37601ea23a9787cc62d8a97bc380cb5239378b3b0596",
+    "tools/build_ui_material_atlas.py": "907fc4bc7181232166b13c29b82997290be9f18c6ecf72a2aad2812ee6b5cf62",
+    "tools/run_new_ui_a3.py": "0f923d6dc0a553952cd6716324129366d38de94c37920d2b413406852d52ce3d",
+    "tools/measure_new_ui_a3.tcl": "3a1fff50c14b4addde85c2423335c8c8064eb6394ce72838e35de0e396b60ee1",
+    "tools/export_new_ui_a3.py": "13b065929ca8cc23aab68781455adee17186f058310faa419e6deea9bfbf5f5a",
+    "tools/run_new_ui_a1.py": "0ab79fc4fdba5eca1c240318110a7e1d6ba4af6df0467076c858c65ec2d633c6",
+    "tools/run_new_ui_a2.py": "ec0dbf8484ebef506b110f8ecb1ae8850af3425cf93df7b076fbd24f203921d0",
+    "assets/new_ui/verification/a2/manifest.json": "5dba39c511e0462ddaf77fcefe8c97ba1f7b6ba7bd7cce2434be040be37c5461",
+    "assets/new_ui/verification/a2/reference_ui_renderer_a2.v.snapshot": "611ae123dfc50818e3069ed3f5300d1d3871c01b3eb821706d3d7a3a4eb08742",
+    "assets/new_ui/verification/a2/ui_basic_layer_a2.v.snapshot": "c38dc3c8bd045d965977bae62117f1a955ed21f3f2f56abcd07fe04aaaf0fb44",
+    "assets/new_ui/verification/a2/ui_panel_atlas_a2.v.snapshot": "942fed62ceb5beff12f6802e519d013b7a9c883dabd7fccc152e9bd8c46f3fe7",
+    "assets/new_ui/duo_campaign_material.png": "2ac93c224d628ffb4cf73335a3bf9733cdb01b15d4cb22c7004db68e6a24522a",
+    "assets/new_ui/solo_campaign_material.png": "ea16af9c949df9a661053117c43ca812d6f0226b74ec15478b78d38a2a454043",
+    "assets/new_ui/solo_endless_material.png": "5070aec2c296a069632b2b2756ef1cdb7f2fb97a5edc68c26a11a2a1635b77af",
+    "assets/new_ui/duo_endless_material.png": "a0557c4b1043b33e1d6cb7f8ab11fd85e7bc9858d7dc054def695d4ec1533397",
+    "assets/new_ui/terminal_material.png": "07cb78919af51b59b37ff5d3de39c293f60c926e50f4a1efcc5999ada05843fa",
+    "assets/reference_ui/pipe_removal_mask.png": "eac6984323187d0464dd8200b9b1f60c0c32bb09b895f59dec2d6b51bff3ee73",
+    "assets/new_ui/materials/manifest.json": "15ffe98df20a913fc99e587afae0652e83735e5580ae2636a4f471857627295d"
+  },
+  "outputs": [
+    {
+      "file": "局部状态/20261028_船况头与导管接缝_RTL.png",
+      "sha256": "d318c4f61f33c28bf4533194c9fe6081f93175216899b888c37727cba62cd741",
+      "decoded_rgb_sha256": "e2a8dab35b60c8fe34a091f6a57830559db4e7d40f9de46a098a8394f906a3f2",
+      "size": [
+        746,
+        310
+      ],
+      "origin": [
+        468,
+        32
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_核心_HALF_RTL.png",
+      "sha256": "1627c412ab241d587a77fdb6db31983a1d16e21db5bb3e6f2395ca545299d283",
+      "decoded_rgb_sha256": "25e20e6e24781db633adea2622d3485d4acab6d1f94f914f7b70624b8bfdb67f",
+      "size": [
+        100,
+        370
+      ],
+      "origin": [
+        1120,
+        208
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_刻度_REBUILD_RTL.png",
+      "sha256": "deeed39acc2e83455e5346edeae7023095ece94164d044a8ea4cb6070ff070c3",
+      "decoded_rgb_sha256": "c31e3958ec1f02975f9c4b67e5a0ebdfa5234deba67b9558e2e554b99609c312",
+      "size": [
+        136,
+        248
+      ],
+      "origin": [
+        972,
+        364
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_核心_LOCKED六圈锁链_RTL.png",
+      "sha256": "124daac25ea4160565776bd171fe935d61ab58b2d759ba1120c49e9ed0cfd61f",
+      "decoded_rgb_sha256": "64c1226d41891f68b4b0539917112ac307a838730fbf62ebf9cb4831c281a882",
+      "size": [
+        100,
+        370
+      ],
+      "origin": [
+        1120,
+        208
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_刻度_RECONNECT_RTL.png",
+      "sha256": "47e3c47f26e2326a70497cbe6fb9b53c6c9e44b2ce46239ef6ae0d1e4d216fbb",
+      "decoded_rgb_sha256": "90e2b78fc4821fe8000b812738e7805fc8176a6c00c16d29ccc751586ace6cb9",
+      "size": [
+        136,
+        248
+      ],
+      "origin": [
+        972,
+        364
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_核心_五段_RTL.png",
+      "sha256": "e408b9633b658d6b6d8149f20b0e2f6f3566eb569522971c18b7e449a17a4463",
+      "decoded_rgb_sha256": "484907bd40cfab02cc02752ad56ce42059e37f09671329d6497c80ab880d55a7",
+      "size": [
+        100,
+        370
+      ],
+      "origin": [
+        1120,
+        208
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_刻度_STABILIZE_RTL.png",
+      "sha256": "0c549b97680be16fbc822c33eb2f8269a7d464e039b5761eda52f98dd0ef9568",
+      "decoded_rgb_sha256": "d8dab2b08b3ed06358980b40ff3bf0541102682beebadb2ac2126703550d00dc",
+      "size": [
+        136,
+        248
+      ],
+      "origin": [
+        972,
+        364
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_核心_ONLINE七段_RTL.png",
+      "sha256": "71bc64c672b3532e232bec6a1f13bf51a1497a9320f81703d063c9db8a6b365f",
+      "decoded_rgb_sha256": "20c67cfa8dd7a617bd8e69265435ff981f0d28c26abbfa94958e5b81fde15825",
+      "size": [
+        100,
+        370
+      ],
+      "origin": [
+        1120,
+        208
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_刻度_RECHARGE_RTL.png",
+      "sha256": "752d2075752599a61b5c1f1b7e5f9a3857de3ebf9523faceef18f64f69053f58",
+      "decoded_rgb_sha256": "0bf4115e69c1a42fcffe4209fa5b822365dfe132e4e15a9a823366818e471c06",
+      "size": [
+        136,
+        248
+      ],
+      "origin": [
+        972,
+        364
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_核心_成功八段_RTL.png",
+      "sha256": "4b7d695905c1cfd49024e152ba9c03d12f68212ed350b63d37aa7fa4df6ed83e",
+      "decoded_rgb_sha256": "f3594213fbb61323f463fe1f1a03b615b9b4b2295ba27968deb57869665df7ce",
+      "size": [
+        100,
+        370
+      ],
+      "origin": [
+        1120,
+        208
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_任务完成船况头_RTL.png",
+      "sha256": "6fff3b0f1c565efa3106a8f51f74cc80f8200449bbac7dae16cc9872e2a7fa60",
+      "decoded_rgb_sha256": "93abcd76982770c8a4db740dd64b44a57218b8bea3c0ce6a37a3d5c2fdb6b406",
+      "size": [
+        893,
+        96
+      ],
+      "origin": [
+        156,
+        32
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_储备_空_RTL.png",
+      "sha256": "23329e321e6abeb7772b132bac8914a29058462bd571d76ef3a0276526be104d",
+      "decoded_rgb_sha256": "92e558d731428d1335370bfcf14af56a7eeb56158eca8cf012f5797271281b2e",
+      "size": [
+        248,
+        452
+      ],
+      "origin": [
+        972,
+        208
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_储备_满_RTL.png",
+      "sha256": "0c3ff7374f38ccd5d92441f332830d4747324afe402ed8cf213fcffeb296bf22",
+      "decoded_rgb_sha256": "9a139988d700f833948079fc75b90b9c280d8ff7836ca956950abd5f46a70b63",
+      "size": [
+        248,
+        452
+      ],
+      "origin": [
+        972,
+        208
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_储备_低量_RTL.png",
+      "sha256": "69bf2619b5d014790dce70823f9801547da81677f718158867c17d5d1c6d1073",
+      "decoded_rgb_sha256": "0d6b5d0685d242c5d2eaeace5ad8e3245d6dc7e3153c3a24405238587a255d5e",
+      "size": [
+        248,
+        452
+      ],
+      "origin": [
+        972,
+        208
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_储备_危急_RTL.png",
+      "sha256": "18cc15c2ba36cf9bab3ca3d1c9d58ee9c7fd72d9d76710229153604b8396f831",
+      "decoded_rgb_sha256": "0274498be6e3519ae7ea7cd317d0c45bc17f70aa2cd82e42036190fad90eeb79",
+      "size": [
+        248,
+        452
+      ],
+      "origin": [
+        972,
+        208
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "20261028_双人闯关_RTL.png",
+      "sha256": "e4f43c413776581af50760d35a54a5246da30681109426ee3272d9420bb896b1",
+      "decoded_rgb_sha256": "d00f809e84480fa127b67f2c656742900a4ddedcd3b86ede9c79780fe65a96dc",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "20261028_单人闯关_RTL.png",
+      "sha256": "7064e985a48d72e27d87a7cd420b81358a280f64c88d4ab915fff0a9ab39c222",
+      "decoded_rgb_sha256": "eb1ae1833e49521b45fffbc911c930009c70f79d0c36045ba5186c80831ac01d",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "20261028_双人无尽_RTL.png",
+      "sha256": "f9349ddc678e7ab7f9cea4e9761a8128d344cc748663f55e308453032c7645b8",
+      "decoded_rgb_sha256": "7b2e09509f42786493d884f1087a57f633c33e7e2949325b41ab2c7639070bc8",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "20261028_单人无尽_RTL.png",
+      "sha256": "93c0abc7acde761045af665da812629a59a9e8861cceab1c7c889031bba6762b",
+      "decoded_rgb_sha256": "44c89a1e22e716574ba0c825846638eb540afd1a4a1dec980296cdce2ef2d83f",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "20261028_主菜单_RTL.png",
+      "sha256": "fe06153bb47632dcee98ea69873191ed1bad1f84c352121b8a779db7497a1508",
+      "decoded_rgb_sha256": "a06b752cff24f90dad579cc23545a1ef1caea1b5277bd8c12673b270c8cc8d9d",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_对白覆盖_RTL.png",
+      "sha256": "892a885641d12ae220915be0e7895deed411ddeb2fcd7faa4d442290313f63a8",
+      "decoded_rgb_sha256": "821e1d27180399b19bc76c97ced31f655205fa85ec698a345ddd6d4f7946270e",
+      "size": [
+        576,
+        144
+      ],
+      "origin": [
+        352,
+        144
+      ],
+      "mismatches": 0
+    },
+    {
+      "file": "20261028_核心四状态_RTL索引.png",
+      "sha256": "2519e922ef36b3a0ca7b89763424572499cb576675f7b45669af4f3798e6b2cb",
+      "size": [
+        1000,
+        820
+      ],
+      "kind": "integer_enlargement_index"
+    }
+  ],
+  "bit_sha256_unchanged": "851ba01534ee3aa60f0ba8c65514dbb7b1787050675f644cab1cadbaab5b7127",
+  "frozen_PNGs_unchanged": true,
+  "whole_design_validated": false,
+  "decorations_cut": false,
+  "dynamic_effects_cut": false
+}

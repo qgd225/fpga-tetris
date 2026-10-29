@@ -1,0 +1,18 @@
+{
+  "source_inputs": {
+    "build_pc_exe.py": "ae668954c907fa25eed7fb12fdab6e3fb882c8ebc4281810055b2220c5980907",
+    "network_selftest.py": "40ac46c0c704d4cdf92574ffecb029d6eedac3a55fab107ecf9ab47a0b9ed530",
+    "net_screen_view.py": "b6b4834a44ea191bb2201b8c3d36707f8965820ec58d9a8e467dc79c45d5cf51",
+    "pc_protocol.py": "3374b4bca67e0b7d41252716878ee5715d8b26b2344916cb2d8f474a3c513d65",
+    "pc_runtime.py": "da27e05ec29553196b78ecf65e0f73faf4e70f3cfffb30eaf8dcec4aaef2fa37",
+    "Python备用启动_需要Python.bat": "d876a363c1e76998094fadebff7e81ed8c90614af41b758b8515d75c6a533f44",
+    "requirements-build.txt": "edc1c28335bc1a22a65eec0e011025d6924fdfde6db004966ef1a81c2f99b330",
+    "set_static_arp.py": "a4c4127cf0c016f14a0895c3008371a1cd19bc2935ccc1562808570bbba3ee46",
+    "TetrisPC.spec": "380f93c701f5608d17bb240ded427812d0b5edcfa3e4a126e63da17b11284242",
+    "tetris_pc_launcher.py": "d39e8fdc30542248fcce08d7c2da1e5ed1c17f2713a90ec5781e119c8461a41d",
+    "网口自测.bat": "70dd0ee08456c5af6a84199f472bda038193a6da8483d96449924ec64f2282a3"
+  },
+  "exe_sha256": "d0c40f1218daa98d58abb24126402e90d811e7e99f1256870570dbdbfe49fe72",
+  "platform": "win32",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]"
+}

@@ -1,0 +1,9 @@
+[
+  {
+    "stage": "whole_synth",
+    "LUT": 19293,
+    "BRAM": 49.5,
+    "evidence_sha256": "f59133bfd710a1328f2ccfd8e98fc48b975440cb07c128430017f7ddf2a2e0ba",
+    "scope": "阶段综合测量，仅最终布线用于交付验收"
+  }
+]

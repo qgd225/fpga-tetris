@@ -1,0 +1,9 @@
+{
+  "pass": true,
+  "field_rgb_unchanged_pixels": 276480,
+  "asteroid_source": "80ba903041a030972cc02589b35ae722383f9db45b205522ad50f74fb64c9032",
+  "planet_source": "9400ce713189d3b5d44e7534510fb20edcee57f6b21f77e9509908fc05c3b671",
+  "joint_assertions": 28,
+  "layout_checks": 146474,
+  "new_background_animation": false
+}

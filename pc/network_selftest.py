@@ -10,7 +10,7 @@ import sys
 import threading
 import time
 from pathlib import Path
-from pc_protocol import decode_packet, line_packet, palette_packet, LinePacket, PalettePacket
+from pc_protocol import decode_packet, line_packet, palette_packet, LinePacket, PalettePacket, RGBChunkPacket
 from pc_runtime import VERSION
 
 
@@ -47,7 +47,7 @@ def receive(sock, seconds, source_ip=None, expected=None):
         try:
             packet = decode_packet(data)
             protocol_sources.add(peer[0])
-            if isinstance(packet, LinePacket):
+            if isinstance(packet, (LinePacket, RGBChunkPacket)):
                 stats["line_packets"] += 1
             elif isinstance(packet, PalettePacket):
                 stats["palette_packets"] += 1

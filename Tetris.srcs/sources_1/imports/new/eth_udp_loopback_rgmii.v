@@ -3,7 +3,7 @@
 // 导入模块：eth_udp_loopback_rgmii
 // 本工程用途：RGMII 以太网 UDP 收发集成。
 //============================================================
-module eth_udp_loopback_rgmii(
+module eth_udp_loopback_rgmii #(parameter WORD_TX=0)(
   input         reset_n,
   input         clk_74m,  // 74.25MHz 像素时钟（给跨时钟 FIFO 用）
 
@@ -25,6 +25,7 @@ module eth_udp_loopback_rgmii(
   output [15:0] rx_data_length,  // 这一包 payload 有多少字节
 
 //-------- 发送方向：把要发的数据写进来 --------
+  input [31:0] tx_word,input tx_word_write,output reg tx_word_underflow,
   input  [7:0]  tx,  // 要发的 payload 字节
   input         tx_wr_en,  // 1 拍脉冲 = 写入一个字节（请在 !tx_full 时给）
   output        tx_full,  // 1 = 发送 FIFO 满
@@ -147,6 +148,7 @@ eth_msg_buf eth_msg_buf (
 );
 
 //对以太网发出数据缓存（你把要发的东西写进来）
+generate if(!WORD_TX)begin:byte_transmit
 eth_data_buf eth_tx_data_buf (
   .rst   (reset_p          ),  // input wire rst
   .wr_clk(clk_74m          ),  // input wire wr_clk  (打包逻辑写)
@@ -158,6 +160,23 @@ eth_data_buf eth_tx_data_buf (
   .full  (tx_full          ),  // output wire full
   .empty (                 )  // output wire empty
 );
+always @(*)tx_word_underflow=1'b0;
+end else begin:word_transmit
+ wire [31:0] head;wire valid;
+ reg [1:0] byte_index;
+ ui_async_fifo #(.WIDTH(32),.ADDR_BITS(9)) words(
+  .reset_n(reset_n),.wr_clk(clk_74m),.rd_clk(clk125m),
+  .write(tx_word_write),.write_data(tx_word),.full(tx_full),
+  .pop(tx_payload_req && byte_index==3),.head(head),.valid(valid));
+ always @(posedge clk125m or negedge reset_n)begin
+  if(!reset_n)begin byte_index<=0;tx_word_underflow<=0;end
+  else if(tx_payload_req)begin
+   byte_index<=byte_index+1'b1;
+   if(!valid)tx_word_underflow<=1;
+  end
+ end
+ assign tx_payload_dat=head[31-byte_index*8-:8];
+end endgenerate
 
 eth_udp_tx_gmii eth_udp_tx_gmii
 (

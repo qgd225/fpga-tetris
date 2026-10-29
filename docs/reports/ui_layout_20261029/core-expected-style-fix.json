@@ -1,0 +1,19 @@
+{
+  "scope": "Only pipe/groove pixels outside the core silhouette in component crops follow the explicitly updated surface finish. Core pixels remain original.",
+  "changed_pixels": {
+    "core_locked": 52,
+    "core_half": 52,
+    "core_online7": 52,
+    "core_success8": 52
+  },
+  "expected_sha256": {
+    "core_half_expected.mem": "7c894898766bd28cbf5e8d0b542a048b5b09f6f141b787f792601f829c758cce",
+    "core_locked_expected.mem": "5fb3a059636bb62ba8ef5f16677b267a0fb455482c846e390d7903b518b9847f",
+    "core_online7_expected.mem": "69b47af07fd9138b8090fe3e03b86483041f19b4582d3034cbf824988e71fec4",
+    "core_success8_expected.mem": "85e133d1e968b0395fd89dd79891ccc98af8db9103a222e046b387071aa725b1",
+    "duo_campaign_expected.mem": "fb8bc8cfb0fdcb6c63c344ec5a2d66549727b61c9ab6ed6b384db863966f6f84",
+    "duo_endless_expected.mem": "a60ce8b7557114c6c6a6ee5ce2af5825aaaee7b5a4f8a0368928c2f303898565",
+    "solo_campaign_expected.mem": "40f15bf97f1d30f47d756ed3f01d5cf4945209e8422002d101f7fcd5dba253a2",
+    "solo_endless_expected.mem": "1e17dfee62159ec837dacff43effa7c0914d07c7674c93aba8d56a3073b057ce"
+  }
+}

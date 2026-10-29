@@ -1,0 +1,18 @@
+{
+  "pass": true,
+  "bit_sha256": "2a6643a9329276b3b4620f5a8cf9c97434f4195f0b7671ec82aff4790534de88",
+  "old_bit_archive": "bit\\Tetris_20261029_151659_03cc79161106.bit",
+  "pc_exe_reused": true,
+  "pc_exe_sha256": "d0c40f1218daa98d58abb24126402e90d811e7e99f1256870570dbdbfe49fe72",
+  "rtl_images_verified": 38,
+  "document_links_verified": [
+    "docs/README.md",
+    "docs/资料索引.md",
+    "docs/参考图/README.md",
+    "docs/参考图/预览图/清单.md",
+    "docs/技术说明/新UI渲染与网口.md",
+    "docs/计划书/UI布局、选关与背景修正计划.md",
+    "docs/reports/ui_layout_20261029/README.md",
+    "docs/reports/ui_layout_20261029/告警与时序复核.md"
+  ]
+}

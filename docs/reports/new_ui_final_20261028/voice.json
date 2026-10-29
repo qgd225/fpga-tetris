@@ -1,0 +1,24 @@
+{
+  "pass": true,
+  "samples": 111572,
+  "voices": 7,
+  "source_sha256": {
+    "voice_adpcm_rom.v": "18839e69bad58a870310149e53e531f90169cc2e87e36076794b551c8b0ed307",
+    "ima_adpcm_decoder.v": "d35bf987774902c0ce6b78cd92b43ca13b1c2d8a65d8ceaaf8d8c2c8f8e9d76b",
+    "voice_player.v": "f3014c0fe34dfa485d10e777fadad681f369254994728fa13f30661680ec332f",
+    "ui_voice_pack.vh": "3b4b8f7e16e42e942d8f6b961c72509968a95e74a4cb873226623e77ed7a22de",
+    "ui_voice_pack_00.mem": "3f8ca1e33fea1ced6b6eb34ffb3b2f8e6c3ad3f47f7b7f2737215d04bbe305aa",
+    "ui_voice_pack_01.mem": "1fc989e3c0d1146fed21f8edbba2ee55fecc5d000771444687af9977b1f41552",
+    "ui_voice_pack_02.mem": "426893bb4736338df4566c7bdcfdd461f27e9003ba6e0ac1ce12ecf71f8a44d1",
+    "ui_voice_pack_03.mem": "ffdc2bc8d98dec10ff3ebad1113ec8f25bed66eb788015dcf7d02cb7a96c52f3",
+    "ui_voice_pack_04.mem": "70c1cbf442ebf82571d92b9223e657dc81d30b8442ac6453688ced595aabfbd0",
+    "ui_voice_pack_05.mem": "9755e15db8bf014e28cdb9a6d26e5e6e8e61a5f0b05b2ae2b9ef2c4fc0377164",
+    "ui_voice_pack_06.mem": "e4b95235af91c2b72207119f0af4acea2bc14335683be669414c76f4ebd134a3",
+    "ui_voice_pack_07.mem": "91a2747e25a1b0242e468470cec835ffd7b680446ae493705bd3447fe3227261",
+    "ui_voice_pack_08.mem": "7f54a1aea56b5d837b6c3245922e68726267c06d2780e5be5b05f3e97d772fdd",
+    "ui_voice_pack_09.mem": "7849d86d41f78ae897cc5abe5647ffedc9124870197c6407e6fa703d8284d43c",
+    "ui_voice_pack_10.mem": "a08e3f28e2596d99ec00ec5605be6bc3895773c0138d026b13d23ac0b459b8cf",
+    "ui_voice_pack_11.mem": "e804eacd43808e79172a72130defb00c34c7574ce32e4658cfa1593fd25ea05d",
+    "ui_voice_pack_12.mem": "889c44d9ca9684e291fd36c395eaab26b42334af3b13cdf10c20156b0e888fb1"
+  }
+}

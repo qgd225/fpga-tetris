@@ -1,0 +1,23 @@
+[
+  {
+    "stage": "whole_synth_before_tail",
+    "LUT": 18351,
+    "BRAM": 52.5,
+    "evidence_sha256": "fa7824c7865e050d1c9379be1d95cab1765de1a0a976e5a31465570691067eee",
+    "scope": "阶段综合测量，仅最终布线用于交付验收"
+  },
+  {
+    "stage": "whole_synth_before_declaration_order",
+    "LUT": 19582,
+    "BRAM": 49.5,
+    "evidence_sha256": "8e24582cbe848f0addb20f8f255542d2a882ffad8b3a2c9a86389e2dc751d092",
+    "scope": "阶段综合测量，仅最终布线用于交付验收"
+  },
+  {
+    "stage": "whole_synth",
+    "LUT": 18554,
+    "BRAM": 50.0,
+    "evidence_sha256": "7da7b17baed02e3ea160a1eca6d035b14287006af5e0d0ff667b3f16ef3f4026",
+    "scope": "阶段综合测量，仅最终布线用于交付验收"
+  }
+]

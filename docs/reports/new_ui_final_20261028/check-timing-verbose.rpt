@@ -1,0 +1,286 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Thu Oct 29 10:57:39 2026
+| Host         : qiguidei running 64-bit major release  (build 9200)
+| Command      : check_timing -verbose -file D:/vivado_project/Tetris/temporary/new_ui_finish/routed/check-timing-verbose.rpt
+| Design       : Tetris
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+------------------------------------------------------------------------------------------------------------------------------
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock
+2. checking constant_clock
+3. checking pulse_width_clock
+4. checking unconstrained_internal_endpoints
+5. checking no_input_delay
+6. checking no_output_delay
+7. checking multiple_clock
+8. checking generated_clocks
+9. checking loops
+10. checking partial_input_delay
+11. checking partial_output_delay
+12. checking latch_loops
+
+1. checking no_clock
+--------------------
+ There are 45 register/latch pins with no clock driven by root clock pin: Clk (HIGH)
+
+Key_inst/key_filter_rst/counter_cnt_reg[0]/C
+Key_inst/key_filter_rst/counter_cnt_reg[10]/C
+Key_inst/key_filter_rst/counter_cnt_reg[11]/C
+Key_inst/key_filter_rst/counter_cnt_reg[12]/C
+Key_inst/key_filter_rst/counter_cnt_reg[13]/C
+Key_inst/key_filter_rst/counter_cnt_reg[14]/C
+Key_inst/key_filter_rst/counter_cnt_reg[15]/C
+Key_inst/key_filter_rst/counter_cnt_reg[16]/C
+Key_inst/key_filter_rst/counter_cnt_reg[17]/C
+Key_inst/key_filter_rst/counter_cnt_reg[18]/C
+Key_inst/key_filter_rst/counter_cnt_reg[19]/C
+Key_inst/key_filter_rst/counter_cnt_reg[1]/C
+Key_inst/key_filter_rst/counter_cnt_reg[2]/C
+Key_inst/key_filter_rst/counter_cnt_reg[3]/C
+Key_inst/key_filter_rst/counter_cnt_reg[4]/C
+Key_inst/key_filter_rst/counter_cnt_reg[5]/C
+Key_inst/key_filter_rst/counter_cnt_reg[6]/C
+Key_inst/key_filter_rst/counter_cnt_reg[7]/C
+Key_inst/key_filter_rst/counter_cnt_reg[8]/C
+Key_inst/key_filter_rst/counter_cnt_reg[9]/C
+Key_inst/key_filter_rst/en_cnt_reg/C
+Key_inst/key_filter_rst/key_en_reg/C
+Key_inst/key_filter_rst/r_key_reg/C
+Key_inst/key_filter_rst/sync_d0_key_reg/C
+Key_inst/key_filter_rst/sync_d1_key_reg/C
+por_cnt_reg[0]/C
+por_cnt_reg[10]/C
+por_cnt_reg[11]/C
+por_cnt_reg[12]/C
+por_cnt_reg[13]/C
+por_cnt_reg[14]/C
+por_cnt_reg[15]/C
+por_cnt_reg[16]/C
+por_cnt_reg[17]/C
+por_cnt_reg[18]/C
+por_cnt_reg[19]/C
+por_cnt_reg[1]/C
+por_cnt_reg[2]/C
+por_cnt_reg[3]/C
+por_cnt_reg[4]/C
+por_cnt_reg[5]/C
+por_cnt_reg[6]/C
+por_cnt_reg[7]/C
+por_cnt_reg[8]/C
+por_cnt_reg[9]/C
+
+ There are 3 register/latch pins with no clock driven by root clock pin: Game_state_machine_inst/choose_cnt_reg[0]_rep__1/Q (HIGH)
+
+frame_inst/Playfield_inst/counter_c2_reg[3]_LDC/G
+frame_inst/Playfield_inst/counter_c2_reg[4]_LDC/G
+frame_inst/Playfield_inst/counter_c_reg[0]_LDC/G
+
+ There are 3 register/latch pins with no clock driven by root clock pin: Key_inst/key_filter_rst/key_en_reg/Q (HIGH)
+
+frame_inst/Playfield_inst/counter_c2_reg[3]_LDC/G
+frame_inst/Playfield_inst/counter_c2_reg[4]_LDC/G
+frame_inst/Playfield_inst/counter_c_reg[0]_LDC/G
+
+ There are 3 register/latch pins with no clock driven by root clock pin: net_screen_tx_inst/keyboard_receiver_inst/kb_rst_hold_reg/Q (HIGH)
+
+frame_inst/Playfield_inst/counter_c2_reg[3]_LDC/G
+frame_inst/Playfield_inst/counter_c2_reg[4]_LDC/G
+frame_inst/Playfield_inst/counter_c_reg[0]_LDC/G
+
+ There are 3 register/latch pins with no clock driven by root clock pin: por_cnt_reg[19]/Q (HIGH)
+
+frame_inst/Playfield_inst/counter_c2_reg[3]_LDC/G
+frame_inst/Playfield_inst/counter_c2_reg[4]_LDC/G
+frame_inst/Playfield_inst/counter_c_reg[0]_LDC/G
+
+
+2. checking constant_clock
+--------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock
+-----------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints
+--------------------------------------------
+ There are 93 pins that are not constrained for maximum delay. (HIGH)
+
+Key_inst/key_filter_rst/counter_cnt_reg[0]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[0]/D
+Key_inst/key_filter_rst/counter_cnt_reg[10]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[10]/D
+Key_inst/key_filter_rst/counter_cnt_reg[11]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[11]/D
+Key_inst/key_filter_rst/counter_cnt_reg[12]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[12]/D
+Key_inst/key_filter_rst/counter_cnt_reg[13]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[13]/D
+Key_inst/key_filter_rst/counter_cnt_reg[14]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[14]/D
+Key_inst/key_filter_rst/counter_cnt_reg[15]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[15]/D
+Key_inst/key_filter_rst/counter_cnt_reg[16]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[16]/D
+Key_inst/key_filter_rst/counter_cnt_reg[17]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[17]/D
+Key_inst/key_filter_rst/counter_cnt_reg[18]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[18]/D
+Key_inst/key_filter_rst/counter_cnt_reg[19]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[19]/D
+Key_inst/key_filter_rst/counter_cnt_reg[1]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[1]/D
+Key_inst/key_filter_rst/counter_cnt_reg[2]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[2]/D
+Key_inst/key_filter_rst/counter_cnt_reg[3]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[3]/D
+Key_inst/key_filter_rst/counter_cnt_reg[4]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[4]/D
+Key_inst/key_filter_rst/counter_cnt_reg[5]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[5]/D
+Key_inst/key_filter_rst/counter_cnt_reg[6]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[6]/D
+Key_inst/key_filter_rst/counter_cnt_reg[7]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[7]/D
+Key_inst/key_filter_rst/counter_cnt_reg[8]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[8]/D
+Key_inst/key_filter_rst/counter_cnt_reg[9]/CLR
+Key_inst/key_filter_rst/counter_cnt_reg[9]/D
+Key_inst/key_filter_rst/en_cnt_reg/CLR
+Key_inst/key_filter_rst/en_cnt_reg/D
+Key_inst/key_filter_rst/key_en_reg/CLR
+Key_inst/key_filter_rst/key_en_reg/D
+Key_inst/key_filter_rst/r_key_reg/D
+Key_inst/key_filter_rst/r_key_reg/PRE
+Key_inst/key_filter_rst/sync_d0_key_reg/D
+Key_inst/key_filter_rst/sync_d0_key_reg/PRE
+Key_inst/key_filter_rst/sync_d1_key_reg/D
+Key_inst/key_filter_rst/sync_d1_key_reg/PRE
+frame_inst/Playfield_inst/counter_c2_reg[3]_LDC/CLR
+frame_inst/Playfield_inst/counter_c2_reg[4]_LDC/CLR
+frame_inst/Playfield_inst/counter_c_reg[0]_LDC/CLR
+por_cnt_reg[0]/CE
+por_cnt_reg[0]/D
+por_cnt_reg[10]/CE
+por_cnt_reg[10]/D
+por_cnt_reg[11]/CE
+por_cnt_reg[11]/D
+por_cnt_reg[12]/CE
+por_cnt_reg[12]/D
+por_cnt_reg[13]/CE
+por_cnt_reg[13]/D
+por_cnt_reg[14]/CE
+por_cnt_reg[14]/D
+por_cnt_reg[15]/CE
+por_cnt_reg[15]/D
+por_cnt_reg[16]/CE
+por_cnt_reg[16]/D
+por_cnt_reg[17]/CE
+por_cnt_reg[17]/D
+por_cnt_reg[18]/CE
+por_cnt_reg[18]/D
+por_cnt_reg[19]/CE
+por_cnt_reg[19]/D
+por_cnt_reg[1]/CE
+por_cnt_reg[1]/D
+por_cnt_reg[2]/CE
+por_cnt_reg[2]/D
+por_cnt_reg[3]/CE
+por_cnt_reg[3]/D
+por_cnt_reg[4]/CE
+por_cnt_reg[4]/D
+por_cnt_reg[5]/CE
+por_cnt_reg[5]/D
+por_cnt_reg[6]/CE
+por_cnt_reg[6]/D
+por_cnt_reg[7]/CE
+por_cnt_reg[7]/D
+por_cnt_reg[8]/CE
+por_cnt_reg[8]/D
+por_cnt_reg[9]/CE
+por_cnt_reg[9]/D
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay
+--------------------------
+ There are 12 input ports with no input delay specified. (HIGH)
+
+Reset_key
+drop
+hold
+left
+rgmii_rxd[0]
+rgmii_rxd[1]
+rgmii_rxd[2]
+rgmii_rxd[3]
+rgmii_rxdv
+right
+rotate
+switch
+
+ There are 0 input ports with no input delay but user has a false path constraint.
+
+
+6. checking no_output_delay
+---------------------------
+ There are 9 ports with no output delay specified. (HIGH)
+
+hdmi_clk_p
+hdmi_data_p[0]
+hdmi_data_p[1]
+hdmi_data_p[2]
+rgmii_txd[0]
+rgmii_txd[1]
+rgmii_txd[2]
+rgmii_txd[3]
+rgmii_txen
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There is 1 port with no output delay but with a timing clock defined on it or propagating through it (LOW)
+
+rgmii_tx_clk
+
+
+7. checking multiple_clock
+--------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks
+----------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops
+-----------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay
+--------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay
+---------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops
+------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+

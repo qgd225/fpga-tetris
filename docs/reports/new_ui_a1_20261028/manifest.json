@@ -1,0 +1,172 @@
+{
+  "date": "2026-10-28",
+  "phase": "A1 first prototype; waiting for review before integration",
+  "scope": "standalone ROM and glyph verification/synthesis; full frames are appearance review through existing preview renderer",
+  "source_sha256": {
+    "Tetris.srcs/sources_1/new/ui_exact_tile_rom.v": "c52a8806011a0b04a3c223b8f3dbc3c99ddf088ed96b0c6743d755b9de2b3551",
+    "Tetris.srcs/sources_1/new/ui_font_5x7.v": "747dccf53d697e81af51698c6774237fcdf36ff77c7403fb3ad596896cfddea7",
+    "Tetris.srcs/sources_1/new/ui_font_5x7.mem": "68aee7fc64eb82e09b5392d7ecf660a0b9d9d09b313dd6c8e2647629eeaaf9fd",
+    "Tetris.srcs/sources_1/new/reference_ui_renderer.v": "b473b9297ae7ecf7232863c073713ce7918a1565a97378f71591b59b6426198f",
+    "Tetris.srcs/sources_1/new/reference_ui_geometry.vh": "0dfa06ca03af4cba1203426e52c4d93c90d6e86520e42b780e1af5f6c19b0cda",
+    "Tetris.srcs/sources_1/new/reference_ui_material.mem": "c7593af2bf4036d04f2e46a88a31fae8f4a4abbd4226fc4017b3f443af7db13c",
+    "Tetris.srcs/sources_1/new/story_ui.v": "d1846081d099bea6039b699e73ca6ef61b5bdc5b02da9724f9e5762afa55af50",
+    "Tetris.srcs/sources_1/new/rgb_to_palette.v": "04d28879d08bb5d1bb1d18f2c61541976f234f0d864dd4d3790dea55da4e5b1e",
+    "Tetris.srcs/sources_1/new/net_screen_tx.v": "9d58a1391cd986dd449313a0c7b6862de40fbb9c412ef749ccdfbc08ac7ecd36",
+    "Tetris.sim/story_visual/ui_exact_tile_rom_tb.v": "d6813ca95042119f8e2fdd35d183611404e2f88cd7303745436cfdce209dbcc6",
+    "Tetris.sim/story_visual/ui_font_5x7_tb.v": "37a3c8f1f8485cf2a6a9b40708533f07e7a2f3c3cba72f078fb46b31c884380a",
+    "Tetris.sim/story_visual/ui_a1_palette_frame_tb.v": "cabd62cbee7c9ee91011315820b831922af6695ab245390d42097a30e814e062",
+    "Tetris.sim/story_visual/ui_scenes_tb.v": "8aabe47f58fb8d3f70fe512707404d23142c8415b1b02548ebb93abf9d4bdc49",
+    "tools/build_new_ui_palette.py": "5144dc606018f0aeb2fcf92b508e605dada4f3a78242b8aaf27a44f2320e03d0",
+    "tools/analyze_new_ui_assets.py": "d6399337c603097ed6576bbde63ba7cd663085e1ba9e6aa8d0e3f087e3165f17",
+    "tools/run_new_ui_a1.py": "e9776ada07ca1e4f6873bb13b5189d81d7002504f3b6ba3f7067b420c00c7ed1",
+    "tools/measure_new_ui_a1.tcl": "6e009ca0e7b15691b85511efc988ef71e3b70027985aa532e3ce4bd8d4104c2f",
+    "assets/new_ui/palette.json": "dacdc4dca4e19b450d1ef886ecff5c2d0580e08b6be986b039e32a03d7d2405f",
+    "assets/new_ui/palette.mem": "258d3b6c509221bd92fce73d1dd5ec443a2165be0c98612d107a258ac32645c3",
+    "assets/new_ui/color_mapping.json": "140b9510689b3df2d2e33a667ea33d957aa3a4357c98079102429d0ffc829d8e"
+  },
+  "outputs": [
+    {
+      "file": "20261028_NEXT_原色_RTL材质原型.png",
+      "size": [
+        155,
+        172
+      ],
+      "sha256": "e9cc1fe6d02534fa1b55fdc9736501e59e5a78ee0bc07f74d78f4bfb915bea1d",
+      "kind": "standalone_sync_ROM_material_only",
+      "pixel_mismatches_against_encoded_input": 0,
+      "nonraster_samples": 512
+    },
+    {
+      "file": "20261028_NEXT_近色_RTL材质原型.png",
+      "size": [
+        155,
+        172
+      ],
+      "sha256": "4b304bcc1c3c65dc0001de92d1817a03e4be42a81a52943d0c42b1f3f76d6f67",
+      "kind": "standalone_sync_ROM_material_only",
+      "pixel_mismatches_against_encoded_input": 0,
+      "nonraster_samples": 512
+    },
+    {
+      "file": "20261028_核心壳体_原色_RTL材质原型.png",
+      "size": [
+        90,
+        356
+      ],
+      "sha256": "4eca3d18b2dae2ac4d798456f37d12273de6dbb820a3a963b9c67276ea4ded64",
+      "kind": "standalone_sync_ROM_material_only",
+      "pixel_mismatches_against_encoded_input": 0,
+      "nonraster_samples": 512
+    },
+    {
+      "file": "20261028_核心壳体_近色_RTL材质原型.png",
+      "size": [
+        90,
+        356
+      ],
+      "sha256": "71619837859b0b7055dbee61013c7b8ddbd7bd4b8d2e7e3005481844343269c7",
+      "kind": "standalone_sync_ROM_material_only",
+      "pixel_mismatches_against_encoded_input": 0,
+      "nonraster_samples": 512
+    },
+    {
+      "file": "20261028_双人闯关_HALF_合色候选_RTL.png",
+      "sha256": "e4f43c413776581af50760d35a54a5246da30681109426ee3272d9420bb896b1",
+      "size": [
+        1280,
+        720
+      ],
+      "reference": "docs\\参考图\\最新参考图\\新UI\\05_双人闯关UI.png",
+      "kind": "palette appearance via existing full-frame preview renderer, not compressed whole-UI synthesis",
+      "rgb_pixels_changed": 460976,
+      "max_delta_e_76": 2.998786413411756,
+      "mean_delta_e_76": 0.7716538531848988
+    },
+    {
+      "file": "20261028_双人闯关_LOCKED_合色候选_RTL.png",
+      "sha256": "54514e9a7717d1ff5875018c9520894211e8c435c7ebdb945d3cceeac16fff5a",
+      "size": [
+        1280,
+        720
+      ],
+      "reference": "docs\\参考图\\最新参考图\\新UI\\06_双人闯关_LOCKED六圈锁链.png",
+      "kind": "palette appearance via existing full-frame preview renderer, not compressed whole-UI synthesis",
+      "rgb_pixels_changed": 458810,
+      "max_delta_e_76": 2.998786413411756,
+      "mean_delta_e_76": 0.7687426707379836
+    }
+  ],
+  "probe_resources": [
+    {
+      "name": "ui_a1_next_raw",
+      "LUT": 114.0,
+      "FF": 3.0,
+      "BRAM36_equiv": 9.0,
+      "DSP": 0.0,
+      "internal_synthesis_WNS_estimate_ns": 10.138,
+      "not_routed": true
+    },
+    {
+      "name": "ui_a1_next_near",
+      "LUT": 112.0,
+      "FF": 3.0,
+      "BRAM36_equiv": 4.5,
+      "DSP": 0.0,
+      "internal_synthesis_WNS_estimate_ns": 10.138,
+      "not_routed": true
+    },
+    {
+      "name": "ui_a1_core_raw",
+      "LUT": 103.0,
+      "FF": 3.0,
+      "BRAM36_equiv": 4.0,
+      "DSP": 0.0,
+      "internal_synthesis_WNS_estimate_ns": 10.138,
+      "not_routed": true
+    },
+    {
+      "name": "ui_a1_core_near",
+      "LUT": 103.0,
+      "FF": 3.0,
+      "BRAM36_equiv": 3.5,
+      "DSP": 0.0,
+      "internal_synthesis_WNS_estimate_ns": 10.138,
+      "not_routed": true
+    },
+    {
+      "name": "ui_a1_font_measure",
+      "LUT": 89.0,
+      "FF": 43.0,
+      "BRAM36_equiv": 0.0,
+      "DSP": 0.0,
+      "font_cases": 16384,
+      "not_routed": true
+    }
+  ],
+  "palette": {
+    "source_color_count": 53156,
+    "original_palette_count": 56,
+    "palette_count": 1437,
+    "code_bits": 11,
+    "radius": 3.0,
+    "metric": "CIELAB D65 Delta-E-76",
+    "max_delta_e_76": 2.999887117759753,
+    "pixel_weighted_mean_delta_e_76": 1.4397207949952127
+  },
+  "whole_device_resources_verified": false,
+  "whole_ui_compressed_renderer_integrated": false,
+  "network_palette_upgraded": false,
+  "decorative_UI_removed": false,
+  "dynamic_effects_removed": false,
+  "baseline_bit_sha256": "851ba01534ee3aa60f0ba8c65514dbb7b1787050675f644cab1cadbaab5b7127",
+  "bit_generated": false,
+  "git_committed": false,
+  "github_pushed": false,
+  "log_sha256": {
+    "render/render.log": "732e10330fa37f447143babf9b0d2ad054cbb03e3e6686432925b16a3dde54c1",
+    "font_render/render.log": "b89457cf35234b3e7358c82b180a734e4a0fc216690dc85709a86734512ad1f7",
+    "palette_render/render.log": "4551e868bbf7ecd5befba4c83f93ec3a3ebdb70297433aa673e2e86562b76f5d",
+    "synthesis.log": "0a73c22e2804d9899ab377ee8e17a484657b495a766bf4b0510e97e962128dbe",
+    "font_synthesis.log": "a664253796f42cab3452aff9074456115ab4addbf87f92c915f5c861045c2bd8"
+  }
+}

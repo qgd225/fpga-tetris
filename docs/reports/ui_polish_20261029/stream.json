@@ -1,0 +1,26 @@
+{
+  "pass": true,
+  "frames": 4,
+  "pixels": 3686400,
+  "packets": 3207,
+  "max_payload": 1292,
+  "CRC32_verified": true,
+  "IPv4_checksum_verified": true,
+  "real_localhost_receiver": true,
+  "frame_reorder_and_wrap": true,
+  "decoded_rgb_sha256": [
+    "d00f809e84480fa127b67f2c656742900a4ddedcd3b86ede9c79780fe65a96dc",
+    "eb1ae1833e49521b45fffbc911c930009c70f79d0c36045ba5186c80831ac01d",
+    "7b2e09509f42786493d884f1087a57f633c33e7e2949325b41ab2c7639070bc8",
+    "44c89a1e22e716574ba0c825846638eb540afd1a4a1dec980296cdce2ef2d83f"
+  ],
+  "scope": "模拟GMII与本机UDP接收已验证；PHY、HDMI与实机收流待用户上板",
+  "final_source_sha256": {
+    "Tetris.srcs\\sources_1\\new\\net_screen_tx.v": "8f4c611ab925e6564243020f9a02ef8304468fe37be398726a7aa28bc063b2d8",
+    "Tetris.srcs\\sources_1\\new\\ui_rgb_packetizer.v": "e6a70e94d04805ad27f0c4c5e84a915b04780892119e569cab591dd41fcd67f4",
+    "Tetris.srcs\\sources_1\\new\\ui_async_fifo.v": "30bc17ff5904f8761083e8318d74c87ba9e4f8221a98135b579115eaf6d5efed",
+    "Tetris.srcs\\sources_1\\imports\\new\\eth_udp_loopback_rgmii.v": "7690abdf1e687ec25160b8b9df8cf8608264a88bf156f7f314888a2608bb014b",
+    "pc\\pc_protocol.py": "3374b4bca67e0b7d41252716878ee5715d8b26b2344916cb2d8f474a3c513d65",
+    "pc\\net_screen_view.py": "b6b4834a44ea191bb2201b8c3d36707f8965820ec58d9a8e467dc79c45d5cf51"
+  }
+}

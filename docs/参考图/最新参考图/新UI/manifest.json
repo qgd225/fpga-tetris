@@ -1,0 +1,343 @@
+{
+  "name": "新UI计划书参考图冻结集",
+  "date": "2026-10-28",
+  "authority": "用户明确要求以第14轮这些图作为参考图；随后指定先砍装饰UI、再砍动态效果",
+  "records": [
+    {
+      "file": "05_双人闯关UI.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_双人闯关_RTL.png",
+      "sha256": "e65d7d97af2548c7cd5bd840ac85937e8f4f45ce8fa833149468e09768aff1db",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "duo_campaign",
+      "decoded_rgb_sha256": "d77505884d0f02cc441edf92c8e602bc4c14488306bad1cdf3d193f656ac5cb3"
+    },
+    {
+      "file": "03_双人无尽UI.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_双人无尽_RTL.png",
+      "sha256": "908f4c66e7cdff11281444dfb5fe36b342bce430dd91dadb464ff0ce21a0dfef",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "duo_endless",
+      "decoded_rgb_sha256": "8456788506fad14a5006477bb01bf557fd68e08821baf59b84c3e256e61ce7a4"
+    },
+    {
+      "file": "组件状态/01_核心_LOCKED.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_核心柱_锁定_铁索_RTL.png",
+      "sha256": "862547df055a7d831b4dde069bce10973cafb2f2feca24781f98db92fe738d89",
+      "size": [
+        118,
+        456
+      ],
+      "origin": [
+        1110,
+        208
+      ],
+      "fixture": "core_locked",
+      "decoded_rgb_sha256": "0a72ab687e1b76e39bdaa74c8b1aec997aaa10ff77b9b280a292009e22ad2023"
+    },
+    {
+      "file": "组件状态/02_核心_HALF三段.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_核心柱_半充能_三段_RTL.png",
+      "sha256": "ab4e1dabf9812ce0d99245e607ea7897060362646fbbc072de599dbdb4c5d195",
+      "size": [
+        118,
+        456
+      ],
+      "origin": [
+        1110,
+        208
+      ],
+      "fixture": "core_half",
+      "decoded_rgb_sha256": "808d5a49938c6f4f01f14d2dd841499f7335d26e8d997546aa64c3288fc9f3d1"
+    },
+    {
+      "file": "组件状态/03_核心_ONLINE七段.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_核心柱_在线_七段_RTL.png",
+      "sha256": "a13a457cbfb643acb2db77a46ceb1e7d9af1e19ddd363ad16ce33eb6d0efa926",
+      "size": [
+        118,
+        456
+      ],
+      "origin": [
+        1110,
+        208
+      ],
+      "fixture": "core_online7",
+      "decoded_rgb_sha256": "518a9387664e69108936c2e7dc3248358c17fe034224852b9a4443b8e68a101b"
+    },
+    {
+      "file": "组件状态/04_核心_成功八段.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_核心柱_成功_八段_RTL.png",
+      "sha256": "dccb687caffcf9fc3838481af20cb64b0fd36ce18928300f4a06815298d2ede1",
+      "size": [
+        118,
+        456
+      ],
+      "origin": [
+        1110,
+        208
+      ],
+      "fixture": "core_success8",
+      "decoded_rgb_sha256": "77da73c867bc390ca1636995423e1fe8bc75ea7a718cd85141e74ed41ea5fcd3"
+    },
+    {
+      "file": "07_双人闯关_左上对白.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_双人闯关_左上对白_RTL.png",
+      "sha256": "c3946e524c3367b28636730a7e41a90fa1c28741b0fb55e762bdd729e641433b",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "duo_campaign_comms",
+      "decoded_rgb_sha256": "c77a98d23fff98223cf860839acd1e91757b91fecf439241ef6dd10d90480f13"
+    },
+    {
+      "file": "组件状态/05_对白0.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_左上对白_0_RTL.png",
+      "sha256": "fefb71070c9228bf17645d79c413d4ffa6b6059979c6a18db9e2bf2a464f3c47",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "fixture": "comms_0",
+      "decoded_rgb_sha256": "51faeba87c2141479f7e523f794c2b9c57405714e0a47ee12dd2877e8f40ca25"
+    },
+    {
+      "file": "组件状态/06_对白1.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_左上对白_1_RTL.png",
+      "sha256": "3b2cf205abf212361d5883cb5926b2f0cd8e3ecfae4d9506fcb2aa7ebef912c4",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "fixture": "comms_1",
+      "decoded_rgb_sha256": "ccd3f12808575dbd54a21e10959c4c174493b3ee7f9167ee32c2eb1d529096f0"
+    },
+    {
+      "file": "组件状态/07_对白2.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_左上对白_2_RTL.png",
+      "sha256": "371d71bdd13e48a978dc39aaeccb9849c1b646f3cbe9c6959ef6d7cfe8b0c974",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "fixture": "comms_2",
+      "decoded_rgb_sha256": "1b3fe12ff8657b114c3da243b56598c22a6c613a2d3bdb782bb49d72e689bff3"
+    },
+    {
+      "file": "组件状态/08_对白3.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_左上对白_3_RTL.png",
+      "sha256": "66355cc9a8637658dbe363b350a1dffc8ad65857c9333d8ce13653038c064a60",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "fixture": "comms_3",
+      "decoded_rgb_sha256": "4d0974626c778c337892beae09c31748e77b4885b71fa0791f8a73620c3f0c74"
+    },
+    {
+      "file": "组件状态/09_对白4.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_左上对白_4_RTL.png",
+      "sha256": "3352f6efe08df38fefc892accf6d85c5365b22c58d18b807fb7702ebd04c2464",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "fixture": "comms_4",
+      "decoded_rgb_sha256": "53f0d6db08f43ad59ad9a0ac86eb7d9a8a3bee48133e35c98c87b929cb9e510d"
+    },
+    {
+      "file": "组件状态/10_对白5.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_左上对白_5_RTL.png",
+      "sha256": "c730f78ade8a101e6183fb7fca0c9961ae72c2b9f511be2df70642aec3db3637",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "fixture": "comms_5",
+      "decoded_rgb_sha256": "fef86d9d172f4de63a6d7707123d1221ede89599ab1ab83e87b37ca3a1d36140"
+    },
+    {
+      "file": "组件状态/11_对白6.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/独立组件/20261027_左上对白_6_RTL.png",
+      "sha256": "bef798bb413a9e7fa544d86615859e663a4fead686966c484e68875299387383",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "fixture": "comms_6",
+      "decoded_rgb_sha256": "b162ec1570814e5925705cccb400528b5e2d950bcfcfdb9f5fb20063e99da5a5"
+    },
+    {
+      "file": "04_单人闯关UI.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_单人闯关_RTL.png",
+      "sha256": "0524a7c4c179ffbc6e88f2df6715fae70d708c22d16b88da43dc8058a92845c1",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "solo_campaign",
+      "decoded_rgb_sha256": "10da7151d6aae46cdb11bb83781553e55a836bf233889a8ee6ac1783db8bedec"
+    },
+    {
+      "file": "02_单人无尽UI.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_单人无尽_RTL.png",
+      "sha256": "0f8c6306b922de42aa589e52208a6d332d068a8bcd135b50fa26541a857732b5",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "solo_endless",
+      "decoded_rgb_sha256": "ab1fd019037f87488366414143117e70242f23e5c5b4a7f81fe54e23022da1cf"
+    },
+    {
+      "file": "01_主菜单UI.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_主菜单_RTL.png",
+      "sha256": "4dd1d237960aa8234b010131a467b91bc4f275058d6ef6a7fa01f4f640119e3b",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "main_menu",
+      "decoded_rgb_sha256": "58e57e977ba769c95557fb6aedb1e27076a83986f2bf7e02fe10ac8efd7e2ab6"
+    },
+    {
+      "file": "08_单人选关UI.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_单人选关_RTL.png",
+      "sha256": "1d4a8eaaedfa6271a56473a3ea9544a92889047257b14fc5fc2557803ccbdec0",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "solo_select",
+      "decoded_rgb_sha256": "8fe8a1e814b7e828a8d4ce21962315aaf54ceffb0b51913d33086ebb55cc85c2"
+    },
+    {
+      "file": "09_双人选关UI.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_双人选关_RTL.png",
+      "sha256": "e29bcbda974887e0178283b66e37f3412ec076e2e6e7e91e76df3d7c457d61ac",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "duo_select",
+      "decoded_rgb_sha256": "e68ba142ecd0526b3ac5bec0d25e636e06da53f89281ef0a0edfea5b7f73583c"
+    },
+    {
+      "file": "06_双人闯关_LOCKED六圈锁链.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_双人闯关_LOCKED缠绕铁索_RTL.png",
+      "sha256": "f3741be6d4add71dfb10d99cab579d2f426691bbb18772ad496a49ef1700a49e",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "duo_campaign_locked",
+      "decoded_rgb_sha256": "c6a8a9e4109e88f1dd14e4ba9c483911c11493c73fe9c59d5d204ef29f511c34"
+    },
+    {
+      "file": "00_七场景索引.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_七场景_RTL总览.png",
+      "sha256": "fe162ece65d6ee40c26d53cd22f410af5bb79d2172718f1e786bfb5207141ecc",
+      "role": "contact_sheet_navigation_only; use native frame/ROI for pixel comparison"
+    },
+    {
+      "file": "10_核心柱四状态索引.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_核心柱四状态_RTL.png",
+      "sha256": "c2843c4c79275822328f21d618ce9f15215743f05d22340e75afb437c5d4221f",
+      "role": "contact_sheet_navigation_only; use native frame/ROI for pixel comparison"
+    },
+    {
+      "file": "11_左上对白七状态索引.png",
+      "source": "docs/参考图/预览图/RTL生成/20261027_UI迭代第14轮_统一文字与左侧信息栏/20261027_左上对白七状态_RTL.png",
+      "sha256": "324a07254965e7f2f18d6bb66b4da8665776271288554a0426c94d82aa6978fc",
+      "role": "contact_sheet_navigation_only; use native frame/ROI for pixel comparison"
+    }
+  ],
+  "status": "完整版本目标；不是新UI上板或资源验收结果",
+  "source_manifest_sha256": "93f6be3b73a7b0398b2ba83fa9f3a261c285539509efca7ed7b75fd8cf0d00f3",
+  "precedence": "本计划内优先于上级目录早期风格图；不更改旧素材生成器依赖的上级05原图",
+  "missing_reference_states": [
+    "新版结算成功/失败",
+    "新版暂停",
+    "全部HOLD/提示/储备预警组合"
+  ],
+  "full_match_rule": "同一固定输入下按用户授权并记录的近色映射比较原生1280x720，编解码及合成零差异；原RGB误差单列。装饰/动态裁减版另列变化区，不冒称完整一致。",
+  "color_policy": {
+    "date": "2026-10-28",
+    "authority": "用户：取相近颜色，无相近颜色就再加颜色",
+    "original_pngs_unchanged": true,
+    "comparison": "retain geometry and texture positions; compare after recorded palette mapping; report original-RGB differences separately",
+    "candidate_radius_delta_e_76": 3,
+    "candidate_radius_status": "engineering trial awaiting A1 visual review",
+    "palette_size_limit": null
+  }
+}

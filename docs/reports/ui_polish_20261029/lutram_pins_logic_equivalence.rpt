@@ -1,0 +1,1 @@
+Only LUT truth tables with recursively identical input functions, constants and LUT1 identity buffers are normalized. Every sequential/memory/input leaf retains its exact identity.

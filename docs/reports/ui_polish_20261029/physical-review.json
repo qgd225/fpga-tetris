@@ -1,0 +1,9 @@
+{
+  "pass": true,
+  "baseline": "docs/reports/ui_layout_20261029/check-timing-verbose.rpt",
+  "unconstrained_endpoint_count": 93,
+  "unconstrained_names_identical": true,
+  "no_multiple_clock_or_loops": true,
+  "gate": "LUT=19135 FREE_LUT=1665 TIMING=WNS 0.063 WHS 0.036 TNS 0.000 THS 0",
+  "candidate_sha256": "df0f5c6ec93f742b2e324a3d26bf521a4ee24d31c47916d703286e2cf61a6b3c"
+}

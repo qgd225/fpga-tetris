@@ -1,0 +1,33 @@
+{
+  "pass": true,
+  "published": true,
+  "date": "2026-10-29T10:58:13.413246",
+  "bit_sha256": "03cc79161106ce02d4731252c30bf2ba1a46bb475d2431a9e20610dcb9011b48",
+  "pc_exe_sha256": "d0c40f1218daa98d58abb24126402e90d811e7e99f1256870570dbdbfe49fe72",
+  "LUT": 18298,
+  "free_LUT": 2502,
+  "BRAM": 50.0,
+  "timing_ns": {
+    "WNS": 0.445,
+    "WHS": 0.036,
+    "TNS": 0.0,
+    "THS": 0.0
+  },
+  "functional_groups": 15,
+  "rtl_frames": 27,
+  "priority_cuts": [
+    "D1 外围星空与漂浮残片",
+    "D2 非功能磨损、划痕与外壳重复纹理",
+    "D3 外围额外支架、冗余装甲与无功能走线"
+  ],
+  "dynamic_cuts": [],
+  "protected": "五组重点模块按A1受控近色后的冻结图保护；稳态像素与A3逐像素比较",
+  "board_pending": [
+    "HDMI实际显示相位与布局",
+    "核心、导管、消行与HOLD的实机反馈",
+    "PC物理网口收流与遥控",
+    "实际音频试听"
+  ],
+  "git_commit": false,
+  "git_push": false
+}

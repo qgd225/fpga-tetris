@@ -20,6 +20,7 @@ module letter(input clka, input ena, input [10:0] addra, output [19:0] douta);
 endmodule
 
 module frame_duo_tb;
+ `include "ui_layout_geometry.vh"
     reg campaign=1;
 
     reg Clk=0,Rst=0;
@@ -28,7 +29,7 @@ module frame_duo_tb;
     wire [23:0] rgb;
     wire [2:0] speed;
     wire [19:0] score;wire [15:0] lines;wire [13:0] time_sec;
-    reg [7:0] font_reference[0:2047];
+    reg [34:0] font_reference[0:127];
     integer errors=0,checks=0,i,j,c,r;
     reg [4:0] test_row,meta_col,meta_row;
     reg [23:0] test_data;
@@ -37,7 +38,7 @@ module frame_duo_tb;
     reg [3:0] locked_value;
     reg [10:0] drift_snapshot;
     always #6.734 Clk=~Clk;
-    frame #(.EFF_TICK(21'd8),.SUCCESS_TICKS(4)) dut(.menu_window(2'd0),
+    frame #(.EFF_TICK(21'd8),.SUCCESS_TICKS(4)) dut(.comms_visible(1'b0),.comms_id(3'd0),.menu_window(2'd0),
         .campaign(campaign),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.Clk_74M(Clk),.Reset_n(Rst),.hcounter(hc),.vcounter(vc),.video_de(1'b1),
         .left_p_flag(1'b0),.right_p_flag(1'b0),.drop_r_flag(1'b0),.drop_en(1'b0),.rotate_p_flag(1'b0),
         .switch_r_flag(sw),.hold_p_flag(1'b0),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),
@@ -58,14 +59,15 @@ module frame_duo_tb;
     task frame_edge;
         begin @(negedge Clk);hc=0;vc=0;repeat(3)@(negedge Clk);end
     endtask
+    // Probe the shared 5x7 glyph at its declared pitch and cap height.
     task glyph;
-        input integer bx,by,char_id,scale;input [23:0] color;
+        input integer bx,by,char_id,pitch,height;input [23:0] color;
         integer gy,gx,found;
         begin
             found=0;
-            for(gy=0;gy<12;gy=gy+1)for(gx=0;gx<8;gx=gx+1)
-                if(!found && font_reference[char_id*16+gy][7-gx])begin
-                    look(bx+gx*scale,by+gy*scale);check(rgb===color,"real glyph pixel");found=1;
+            for(gy=0;gy<7;gy=gy+1)for(gx=0;gx<5;gx=gx+1)
+                if(!found && font_reference[char_id][34-gy*5-gx])begin
+                    look(bx+(gx*pitch+5)/6,by+(gy*height+6)/7);check(rgb===color,"shared glyph pixel");found=1;
                 end
             check(found==1,"glyph source is nonempty");
         end
@@ -103,7 +105,7 @@ module frame_duo_tb;
         end
     endtask
     initial begin
-        $readmemh("story_font.mem",font_reference);
+        $readmemh("ui_font_5x7.mem",font_reference);
         force dut.over_raw=0;
         #100;Rst=1;repeat(32)@(negedge Clk);Idle=0;Playing=1;
         force dut.Playfield_inst.Drop=30'd100_000_000;
@@ -111,7 +113,7 @@ module frame_duo_tb;
         duo=1;
         force dut.Playfield_inst.counter_c2=5'd20;force dut.Playfield_inst.counter_r2=5'd0;force dut.Playfield_inst.type2=3'd0;
         look(842,154);check(rgb===24'h38B6C8,"P2 active piece at new coordinates");
-        duo=0;look(842,154);check(rgb===24'h131D26,"solo suppresses P2 piece");
+        duo=0;look(842,154);check(rgb===24'h091722,"solo suppresses P2 piece");
         release dut.Playfield_inst.counter_c2;release dut.Playfield_inst.counter_r2;
         clear_board;duo=1;
         force dut.Playfield_inst.counter_c2=5'd10;force dut.Playfield_inst.counter_r2=5'd19;force dut.Playfield_inst.type2=3'd3;
@@ -132,41 +134,39 @@ module frame_duo_tb;
         duo=1;look(210,458);check(rgb===24'hD97B33,"one shared HOLD on left");
         look(1026,458);check(!dut.hold_slot && !dut.hold,"no second HOLD over core");
         release dut.en_hold;release dut.hold_type;release dut.type_t;release dut.type_t2;
-        duo=0;hint_show=1;
+        duo=0;hint_show=1;force dut.hint_active=1;frame_edge;
         force dut.hint_valid=1;force dut.hint_c0=2;force dut.hint_c1=3;force dut.hint_c2=4;force dut.hint_c3=5;
         force dut.hint_r0=5;force dut.hint_r1=5;force dut.hint_r2=5;force dut.hint_r3=5;
-        look(454,270);check(rgb===24'hE8EEF2,"hint white corner");
-        look(458,274);check(rgb===24'hE8EEF2,"hint white center");
-        look(456,272);check(rgb===24'h131D26,"hint does not fill whole cell");
-        duo=1;look(454,270);check(rgb===24'h131D26,"duo hides solo hint");
-        hint_show=0;release dut.hint_valid;release dut.hint_c0;release dut.hint_c1;release dut.hint_c2;release dut.hint_c3;
+        look(448,270);check(rgb===24'hFFE39C,"solo hint hollow left edge");
+        look(454,264);check(rgb===24'hFFE39C,"solo hint hollow top edge");
+        look(456,272);check(rgb===24'h091722,"hint does not fill whole cell");
+        duo=1;look(454,270);check(rgb===24'h091722,"duo hides solo hint");
+        hint_show=0;release dut.hint_active;release dut.hint_valid;release dut.hint_c0;release dut.hint_c1;release dut.hint_c2;release dut.hint_c3;
         release dut.hint_r0;release dut.hint_r1;release dut.hint_r2;release dut.hint_r3;
-        force dut.story_phase=phase_value;force dut.core_locked=locked_value;force dut.display_debris=7'd0;
+        force dut.charge_left=0;force dut.story_phase=phase_value;force dut.core_locked=locked_value;force dut.display_debris=7'd0;
         phase_value=0;locked_value=0;frame_edge;
-        look(1014,520);check(rgb===24'h3A4A58,"phase0 rail interrupted");
+        look(UI_CORE_CENTER_X,494);check(rgb===24'h040c13,"core zero cells dark");
         phase_value=1;locked_value=2;repeat(3)@(negedge Clk);
-        check(dut.display_phase==0,"phase waits visible frame boundary");
-        frame_edge;look(1014,520);check(rgb===24'h7FE3EC,"phase1 lower rail restored");
-        phase_value=2;locked_value=4;frame_edge;look(1014,392);check(rgb===24'h7FE3EC,"phase2 continuous rail");
-        phase_value=3;locked_value=6;frame_edge;look(1040,372);check(rgb===24'h0C161E,"phase3 remaining segment stays dark");
-        look(1032,357);check(rgb===24'h5B6E7E,"single upper connector approaches");
-        force dut.danger_lvl=2'd2;frame_edge;look(1002,368);check(rgb===24'hD8442E,"real danger expands four paired teeth");
-        look(1040,586);check(rgb===24'h2FA8B8,"danger preserves locked energy");
+        check(dut.display_phase==0 && dut.display_locked==0,"phase and cells wait visible frame boundary");
+        frame_edge;look(UI_CORE_CENTER_X,494);check(rgb===24'h3fdef4,"core two lower cells");
+        phase_value=2;locked_value=4;frame_edge;look(UI_CORE_CENTER_X,422);check(rgb===24'h3fdef4,"core four lower cells");
+        phase_value=3;locked_value=6;frame_edge;look(UI_CORE_CENTER_X,300);check(rgb===24'h040c13,"core upper slot remains dark");
+        force dut.danger_lvl=2'd2;frame_edge;look(UI_CORE_CENTER_X,530);check(rgb===24'h3fdef4,"danger preserves attained cells");
         release dut.danger_lvl;
-        look(1000,40);check(rgb===24'h070A10,"no silent COMMS panel");
+        check(!dut.comms_visible,"no silent COMMS panel");
         force dut.result_valid=1;force dut.mission_success=1;locked_value=8;Finalize=1;Playing=0;
-        frame_edge;look(352,56);check(!dut.story_ui_inst.text_valid,"success presentation suppresses text");
+        frame_edge;look(352,56);check(!dut.story_ui_inst.reference_layer.terminal_panel,"success waits presentation before result overlay");
         repeat(40)@(negedge Clk);check(dut.result_ready,"success presentation completes");
-        glyph(420,264,16,3,24'hE8EEF2);
+        glyph(500,256,80,20,21,24'h7FE3EC);
         sw=1;@(negedge Clk);sw=0;#1;check(!dut.result_ready,"restart cancels old presentation");
         release dut.result_valid;release dut.mission_success;
         Finalize=0;Idle=1;repeat(30)@(negedge Clk);Idle=0;
         force dut.result_valid=1;force dut.mission_success=0;Finalize=1;frame_edge;
-        glyph(500,264,12,3,24'hD8442E);
+        glyph(550,256,76,20,21,24'hD8442E);
         release dut.result_valid;release dut.mission_success;release dut.story_phase;release dut.core_locked;release dut.display_debris;
-        Finalize=0;choose=1;duo=0;glyph(736,288,19,2,24'hE8EEF2);
-        duo=1;glyph(736,360,4,2,24'hE8EEF2);
-        choose=0;Idle=1;glyph(512,264,18,2,24'hE8EEF2);
+        Finalize=0;choose=1;duo=0;glyph(780,190,83,16,21,24'h7FE3EC);
+        duo=1;glyph(780,288,68,16,21,24'h7FE3EC);
+        choose=0;Idle=1;frame_edge;check(dut.story_ui_inst.Idle,"Idle display state latched");
         choose=0;Idle=0;Finalize=0;Playing=1;Stop=0;
         force dut.story_phase=phase_value;phase_value=0;
         drift_snapshot=dut.star_drift;repeat(600)@(negedge Clk);
@@ -184,6 +184,19 @@ module frame_duo_tb;
         Idle=1;Playing=0;campaign=0;repeat(100)@(negedge Clk);
         check(dut.debris_remaining==0 && dut.debris_mask==0 && dut.state==0,"campaign to endless reloads empty board");
         check(dut.run_ready,"cross-mode initialization becomes ready");
+        // UI award latches are read-only observers of the real batch contract.
+        Idle=0;Playing=1;Stop=0;repeat(3)@(negedge Clk);
+        force dut.batch_commit=1;force dut.batch_n=4;@(negedge Clk);
+        check(dut.ui_clear_credit==6 && dut.ui_clear_credit_age==48,"four lines show six credited units");
+        release dut.batch_commit;release dut.batch_n;
+        Stop=1;force dut.eff_tick=1;repeat(3)@(negedge Clk);
+        check(dut.ui_clear_credit_age==48,"pause freezes credit popup");
+        Stop=0;repeat(5)@(negedge Clk);check(dut.ui_clear_credit_age==43,"popup ages on UI tick");
+        release dut.eff_tick;
+        force dut.batch_commit=1;force dut.batch_n=8;@(negedge Clk);
+        check(dut.ui_clear_credit==8,"wide batch credit is not truncated");release dut.batch_commit;release dut.batch_n;
+        force dut.new_run=1;@(negedge Clk);
+        check(dut.ui_clear_credit==0 && dut.ui_clear_credit_age==0,"new run clears credit popup");release dut.new_run;
         if(errors==0)$display("=== ALL PASS: STORY FRAME %0d checks ===",checks);
         else $display("=== FAILED STORY FRAME %0d ===",errors);
         $finish;

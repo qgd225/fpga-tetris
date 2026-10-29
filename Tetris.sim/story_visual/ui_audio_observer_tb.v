@@ -1,0 +1,106 @@
+`timescale 1ns/1ps
+module ui_audio_observer_tb;
+ reg Clk_74M=0,Reset_n=0;always #5 Clk_74M=~Clk_74M;
+ reg Stop=0;
+ reg [5:0] audio_reject=0;
+ reg audio_reset_event=0;
+ reg blk_l1=0;
+ reg blk_l2=0;
+ reg blk_r1=0;
+ reg blk_r2=0;
+ reg blk_rot1=0;
+ reg blk_rot2=0;
+ reg choose=0;
+ reg clear=0;
+ reg core_half_event=0;
+ reg core_online_event=0;
+ reg danger1_pulse=0;
+ reg debris_clear_event=0;
+ reg left_p_menu=0;
+ reg lvl_up=0;
+ reg mission_success=0;
+ reg over=0;
+ reg p1_left=0;
+ reg p1_right=0;
+ reg p2_left=0;
+ reg p2_right=0;
+ reg p2_rotate=0;
+ reg rhythm_critical=0;
+ reg rhythm_expire=0;
+ reg rhythm_recharge=0;
+ reg rhythm_reject=0;
+ reg right_p_menu=0;
+ reg rotate_p=0;
+ reg [2:0] snd_clr_n=0;
+ reg snd_hard1=0;
+ reg snd_hard2=0;
+ reg snd_hold1=0;
+ reg snd_hold2=0;
+ reg snd_land1=0;
+ reg snd_land2=0;
+ reg snd_soft1=0;
+ reg snd_soft2=0;
+ reg story_alarm2=0;
+ reg sw_long=0;
+ reg sw_short=0;
+ wire [4:0] fx_event,old_event;wire [3:0] fx_step,fx_note,old_step,old_note;
+ wire fx_urgent,fx_active,old_urgent,old_active;
+ `include "ui_audio_observer_instance.vh"
+ sound #(.MS_MAX(3)) old_sound(.Clk_74M(Clk_74M),.Reset_n(Reset_n),.rhythm_reject(rhythm_reject),.rhythm_expire(rhythm_expire),.rhythm_recharge(rhythm_recharge),.rhythm_tick(rhythm_critical),.core_half(core_half_event),.core_online(core_online_event),.debris_clear(debris_clear_event),.over(over),.clear(clear),.clr_n(snd_clr_n),.lvl_up(lvl_up),.sw_short(sw_short),.sw_long(sw_long),.menu_l(choose && left_p_menu),.menu_r(choose && right_p_menu),.land1(snd_land1),.land2(snd_land2),.lft1(p1_left && !blk_l1),.rgt1(p1_right && !blk_r1),.rot1(rotate_p && !blk_rot1),.hard1(snd_hard1),.soft1(snd_soft1),.hold1(snd_hold1),.blk1(blk_l1 || blk_r1),.lft2(p2_left && !blk_l2),.rgt2(p2_right && !blk_r2),.rot2(p2_rotate && !blk_rot2),.hard2(snd_hard2),.soft2(snd_soft2),.hold2(snd_hold2),.blk2(blk_l2 || blk_r2),.blk_rot1(audio_reject[4]),.blk_rot2(audio_reject[5]),.danger1(danger1_pulse),.danger2(story_alarm2),.cancel(audio_reset_event || Stop || mission_success),.event_id(old_event),.step_id(old_step),.note_id(old_note),.fx_urgent(old_urgent),.fx_active(old_active));
+ reg [14:0] previous;integer n;
+ initial begin
+  repeat(4)@(negedge Clk_74M);Reset_n=1;previous=0;
+  for(n=0;n<50004;n=n+1)begin
+   @(negedge Clk_74M);
+   Stop=$random;
+   audio_reject=$random;
+   audio_reset_event=$random;
+   blk_l1=$random;
+   blk_l2=$random;
+   blk_r1=$random;
+   blk_r2=$random;
+   blk_rot1=$random;
+   blk_rot2=$random;
+   choose=$random;
+   clear=$random;
+   core_half_event=$random;
+   core_online_event=$random;
+   danger1_pulse=$random;
+   debris_clear_event=$random;
+   left_p_menu=$random;
+   lvl_up=$random;
+   mission_success=$random;
+   over=$random;
+   p1_left=$random;
+   p1_right=$random;
+   p2_left=$random;
+   p2_right=$random;
+   p2_rotate=$random;
+   rhythm_critical=$random;
+   rhythm_expire=$random;
+   rhythm_recharge=$random;
+   rhythm_reject=$random;
+   right_p_menu=$random;
+   rotate_p=$random;
+   snd_clr_n=$random;
+   snd_hard1=$random;
+   snd_hard2=$random;
+   snd_hold1=$random;
+   snd_hold2=$random;
+   snd_land1=$random;
+   snd_land2=$random;
+   snd_soft1=$random;
+   snd_soft2=$random;
+   story_alarm2=$random;
+   sw_long=$random;
+   sw_short=$random;
+   snd_clr_n=snd_clr_n%5;
+   @(posedge Clk_74M);#1;
+   if(n>=3 && {fx_event,fx_step,fx_note,fx_urgent,fx_active}!==previous)begin
+    $display("FAIL AUDIO_OBSERVER n=%0d actual=%h old_delayed=%h",n,{fx_event,fx_step,fx_note,fx_urgent,fx_active},previous);$finish;
+   end
+   previous={old_event,old_step,old_note,old_urgent,old_active};
+  end
+  $display("ALL PASS AUDIO_OBSERVER 50000 EVENT_PRIORITY_CANCEL_SEQUENCES_ONE_CLOCK");$finish;
+ end
+endmodule

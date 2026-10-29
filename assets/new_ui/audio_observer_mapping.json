@@ -1,0 +1,187 @@
+{
+  "width": 38,
+  "latency_cycles": 1,
+  "fields": [
+    {
+      "name": "rhythm_reject",
+      "source": "rhythm_reject",
+      "width": 1
+    },
+    {
+      "name": "rhythm_expire",
+      "source": "rhythm_expire",
+      "width": 1
+    },
+    {
+      "name": "rhythm_recharge",
+      "source": "rhythm_recharge",
+      "width": 1
+    },
+    {
+      "name": "rhythm_tick",
+      "source": "rhythm_critical",
+      "width": 1
+    },
+    {
+      "name": "core_half",
+      "source": "core_half_event",
+      "width": 1
+    },
+    {
+      "name": "core_online",
+      "source": "core_online_event",
+      "width": 1
+    },
+    {
+      "name": "debris_clear",
+      "source": "debris_clear_event",
+      "width": 1
+    },
+    {
+      "name": "over",
+      "source": "over",
+      "width": 1
+    },
+    {
+      "name": "clear",
+      "source": "clear",
+      "width": 1
+    },
+    {
+      "name": "clr_n",
+      "source": "snd_clr_n",
+      "width": 3
+    },
+    {
+      "name": "lvl_up",
+      "source": "lvl_up",
+      "width": 1
+    },
+    {
+      "name": "sw_short",
+      "source": "sw_short",
+      "width": 1
+    },
+    {
+      "name": "sw_long",
+      "source": "sw_long",
+      "width": 1
+    },
+    {
+      "name": "menu_l",
+      "source": "choose && left_p_menu",
+      "width": 1
+    },
+    {
+      "name": "menu_r",
+      "source": "choose && right_p_menu",
+      "width": 1
+    },
+    {
+      "name": "land1",
+      "source": "snd_land1",
+      "width": 1
+    },
+    {
+      "name": "land2",
+      "source": "snd_land2",
+      "width": 1
+    },
+    {
+      "name": "lft1",
+      "source": "p1_left && !blk_l1",
+      "width": 1
+    },
+    {
+      "name": "rgt1",
+      "source": "p1_right && !blk_r1",
+      "width": 1
+    },
+    {
+      "name": "rot1",
+      "source": "rotate_p && !blk_rot1",
+      "width": 1
+    },
+    {
+      "name": "hard1",
+      "source": "snd_hard1",
+      "width": 1
+    },
+    {
+      "name": "soft1",
+      "source": "snd_soft1",
+      "width": 1
+    },
+    {
+      "name": "hold1",
+      "source": "snd_hold1",
+      "width": 1
+    },
+    {
+      "name": "blk1",
+      "source": "blk_l1 || blk_r1",
+      "width": 1
+    },
+    {
+      "name": "lft2",
+      "source": "p2_left && !blk_l2",
+      "width": 1
+    },
+    {
+      "name": "rgt2",
+      "source": "p2_right && !blk_r2",
+      "width": 1
+    },
+    {
+      "name": "rot2",
+      "source": "p2_rotate && !blk_rot2",
+      "width": 1
+    },
+    {
+      "name": "hard2",
+      "source": "snd_hard2",
+      "width": 1
+    },
+    {
+      "name": "soft2",
+      "source": "snd_soft2",
+      "width": 1
+    },
+    {
+      "name": "hold2",
+      "source": "snd_hold2",
+      "width": 1
+    },
+    {
+      "name": "blk2",
+      "source": "blk_l2 || blk_r2",
+      "width": 1
+    },
+    {
+      "name": "blk_rot1",
+      "source": "audio_reject[4]",
+      "width": 1
+    },
+    {
+      "name": "blk_rot2",
+      "source": "audio_reject[5]",
+      "width": 1
+    },
+    {
+      "name": "danger1",
+      "source": "danger1_pulse",
+      "width": 1
+    },
+    {
+      "name": "danger2",
+      "source": "story_alarm2",
+      "width": 1
+    },
+    {
+      "name": "cancel",
+      "source": "audio_reset_event || Stop || mission_success",
+      "width": 1
+    }
+  ],
+  "scope": "仅音效观察快照，不回写游戏状态"
+}

@@ -1,0 +1,2 @@
+POSITIVE=PASS NEGATIVE=PASS
+INTENTIONAL_WRONG_ADDRESS_REJECTED: Wrong A2 connection on frame_inst/Playfield_inst/board_reads[0].below1/bits[0].ram

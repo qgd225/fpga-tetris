@@ -5,6 +5,8 @@ Tetris 以太网：PC 端画面显示 + 键盘按键发送
 正常使用时双击根目录 TetrisPC.exe 即可运行。
 
 FPGA 发来的包：
+  RGB游程: A5 5A 04 00 | 帧号/行号/起点/宽度各2B | N*(长度,R,G,B)，最多1292字节
+  以下两种为旧版兼容格式：
   行包   : A5 5A 01 | 帧号2B | 行号2B | 1280 个颜色标号(每像素 1B)   共 1287 字节
   调色板 : A5 5A 02 | N | N*(标号,R,G,B)                            共 4+4N 字节
 本程序发给 FPGA 的按键包：
@@ -17,7 +19,7 @@ FPGA 发来的包：
       它会自动把静态 ARP 绑到正确的网卡，然后启动本程序。
 """
 import os, socket, sys, threading, time
-from pc_protocol import decode_packet, LinePacket, create_receiver
+from pc_protocol import decode_packet, LinePacket, RGBChunkPacket, create_receiver
 
 # ======== 默认参数（要改就改这里）========
 FPGA_IP     = "192.168.0.2"     # FPGA 的 IP（和 net_screen_tx 里 LOCAL_IP 一致）
@@ -89,6 +91,9 @@ DEFAULT_PAL = {
 
 pal = dict(DEFAULT_PAL)
 buf = bytearray(W * H)
+rgb_buf = bytearray(W * H * 3)
+rgb_mode = False
+chunk_masks = [0] * H
 line_ok = [0] * H
 lock = threading.Lock()
 stat = {"pkt":0, "line":0, "pal":0, "last_frame":-1, "fps":0.0, "kb":0, "invalid":0, "error":""}
@@ -223,8 +228,10 @@ def tx_loop(local_source=None):
 
 
 def rx_loop(receiver):
+    global rgb_mode
     receiver.settimeout(0.2)
     t0, n0 = time.monotonic(), 0
+    last_accepted = t0
     try:
         while not stop_event.is_set():
             try:
@@ -242,14 +249,27 @@ def rx_loop(receiver):
                 stat["invalid"] += 1
                 continue
             with lock:
-                if isinstance(packet, LinePacket):
+                if isinstance(packet, (LinePacket, RGBChunkPacket)):
                     old_frame = stat["last_frame"]
                     if packet.frame != old_frame:
+                        # 活跃流拒绝迟到旧帧；超过250ms未接纳像素时重新同步FPGA复位后的帧号。
+                        if old_frame >= 0 and ((packet.frame-old_frame)&65535) >= 32768 and time.monotonic()-last_accepted < 0.25:
+                            continue
                         line_ok[:] = [0] * H
-                    buf[packet.line * W:(packet.line + 1) * W] = packet.pixels
-                    line_ok[packet.line] = 1
+                        chunk_masks[:] = [0] * H
+                    if isinstance(packet, RGBChunkPacket):
+                        rgb_mode = True
+                        offset=(packet.line*W+packet.x)*3
+                        rgb_buf[offset:offset+len(packet.pixels)] = packet.pixels
+                        chunk_masks[packet.line] |= ((1 << (len(packet.pixels)//3)) - 1) << packet.x
+                        line_ok[packet.line] = chunk_masks[packet.line] == (1 << W) - 1
+                    else:
+                        rgb_mode = False
+                        buf[packet.line * W:(packet.line + 1) * W] = packet.pixels
+                        line_ok[packet.line] = 1
                     stat["line"] += 1
                     stat["last_frame"] = packet.frame
+                    last_accepted = time.monotonic()
                 else:
                     pal.update(dict(packet.entries))
                     stat["pal"] += 1
@@ -308,10 +328,12 @@ def main(local_source=None, smoke_test=False, smoke_report=None):
         item = canvas.create_image(0, 0, anchor="nw", image=photo)
         def tick():
             with lock:
-                pixels = bytes(buf)
+                direct_rgb = rgb_mode
+                pixels = bytes(rgb_buf if direct_rgb else buf)
                 missing = line_ok.count(0)
-            im = Image.frombytes("P", (W, H), pixels)
-            im.putpalette(pal_bytes())
+            im = Image.frombytes("RGB" if direct_rgb else "P", (W, H), pixels)
+            if not direct_rgb:
+                im.putpalette(pal_bytes())
             photo.paste(im)
             canvas.itemconfigure(item, image=photo)
             label.config(text="行包=%d 调色板=%d 帧号=%d 本帧缺行=%d | 按键:%s 已发=%d | %s" %

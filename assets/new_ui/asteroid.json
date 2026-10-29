@@ -1,0 +1,12 @@
+{
+  "source": "asteroid.png",
+  "sha256": "80ba903041a030972cc02589b35ae722383f9db45b205522ad50f74fb64c9032",
+  "size": [
+    32,
+    32
+  ],
+  "visible_colors": 6,
+  "ROM_bits": 3264,
+  "decoded_pixels_verified": 1024,
+  "storage": "distributed ROM; no new BRAM"
+}

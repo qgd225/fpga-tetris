@@ -1,0 +1,1257 @@
+{
+  "round": 14,
+  "kind": "real_story_ui_xsim_rgb_frames",
+  "tool": "XSim 2018.3",
+  "baseline_commit": "46745c1b5b9ff14e6fd3fa8c251e1552bba6e840",
+  "changes": [
+    "all runtime labels and digits use one 5x7 alphabet",
+    "common baseline for header rows, SPD, player chips, timer and labels",
+    "campaign stage panel moved left below P2 NEXT; endless reserve information likewise",
+    "six-turn continuous descending steel chain wrap drawn only under existing LOCKED condition",
+    "seven existing COMMS IDs read from assets/story_ui.json; left-upper playfield overlay"
+  ],
+  "verification": "compile, elaborate and fixed-input RGB export only; no functional regression, synthesis, implementation or bit generation",
+  "rtl_source_sha256": {
+    "Tetris.srcs/sources_1/new/story_ui.v": "d1846081d099bea6039b699e73ca6ef61b5bdc5b02da9724f9e5762afa55af50",
+    "Tetris.srcs/sources_1/new/reference_ui_renderer.v": "b473b9297ae7ecf7232863c073713ce7918a1565a97378f71591b59b6426198f",
+    "Tetris.srcs/sources_1/new/reference_ui_geometry.vh": "0dfa06ca03af4cba1203426e52c4d93c90d6e86520e42b780e1af5f6c19b0cda",
+    "Tetris.srcs/sources_1/new/reference_ui_skin.mem": "f53d66f0021909d21ec28487cb97966938b65f145de74960064277a80e34fa3a",
+    "Tetris.srcs/sources_1/new/reference_ui_material.mem": "c7593af2bf4036d04f2e46a88a31fae8f4a4abbd4226fc4017b3f443af7db13c",
+    "Tetris.srcs/sources_1/new/story_palette.vh": "57804c0cb903b288a9da7c0ad4d7e1f8b2586eb91596bed1c1a309245b685acc",
+    "Tetris.srcs/sources_1/new/game_mode_params.vh": "34099850416d8a30c7c6087da1591d1541c5557e2a82dcf4450d278014821cde",
+    "tools/build_reference_ui_assets.py": "47b93ca73623b0785501b6d1a43bfbe85d22aa0dbd60bb635a86362fcf839838",
+    "assets/story_ui.json": "a8d924364d1984476ad1e9348beef31ee650e40d0ba455ede239df4727e0b2b4",
+    "assets/reference_ui/source_core_pipe.png": "98bcb5e0cbea9aeace8a11324bdfd776eeaad2d688de2502cd2d54193d90b07f",
+    "assets/reference_ui/source_header_panels.png": "f3d3be45b53524dd16335f9c3322d0be4446fd409d8f5bfbe5b2b8807f09a736",
+    "Tetris.sim/story_visual/ui_scenes_tb.v": "8aabe47f58fb8d3f70fe512707404d23142c8415b1b02548ebb93abf9d4bdc49",
+    "Tetris.sim/story_visual/ui_typography_review_tb.v": "a68e450257bd886cdf83b682bf4669ae7569fd4ad15e2da58483bc112820cc84",
+    "Tetris.sim/story_visual/ui_core_chain_review_tb.v": "79ecf706f0d74ed7728d39455d0385bd8c23ab3d7e2f5a6dab8a0ea5dbe544f5"
+  },
+  "gameplay_files_unchanged_since_baseline": [
+    "Game_state_machine.v",
+    "Playfield.v",
+    "Playfield_hold_controller.v",
+    "frame.v",
+    "scoring.v",
+    "story_controller.v",
+    "reserve_timer.v",
+    "hold_limits.v",
+    "hint_budget.v",
+    "Tetris.v"
+  ],
+  "baseline_bit_sha256": "851ba01534ee3aa60f0ba8c65514dbb7b1787050675f644cab1cadbaab5b7127",
+  "bit_is_this_round_ui": false,
+  "outputs": [
+    {
+      "file": "20261027_双人闯关_RTL.png",
+      "source_ppm": "duo_campaign.ppm",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "sha256": "e65d7d97af2548c7cd5bd840ac85937e8f4f45ce8fa833149468e09768aff1db",
+      "fixture": "duo_campaign"
+    },
+    {
+      "file": "20261027_双人无尽_RTL.png",
+      "source_ppm": "duo_endless.ppm",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "sha256": "908f4c66e7cdff11281444dfb5fe36b342bce430dd91dadb464ff0ce21a0dfef",
+      "fixture": "duo_endless"
+    },
+    {
+      "file": "独立组件/20261027_核心柱_锁定_铁索_RTL.png",
+      "source_ppm": "core_locked.ppm",
+      "size": [
+        118,
+        456
+      ],
+      "origin": [
+        1110,
+        208
+      ],
+      "sha256": "862547df055a7d831b4dde069bce10973cafb2f2feca24781f98db92fe738d89",
+      "fixture": "core_locked"
+    },
+    {
+      "file": "独立组件/20261027_核心柱_半充能_三段_RTL.png",
+      "source_ppm": "core_half.ppm",
+      "size": [
+        118,
+        456
+      ],
+      "origin": [
+        1110,
+        208
+      ],
+      "sha256": "ab4e1dabf9812ce0d99245e607ea7897060362646fbbc072de599dbdb4c5d195",
+      "fixture": "core_half"
+    },
+    {
+      "file": "独立组件/20261027_核心柱_在线_七段_RTL.png",
+      "source_ppm": "core_online7.ppm",
+      "size": [
+        118,
+        456
+      ],
+      "origin": [
+        1110,
+        208
+      ],
+      "sha256": "a13a457cbfb643acb2db77a46ceb1e7d9af1e19ddd363ad16ce33eb6d0efa926",
+      "fixture": "core_online7"
+    },
+    {
+      "file": "独立组件/20261027_核心柱_成功_八段_RTL.png",
+      "source_ppm": "core_success8.ppm",
+      "size": [
+        118,
+        456
+      ],
+      "origin": [
+        1110,
+        208
+      ],
+      "sha256": "dccb687caffcf9fc3838481af20cb64b0fd36ce18928300f4a06815298d2ede1",
+      "fixture": "core_success8"
+    },
+    {
+      "file": "20261027_双人闯关_左上对白_RTL.png",
+      "source_ppm": "duo_campaign_comms.ppm",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "sha256": "c3946e524c3367b28636730a7e41a90fa1c28741b0fb55e762bdd729e641433b",
+      "fixture": "duo_campaign_comms"
+    },
+    {
+      "file": "独立组件/20261027_左上对白_0_RTL.png",
+      "source_ppm": "comms_0.ppm",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "sha256": "fefb71070c9228bf17645d79c413d4ffa6b6059979c6a18db9e2bf2a464f3c47",
+      "fixture": "comms_0"
+    },
+    {
+      "file": "独立组件/20261027_左上对白_1_RTL.png",
+      "source_ppm": "comms_1.ppm",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "sha256": "3b2cf205abf212361d5883cb5926b2f0cd8e3ecfae4d9506fcb2aa7ebef912c4",
+      "fixture": "comms_1"
+    },
+    {
+      "file": "独立组件/20261027_左上对白_2_RTL.png",
+      "source_ppm": "comms_2.ppm",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "sha256": "371d71bdd13e48a978dc39aaeccb9849c1b646f3cbe9c6959ef6d7cfe8b0c974",
+      "fixture": "comms_2"
+    },
+    {
+      "file": "独立组件/20261027_左上对白_3_RTL.png",
+      "source_ppm": "comms_3.ppm",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "sha256": "66355cc9a8637658dbe363b350a1dffc8ad65857c9333d8ce13653038c064a60",
+      "fixture": "comms_3"
+    },
+    {
+      "file": "独立组件/20261027_左上对白_4_RTL.png",
+      "source_ppm": "comms_4.ppm",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "sha256": "3352f6efe08df38fefc892accf6d85c5365b22c58d18b807fb7702ebd04c2464",
+      "fixture": "comms_4"
+    },
+    {
+      "file": "独立组件/20261027_左上对白_5_RTL.png",
+      "source_ppm": "comms_5.ppm",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "sha256": "c730f78ade8a101e6183fb7fca0c9961ae72c2b9f511be2df70642aec3db3637",
+      "fixture": "comms_5"
+    },
+    {
+      "file": "独立组件/20261027_左上对白_6_RTL.png",
+      "source_ppm": "comms_6.ppm",
+      "size": [
+        376,
+        120
+      ],
+      "origin": [
+        360,
+        152
+      ],
+      "sha256": "bef798bb413a9e7fa544d86615859e663a4fead686966c484e68875299387383",
+      "fixture": "comms_6"
+    },
+    {
+      "file": "20261027_单人闯关_RTL.png",
+      "source_ppm": "solo_campaign.ppm",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "sha256": "0524a7c4c179ffbc6e88f2df6715fae70d708c22d16b88da43dc8058a92845c1",
+      "fixture": "solo_campaign"
+    },
+    {
+      "file": "20261027_单人无尽_RTL.png",
+      "source_ppm": "solo_endless.ppm",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "sha256": "0f8c6306b922de42aa589e52208a6d332d068a8bcd135b50fa26541a857732b5",
+      "fixture": "solo_endless"
+    },
+    {
+      "file": "20261027_主菜单_RTL.png",
+      "source_ppm": "main_menu.ppm",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "sha256": "4dd1d237960aa8234b010131a467b91bc4f275058d6ef6a7fa01f4f640119e3b",
+      "fixture": "main_menu"
+    },
+    {
+      "file": "20261027_单人选关_RTL.png",
+      "source_ppm": "solo_select.ppm",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "sha256": "1d4a8eaaedfa6271a56473a3ea9544a92889047257b14fc5fc2557803ccbdec0",
+      "fixture": "solo_select"
+    },
+    {
+      "file": "20261027_双人选关_RTL.png",
+      "source_ppm": "duo_select.ppm",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "sha256": "e29bcbda974887e0178283b66e37f3412ec076e2e6e7e91e76df3d7c457d61ac",
+      "fixture": "duo_select"
+    },
+    {
+      "file": "20261027_双人闯关_LOCKED缠绕铁索_RTL.png",
+      "source_ppm": "duo_campaign_locked.ppm",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "sha256": "f3741be6d4add71dfb10d99cab579d2f426691bbb18772ad496a49ef1700a49e",
+      "fixture": "duo_campaign_locked"
+    }
+  ],
+  "sheets": [
+    "20261027_核心柱四状态_RTL.png",
+    "20261027_左上对白七状态_RTL.png",
+    "20261027_七场景_RTL总览.png"
+  ],
+  "sheets_note": "RTL images cropped by the capture fixture at original screen coordinates; nearest integer 2x for component sheets; external labels only. Overview is a downscaled index, use native full frames for pixel review.",
+  "material_changes": {
+    "source_sha256": "2ec45276d0ec937a5df04bdd2ce6becabd165b7adf8e0e32b14eb35b89e1ead2",
+    "canvas": [
+      1280,
+      720
+    ],
+    "kind": "material_only_not_rtl_preview",
+    "fields": {
+      "charge_value": [
+        569,
+        57,
+        642,
+        80
+      ],
+      "debris_value": [
+        569,
+        92,
+        660,
+        114
+      ],
+      "charge_track": [
+        664,
+        59,
+        997,
+        80
+      ],
+      "debris_track": [
+        664,
+        95,
+        997,
+        114
+      ],
+      "charge_percent": [
+        1000,
+        57,
+        1048,
+        80
+      ],
+      "debris_percent": [
+        1000,
+        93,
+        1048,
+        116
+      ],
+      "ship_number": [
+        251,
+        43,
+        288,
+        72
+      ],
+      "time_value": [
+        651,
+        645,
+        779,
+        679
+      ]
+    },
+    "core": {
+      "x": 1130,
+      "y": 260,
+      "w": 54,
+      "h": 288,
+      "glass_x": 1157,
+      "glass_w": 26,
+      "pitch": 36
+    },
+    "atlas_words": 30128,
+    "core_logic_changed": false,
+    "scope": "four play modes, main menu and solo/duo ship selection",
+    "player_tabs": {
+      "p1_header": [
+        143,
+        148,
+        298,
+        184
+      ],
+      "p2_header": [
+        959,
+        148,
+        1114,
+        184
+      ],
+      "offset_x": 816,
+      "same_protruding_silhouette": true,
+      "p1_lower_transition": [
+        143,
+        184,
+        168,
+        216
+      ],
+      "p2_lower_transition": [
+        959,
+        184,
+        984,
+        216
+      ],
+      "p2_ink_source": "approved reference chip"
+    },
+    "skin_banks": [
+      "duo_campaign",
+      "solo_campaign",
+      "solo_endless",
+      "duo_endless",
+      "terminal"
+    ],
+    "component_sources": {
+      "pipe_core_phase": {
+        "file": "source_core_pipe.png",
+        "sha256": "98bcb5e0cbea9aeace8a11324bdfd776eeaad2d688de2502cd2d54193d90b07f"
+      },
+      "header_next_hold": {
+        "file": "source_header_panels.png",
+        "sha256": "f3d3be45b53524dd16335f9c3322d0be4446fd409d8f5bfbe5b2b8807f09a736"
+      }
+    },
+    "pipe_path": [
+      [
+        1064.0,
+        70.0
+      ],
+      [
+        1098.0,
+        70.0
+      ],
+      [
+        1098.3926738492125,
+        70.0038551903587
+      ],
+      [
+        1098.7851963151813,
+        70.01541927518554
+      ],
+      [
+        1099.1774160730238,
+        70.03468779630569
+      ],
+      [
+        1099.5691819145568,
+        70.06165332533745
+      ],
+      [
+        1099.9603428065911,
+        70.09630546655606
+      ],
+      [
+        1100.3507479491568,
+        70.13863086090147
+      ],
+      [
+        1100.7402468336393,
+        70.18861319112845
+      ],
+      [
+        1101.1286893008046,
+        70.24623318809725
+      ],
+      [
+        1101.515925598687,
+        70.31146863820217
+      ],
+      [
+        1101.9018064403226,
+        70.38429439193538
+      ],
+      [
+        1102.286183061301,
+        70.46468237358255
+      ],
+      [
+        1102.668907277118,
+        70.55260159204647
+      ],
+      [
+        1103.049831540303,
+        70.6480181527948
+      ],
+      [
+        1103.4288089973015,
+        70.75089527092706
+      ],
+      [
+        1103.8056935450893,
+        70.86119328535582
+      ],
+      [
+        1104.180339887499,
+        70.97886967409693
+      ],
+      [
+        1104.552603591234,
+        71.10387907066244
+      ],
+      [
+        1104.9223411415499,
+        71.23617328155032
+      ],
+      [
+        1105.2894099975829,
+        71.37570130482393
+      ],
+      [
+        1105.6536686473019,
+        71.52240934977426
+      ],
+      [
+        1106.0149766620627,
+        71.67624085765728
+      ],
+      [
+        1106.3731947507486,
+        71.83713652349837
+      ],
+      [
+        1106.728184813467,
+        72.00503431895557
+      ],
+      [
+        1107.079809994791,
+        72.17986951623264
+      ],
+      [
+        1107.42793473652,
+        72.3615747130329
+      ],
+      [
+        1107.7724248299392,
+        72.55007985854405
+      ],
+      [
+        1108.1131474675597,
+        72.74531228044417
+      ],
+      [
+        1108.449971294319,
+        72.94719671291816
+      ],
+      [
+        1108.78276645822,
+        73.15565532567427
+      ],
+      [
+        1109.111404660392,
+        73.37060775394909
+      ],
+      [
+        1109.4357592045521,
+        73.59197112948974
+      ],
+      [
+        1109.7557050458495,
+        73.81966011250105
+      ],
+      [
+        1110.0711188390715,
+        74.05358692454585
+      ],
+      [
+        1110.3818789861966,
+        74.2936613823851
+      ],
+      [
+        1110.687865683273,
+        74.53979093274526
+      ],
+      [
+        1110.9889609666036,
+        74.79188068799938
+      ],
+      [
+        1111.2850487582257,
+        75.04983346274807
+      ],
+      [
+        1111.5760149106588,
+        75.3135498112863
+      ],
+      [
+        1111.8617472509127,
+        75.58292806594162
+      ],
+      [
+        1112.142135623731,
+        75.85786437626905
+      ],
+      [
+        1112.4170719340584,
+        76.13825274908729
+      ],
+      [
+        1112.6864501887137,
+        76.42398508934116
+      ],
+      [
+        1112.950166537252,
+        76.71495124177437
+      ],
+      [
+        1113.2081193120007,
+        77.01103903339633
+      ],
+      [
+        1113.4602090672547,
+        77.31213431672708
+      ],
+      [
+        1113.7063386176148,
+        77.61812101380332
+      ],
+      [
+        1113.946413075454,
+        77.92888116092857
+      ],
+      [
+        1114.180339887499,
+        78.24429495415053
+      ],
+      [
+        1114.4080288705102,
+        78.56424079544776
+      ],
+      [
+        1114.6293922460509,
+        78.88859533960796
+      ],
+      [
+        1114.8443446743258,
+        79.21723354177999
+      ],
+      [
+        1115.0528032870818,
+        79.55002870568103
+      ],
+      [
+        1115.254687719556,
+        79.88685253244032
+      ],
+      [
+        1115.449920141456,
+        80.2275751700609
+      ],
+      [
+        1115.638425286967,
+        80.57206526348004
+      ],
+      [
+        1115.8201304837673,
+        80.92019000520907
+      ],
+      [
+        1115.9949656810445,
+        81.27181518653316
+      ],
+      [
+        1116.1628634765016,
+        81.62680524925143
+      ],
+      [
+        1116.3237591423426,
+        81.98502333793718
+      ],
+      [
+        1116.4775906502257,
+        82.3463313526982
+      ],
+      [
+        1116.624298695176,
+        82.710590002417
+      ],
+      [
+        1116.7638267184498,
+        83.07765885845014
+      ],
+      [
+        1116.8961209293375,
+        83.44739640876612
+      ],
+      [
+        1117.021130325903,
+        83.81966011250105
+      ],
+      [
+        1117.1388067146443,
+        84.19430645491076
+      ],
+      [
+        1117.249104729073,
+        84.57119100269851
+      ],
+      [
+        1117.3519818472053,
+        84.95016845969684
+      ],
+      [
+        1117.4473984079536,
+        85.33109272288189
+      ],
+      [
+        1117.5353176264175,
+        85.71381693869898
+      ],
+      [
+        1117.6157056080647,
+        86.09819355967744
+      ],
+      [
+        1117.688531361798,
+        86.48407440131291
+      ],
+      [
+        1117.7537668119028,
+        86.87131069919538
+      ],
+      [
+        1117.8113868088715,
+        87.25975316636064
+      ],
+      [
+        1117.8613691390985,
+        87.64925205084324
+      ],
+      [
+        1117.903694533444,
+        88.03965719340879
+      ],
+      [
+        1117.9383466746626,
+        88.43081808544311
+      ],
+      [
+        1117.9653122036943,
+        88.82258392697622
+      ],
+      [
+        1117.9845807248144,
+        89.21480368481863
+      ],
+      [
+        1117.9961448096412,
+        89.60732615078743
+      ],
+      [
+        1118.0,
+        90.0
+      ],
+      [
+        1118.0,
+        304.0
+      ],
+      [
+        1118.0038551903588,
+        304.39267384921254
+      ],
+      [
+        1118.0154192751856,
+        304.7851963151814
+      ],
+      [
+        1118.0346877963057,
+        305.1774160730238
+      ],
+      [
+        1118.0616533253374,
+        305.5691819145569
+      ],
+      [
+        1118.096305466556,
+        305.9603428065912
+      ],
+      [
+        1118.1386308609015,
+        306.35074794915676
+      ],
+      [
+        1118.1886131911285,
+        306.7402468336394
+      ],
+      [
+        1118.2462331880972,
+        307.12868930080464
+      ],
+      [
+        1118.311468638202,
+        307.5159255986871
+      ],
+      [
+        1118.3842943919353,
+        307.90180644032256
+      ],
+      [
+        1118.4646823735825,
+        308.286183061301
+      ],
+      [
+        1118.5526015920464,
+        308.66890727711814
+      ],
+      [
+        1118.6480181527947,
+        309.04983154030316
+      ],
+      [
+        1118.750895270927,
+        309.4288089973015
+      ],
+      [
+        1118.8611932853557,
+        309.80569354508924
+      ],
+      [
+        1118.978869674097,
+        310.180339887499
+      ],
+      [
+        1119.1038790706625,
+        310.5526035912339
+      ],
+      [
+        1119.2361732815502,
+        310.92234114154985
+      ],
+      [
+        1119.375701304824,
+        311.289409997583
+      ],
+      [
+        1119.5224093497743,
+        311.6536686473018
+      ],
+      [
+        1119.6762408576574,
+        312.01497666206285
+      ],
+      [
+        1119.8371365234984,
+        312.37319475074855
+      ],
+      [
+        1120.0050343189555,
+        312.72818481346684
+      ],
+      [
+        1120.1798695162327,
+        313.07980999479093
+      ],
+      [
+        1120.361574713033,
+        313.42793473651994
+      ],
+      [
+        1120.550079858544,
+        313.7724248299391
+      ],
+      [
+        1120.745312280444,
+        314.1131474675597
+      ],
+      [
+        1120.9471967129182,
+        314.44997129431897
+      ],
+      [
+        1121.1556553256742,
+        314.78276645822
+      ],
+      [
+        1121.3706077539491,
+        315.11140466039205
+      ],
+      [
+        1121.5919711294898,
+        315.43575920455226
+      ],
+      [
+        1121.819660112501,
+        315.7557050458495
+      ],
+      [
+        1122.053586924546,
+        316.07111883907146
+      ],
+      [
+        1122.2936613823852,
+        316.3818789861967
+      ],
+      [
+        1122.5397909327453,
+        316.6878656832729
+      ],
+      [
+        1122.7918806879993,
+        316.98896096660366
+      ],
+      [
+        1123.049833462748,
+        317.2850487582256
+      ],
+      [
+        1123.3135498112863,
+        317.57601491065884
+      ],
+      [
+        1123.5829280659416,
+        317.86174725091274
+      ],
+      [
+        1123.8578643762692,
+        318.14213562373095
+      ],
+      [
+        1124.1382527490873,
+        318.41707193405836
+      ],
+      [
+        1124.4239850893412,
+        318.6864501887137
+      ],
+      [
+        1124.7149512417743,
+        318.95016653725196
+      ],
+      [
+        1125.0110390333964,
+        319.20811931200063
+      ],
+      [
+        1125.312134316727,
+        319.46020906725477
+      ],
+      [
+        1125.6181210138034,
+        319.7063386176149
+      ],
+      [
+        1125.9288811609285,
+        319.94641307545413
+      ],
+      [
+        1126.2442949541505,
+        320.180339887499
+      ],
+      [
+        1126.5642407954479,
+        320.4080288705103
+      ],
+      [
+        1126.888595339608,
+        320.6293922460509
+      ],
+      [
+        1127.21723354178,
+        320.8443446743257
+      ],
+      [
+        1127.550028705681,
+        321.0528032870819
+      ],
+      [
+        1127.8868525324403,
+        321.2546877195558
+      ],
+      [
+        1128.2275751700608,
+        321.44992014145595
+      ],
+      [
+        1128.57206526348,
+        321.6384252869671
+      ],
+      [
+        1128.920190005209,
+        321.82013048376734
+      ],
+      [
+        1129.271815186533,
+        321.99496568104445
+      ],
+      [
+        1129.6268052492514,
+        322.1628634765016
+      ],
+      [
+        1129.9850233379373,
+        322.32375914234274
+      ],
+      [
+        1130.3463313526981,
+        322.47759065022575
+      ],
+      [
+        1130.710590002417,
+        322.6242986951761
+      ],
+      [
+        1131.0776588584501,
+        322.7638267184497
+      ],
+      [
+        1131.447396408766,
+        322.89612092933754
+      ],
+      [
+        1131.819660112501,
+        323.0211303259031
+      ],
+      [
+        1132.1943064549107,
+        323.13880671464415
+      ],
+      [
+        1132.5711910026985,
+        323.24910472907294
+      ],
+      [
+        1132.950168459697,
+        323.3519818472052
+      ],
+      [
+        1133.331092722882,
+        323.44739840795353
+      ],
+      [
+        1133.713816938699,
+        323.53531762641745
+      ],
+      [
+        1134.0981935596774,
+        323.6157056080646
+      ],
+      [
+        1134.484074401313,
+        323.68853136179786
+      ],
+      [
+        1134.8713106991954,
+        323.7537668119028
+      ],
+      [
+        1135.2597531663607,
+        323.81138680887153
+      ],
+      [
+        1135.6492520508432,
+        323.86136913909854
+      ],
+      [
+        1136.0396571934089,
+        323.90369453344397
+      ],
+      [
+        1136.4308180854432,
+        323.93834667466257
+      ],
+      [
+        1136.8225839269762,
+        323.96531220369434
+      ],
+      [
+        1137.2148036848187,
+        323.98458072481446
+      ],
+      [
+        1137.6073261507875,
+        323.9961448096413
+      ],
+      [
+        1138.0,
+        324.0
+      ],
+      [
+        1141.0,
+        324.0
+      ]
+    ],
+    "block_style": "original block_index and story_palette; one-pixel bevel, clipped corners",
+    "debris_style": "original story_ui shader; gray-blue face with one-pixel X",
+    "field_edge_repair": {
+      "left": [
+        298,
+        132,
+        352,
+        632
+      ],
+      "right": [
+        928,
+        132,
+        970,
+        632
+      ],
+      "bezel_width": 24,
+      "facets": "three hard value steps; no global haze"
+    },
+    "finishing_brief": "art_review/fig3_fix_prompts.md zones 2,3,4,5,6,7; retain approved layout and original blocks/debris",
+    "hint_panel": "solo only; falling-piece/projected-target diagram, reticle and arrow; campaign slots/time bar; endless infinity icon; no text",
+    "endless_pipe": "absent; pipe, recessed channel, collars and endpoints restored to clean underlay",
+    "phase_labels": "stacked circles above full labels, centered and 54px spaced; bottom-to-top RECONNECT REBUILD STABILIZE RECHARGE",
+    "legend_panel": [
+      972,
+      364,
+      1108,
+      612
+    ],
+    "locked_chain": {
+      "rect": [
+        1126,
+        274,
+        1214,
+        538
+      ],
+      "turns": 6,
+      "path": "one continuous descending helix; rear links occluded by mast",
+      "atlas_offset": 6896,
+      "condition": "campaign and debris_left > mode_half"
+    },
+    "typography": "one runtime 5x7 alphabet; same-group common bottom baseline",
+    "comms": "existing seven dialogue IDs, native RTL, upper-left playfield overlay",
+    "spd_plate": [
+      974,
+      312,
+      1110,
+      354
+    ],
+    "time_plaque": [
+      466,
+      640,
+      880,
+      689
+    ],
+    "core_mast_revision": {
+      "envelope": [
+        1124,
+        214,
+        1204,
+        570
+      ],
+      "layers": 3,
+      "axis_x": 1170,
+      "left_rail": "ladder",
+      "right_rail": "straight machined bar",
+      "chamber": [
+        1154,
+        258,
+        1186,
+        548
+      ],
+      "square_chamber": true,
+      "rung_pitch": 18,
+      "joint_rows": [
+        260,
+        332,
+        404,
+        476,
+        548
+      ],
+      "clamp_datum_y": 512,
+      "crown": "orange-gold dome and stepped collar",
+      "amber_base_is_not_charge_cell": true,
+      "runtime_cells": 8,
+      "scope": "energy mast only; original core glass coordinates retained"
+    },
+    "pipe_channel": {
+      "sample_radius": 15,
+      "tube_radius": 7,
+      "source": "analytic centerline; reference hardware palette",
+      "elbow_radius": 20,
+      "diameter": 14,
+      "fluid_segment": [
+        1118,
+        106,
+        1118,
+        154
+      ],
+      "interface_revision": {
+        "header_flange": [
+          1049,
+          53,
+          1079,
+          88
+        ],
+        "mast_seat": [
+          1140,
+          310,
+          1155,
+          339
+        ],
+        "shared_panel_edge": [
+          1102,
+          148,
+          1110,
+          354
+        ],
+        "glass_collars_y": [
+          106,
+          154
+        ],
+        "hull_tab_y": [
+          190,
+          270
+        ]
+      },
+      "includes": [
+        "recess_floor",
+        "inner_shadow",
+        "steel_lip"
+      ]
+    }
+  },
+  "render_log_sha256": "f71b38b8492681f00f0f215f4049c9a30339ab72ee511f9b7ef7cf12e2b209ad",
+  "chain_render_log_sha256": "566ee97386a8e133302c0599a700d6bd72db525c3c0f4e31311112158c3c3c0b",
+  "review_status": "waiting_for_user",
+  "render_batches": {
+    "initial": {
+      "frames": "all except core_locked and duo_campaign_locked",
+      "material_sha256": "5ee303048adfbdafc2739d9b8b3c3e5ee161fd245616aa3138c445fe442d2f2a",
+      "geometry_sha256": "de263ff9b808d2905a274b5a475d74bf4ec9650f306cba3c4796405b0ceb1f86"
+    },
+    "chain_revision": {
+      "frames": [
+        "core_locked",
+        "duo_campaign_locked"
+      ],
+      "source_hashes": "rtl_source_sha256",
+      "reason": "user corrected a single belt to six descending turns"
+    }
+  },
+  "reuse_evidence": "Skin bytes and atlas words 0..6895 unchanged; only chain sprite/rect/atlas length changed. The existing LOCKED condition is false in every reused frame. LOCKED ROI and full frame recompiled and rescanned using final assets."
+}

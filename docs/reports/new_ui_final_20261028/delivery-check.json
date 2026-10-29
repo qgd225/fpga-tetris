@@ -1,0 +1,16 @@
+{
+  "pass": true,
+  "published_bit_sha256": "03cc79161106ce02d4731252c30bf2ba1a46bb475d2431a9e20610dcb9011b48",
+  "published_exe_sha256": "d0c40f1218daa98d58abb24126402e90d811e7e99f1256870570dbdbfe49fe72",
+  "old_bit_archive": "bit\\Tetris_20261029_105813_851ba01534ee.bit",
+  "checked_document_links": [
+    "docs/README.md",
+    "docs/资料索引.md",
+    "docs/参考图/README.md",
+    "docs/参考图/预览图/清单.md",
+    "docs/技术说明/新UI渲染与网口.md",
+    "docs/reports/new_ui_final_20261028/README.md",
+    "docs/reports/new_ui_final_20261028/告警与时序复核.md",
+    "pc/README.md"
+  ]
+}

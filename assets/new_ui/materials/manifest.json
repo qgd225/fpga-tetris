@@ -1,0 +1,310 @@
+{
+  "sprites": [
+    {
+      "id": 0,
+      "name": "p1_next",
+      "size": [
+        155,
+        172
+      ],
+      "stride": 20,
+      "map_base": 0,
+      "map_words": 440,
+      "origin": [
+        143,
+        148
+      ]
+    },
+    {
+      "id": 1,
+      "name": "p2_next",
+      "size": [
+        155,
+        172
+      ],
+      "stride": 20,
+      "map_base": 440,
+      "map_words": 440,
+      "origin": [
+        959,
+        148
+      ]
+    },
+    {
+      "id": 2,
+      "name": "hold",
+      "size": [
+        140,
+        174
+      ],
+      "stride": 18,
+      "map_base": 880,
+      "map_words": 396,
+      "origin": [
+        154,
+        332
+      ]
+    },
+    {
+      "id": 3,
+      "name": "p2_next_endless",
+      "size": [
+        155,
+        172
+      ],
+      "stride": 20,
+      "map_base": 1276,
+      "map_words": 440,
+      "origin": [
+        959,
+        148
+      ]
+    },
+    {
+      "id": 4,
+      "name": "header",
+      "size": [
+        893,
+        96
+      ],
+      "stride": 112,
+      "map_base": 1716,
+      "map_words": 1344,
+      "origin": [
+        156,
+        32
+      ]
+    },
+    {
+      "id": 5,
+      "name": "core_campaign",
+      "size": [
+        90,
+        356
+      ],
+      "stride": 12,
+      "map_base": 3060,
+      "map_words": 540,
+      "origin": [
+        1124,
+        214
+      ]
+    },
+    {
+      "id": 6,
+      "name": "core_endless",
+      "size": [
+        90,
+        356
+      ],
+      "stride": 12,
+      "map_base": 3600,
+      "map_words": 540,
+      "origin": [
+        1124,
+        214
+      ]
+    },
+    {
+      "id": 7,
+      "name": "core_locked",
+      "size": [
+        90,
+        356
+      ],
+      "stride": 12,
+      "map_base": 4140,
+      "map_words": 540,
+      "origin": null
+    },
+    {
+      "id": 8,
+      "name": "pipe",
+      "size": [
+        106,
+        310
+      ],
+      "stride": 14,
+      "map_base": 4680,
+      "map_words": 546,
+      "origin": [
+        1049,
+        32
+      ]
+    },
+    {
+      "id": 9,
+      "name": "legend",
+      "size": [
+        136,
+        248
+      ],
+      "stride": 17,
+      "map_base": 5226,
+      "map_words": 527,
+      "origin": [
+        972,
+        364
+      ]
+    },
+    {
+      "id": 10,
+      "name": "status",
+      "size": [
+        96,
+        42
+      ],
+      "stride": 12,
+      "map_base": 5753,
+      "map_words": 72,
+      "origin": [
+        1114,
+        618
+      ]
+    },
+    {
+      "id": 11,
+      "name": "charge_on",
+      "size": [
+        14,
+        16
+      ],
+      "stride": 2,
+      "map_base": 5825,
+      "map_words": 4,
+      "origin": null
+    },
+    {
+      "id": 12,
+      "name": "charge_off",
+      "size": [
+        14,
+        16
+      ],
+      "stride": 2,
+      "map_base": 5829,
+      "map_words": 4,
+      "origin": null
+    },
+    {
+      "id": 13,
+      "name": "debris_on",
+      "size": [
+        14,
+        16
+      ],
+      "stride": 2,
+      "map_base": 5833,
+      "map_words": 4,
+      "origin": null
+    },
+    {
+      "id": 14,
+      "name": "debris_off",
+      "size": [
+        14,
+        16
+      ],
+      "stride": 2,
+      "map_base": 5837,
+      "map_words": 4,
+      "origin": null
+    },
+    {
+      "id": 15,
+      "name": "speed",
+      "size": [
+        140,
+        42
+      ],
+      "stride": 18,
+      "map_base": 5841,
+      "map_words": 108,
+      "origin": [
+        972,
+        314
+      ]
+    },
+    {
+      "id": 16,
+      "name": "speed_endless",
+      "size": [
+        140,
+        42
+      ],
+      "stride": 18,
+      "map_base": 5949,
+      "map_words": 108,
+      "origin": [
+        972,
+        314
+      ]
+    },
+    {
+      "id": 17,
+      "name": "header_endless_edge",
+      "size": [
+        15,
+        96
+      ],
+      "stride": 2,
+      "map_base": 6057,
+      "map_words": 24,
+      "origin": [
+        1049,
+        32
+      ]
+    }
+  ],
+  "descriptor_bits": 27,
+  "palette_words": 8516,
+  "rgb_words": 1532,
+  "rgb_bits": 11,
+  "pattern_counts": [
+    1,
+    64,
+    316,
+    628,
+    483,
+    246
+  ],
+  "ROM_capacity_bits": 759647,
+  "capacity_only_bram36_lower_bound": 21,
+  "endless_header_fill_model_verified": true,
+  "high_color_global_entries": 1426,
+  "high_color_index_bits": 11,
+  "fallback_ownership_verified": true,
+  "track_threshold_pairs_verified": 33633,
+  "files_sha256": {
+    "ui_material_map.mem": "e4a1d2b84e92d40da06e34eaf114301868fc27f35115ba08065707c686675235",
+    "ui_material_map_hi.mem": "47e05e6a1dd09522e276ab537970000424e3f90959dd6219922fef6d10ee3f73",
+    "ui_material_map_lo.mem": "fe6a884a33552692ce0b7a8b2031d6af05553c98a6be6ae4c0487a6f2f728b07",
+    "ui_material_p1.mem": "4fbeee8f2c8496042243b76d849df1a31bacf9053363010be5417d0ff308e106",
+    "ui_material_p1_hi.mem": "ee4113e64106711431aa2d9430b77ec69bec1b740509c09370ddd11d3c8b12c1",
+    "ui_material_p1_lo.mem": "a160e6eda55c970eebfacde77841fc4dd5e6518dfecae555680b7c10fb9bf50f",
+    "ui_material_p2.mem": "731389c21ec1b4913c759adefdcf8421bad339854be8a66aaa9e06df41c89b98",
+    "ui_material_p2_hi.mem": "87e8c68935eb1155b4a0c9075ef7621ce3581a8cd7a571249adc5971645f6fcc",
+    "ui_material_p2_lo.mem": "e466683fed953fee24046e28f8e959930d429ec553f71ffdead3d4258c7b61ec",
+    "ui_material_p3.mem": "57b3a5e139535544ae61db19e6cd60c188fa64a34281cfbd7030a3084aa002ed",
+    "ui_material_p3_hi.mem": "1bef3b182f83797c188f0ed3eadbbc381386ae58942a0b566e06894646960a06",
+    "ui_material_p3_lo.mem": "edfa9879ba83b4bc726de522a237dc1c305d04da2aab4f614280111a8f303c3f",
+    "ui_material_p4.mem": "59b6b6dd9764a9ee1820eb2a7568c62af6009697c0ad7c681c68073975fd01ff",
+    "ui_material_p4_hi.mem": "addecf337cb625977e4fad9c123a073588bfcfde4ee281fccf214389a37b4f90",
+    "ui_material_p4_lo.mem": "77e45b0736dc53cf1bd0676be18ab551df77b58c0c7eb0a19a8fb0a0d37997dc",
+    "ui_material_p8.mem": "d3af264b907a59fe32f5fc988d7c7c5942b5638d52244c65d53d1bf17fc3bf8f",
+    "ui_material_p8_hi.mem": "61a52aa5cd8a14b7626ca2c540978c10c8506e46fcced141c636b1a3ae56e5aa",
+    "ui_material_p8_lo.mem": "5b37579590208c09416ced0060cae1afae932d8681fd79b4f26201be792d14b0",
+    "ui_material_palette.mem": "2f0feb92ea381699423a7984138cbd2cd6eaff68080fb85c167858d6a1026738",
+    "ui_material_palette_hi.mem": "724950740a917a8f3efc067cf96f005141770de0d2f5cf1022bb4ff17eae2c1e",
+    "ui_material_palette_lo.mem": "a0d4fb71020a7f048713af45c75dc3739d6e071aaa061f05f9225eddac3c7e71",
+    "ui_material_rgb.mem": "d4d4e3523c6f0341db9702fe4bb6aea77d5b7aced92178880c7593d0d8fda27f",
+    "ui_material_geometry.vh": "8a0135a78038216e8be9717ca8eed5b19fa6a1eddf160b841bf176d635c911eb",
+    "ui_charge_x.mem": "4a2271a714723e45cfba00d4ae87ef5ecca90467105ec0af8e78c6cb32baaf3c",
+    "ui_charge_y.mem": "1882c3392242dac64c3df2b09a999482adb288ae6c1a3509618460b0a93d4d4e",
+    "ui_debris_x.mem": "5f0da82c8db28817c6fc6b1e26a7c1170a9679065b22087216e2ac90f55aa3e4",
+    "ui_debris_y.mem": "04d9e6744be221b1db86117f1c19860c293b08087d8cd9ae51366d834a743a84",
+    "ui_track_limit.mem": "585c7287c391ebf64c2bacba2dd4162e95938feb8645b84ed608a971de0eb5ad",
+    "ui_core_gradient.mem": "db1a5594b3f43d3d10cdeb4ba276955c5b3a2204d143934ea90eaa4fb1af46be",
+    "ui_legend_circle.mem": "22a15f64c34466164d2c37601ea23a9787cc62d8a97bc380cb5239378b3b0596"
+  }
+}

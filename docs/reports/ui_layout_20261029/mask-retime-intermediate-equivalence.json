@@ -1,0 +1,5 @@
+{
+  "pass": true,
+  "frames": 37,
+  "scope": "all RGB pixels identical before/after visibility-mask retiming"
+}

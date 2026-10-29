@@ -1,0 +1,423 @@
+{
+  "date": "2026-10-28",
+  "phase": "A2 common base layer connected; waiting for review",
+  "source_sha256": {
+    "Tetris.srcs/sources_1/new/reference_ui_renderer.v": "076d6d60601476685f7946b2e1984dc74c29a0380eb778799ae09dbb0bdcb214",
+    "Tetris.srcs/sources_1/new/story_ui.v": "d1846081d099bea6039b699e73ca6ef61b5bdc5b02da9724f9e5762afa55af50",
+    "Tetris.srcs/sources_1/new/ui_basic_layer.v": "792b6ce84b499e49670054616340022d200dcc3bf7baa9f48089729f1a9dce23",
+    "Tetris.srcs/sources_1/new/ui_panel_atlas.v": "70ec8d96108f4ab4f50fdb4cf9021a2a20b397e1c43ecea90bbc399f6ebf7870",
+    "Tetris.srcs/sources_1/new/ui_text_raster.v": "d61de53c61cf93acc869e3e849258cd0d52fff9de3469d5e56b814e0f0645455",
+    "Tetris.srcs/sources_1/new/ui_font_5x7.v": "1b7d8e67e4422320a598fec3ef7fc7455593c4862ea2de2c25770950a2af842b",
+    "Tetris.srcs/sources_1/new/ui_font_5x7.mem": "68aee7fc64eb82e09b5392d7ecf660a0b9d9d09b313dd6c8e2647629eeaaf9fd",
+    "Tetris.srcs/sources_1/new/ui_panel_geometry.vh": "70e8b6962422d66ec469626a5c0c2ded829a25790e38876e81963c5ec3379e5e",
+    "Tetris.srcs/sources_1/new/ui_panel_map.mem": "09e779a5d66fc275209f6ebddf5e829767173b00ecf1a35a8e782d5505c2089e",
+    "Tetris.srcs/sources_1/new/ui_panel_pixels.mem": "14ab755e24d78669129e3d956531a108ae3eab3dabaaa320a538a6719117c86d",
+    "Tetris.srcs/sources_1/new/ui_panel_palette.mem": "57d8ed4a12fdcd8a92afc011a291b14568d4973a5cd0ed519ce3be1aa3b9ec59",
+    "Tetris.srcs/sources_1/new/reference_ui_geometry.vh": "0dfa06ca03af4cba1203426e52c4d93c90d6e86520e42b780e1af5f6c19b0cda",
+    "Tetris.srcs/sources_1/new/reference_ui_skin.mem": "ef765cb8d44e34feafd8b1bf8b661553553b13322bca47473abd9322a1ec8df4",
+    "Tetris.srcs/sources_1/new/reference_ui_material.mem": "c7593af2bf4036d04f2e46a88a31fae8f4a4abbd4226fc4017b3f443af7db13c",
+    "Tetris.srcs/sources_1/new/story_palette.vh": "57804c0cb903b288a9da7c0ad4d7e1f8b2586eb91596bed1c1a309245b685acc",
+    "Tetris.sim/story_visual/ui_a2_integration_tb.v": "f2df1ec5068feb889ec12cd9355d3f4c4f61262132468eded7678d4a7354b033",
+    "Tetris.sim/story_visual/ui_font_5x7_tb.v": "f21cac48a4ea299a5eaeaffd09eecd16c750ba810cac40fb296b05a31ade5573",
+    "Tetris.sim/story_visual/ui_scenes_tb.v": "8aabe47f58fb8d3f70fe512707404d23142c8415b1b02548ebb93abf9d4bdc49",
+    "tools/build_ui_panel_atlas.py": "1badebe6df4a4681a7a5af4629c47a0778a44fa9416a106b8027087d6cbdb2c9",
+    "tools/run_new_ui_a2.py": "e564f4f9a3e818a2290aa8ad05b7601f4cddc595ebdaf429f1ec7c6ed4de8bc1",
+    "tools/measure_new_ui_a2.tcl": "ea9998f467655a831479feb4cf6c329a4183a5307e5c4dd8e9ddfab4df2fda33",
+    "tools/run_new_ui_a1.py": "879ae78cfcd2ee4e334adf9172c08be6cce9a444cd43d9b0f1f1161023fb77c6",
+    "assets/new_ui/duo_campaign_material.png": "2ac93c224d628ffb4cf73335a3bf9733cdb01b15d4cb22c7004db68e6a24522a",
+    "assets/new_ui/solo_campaign_material.png": "ea16af9c949df9a661053117c43ca812d6f0226b74ec15478b78d38a2a454043",
+    "assets/new_ui/solo_endless_material.png": "5070aec2c296a069632b2b2756ef1cdb7f2fb97a5edc68c26a11a2a1635b77af",
+    "assets/new_ui/duo_endless_material.png": "a0557c4b1043b33e1d6cb7f8ab11fd85e7bc9858d7dc054def695d4ec1533397",
+    "assets/new_ui/terminal_material.png": "07cb78919af51b59b37ff5d3de39c293f60c926e50f4a1efcc5999ada05843fa",
+    "Tetris.xpr": "63a927ec113a657d6bdcfef35227273c9c74e8d18204f2873729f99ecd476410",
+    "assets/new_ui/panels/manifest.json": "f84c64886773b1e3f87c81fc3ea94514c10ae893b48dee9362080f6d2efbabb4",
+    "assets/new_ui/verification/reference_ui_renderer_a1.v.snapshot": "e0672c7106f91d52a48a102f732070748e041d969ad9da9bead4256db67f8d0b",
+    "assets/new_ui/verification/manifest.json": "f7b571042ea9be9b4b364236984101b2084b840ccb15bd97cc83557455b39688",
+    "assets/new_ui/palette.json": "dacdc4dca4e19b450d1ef886ecff5c2d0580e08b6be986b039e32a03d7d2405f"
+  },
+  "outputs": [
+    {
+      "file": "20261028_双人闯关_RTL.png",
+      "sha256": "e4f43c413776581af50760d35a54a5246da30681109426ee3272d9420bb896b1",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "duo_campaign",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "20261028_单人闯关_RTL.png",
+      "sha256": "7064e985a48d72e27d87a7cd420b81358a280f64c88d4ab915fff0a9ab39c222",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "solo_campaign",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "20261028_双人无尽_RTL.png",
+      "sha256": "f9349ddc678e7ab7f9cea4e9761a8128d344cc748663f55e308453032c7645b8",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "duo_endless",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "20261028_单人无尽_RTL.png",
+      "sha256": "93c0abc7acde761045af665da812629a59a9e8861cceab1c7c889031bba6762b",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "solo_endless",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "20261028_主菜单_RTL.png",
+      "sha256": "fe06153bb47632dcee98ea69873191ed1bad1f84c352121b8a779db7497a1508",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "menu_0",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "20261028_单人选关_RTL.png",
+      "sha256": "41fe3fa0c0411a444d97866cb840b7d016e232d5537e449f0435daf88405f3bc",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "menu_1",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "20261028_双人选关_RTL.png",
+      "sha256": "2a81ff7ed8e0ab0d2bd241bbe5fc3ce08edf2624886c19491174e024d87e0d69",
+      "size": [
+        1280,
+        720
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "fixture": "menu_2",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_对白覆盖_RTL.png",
+      "sha256": "892a885641d12ae220915be0e7895deed411ddeb2fcd7faa4d442290313f63a8",
+      "size": [
+        576,
+        144
+      ],
+      "origin": [
+        352,
+        144
+      ],
+      "fixture": "comms_overlay",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_暂停覆盖_RTL.png",
+      "sha256": "001729d7b4f17bfbe90362c61066197b950e0e577410f07d18bbdadc3ec383eb",
+      "size": [
+        160,
+        64
+      ],
+      "origin": [
+        560,
+        284
+      ],
+      "fixture": "pause_overlay",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_HOLD状态0_RTL.png",
+      "sha256": "4e014720490219b279a360c98ee6fd83716efff120e2d9289630ea8bad1fe541",
+      "size": [
+        146,
+        184
+      ],
+      "origin": [
+        152,
+        328
+      ],
+      "fixture": "hold_0",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_HOLD状态1_RTL.png",
+      "sha256": "b3f52141f8900dc432368aa7a184889dfdbb681326f85932b448fc5d32e7080e",
+      "size": [
+        146,
+        184
+      ],
+      "origin": [
+        152,
+        328
+      ],
+      "fixture": "hold_1",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_HOLD状态2_RTL.png",
+      "sha256": "c2d3da9b29ee92f57a67cfda761981591f25f5cfecc649f09d8d6becf62271a7",
+      "size": [
+        146,
+        184
+      ],
+      "origin": [
+        152,
+        328
+      ],
+      "fixture": "hold_2",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_HOLD状态3_RTL.png",
+      "sha256": "481754759f3c1e5e46fc6d9db37d2d7d05576ac10912953c10d14bed7ee97bdf",
+      "size": [
+        146,
+        184
+      ],
+      "origin": [
+        152,
+        328
+      ],
+      "fixture": "hold_3",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_HOLD状态4_RTL.png",
+      "sha256": "25b52a0febcf4761e3ec457db92369fa1f49bb6f9b2024d0d71f5d16108c499b",
+      "size": [
+        146,
+        184
+      ],
+      "origin": [
+        152,
+        328
+      ],
+      "fixture": "hold_4",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_消行反馈_RTL.png",
+      "sha256": "87558df2735757d19ae788537c4f4c05c48157f447b67df0b18d89daf1848f45",
+      "size": [
+        576,
+        54
+      ],
+      "origin": [
+        352,
+        570
+      ],
+      "fixture": "clear_feedback",
+      "pre_A2_RGB_mismatches": 0
+    },
+    {
+      "file": "局部状态/20261028_任务完成划线_RTL.png",
+      "sha256": "4ecbdd99897b0c2cf84873ec106fcd97c7d10715bdf69dc60b40e03996804a00",
+      "size": [
+        584,
+        72
+      ],
+      "origin": [
+        468,
+        48
+      ],
+      "fixture": "completed_header",
+      "pre_A2_RGB_mismatches": 0
+    }
+  ],
+  "compared_pixels": 6751856,
+  "RGB_mismatches": 0,
+  "batch_kind": "same final HDL: seven full frames plus nine re-exported overlay frames",
+  "full_testbench_snapshot_sha256": "452b4ad8a756574c9d0c6b87ea7d831e3a632a9b9ecb915b74138c873b69949d",
+  "oracle": "pre-A2 renderer snapshot; same game fixture and reviewed near-color material; one extra output register matches story_ui latency",
+  "font_validation": "16384 ASCII/row/column cases, both two-clock glyph pipeline organizations",
+  "latency": {
+    "atlas_reads": 3,
+    "basic_layer_clocks": 3,
+    "font_clocks": 2,
+    "reference_renderer_clocks": 4,
+    "story_ui_total_clocks": 5
+  },
+  "runtime_ROM_sha256": {
+    "reference_ui_digits.mem": "fba8a917d11150a34fca8e7a360810064dca6fcdf4d192b5e6614705fa33e68b",
+    "reference_ui_material.mem": "c7593af2bf4036d04f2e46a88a31fae8f4a4abbd4226fc4017b3f443af7db13c",
+    "reference_ui_skin.mem": "ef765cb8d44e34feafd8b1bf8b661553553b13322bca47473abd9322a1ec8df4",
+    "story_font.mem": "ec90f815bbe06601adf3dbac39f98f1590aee668f796877e9b4d42644a6b2cd9",
+    "story_sprites.mem": "aad6020785d71531d9c6bc41ac800df7af70d8c2a35f24bbb8bb9938ef02a1b4",
+    "ui_font_5x7.mem": "68aee7fc64eb82e09b5392d7ecf660a0b9d9d09b313dd6c8e2647629eeaaf9fd",
+    "ui_panel_map.mem": "09e779a5d66fc275209f6ebddf5e829767173b00ecf1a35a8e782d5505c2089e",
+    "ui_panel_palette.mem": "57d8ed4a12fdcd8a92afc011a291b14568d4973a5cd0ed519ce3be1aa3b9ec59",
+    "ui_panel_pixels.mem": "14ab755e24d78669129e3d956531a108ae3eab3dabaaa320a538a6719117c86d"
+  },
+  "resources": [
+    {
+      "name": "ui_panel_atlas",
+      "LUT": 355.0,
+      "FF": 0.0,
+      "BRAM36_equiv": 8.5,
+      "DSP": 0.0,
+      "setup_estimate_WNS_ns": 5.372,
+      "timing_kind": "synthesized, not routed; 13.473ns, input/output max2.0/min0.2ns model"
+    },
+    {
+      "name": "ui_basic_layer",
+      "LUT": 1184.0,
+      "FF": 97.0,
+      "BRAM36_equiv": 8.0,
+      "DSP": 0.0,
+      "setup_estimate_WNS_ns": 2.901,
+      "timing_kind": "synthesized, not routed; 13.473ns, input/output max2.0/min0.2ns model"
+    },
+    {
+      "name": "ui_text_raster",
+      "LUT": 481.0,
+      "FF": 15.0,
+      "BRAM36_equiv": 0.0,
+      "DSP": 0.0,
+      "setup_estimate_WNS_ns": 1.256,
+      "timing_kind": "synthesized, not routed; 13.473ns, input/output max2.0/min0.2ns model"
+    }
+  ],
+  "atlas": {
+    "sprites": [
+      {
+        "name": "p1_next",
+        "origin": [
+          143,
+          148
+        ],
+        "size": [
+          155,
+          172
+        ],
+        "unique_tile_count": 196,
+        "decoded_rgb_sha256": "3c004896802575cd4d05282d24ae699b4e92ad090352da3109b9535900e002e7"
+      },
+      {
+        "name": "p2_next",
+        "origin": [
+          959,
+          148
+        ],
+        "size": [
+          155,
+          172
+        ],
+        "unique_tile_count": 140,
+        "decoded_rgb_sha256": "902a2cf6034798b010ea946f59cd0832632d51eb7d5cb08a1003ee9eda21f0ce"
+      },
+      {
+        "name": "hold",
+        "origin": [
+          154,
+          332
+        ],
+        "size": [
+          140,
+          174
+        ],
+        "unique_tile_count": 147,
+        "decoded_rgb_sha256": "f411475201533d18c3da945ab300af1cee9c8005db9da02e6d7a9da5f8449922"
+      },
+      {
+        "name": "p2_next_endless",
+        "origin": [
+          959,
+          148
+        ],
+        "size": [
+          155,
+          172
+        ],
+        "unique_tile_count": 136,
+        "decoded_rgb_sha256": "6a04d347712d6a849ce8308902788129d647a5e0265ab852e76ca9348badffb1"
+      }
+    ],
+    "padded_sprite_size": [
+      160,
+      176
+    ],
+    "map_stride": 20,
+    "unique_tiles": 443,
+    "local_colors": 254,
+    "tile_bits": 9,
+    "color_bits": 8,
+    "global_color_code_bits": 11,
+    "map_words": 1760,
+    "pixel_words": 28352,
+    "rom_capacity_bits": 251546,
+    "files_sha256": {
+      "ui_panel_map.mem": "09e779a5d66fc275209f6ebddf5e829767173b00ecf1a35a8e782d5505c2089e",
+      "ui_panel_pixels.mem": "14ab755e24d78669129e3d956531a108ae3eab3dabaaa320a538a6719117c86d",
+      "ui_panel_palette.mem": "57d8ed4a12fdcd8a92afc011a291b14568d4973a5cd0ed519ce3be1aa3b9ec59",
+      "ui_panel_geometry.vh": "70e8b6962422d66ec469626a5c0c2ded829a25790e38876e81963c5ec3379e5e"
+    }
+  },
+  "core_gameplay_unchanged": [
+    "Game_state_machine.v",
+    "Playfield.v",
+    "Playfield_hold_controller.v",
+    "frame.v",
+    "scoring.v",
+    "story_controller.v",
+    "reserve_timer.v",
+    "hold_limits.v",
+    "hint_budget.v",
+    "Tetris.v"
+  ],
+  "whole_device_resources_verified": false,
+  "whole_skin_ROM_removed": false,
+  "whole_ui_hardware_complete": false,
+  "network_palette_upgraded": false,
+  "decorative_UI_removed": false,
+  "dynamic_effects_removed": false,
+  "bit_generated": false,
+  "bit_sha256": "851ba01534ee3aa60f0ba8c65514dbb7b1787050675f644cab1cadbaab5b7127",
+  "committed": false,
+  "pushed": false,
+  "log_sha256": {
+    "render/compile.log": "649864dd9bade21795fe0ef91e964babe559a4697df7234eb0f644a3d2de4f1d",
+    "render/elaborate.log": "8ddab1e8c79d786e09858df00d2b4e58b8b3fd95000299862e268cd9e47e1d88",
+    "render/render.log": "de0b72b69934ce1062c7155da69c768ef3c7a281507401d5092a82d7a1a5cef2",
+    "font_render/render.log": "67b676102a62f570b5a62e9886a77fbce52ff2c0dfda0d03e214b4079d8e5406",
+    "synthesis_mode_variant.log": "1a84e5d1c0f272717f2a19a406dba5bfe399e161991ea5b6846d9c850c3c4b35",
+    "synthesis_retimed.log": "2ca755cb89aee9cb26ec14c2f9c0eaf796057a193ff3bee6eea2332b4558f8b4",
+    "final_full_scene_run.log": "e43461c1757daba78ab93cdd01e0fe85c6c1cd58861638f1b778e66c43dde619"
+  }
+}

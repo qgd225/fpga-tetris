@@ -422,40 +422,47 @@ wire solo_hint_show = !duo && solo_hint_latched;
         if(!Reset_n)audio_reject<=0;
         else audio_reject<={blk_rot2,blk_rot1,blk_r2,blk_l2,blk_r1,blk_l1};
     end
+    // Read-only audio snapshot breaks game/collision -> event arbitration paths.
+    // All event inputs, including cancel, move together by one pixel clock.
+    reg [37:0] ui_audio_events;
+    always @(posedge Clk_74M or negedge Reset_n)begin
+        if(!Reset_n)ui_audio_events<=0;
+        else ui_audio_events<={(rhythm_reject),(rhythm_expire),(rhythm_recharge),(rhythm_critical),(core_half_event),(core_online_event),(debris_clear_event),(over),(clear),(snd_clr_n),(lvl_up),(sw_short),(sw_long),(choose && left_p_menu),(choose && right_p_menu),(snd_land1),(snd_land2),(p1_left && !blk_l1),(p1_right && !blk_r1),(rotate_p && !blk_rot1),(snd_hard1),(snd_soft1),(snd_hold1),(blk_l1 || blk_r1),(p2_left && !blk_l2),(p2_right && !blk_r2),(p2_rotate && !blk_rot2),(snd_hard2),(snd_soft2),(snd_hold2),(blk_l2 || blk_r2),(audio_reject[4]),(audio_reject[5]),(danger1_pulse),(story_alarm2),(audio_reset_event || Stop || mission_success)};
+    end
     sound sound_inst(
-    .rhythm_reject(rhythm_reject),.rhythm_expire(rhythm_expire),.rhythm_recharge(rhythm_recharge),.rhythm_tick(rhythm_critical),.core_half(core_half_event),.core_online(core_online_event),.debris_clear(debris_clear_event),
+    .rhythm_reject(ui_audio_events[37]),.rhythm_expire(ui_audio_events[36]),.rhythm_recharge(ui_audio_events[35]),.rhythm_tick(ui_audio_events[34]),.core_half(ui_audio_events[33]),.core_online(ui_audio_events[32]),.debris_clear(ui_audio_events[31]),
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
-    .over(over),
-    .clear(clear),
-    .clr_n(snd_clr_n),
-    .lvl_up(lvl_up),
-    .sw_short(sw_short),
-    .sw_long(sw_long),
-    .menu_l(choose && left_p_menu),
-    .menu_r(choose && right_p_menu),
-    .land1(snd_land1),
-    .land2(snd_land2),
-    .lft1(p1_left && !blk_l1),
-    .rgt1(p1_right && !blk_r1),
-    .rot1(rotate_p && !blk_rot1),
-    .hard1(snd_hard1),
-    .soft1(snd_soft1),
-    .hold1(snd_hold1),
-    .blk1(blk_l1 || blk_r1),
-    .lft2(p2_left && !blk_l2),
-    .rgt2(p2_right && !blk_r2),
-    .rot2(p2_rotate && !blk_rot2),
-    .hard2(snd_hard2),
-    .soft2(snd_soft2),
-    .hold2(snd_hold2),
-    .blk2(blk_l2 || blk_r2),
-    .blk_rot1(audio_reject[4]),
-    .blk_rot2(audio_reject[5]),
-    .danger1(danger1_pulse),
-    .danger2(story_alarm2),
+    .over(ui_audio_events[30]),
+    .clear(ui_audio_events[29]),
+    .clr_n(ui_audio_events[28:26]),
+    .lvl_up(ui_audio_events[25]),
+    .sw_short(ui_audio_events[24]),
+    .sw_long(ui_audio_events[23]),
+    .menu_l(ui_audio_events[22]),
+    .menu_r(ui_audio_events[21]),
+    .land1(ui_audio_events[20]),
+    .land2(ui_audio_events[19]),
+    .lft1(ui_audio_events[18]),
+    .rgt1(ui_audio_events[17]),
+    .rot1(ui_audio_events[16]),
+    .hard1(ui_audio_events[15]),
+    .soft1(ui_audio_events[14]),
+    .hold1(ui_audio_events[13]),
+    .blk1(ui_audio_events[12]),
+    .lft2(ui_audio_events[11]),
+    .rgt2(ui_audio_events[10]),
+    .rot2(ui_audio_events[9]),
+    .hard2(ui_audio_events[8]),
+    .soft2(ui_audio_events[7]),
+    .hold2(ui_audio_events[6]),
+    .blk2(ui_audio_events[5]),
+    .blk_rot1(ui_audio_events[4]),
+    .blk_rot2(ui_audio_events[3]),
+    .danger1(ui_audio_events[2]),
+    .danger2(ui_audio_events[1]),
 
-    .cancel(audio_reset_event || Stop || mission_success),
+    .cancel(ui_audio_events[0]),
     .event_id(fx_event),.step_id(fx_step),.note_id(fx_note),.fx_urgent(fx_urgent),
     .fx_active(fx_active)
     );

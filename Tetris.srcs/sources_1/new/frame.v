@@ -554,7 +554,15 @@ module frame(
             bounds1<=pixel_bounds(bounds_cells1,bounds_duo);bounds2<=pixel_bounds(bounds_cells2,bounds_duo);
         end
     end
+    reg [4:0] ui_clear_credit;reg [5:0] ui_clear_credit_age;
+    always @(posedge Clk_74M or negedge Reset_n)begin
+      if(!Reset_n)begin ui_clear_credit<=0;ui_clear_credit_age<=0;end
+      else if(new_run)begin ui_clear_credit<=0;ui_clear_credit_age<=0;end
+      else if(batch_commit && batch_n!=0)begin ui_clear_credit<=batch_n==4?5'd6:batch_n;ui_clear_credit_age<=48;end
+      else if(eff_tick && !Stop && ui_clear_credit_age!=0)ui_clear_credit_age<=ui_clear_credit_age-1'b1;
+    end
     story_ui story_ui_inst(
+        .clear_credit(ui_clear_credit),.clear_credit_age(ui_clear_credit_age),
         .clk(Clk_74M),.reset_n(Reset_n),.x(render_h),.y(render_v),
         .reserve_fill(display_reserve_fill),.reserve_alarm(display_reserve_alarm),.hold_blocks(display_hold_blocks),.hold_life(display_hold_life),.hold_ready(display_hold_ready),.hold_visible(display_hold_visible),.hold_expire_flash(display_expire),.hold_reject_flash(display_reject_age!=0),.hint_quota(display_hint_quota),.hint_capacity(display_hint_capacity),.hint_life(display_hint_life),.hint_active(display_hint_active),.hold_reserved(display_hold_reserved),.hold_actor2(display_hold_actor2),.hold_conditions(display_hold_conditions),.rank(display_grade),.average_tenths(display_average),.charge_done(display_charge_done),.charge_fill(display_charge_fill),.debris_fill(display_debris_fill),.recharge_age(display_recharge_age),.recharge_units(display_recharge_units),.speed_flash(display_speed_flash),.reserve_pulse(display_reserve_pulse),.recharge_capped(display_recharge_clipped),.recharge_no_gain(display_recharge_no_gain),
         .comms_visible(comms_visible),.comms_id(comms_id),.duo(duo),.campaign(campaign),.ship_select(ship_select),.level_id(level_id),.result_option(result_option),.menu_offset(menu_window),.debris_percent(debris_percent),.debris_left(display_debris),.debris_cell((R_num<20 && C_num<24)?debris_rows[R_num][C_num]:1'b0),.choose(choose),.Idle(Idle),.Playing(Playing),.Stop(Stop),.Finalize(Finalize),.choose_cnt(choose_cnt),

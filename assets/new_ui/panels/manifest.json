@@ -1,0 +1,75 @@
+{
+  "sprites": [
+    {
+      "name": "p1_next",
+      "origin": [
+        143,
+        148
+      ],
+      "size": [
+        155,
+        172
+      ],
+      "unique_tile_count": 196,
+      "decoded_rgb_sha256": "3c004896802575cd4d05282d24ae699b4e92ad090352da3109b9535900e002e7"
+    },
+    {
+      "name": "p2_next",
+      "origin": [
+        959,
+        148
+      ],
+      "size": [
+        155,
+        172
+      ],
+      "unique_tile_count": 140,
+      "decoded_rgb_sha256": "902a2cf6034798b010ea946f59cd0832632d51eb7d5cb08a1003ee9eda21f0ce"
+    },
+    {
+      "name": "hold",
+      "origin": [
+        154,
+        332
+      ],
+      "size": [
+        140,
+        174
+      ],
+      "unique_tile_count": 147,
+      "decoded_rgb_sha256": "f411475201533d18c3da945ab300af1cee9c8005db9da02e6d7a9da5f8449922"
+    },
+    {
+      "name": "p2_next_endless",
+      "origin": [
+        959,
+        148
+      ],
+      "size": [
+        155,
+        172
+      ],
+      "unique_tile_count": 136,
+      "decoded_rgb_sha256": "6a04d347712d6a849ce8308902788129d647a5e0265ab852e76ca9348badffb1"
+    }
+  ],
+  "padded_sprite_size": [
+    160,
+    176
+  ],
+  "map_stride": 20,
+  "unique_tiles": 443,
+  "local_colors": 254,
+  "tile_bits": 9,
+  "color_bits": 8,
+  "global_color_code_bits": 11,
+  "map_words": 1760,
+  "pixel_words": 28352,
+  "rom_capacity_bits": 251546,
+  "files_sha256": {
+    "ui_panel_map.mem": "09e779a5d66fc275209f6ebddf5e829767173b00ecf1a35a8e782d5505c2089e",
+    "ui_panel_pixels.mem": "14ab755e24d78669129e3d956531a108ae3eab3dabaaa320a538a6719117c86d",
+    "ui_panel_palette.mem": "57d8ed4a12fdcd8a92afc011a291b14568d4973a5cd0ed519ce3be1aa3b9ec59",
+    "ui_panel_geometry.vh": "70e8b6962422d66ec469626a5c0c2ded829a25790e38876e81963c5ec3379e5e"
+  }
+}

@@ -1,0 +1,223 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Thu Oct 29 14:42:07 2026
+| Host         : qiguidei running 64-bit major release  (build 9200)
+| Command      : report_timing -max_paths 3 -file timing.rpt
+| Design       : ui_hull_background
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             3.977ns  (required time - arrival time)
+  Source:                 y[2]
+                            (input port clocked by pixel_budget  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Destination:            rgb[21]
+                            (output port clocked by pixel_budget  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Path Group:             pixel_budget
+  Path Type:              Max at Slow Process Corner
+  Requirement:            13.473ns  (pixel_budget rise@13.473ns - pixel_budget rise@0.000ns)
+  Data Path Delay:        9.471ns  (logic 1.920ns (20.272%)  route 7.551ns (79.728%))
+  Logic Levels:           14  (CARRY4=2 LUT2=1 LUT3=1 LUT4=2 LUT6=8)
+  Input Delay:            0.000ns
+  Output Delay:           0.000ns
+  Clock Uncertainty:      0.025ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock pixel_budget rise edge)
+                                                      0.000     0.000 r  
+                         ideal clock network latency
+                                                      0.000     0.000    
+                         input delay                  0.000     0.000    
+                                                      0.000     0.000 r  y[2] (IN)
+                         net (fo=117, unset)          0.787     0.787    y[2]
+                         LUT2 (Prop_lut2_I1_O)        0.105     0.892 r  rgb[23]_INST_0_i_131/O
+                         net (fo=1, unplaced)         0.782     1.674    rgb[23]_INST_0_i_131_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     1.779 r  rgb[23]_INST_0_i_52/O
+                         net (fo=1, unplaced)         0.582     2.361    rgb[23]_INST_0_i_52_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.105     2.466 f  rgb[23]_INST_0_i_20/O
+                         net (fo=9, unplaced)         0.388     2.854    rgb[23]_INST_0_i_20_n_0
+                         LUT4 (Prop_lut4_I0_O)        0.105     2.959 r  g0_b0_i_2/O
+                         net (fo=6, unplaced)         0.970     3.929    g0_b0_i_2_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.105     4.034 r  g0_b1/O
+                         net (fo=14, unplaced)        0.989     5.023    g0_b1_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.105     5.128 r  rgb[23]_INST_0_i_189/O
+                         net (fo=2, unplaced)         0.358     5.486    rgb[23]_INST_0_i_189_n_0
+                         LUT3 (Prop_lut3_I0_O)        0.107     5.593 r  rgb[23]_INST_0_i_136/O
+                         net (fo=1, unplaced)         0.000     5.593    rgb[23]_INST_0_i_136_n_0
+                         CARRY4 (Prop_carry4_DI[3]_CO[3])
+                                                      0.337     5.930 r  rgb[23]_INST_0_i_56/CO[3]
+                         net (fo=1, unplaced)         0.008     5.938    rgb[23]_INST_0_i_56_n_0
+                         CARRY4 (Prop_carry4_CI_CO[1])
+                                                      0.149     6.087 r  rgb[23]_INST_0_i_21/CO[1]
+                         net (fo=3, unplaced)         0.490     6.577    rgb3__0
+                         LUT6 (Prop_lut6_I1_O)        0.277     6.854 r  rgb[4]_INST_0_i_5/O
+                         net (fo=2, unplaced)         0.358     7.212    rgb[4]_INST_0_i_5_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     7.317 r  rgb[21]_INST_0_i_38/O
+                         net (fo=1, unplaced)         0.347     7.664    rgb[21]_INST_0_i_38_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.105     7.769 f  rgb[21]_INST_0_i_15/O
+                         net (fo=2, unplaced)         0.358     8.127    rgb[21]_INST_0_i_15_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.105     8.232 f  rgb[21]_INST_0_i_6/O
+                         net (fo=1, unplaced)         0.347     8.579    rgb[21]_INST_0_i_6_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.105     8.684 r  rgb[21]_INST_0/O
+                         net (fo=0)                   0.787     9.471    rgb[21]
+                                                                      r  rgb[21] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock pixel_budget rise edge)
+                                                     13.473    13.473 r  
+                         ideal clock network latency
+                                                      0.000    13.473    
+                         clock pessimism              0.000    13.473    
+                         clock uncertainty           -0.025    13.448    
+                         output delay                -0.000    13.448    
+  -------------------------------------------------------------------
+                         required time                         13.448    
+                         arrival time                          -9.471    
+  -------------------------------------------------------------------
+                         slack                                  3.977    
+
+Slack (MET) :             3.982ns  (required time - arrival time)
+  Source:                 y[2]
+                            (input port clocked by pixel_budget  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Destination:            rgb[12]
+                            (output port clocked by pixel_budget  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Path Group:             pixel_budget
+  Path Type:              Max at Slow Process Corner
+  Requirement:            13.473ns  (pixel_budget rise@13.473ns - pixel_budget rise@0.000ns)
+  Data Path Delay:        9.466ns  (logic 1.920ns (20.283%)  route 7.546ns (79.717%))
+  Logic Levels:           14  (CARRY4=2 LUT2=1 LUT3=1 LUT4=3 LUT6=7)
+  Input Delay:            0.000ns
+  Output Delay:           0.000ns
+  Clock Uncertainty:      0.025ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock pixel_budget rise edge)
+                                                      0.000     0.000 r  
+                         ideal clock network latency
+                                                      0.000     0.000    
+                         input delay                  0.000     0.000    
+                                                      0.000     0.000 r  y[2] (IN)
+                         net (fo=117, unset)          0.787     0.787    y[2]
+                         LUT2 (Prop_lut2_I1_O)        0.105     0.892 r  rgb[23]_INST_0_i_131/O
+                         net (fo=1, unplaced)         0.782     1.674    rgb[23]_INST_0_i_131_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     1.779 r  rgb[23]_INST_0_i_52/O
+                         net (fo=1, unplaced)         0.582     2.361    rgb[23]_INST_0_i_52_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.105     2.466 f  rgb[23]_INST_0_i_20/O
+                         net (fo=9, unplaced)         0.388     2.854    rgb[23]_INST_0_i_20_n_0
+                         LUT4 (Prop_lut4_I0_O)        0.105     2.959 r  g0_b0_i_2/O
+                         net (fo=6, unplaced)         0.970     3.929    g0_b0_i_2_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.105     4.034 f  g0_b0/O
+                         net (fo=14, unplaced)        0.989     5.023    g0_b0_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.105     5.128 f  rgb[23]_INST_0_i_126/O
+                         net (fo=2, unplaced)         0.358     5.486    rgb[23]_INST_0_i_126_n_0
+                         LUT3 (Prop_lut3_I0_O)        0.107     5.593 r  rgb[23]_INST_0_i_43/O
+                         net (fo=1, unplaced)         0.000     5.593    rgb[23]_INST_0_i_43_n_0
+                         CARRY4 (Prop_carry4_DI[3]_CO[3])
+                                                      0.337     5.930 r  rgb[23]_INST_0_i_17/CO[3]
+                         net (fo=1, unplaced)         0.008     5.938    rgb[23]_INST_0_i_17_n_0
+                         CARRY4 (Prop_carry4_CI_CO[1])
+                                                      0.149     6.087 f  rgb[23]_INST_0_i_4/CO[1]
+                         net (fo=10, unplaced)        0.515     6.602    rgb1
+                         LUT6 (Prop_lut6_I1_O)        0.277     6.879 r  rgb[12]_INST_0_i_8/O
+                         net (fo=1, unplaced)         0.328     7.207    rgb[12]_INST_0_i_8_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     7.312 r  rgb[12]_INST_0_i_7/O
+                         net (fo=1, unplaced)         0.347     7.659    rgb[12]_INST_0_i_7_n_0
+                         LUT6 (Prop_lut6_I5_O)        0.105     7.764 r  rgb[12]_INST_0_i_4/O
+                         net (fo=2, unplaced)         0.358     8.122    rgb[12]_INST_0_i_4_n_0
+                         LUT4 (Prop_lut4_I1_O)        0.105     8.227 r  rgb[12]_INST_0_i_3/O
+                         net (fo=1, unplaced)         0.347     8.574    rgb[12]_INST_0_i_3_n_0
+                         LUT4 (Prop_lut4_I3_O)        0.105     8.679 r  rgb[12]_INST_0/O
+                         net (fo=0)                   0.787     9.466    rgb[12]
+                                                                      r  rgb[12] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock pixel_budget rise edge)
+                                                     13.473    13.473 r  
+                         ideal clock network latency
+                                                      0.000    13.473    
+                         clock pessimism              0.000    13.473    
+                         clock uncertainty           -0.025    13.448    
+                         output delay                -0.000    13.448    
+  -------------------------------------------------------------------
+                         required time                         13.448    
+                         arrival time                          -9.466    
+  -------------------------------------------------------------------
+                         slack                                  3.982    
+
+Slack (MET) :             4.119ns  (required time - arrival time)
+  Source:                 y[2]
+                            (input port clocked by pixel_budget  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Destination:            rgb[16]
+                            (output port clocked by pixel_budget  {rise@0.000ns fall@6.736ns period=13.473ns})
+  Path Group:             pixel_budget
+  Path Type:              Max at Slow Process Corner
+  Requirement:            13.473ns  (pixel_budget rise@13.473ns - pixel_budget rise@0.000ns)
+  Data Path Delay:        9.329ns  (logic 1.926ns (20.645%)  route 7.403ns (79.355%))
+  Logic Levels:           14  (CARRY4=2 LUT2=3 LUT3=2 LUT4=1 LUT5=1 LUT6=5)
+  Input Delay:            0.000ns
+  Output Delay:           0.000ns
+  Clock Uncertainty:      0.025ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock pixel_budget rise edge)
+                                                      0.000     0.000 r  
+                         ideal clock network latency
+                                                      0.000     0.000    
+                         input delay                  0.000     0.000    
+                                                      0.000     0.000 r  y[2] (IN)
+                         net (fo=117, unset)          0.787     0.787    y[2]
+                         LUT2 (Prop_lut2_I1_O)        0.105     0.892 r  rgb[23]_INST_0_i_131/O
+                         net (fo=1, unplaced)         0.782     1.674    rgb[23]_INST_0_i_131_n_0
+                         LUT6 (Prop_lut6_I0_O)        0.105     1.779 r  rgb[23]_INST_0_i_52/O
+                         net (fo=1, unplaced)         0.582     2.361    rgb[23]_INST_0_i_52_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.105     2.466 f  rgb[23]_INST_0_i_20/O
+                         net (fo=9, unplaced)         0.388     2.854    rgb[23]_INST_0_i_20_n_0
+                         LUT4 (Prop_lut4_I0_O)        0.105     2.959 r  g0_b0_i_2/O
+                         net (fo=6, unplaced)         0.970     3.929    g0_b0_i_2_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.105     4.034 r  g0_b1/O
+                         net (fo=14, unplaced)        0.989     5.023    g0_b1_n_0
+                         LUT6 (Prop_lut6_I1_O)        0.105     5.128 r  rgb[23]_INST_0_i_189/O
+                         net (fo=2, unplaced)         0.358     5.486    rgb[23]_INST_0_i_189_n_0
+                         LUT3 (Prop_lut3_I0_O)        0.107     5.593 r  rgb[23]_INST_0_i_136/O
+                         net (fo=1, unplaced)         0.000     5.593    rgb[23]_INST_0_i_136_n_0
+                         CARRY4 (Prop_carry4_DI[3]_CO[3])
+                                                      0.337     5.930 r  rgb[23]_INST_0_i_56/CO[3]
+                         net (fo=1, unplaced)         0.008     5.938    rgb[23]_INST_0_i_56_n_0
+                         CARRY4 (Prop_carry4_CI_CO[1])
+                                                      0.149     6.087 f  rgb[23]_INST_0_i_21/CO[1]
+                         net (fo=3, unplaced)         0.258     6.345    rgb3__0
+                         LUT3 (Prop_lut3_I1_O)        0.280     6.625 f  rgb[23]_INST_0_i_5/O
+                         net (fo=20, unplaced)        0.407     7.032    rgb[23]_INST_0_i_5_n_0
+                         LUT2 (Prop_lut2_I0_O)        0.108     7.140 f  rgb[16]_INST_0_i_7/O
+                         net (fo=4, unplaced)         0.371     7.511    rgb[16]_INST_0_i_7_n_0
+                         LUT5 (Prop_lut5_I0_O)        0.105     7.616 r  rgb[16]_INST_0_i_10/O
+                         net (fo=2, unplaced)         0.358     7.974    rgb[16]_INST_0_i_10_n_0
+                         LUT2 (Prop_lut2_I1_O)        0.105     8.079 f  rgb[16]_INST_0_i_5/O
+                         net (fo=2, unplaced)         0.358     8.437    rgb[16]_INST_0_i_5_n_0
+                         LUT6 (Prop_lut6_I4_O)        0.105     8.542 r  rgb[16]_INST_0/O
+                         net (fo=0)                   0.787     9.329    rgb[16]
+                                                                      r  rgb[16] (OUT)
+  -------------------------------------------------------------------    -------------------
+
+                         (clock pixel_budget rise edge)
+                                                     13.473    13.473 r  
+                         ideal clock network latency
+                                                      0.000    13.473    
+                         clock pessimism              0.000    13.473    
+                         clock uncertainty           -0.025    13.448    
+                         output delay                -0.000    13.448    
+  -------------------------------------------------------------------
+                         required time                         13.448    
+                         arrival time                          -9.329    
+  -------------------------------------------------------------------
+                         slack                                  4.119    
+
+
+
+

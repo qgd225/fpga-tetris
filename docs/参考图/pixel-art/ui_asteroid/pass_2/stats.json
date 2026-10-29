@@ -1,0 +1,45 @@
+{
+  "size": [
+    32,
+    32
+  ],
+  "frames": 1,
+  "layers": [
+    "main"
+  ],
+  "durations": [
+    100
+  ],
+  "tags": {},
+  "colors_used": 6,
+  "palette_size": 6,
+  "top_colors": [
+    [
+      "#405e75",
+      167
+    ],
+    [
+      "#0d1b2b",
+      164
+    ],
+    [
+      "#1c3045",
+      99
+    ],
+    [
+      "#607f94",
+      51
+    ],
+    [
+      "#93acb9",
+      30
+    ],
+    [
+      "#2c455b",
+      25
+    ]
+  ],
+  "semi_alpha_px": 0,
+  "isolated_px": [],
+  "near_duplicate_colors": []
+}

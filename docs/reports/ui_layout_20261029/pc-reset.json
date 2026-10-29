@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "same_socket_recovery": true,
+  "active_stale_rejected": true,
+  "frame_wrap": true,
+  "timeout_seconds": 0.25,
+  "viewer_sha256": "b6b4834a44ea191bb2201b8c3d36707f8965820ec58d9a8e467dc79c45d5cf51"
+}

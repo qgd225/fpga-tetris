@@ -19,6 +19,7 @@ module letter(input clka, input ena, input [10:0] addra, output [19:0] douta);
 endmodule
 
 module net_level_tb;
+ `include "ui_layout_geometry.vh"
 reg Clk_74M=0, Rst=0;
 reg [10:0] hc=0, vc=0;
 reg left_p=0, right_p=0, drop_r=0, drop_en=0, rotate_p=0, switch_r=0, hold_p=0;
@@ -29,7 +30,7 @@ integer bad, m, sp;
 
 always #6.734 Clk_74M = ~Clk_74M;
 
-frame #(.EFF_TICK(21'd8)) dut(.menu_window(2'd0),
+frame #(.EFF_TICK(21'd8)) dut(.comms_visible(1'b0),.comms_id(3'd0),.menu_window(2'd0),
   .campaign(1'b1),.ship_select(1'b0),.level_id(2'd2),.result_option(2'd0),.Clk_74M(Clk_74M), .Reset_n(Rst), .hcounter(hc), .vcounter(vc), .video_de(1'b1), .choose(1'b0), .choose_cnt(4'd0),
   .left_p_flag(left_p), .right_p_flag(right_p), .drop_r_flag(drop_r), .drop_en(drop_en),
   .rotate_p_flag(rotate_p), .switch_r_flag(switch_r), .hold_p_flag(hold_p),
@@ -109,7 +110,7 @@ initial begin
   set_score(20'd0); rel_score;add_clear(1,1);chk("one line batch",score,2);
   set_score(20'd0); rel_score;add_clear(1,2);chk("two separate batches",score,4);
   set_score(20'd0); rel_score;add_clear(4,1);chk("four-line batch once",score,32);
-  force dut.story_inst.story_speed=3'd3;
+  force dut.charge_left=0;force dut.story_inst.story_speed=3'd3;
   set_score(20'd0);rel_score;add_clear(2,1);chk("captured batch multiplier",score,32);
   force dut.story_inst.story_speed=0;
   release dut.story_inst.story_speed;
@@ -174,17 +175,12 @@ initial begin
   end
 
   $display("=== 8) 核心：结构、八段锁定与边界 ===");
-  force dut.story_inst.story_speed=3'd3;
+  force dut.charge_left=0;force dut.story_inst.story_speed=3'd3;
   force dut.story_phase=2'd1;force dut.story_inst.core_locked=4'd3;force dut.display_debris=7'd0;
   hc=0;vc=0;repeat(3)@(negedge Clk_74M);
-  hc=1014-6;vc=520;repeat(2)@(negedge Clk_74M);repeat(2)@(negedge Clk_74M);#1;chk("phase1 lower rail",dut.story_ui_inst.core.color_index,37);
-  vc=392;repeat(2)@(negedge Clk_74M);#1;chk("phase1 upper rail open",dut.story_ui_inst.core.color_index,21);
-  hc=1040-6;vc=586;repeat(2)@(negedge Clk_74M);#1;chk("locked lower segment",dut.story_ui_inst.core.color_index,25);
-  vc=372;repeat(2)@(negedge Clk_74M);#1;chk("unlocked upper segment",dut.story_ui_inst.core.color_index,50);
-  hc=999-6;repeat(2)@(negedge Clk_74M);#1;chk("outside core left",dut.story_ui_inst.core.hit,0);
-  hc=1000-6;repeat(2)@(negedge Clk_74M);#1;chk("core left boundary",dut.story_ui_inst.core.hit,1);
-  hc=1079-6;repeat(2)@(negedge Clk_74M);#1;chk("core last pixel",dut.story_ui_inst.core.hit,1);
-  hc=1080-6;repeat(2)@(negedge Clk_74M);#1;chk("outside core right",dut.story_ui_inst.core.hit,0);
+  hc=UI_CORE_CENTER_X-6;vc=530;repeat(12)@(negedge Clk_74M);#1;chk("core lower slot cyan",rgb,24'h3fdef4);
+  vc=300;repeat(12)@(negedge Clk_74M);#1;chk("core upper slot dark",rgb,24'h040c13);
+  chk("speed input preserved",dut.speed_level,3);
   release dut.story_inst.story_speed;release dut.story_phase;release dut.story_inst.core_locked;release dut.display_debris;
   if(bad == 0) $display("=== ALL PASS ===");
   else         $display("=== FAILED %0d ===", bad);

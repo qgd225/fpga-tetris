@@ -1,0 +1,12 @@
+Design Route Status
+                                               :      # nets :
+   ------------------------------------------- : ----------- :
+   # of logical nets.......................... :       35014 :
+       # of nets not needing routing.......... :       11419 :
+           # of internally routed nets........ :       10434 :
+           # of nets with no loads............ :         985 :
+       # of routable nets..................... :       23595 :
+           # of fully routed nets............. :       23595 :
+       # of nets with routing errors.......... :           0 :
+   ------------------------------------------- : ----------- :
+

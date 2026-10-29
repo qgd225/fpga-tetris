@@ -1,0 +1,196 @@
+// A3 common material port and mission hardware shader, three clocks.
+// Static rails, joints, chain, grooves and clamps are sampled without warping.
+module ui_mission_layer(
+ input clk,reset_n,enable,duo,campaign,blocked,choose,
+ input [10:0] x,y,input [3:0] locked,input [1:0] reserve_alarm,
+ input reserve_pulse,input [7:0] reserve_fill,animation,input [4:0] charge_left,
+ input [6:0] charge_percent,debris_percent,input [9:0] lit_top,
+ output [23:0] panel_rgb,output [23:0] rgb,output hit
+);
+ `include "ui_material_geometry.vh"
+ `include "ui_layout_geometry.vh"
+ wire [10:0] core_x=x-UI_CORE_DX;
+ wire [10:0] pipe_x=x<UI_PIPE_STRETCH_X?x:x<UI_PIPE_STRETCH_X+UI_CORE_DX?UI_PIPE_STRETCH_X:x-UI_CORE_DX;
+ (* rom_style="distributed" *) reg ship_mask[0:16639];
+ initial $readmemh("ui_ship_mask.mem",ship_mask);
+ wire [6:0] ship_row=y-UI_SHIP_Y;
+ wire [7:0] ship_col=x-UI_SHIP_X;
+ wire [14:0] ship_address={1'b0,ship_row,7'b0}+{2'b0,ship_row,6'b0}+{4'b0,ship_row,4'b0}+ship_col;
+ reg [2:0] ship_gate_pipe;
+ always @(posedge clk or negedge reset_n)begin
+  if(!reset_n)ship_gate_pipe<=0;
+  else ship_gate_pipe<={ship_gate_pipe[1:0],!choose || (box(x,y,UI_SHIP_X,UI_SHIP_Y,UI_SHIP_W,UI_SHIP_H) && ship_mask[ship_address])};
+ end
+ function box;
+  input [10:0] px,py,bx,by,w,h;
+  begin box=px>=bx && px<bx+w && py>=by && py<by+h;end
+ endfunction
+ (* rom_style="distributed" *) reg [4:0] charge_x[0:665];
+ (* rom_style="distributed" *) reg [3:0] charge_y[0:20];
+ (* rom_style="distributed" *) reg [3:0] debris_x[0:332],debris_y[0:18];
+ (* rom_style="distributed" *) reg [8:0] limit[0:100];
+ (* rom_style="distributed" *) reg [23:0] gradient[0:31];
+ (* rom_style="distributed" *) reg [1:0] circle[0:195];
+ initial begin
+  $readmemh("ui_charge_x.mem",charge_x);$readmemh("ui_charge_y.mem",charge_y);
+  $readmemh("ui_debris_x.mem",debris_x);$readmemh("ui_debris_y.mem",debris_y);
+  $readmemh("ui_track_limit.mem",limit);$readmemh("ui_core_gradient.mem",gradient);
+  $readmemh("ui_legend_circle.mem",circle);
+ end
+ reg selected,native,glow;
+ wire [8:0] charge_step=(5'd18-charge_left)*9'd18;
+ wire [9:0] sweep_y=10'd548-{1'b0,charge_step};
+ wire [9:0] pipe_distance=y<82?x-1064:y<312?y-82+66:x-1142+296;
+ wire [9:0] pipe_step=(5'd18-charge_left)*10'd20;
+ reg [23:0] ink;
+ reg [12:0] base,address;
+ reg [6:0] stride;
+ reg [9:0] sx,sy;
+ reg [4:0] tx;
+ reg [5:0] my,py;
+ reg [4:0] mx;
+ reg [2:0] slot;
+ reg [1:0] phase,row;
+ reg [9:0] center,arrow_y;
+ reg [3:0] cx,cy;
+ reg [1:0] circle_value;
+ reg rounded_out;
+ reg [8:0] charge_limit,debris_limit;
+ always @(posedge clk)begin
+  charge_limit<=limit[charge_percent>100?100:charge_percent];
+  debris_limit<=limit[debris_percent>100?100:debris_percent];
+ end
+ wire pipe_flow=campaign && charge_left!=0 && selected && base==MAT_PIPE_BASE && pipe_distance>=pipe_step && pipe_distance<pipe_step+12;
+ always @(*)begin
+  selected=0;base=0;stride=20;sx=0;sy=0;native=0;ink=0;glow=0;
+  tx=0;slot=0;my=0;py=0;mx=0;row=0;center=0;arrow_y=0;cx=0;cy=0;circle_value=0;rounded_out=0;
+  phase=locked<3?0:locked<5?1:locked<7?2:3;
+  // Shared atlas read. The translated pipe silhouette clears both side panels.
+  if(box(x,y,143,148,155,172))begin selected=1;base=MAT_P1_NEXT_BASE;stride=20;sx=x-143;sy=y-148;end
+  else if(duo && box(x,y,959,148,155,172))begin selected=1;base=campaign?MAT_P2_NEXT_BASE:MAT_P2_NEXT_ENDLESS_BASE;stride=20;sx=x-959;sy=y-148;end
+  else if(box(x,y,154,332,140,174))begin selected=1;base=MAT_HOLD_BASE;stride=18;sx=x-154;sy=y-332;end
+  else if(box(x,y,156,32,893,96))begin
+   selected=1;base=MAT_HEADER_BASE;stride=112;sx=x-156;sy=y-32;
+   if(!campaign)begin
+    if(box(x,y,168,38,64,78))begin native=1;ink=MAT_MODE_BG;end
+    if(box(x,y,471,52,580,31) || box(x,y,471,88,580,30))begin native=1;ink=MAT_STATS_BG;end
+    if(x>=471 && x<=1050 && (y==51 || y==86 || y==119))begin native=1;ink=MAT_ROW_LINE;end
+   end
+  end
+  else if(box(core_x,y,1124,214,90,356))begin
+   selected=1;base=campaign?(blocked?MAT_CORE_LOCKED_BASE:MAT_CORE_CAMPAIGN_BASE):MAT_CORE_ENDLESS_BASE;
+   stride=12;sx=core_x-1124;sy=y-214;
+  end
+  else if(box(x,y,972,314,140,42))begin selected=1;base=campaign?MAT_SPEED_BASE:MAT_SPEED_ENDLESS_BASE;stride=18;sx=x-972;sy=y-314;end
+  else if(campaign && box(x,y,1049,32,130,310))begin selected=1;base=MAT_PIPE_BASE;stride=14;sx=pipe_x-1049;sy=y-32;end
+  else if(box(x,y,972,364,136,248))begin selected=1;base=MAT_LEGEND_BASE;stride=17;sx=x-972;sy=y-364;end
+  else if(box(x,y,UI_STATUS_X,UI_STATUS_Y,96,42))begin selected=1;base=MAT_STATUS_BASE;stride=12;sx=x-UI_STATUS_X;sy=y-UI_STATUS_Y;end
+  if(!selected && !campaign && box(x,y,1049,32,15,96))begin selected=1;base=MAT_HEADER_ENDLESS_EDGE_BASE;stride=2;sx=pipe_x-1049;sy=y-32;end
+  if(choose)begin
+   selected=0;native=0;glow=0;
+   if(box(x,y,UI_SHIP_X,UI_SHIP_Y,UI_SHIP_W,UI_SHIP_H))begin
+    selected=1; // Visibility mask runs in parallel with the material address.
+    base=MAT_HEADER_BASE;stride=112;sx=x-UI_SHIP_X+76;sy=y-UI_SHIP_Y+16;
+   end
+  end
+  // The small offline geometry ROMs exactly reproduce the old integer sampler.
+  if(!choose && box(x,y,664,59,333,21))begin
+   selected=1;stride=2;
+   tx=charge_x[(campaign?0:333)+x-664];sx=tx[3:0];sy=charge_y[y-59];
+   base=x-664<charge_limit?MAT_CHARGE_ON_BASE:MAT_CHARGE_OFF_BASE;
+   native=tx[4];ink=24'h081824;
+  end
+  if(!choose && campaign && box(x,y,664,95,333,19))begin
+   selected=1;stride=2;base=x-664<debris_limit?MAT_DEBRIS_ON_BASE:MAT_DEBRIS_OFF_BASE;
+   sx=debris_x[x-664];sy=debris_y[y-95];native=0;
+  end
+  if((campaign?(locked>0 && locked<=8):reserve_fill>0) && y>=lit_top && y<548 &&
+     (box(core_x,y,1151,260,6,288) || box(core_x,y,1183,260,5,288)))glow=1;
+  if(box(core_x,y,1157,260,26,288))begin
+   native=1;ink=24'h040c13;mx=core_x-1157;
+   if(y<296)begin slot=0;my=y-260;end
+   else if(y<332)begin slot=1;my=y-296;end
+   else if(y<368)begin slot=2;my=y-332;end
+   else if(y<404)begin slot=3;my=y-368;end
+   else if(y<440)begin slot=4;my=y-404;end
+   else if(y<476)begin slot=5;my=y-440;end
+   else if(y<512)begin slot=6;my=y-476;end
+   else begin slot=7;my=y-512;end
+   py=my-2;
+   if(campaign)begin
+    if((7-slot)<locked && my>=2 && my<34)begin
+     // Radius-4 silhouette, matching the original squared-distance mask.
+     rounded_out=((py==0 || py==31) && (mx<4 || mx>21)) ||
+       ((py==1 || py==30) && (mx<2 || mx>23)) ||
+       ((py==2 || py==3 || py==28 || py==29) && (mx<1 || mx>24));
+     ink=gradient[py[4:0]];
+     if(rounded_out)ink=24'h040c13;
+     else if(mx==0 || mx==25 || py==0 || py==31)ink=24'h0b839e;
+     else if((py==1 && mx>=5 && mx<=20) || (mx==1 && py>=5 && py<=26))ink=24'hbbfbff;
+     if(charge_left!=0 && animation[4] && my==3 && mx>=5 && mx<=20)ink=24'hd5ffff;
+    end else if(my==35 && mx>=2 && mx<24)ink=24'h122937;
+   end else begin
+    if(y>=lit_top)begin
+     ink=reserve_alarm==2?24'hd8442e:reserve_alarm==1?24'hffc23a:24'h26d7ec;
+     if(mx==1)ink=reserve_alarm==0?24'hb5fbff:24'hffe5a3;
+     if(y==lit_top || y==lit_top+1)ink=24'hd5ffff;
+    end
+    if(charge_left!=0 && y>=lit_top && (my==3 || my==4))ink=24'hb5fbff;
+    if(my==35 && (mx<4 || mx>21))ink=24'h607d91;
+   end
+  end
+  if(!campaign && reserve_alarm!=0 && reserve_pulse && box(core_x,y,1140,250,59,300) &&
+     (core_x<1143 || core_x>=1196 || y<253 || y>=547))begin
+   native=1;ink=reserve_alarm==2?24'hd8442e:24'hffc23a;
+  end
+  // A charged segment launches a single bottom-to-top scan, clipped to glass.
+  if(campaign && !blocked && charge_left!=0 && box(core_x,y,1159,260,22,288) && y>=sweep_y && y<sweep_y+2)begin
+   native=1;ink=24'hb5fbff;
+  end
+  if(campaign && blocked && box(core_x,y,1150,238,40,6))begin native=1;ink=24'hd8442e;end
+  if(campaign && box(x,y,978,370,124,236))begin
+   row=y<426?0:y<480?1:y<534?2:3;
+   case(row)
+    0:center=388;1:center=442;2:center=496;default:center=550;
+   endcase
+   if(x>=1039 && x<1041 && y>=388 && y<=550)begin native=1;ink=24'h607d91;end
+   if(y>=center+12 && y<center+26)begin native=1;ink=24'h0e1c28;end
+   if(x>=1033 && x<1047 && y>=center-7 && y<center+7)begin
+    cx=x-1033;cy=y-(center-7);circle_value=circle[cy*14+cx];
+    if(circle_value!=0)begin
+     native=1;
+     if(circle_value==1)ink=(3-row)==phase?24'hf5a21f:((3-row)<phase?24'h35e0f5:24'hb3c8d8);
+     else ink=(3-row)==phase?24'hffc96b:((3-row)<phase?24'h35e0f5:24'h0e1c28);
+    end
+   end
+   // Erase baked old arrows before placing the active upward marker.
+   if(x>=1037 && x<=1043 && ((y>=368 && y<=376)||(y>=422 && y<=430)||(y>=476 && y<=484)||(y>=530 && y<=538)))begin
+    native=1;ink=(x>=1039 && x<1041 && y>=388 && y<=550)?24'h607d91:24'h0e1c28;
+   end
+   case(phase)
+    0:arrow_y=550;1:arrow_y=496;2:arrow_y=442;default:arrow_y=388;
+   endcase
+   if(y>=arrow_y-18 && y<=arrow_y-12 && x>=1040-((y-(arrow_y-18))>>1) && x<=1040+((y-(arrow_y-18))>>1))begin native=1;ink=24'hf5a21f;end
+  end
+  address=selected?base+(sy>>3)*stride+(sx>>3):13'd0;
+ end
+ wire [25:0] material_pixel;
+ ui_material_atlas atlas(.clk(clk),.address(address),.offset({sy[2:0],sx[2:0]}),.pixel(material_pixel));
+ reg [23:0] ink0,ink1,ink2;
+ reg [2:0] native_pipe,glow_pipe,valid_pipe,flow_pipe,breath_pipe;
+ always @(posedge clk)begin ink0<=ink;ink1<=ink0;ink2<=ink1;end
+ always @(posedge clk or negedge reset_n)begin
+  if(!reset_n)begin native_pipe<=0;glow_pipe<=0;valid_pipe<=0;flow_pipe<=0;breath_pipe<=0;end
+  else begin
+   native_pipe<={native_pipe[1:0],native};glow_pipe<={glow_pipe[1:0],glow};
+   valid_pipe<={valid_pipe[1:0],enable && selected};
+   flow_pipe<={flow_pipe[1:0],pipe_flow};breath_pipe<={breath_pipe[1:0],campaign && locked>=7 && animation[5]};
+  end
+ end
+ wire [23:0] spill={material_pixel[23:16]>>1,(material_pixel[15:8]>>1)+8'd63,(material_pixel[7:0]>>1)+8'd76};
+ wire pipe_orange=material_pixel[23:16]>140 && material_pixel[15:8]>70 && material_pixel[7:0]<100;
+ wire [23:0] breathing=breath_pipe[2]?{spill[23:16]>>1,spill[15:8]>>1,spill[7:0]>>1}:spill;
+ assign panel_rgb=material_pixel[23:0];
+ assign rgb=material_pixel[25]?material_pixel[23:0]:native_pipe[2]?ink2:flow_pipe[2] && pipe_orange?24'hffe39c:glow_pipe[2]?breathing:material_pixel[23:0];
+ assign hit=valid_pipe[2] && material_pixel[24] && ship_gate_pipe[2];
+endmodule

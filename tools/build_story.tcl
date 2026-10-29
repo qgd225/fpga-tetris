@@ -35,6 +35,7 @@ if {[file isfile [file join $root assets story_voice.json]]} {
     puts [exec python [file join $root tools prepare_story_voice.py]]
     puts [exec python [file join $root tools build_voice_assets.py]]
 }
+puts [exec python [file join $root tools build_ui_runtime_assets.py]]
 open_project [file join $root Tetris.xpr]
 foreach stale {voice_v0.mem voice_v0_config.vh} {set entries [get_files -quiet *$stale];if {[llength $entries]} {remove_files $entries}}
 set_property include_dirs [list [file join $root Tetris.srcs sources_1 new]] [get_filesets sources_1]
@@ -48,6 +49,7 @@ foreach name {rhythm_params.vh reserve_fill.mem game_mode_params.vh story_debris
     set source [file join $root Tetris.srcs sources_1 new $name]
     if {[file isfile $source] && [llength [get_files -quiet $source]] == 0} {add_files -norecurse $source}
 }
+source [file join $root tools register_new_ui.tcl]
 update_compile_order -fileset sources_1
 close_project
 open_project [file join $root Tetris.xpr]
@@ -83,6 +85,7 @@ set status [catch {
     set wns [get_property SLACK $setup_path]
     set whs [get_property SLACK $hold_path]
     set green [expr {$wns >= $timing_target && $whs >= $timing_target}]
+    if {$luts > 20000} {error "NEW_UI_LUT_RESERVE_FAILED LUT=$luts LIMIT=20000"}
     set timing [verify_project_timing $root]
     set tns [dict get $timing TNS]
     set ths [dict get $timing THS]
