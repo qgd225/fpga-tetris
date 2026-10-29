@@ -6,6 +6,7 @@ module Next_piece #(parameter CELL_PITCH=32)(
     output next,next2,next_margin,next_slot,
     output [4:0] pixel_x,pixel_y
 );
+    `include "spawn_shape.vh"
     function [1:0] grid4;
         input [10:0] delta;
         begin grid4=delta>=3*CELL_PITCH?2'd3:(delta>=2*CELL_PITCH?2'd2:(delta>=CELL_PITCH?2'd1:2'd0));end
@@ -31,10 +32,14 @@ module Next_piece #(parameter CELL_PITCH=32)(
     wire [10:0] lx2=dx2-c2*CELL_PITCH,ly2=dy2-r2*CELL_PITCH;
     wire slot1=hcounter>=X1 && vcounter>=Y1 && dx1<4*CELL_PITCH && dy1<4*CELL_PITCH;
     wire slot2=duo && hcounter>=X2 && vcounter>=Y2 && dx2<4*CELL_PITCH && dy2<4*CELL_PITCH;
-    wire [31:0] Tetromino_dout,Tetromino_dout2;
-    wire [4:0] Tetromino_addr={type_t,2'b0},Tetromino_addr2={type_t2,2'b0};
-    Tetromino Tetromino_inst0(.clka(Clk_74M),.addra(Tetromino_addr),.douta(Tetromino_dout));
-    Tetromino Tetromino_inst2(.clka(Clk_74M),.addra(Tetromino_addr2),.douta(Tetromino_dout2));
+    reg [31:0] Tetromino_dout = 32'd0, Tetromino_dout2 = 32'd0;
+    reg [31:0] shape_q1 = 32'd0, shape_q2 = 32'd0;
+    always @(posedge Clk_74M) begin
+        shape_q1 <= spawn_shape(type_t);
+        shape_q2 <= spawn_shape(type_t2);
+        Tetromino_dout <= shape_q1;
+        Tetromino_dout2 <= shape_q2;
+    end
     assign next=!Idle && slot1 && lx1<CELL_PITCH-2 && ly1<CELL_PITCH-2 && shape_hit(Tetromino_dout,c1,r1);
     assign next2=!Idle && slot2 && lx2<CELL_PITCH-2 && ly2<CELL_PITCH-2 && shape_hit(Tetromino_dout2,c2,r2);
     assign next_slot=slot1||slot2;

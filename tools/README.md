@@ -2,6 +2,8 @@
 
 电脑端显示、控制和 ARP 工具集中在工程根目录的 `pc/`。
 
+当前 RGB888 版本的本轮完整复验使用 `python tools/run_spawn_optimization.py`，直接读取冻结的正式资产，调用现有综合、布线、时序、接线检查、15组功能回归及发布检查。独立等价验证使用 `python tools/test_spawn_rom.py`，需要 Vivado 已生成 Tetromino IP 仿真输出。详见 [优化报告](../docs/reports/rom_optimization_20261029/README.md)。旧 `build_story_assets.py` 仍含要求网口内嵌 56 色表的断言，以下资产重建入口在当前 RGB888 版本会因此失败；本轮没有改动资产生成规则。
+
 本机双击 `生成bit.bat`，自动生成资产、完成整机综合和布局布线、检查时序与 RAM 接线、运行功能回归、核对输入指纹，全部通过后保存 `bit/Tetris.bit`。旧版按工程现有规则归档。
 
 入口通过 `local_build.py` 调用 `build_story.tcl`，直接复用 `project_policy.tcl` 与 `publish_bitstream.tcl` 的检查和保存逻辑。Vivado 工程不配置生成后置钩子，旧 `publish_bitstream_post.tcl` 已移除。图形界面只生成标准运行目录中的原始 bit；本机入口完成完整验证后才保存 `bit/Tetris.bit`。这些构建与检查脚本仍随工程上传。

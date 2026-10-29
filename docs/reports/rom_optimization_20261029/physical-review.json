@@ -1,0 +1,5 @@
+{
+  "unconstrained_endpoint_section_identical": true,
+  "new_report": "check-timing-verbose.rpt",
+  "baseline": "docs/reports/ui_polish_20261029/check-timing-verbose.rpt"
+}

@@ -1,10 +1,10 @@
 # FPGA 俄罗斯方块（Tetris）
 
-当前版本：2026-10-29 导管、背景与船板细化版已发布，PC沿用2026.10.29.1。修复导管玻璃接头和橙管左侧被旧面板残片遮断的问题；左侧背景增加一道静态流星和两颗远景小行星，随后补连续船板接缝、嵌入式通风槽及少量固定件。保留原有完整飞船、四关同屏、右上对白、核心八段与六圈锁链、重点材质和既有动态。
+当前版本：2026-10-29 NEXT/HOLD 预览 ROM 无损优化版已发布，PC 沿用 2026.10.29.1。保持导管、背景与船板细化版的画面及玩法，将三份预览小 ROM 改为等价查表逻辑，释放三块 18 Kb BRAM，并减少 94 LUT。
 
-[本轮最终报告](reports/ui_polish_20261029/README.md) · [38帧真实RTL审核图](参考图/预览图/RTL生成/20261029_导管背景与船板细化/README.md) · [实现说明](技术说明/新UI渲染与网口.md)。整机剩余1665 LUT，完整布线时序通过；实际显示、PC物理收流、操作与试听待用户上板验证。原参考保留，画面按本轮上板反馈调整，未宣称与未裁减原图整幅完全相同。
+[本轮最终报告](reports/rom_optimization_20261029/README.md) · [前版视觉审核图](参考图/预览图/RTL生成/20261029_导管背景与船板细化/README.md) · [实现说明](技术说明/新UI渲染与网口.md)。整机剩余 1759 LUT、2 块 BRAM，完整布线时序和 15 组功能检查通过；实际显示、PC 物理收流、操作与试听待用户上板验证。本轮未重新生成预览图，使用原始 IP 模型完成呈现等价对照。
 
-本轮未提交Git、未推送GitHub。旧bit已归档，现有PC程序未重打包、未替换。
+优化前基线已提交并推送，优化结果按本轮授权另行提交及推送。旧 bit 已归档，PC 程序未重打包、未替换。
 
 ## 核心资料
 
@@ -34,21 +34,21 @@
 
 ## 最新交付与验证
 
-当前自动验证来源：[导管背景与船板细化最终报告](reports/ui_polish_20261029/README.md)。最终15组功能回归、字形／图集／核心与导管／完整飞船／四阶段／背景流水线检查通过，38帧真实RTL绑定当前输入；声音与网口底层未改，复用同源有效证明并核对指纹。
+当前自动验证来源：[预览 ROM 优化最终报告](reports/rom_optimization_20261029/README.md)。最终 15 组功能检查通过；NEXT/HOLD 对原始 IP 的逐像素及切换等价检查通过。声音与网口底层未改，复用同源有效专项证据并核对指纹。
 
 | 项目 | 当前已验证结果 |
 | --- | --- |
 | 发布文件 | [bit/Tetris.bit](../bit/Tetris.bit)，2,192,114字节 |
-| bit SHA256 | `df0f5c6ec93f742b2e324a3d26bf521a4ee24d31c47916d703286e2cf61a6b3c` |
-| LUT／寄存器／BRAM／DSP | 19135／7477／49.5／13；剩余1665 LUT |
-| WNS／WHS | +0.063／+0.036 ns |
+| bit SHA256 | `f08c8fe343a9b092cc8ff35f0699042dfd74994542b7354a8cddb072375e2dae` |
+| LUT／寄存器／BRAM／DSP | 19041／7546／48／13；剩余1759 LUT、2块BRAM |
+| WNS／WHS | +0.335／+0.036 ns |
 | TNS／THS | 0／0 |
 | PC程序 | [TetrisPC.exe](../TetrisPC.exe)，沿用2026.10.29.1 |
 | PC SHA256 | `d0c40f1218daa98d58abb24126402e90d811e7e99f1256870570dbdbfe49fe72` |
 | 功能入口 | `python tools/run_functional_regression.py`，依赖本机temporary/sim运行支持 |
 | 待用户上板 | 实际显示与相位、动态及交互、PC物理网口收流、试听 |
 
-未降低目标时钟，新增FIFO偏斜约束仍全部满足。93个未约束端点与上一发布逐项相同，DRC无Error／Critical Warning级违例；既有复位／HDMI跨域及普通警告的说明见[告警复核](reports/ui_polish_20261029/告警与时序复核.md)。[前一发布报告](reports/ui_layout_20261029/README.md)保留为历史证据，不能替代本轮结果。
+未降低目标时钟，新增FIFO偏斜约束仍全部满足。93个未约束端点与上一发布逐项相同，DRC无Error／Critical Warning级违例；既有复位／HDMI跨域及普通警告的说明见[告警复核](reports/rom_optimization_20261029/README.md)。[前一发布报告](reports/ui_layout_20261029/README.md)保留为历史证据，不能替代本轮结果。
 
 现行验收职责见 [AGENTS.md](AGENTS.md)：代理保留功能仿真、整机布线、时序及发布一致性检查，用户负责上板可观察的呈现和体验，不要求代理等待人工反馈才交付。
 
@@ -65,7 +65,7 @@
 
 1. 使用支持 `.gitattributes` 编码属性的 Git 检出工程。
 2. 双击 [tools/打开工程.bat](../tools/打开工程.bat)，或用 Vivado 2018.3 打开 `Tetris.xpr`。
-3. 本机统一构建入口为 [tools/生成bit.bat](../tools/生成bit.bat)，详细用法见 [tools/README.md](../tools/README.md)。结束仅显示是否通过、时序指标、bit 保存路径；详细日志保存在 `temporary/build_candidates/`。
+3. 本轮对冻结正式资产的完整复验入口为 `python tools/run_spawn_optimization.py`；旧资产生成入口仍有 56 色网口断言不兼容问题，见本轮报告。原本机统一构建入口为 [tools/生成bit.bat](../tools/生成bit.bat)，详细用法见 [tools/README.md](../tools/README.md)。结束仅显示是否通过、时序指标、bit 保存路径；详细日志保存在 `temporary/build_candidates/`。
 4. 可直接下载 `bit/Tetris.bit`。重新生成时遵循 AGENTS.md 的验证和发布要求；IP 输出由工程配置重新生成。
 
 ## 操作与 PC 端

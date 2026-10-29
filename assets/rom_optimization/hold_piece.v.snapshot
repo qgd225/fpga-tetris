@@ -1,0 +1,38 @@
+// 编码: 本地工作区 GBK 无 BOM, Git 仓库 UTF-8。
+// 共享 HOLD 只画左槽；保留 X2/Y2 端口兼容现有调用，不复制第二个槽位。
+module hold_piece_before #(parameter CELL_PITCH=32)(
+    input Clk_74M,Reset_n,input [10:0] hcounter,vcounter,
+    input Idle,duo,input [2:0] hold_type,input en_hold,
+    input [10:0] X1,Y1,X2,Y2,
+    output hold,hold_margin,hold_slot,
+    output [4:0] pixel_x,pixel_y
+);
+    function [1:0] grid4;
+        input [10:0] delta;
+        begin grid4=delta>=3*CELL_PITCH?2'd3:(delta>=2*CELL_PITCH?2'd2:(delta>=CELL_PITCH?2'd1:2'd0));end
+    endfunction
+    function shape_hit;
+        input [31:0] shape;
+        input [1:0] c,r;
+        integer k;
+        reg [3:0] cx,ry;
+        begin
+            shape_hit=0;
+            for(k=0;k<4;k=k+1)begin
+                cx=4'd1+shape[k*8+4 +:4];
+                ry=4'd3+shape[k*8 +:4];
+                if(cx=={2'd0,c} && ry=={2'd0,r})shape_hit=1;
+            end
+        end
+    endfunction
+    wire [10:0] dx=hcounter-X1,dy=vcounter-Y1;
+    wire [1:0] c=grid4(dx),r=grid4(dy);
+    wire [10:0] lx=dx-c*CELL_PITCH,ly=dy-r*CELL_PITCH;
+    wire [31:0] Tetromino_dout;
+    wire [4:0] Tetromino_addr={hold_type,2'b0};
+    Tetromino Tetromino_inst0(.clka(Clk_74M),.addra(Tetromino_addr),.douta(Tetromino_dout));
+    assign hold_slot=hcounter>=X1 && vcounter>=Y1 && dx<4*CELL_PITCH && dy<4*CELL_PITCH;
+    assign hold=!Idle && en_hold && hold_slot && lx<CELL_PITCH-2 && ly<CELL_PITCH-2 && shape_hit(Tetromino_dout,c,r);
+    assign hold_margin=1'b0;
+    assign pixel_x=lx[4:0];assign pixel_y=ly[4:0];
+endmodule

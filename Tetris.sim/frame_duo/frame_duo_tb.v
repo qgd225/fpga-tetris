@@ -127,7 +127,8 @@ module frame_duo_tb;
         clear_board;
         force dut.type_t=3'd2;force dut.type_t2=3'd3;
         duo=1;look(210,282);check(rgb===24'hD9B23C,"P1 NEXT on left");
-        look(1026,282);check(rgb===24'hC2453A,"P2 NEXT on right");
+        // Type 3 occupies row 2, column 1; its row 3, column 1 is empty.
+        look(1026,258);check(rgb===24'hC2453A,"P2 NEXT on right");
         duo=0;look(210,282);check(rgb===24'hD9B23C,"solo NEXT remains left");
         look(1026,282);check(!dut.next2 && !dut.next_slot,"solo hides right preview");
         force dut.en_hold=1'b1;force dut.hold_type=3'd5;

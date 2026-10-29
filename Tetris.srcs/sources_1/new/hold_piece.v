@@ -7,6 +7,7 @@ module hold_piece #(parameter CELL_PITCH=32)(
     output hold,hold_margin,hold_slot,
     output [4:0] pixel_x,pixel_y
 );
+    `include "spawn_shape.vh"
     function [1:0] grid4;
         input [10:0] delta;
         begin grid4=delta>=3*CELL_PITCH?2'd3:(delta>=2*CELL_PITCH?2'd2:(delta>=CELL_PITCH?2'd1:2'd0));end
@@ -28,9 +29,12 @@ module hold_piece #(parameter CELL_PITCH=32)(
     wire [10:0] dx=hcounter-X1,dy=vcounter-Y1;
     wire [1:0] c=grid4(dx),r=grid4(dy);
     wire [10:0] lx=dx-c*CELL_PITCH,ly=dy-r*CELL_PITCH;
-    wire [31:0] Tetromino_dout;
-    wire [4:0] Tetromino_addr={hold_type,2'b0};
-    Tetromino Tetromino_inst0(.clka(Clk_74M),.addra(Tetromino_addr),.douta(Tetromino_dout));
+    reg [31:0] Tetromino_dout = 32'd0;
+    reg [31:0] shape_q = 32'd0;
+    always @(posedge Clk_74M) begin
+        shape_q <= spawn_shape(hold_type);
+        Tetromino_dout <= shape_q;
+    end
     assign hold_slot=hcounter>=X1 && vcounter>=Y1 && dx<4*CELL_PITCH && dy<4*CELL_PITCH;
     assign hold=!Idle && en_hold && hold_slot && lx<CELL_PITCH-2 && ly<CELL_PITCH-2 && shape_hit(Tetromino_dout,c,r);
     assign hold_margin=1'b0;

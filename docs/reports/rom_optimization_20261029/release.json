@@ -1,0 +1,25 @@
+{
+  "pass": true,
+  "published": true,
+  "bit_sha256": "f08c8fe343a9b092cc8ff35f0699042dfd74994542b7354a8cddb072375e2dae",
+  "previous_bit_sha256": "df0f5c6ec93f742b2e324a3d26bf521a4ee24d31c47916d703286e2cf61a6b3c",
+  "metrics": {
+    "LUT": "19041",
+    "REGISTERS": "7546",
+    "BRAM": "48",
+    "LATCHES": "3",
+    "DSP": "13",
+    "WNS": "0.335",
+    "WHS": "0.036",
+    "TNS": "0.000",
+    "THS": "0"
+  },
+  "equivalence_checks": 169032,
+  "functional_groups": 15,
+  "baseline_commit": "3c1ee03c93bf832e0dbe2c18f1d4cb2e540c753d",
+  "board_pending": [
+    "HDMI显示与动态",
+    "PC物理网口收流及控制",
+    "操作与试听"
+  ]
+}

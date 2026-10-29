@@ -1,0 +1,10 @@
+{
+  "voice": {
+    "source": "docs/reports/ui_polish_20261029/voice.json",
+    "source_hashes_match": true
+  },
+  "stream": {
+    "source": "docs/reports/ui_polish_20261029/stream.json",
+    "source_hashes_match": true
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "pass": true,
+  "inputs": {
+    "Tetris.srcs\\sources_1\\ip\\Tetromino\\simulation\\blk_mem_gen_v8_4.v": "81500d9fe84c918e7d36e6cdd72cd21a36b25a691a87de055ab199ac57187422",
+    "Tetris.srcs\\sources_1\\ip\\Tetromino\\sim\\Tetromino.v": "4453bd0f9532defd76014532bc0b866036db51393e22f5939a5dcc079c20df98",
+    "temporary\\rom_opt_20261029\\equivalence\\Next_piece_before.v": "7c5cf4e3d674b2b0aa2f8d87ff439c6f6c2623889dc9506550881b54c28e4346",
+    "Tetris.srcs\\sources_1\\new\\Next_piece.v": "961dc1209a5a1810de01c6262792c8ac7c314f6e7f136046c36107358daab5cc",
+    "temporary\\rom_opt_20261029\\equivalence\\hold_piece_before.v": "7b8a10eae43d067fc38340e3b399bdbd2565a8b2535afd75e5043cfd10af51a0",
+    "Tetris.srcs\\sources_1\\new\\hold_piece.v": "ffc6557f6a08609d3d5534ce1264e60e5eed6ddfa59c2911364a8fcf4705161d",
+    "Tetris.sim\\optimization\\spawn_rom_equivalence_tb.v": "c0adbe3d7c59d0d85fde13886e118be9eff38bbcc09d659758ef87da984ea27c",
+    "Tetris.srcs\\sources_1\\new\\spawn_shape.vh": "872d360eb41d140e8e9c0f7915342726a7bba854f779eb6bd72f4d077fd46394",
+    "assets\\rom_optimization\\Next_piece.v.snapshot": "7c5cf4e3d674b2b0aa2f8d87ff439c6f6c2623889dc9506550881b54c28e4346",
+    "assets\\rom_optimization\\hold_piece.v.snapshot": "7b8a10eae43d067fc38340e3b399bdbd2565a8b2535afd75e5043cfd10af51a0",
+    "Tetris.srcs\\sources_1\\ip\\Tetromino\\Tetromino.mif": "39fc7da4b1e38958846eed68ec04a5b1c82a71866ba2bb01accbb194e7459399",
+    "Tetris.srcs\\sources_1\\ip\\shape_rom.coe": "0e8fea3aeeb548e864511617e2e85cd89e441d19684eb2327e32837e000d0447"
+  },
+  "markers": [
+    "ALL PASS SPAWN_ROM_EQUIVALENCE checks=169032"
+  ]
+}
