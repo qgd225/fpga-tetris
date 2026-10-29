@@ -1,6 +1,6 @@
 # 电脑端显示、控制与无板网口自测
 
-更新：2026-10-29。便携程序目标为 Windows 10／11 x64，根目录 `TetrisPC.exe` 自带 Python、Pillow、Tk 和键盘支持；运行该 EXE 无须另装 Python。当前版本2026.10.29.1；本轮实际验证范围见[新UI最终报告](../docs/reports/new_ui_final_20261028/README.md)，原[PC便携化验证](../docs/reports/pc_portable_20261027/build-summary.md)保留为历史证据。
+更新：2026-10-29。便携程序目标为 Windows 10／11 x64，根目录 `TetrisPC.exe` 自带 Python、Pillow、Tk 和键盘支持；运行该 EXE 无须另装 Python。当前版本2026.10.29.1；本轮实际验证范围见[当前硬件发布报告](../docs/reports/rom_optimization_20261029/README.md)，原[PC便携化验证](../docs/reports/pc_portable_20261027/build-summary.md)保留为历史证据。
 
 ## 正常使用
 

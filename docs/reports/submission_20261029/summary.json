@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-29",
+  "title": "芯际救援：俄罗斯方块游戏机",
+  "hardware_commit": "ced2dbd4845f4cb7c8c92c9c4ca396d305b1a30e",
+  "bit_sha256": "f08c8fe343a9b092cc8ff35f0699042dfd74994542b7354a8cddb072375e2dae",
+  "technical_pdf_pages": 10,
+  "poster_size": "A2 portrait",
+  "rtl_frames": 7,
+  "rar_format": "RAR5",
+  "rar_crc_test": true,
+  "extracted_sha256_files": 464,
+  "xpr_file_references": 178,
+  "xpr_all_compile_sources_in_extracted_root": true,
+  "pc_loopback_pass": true,
+  "full_hardware_rebuild_this_round": false,
+  "authorization_signed": false,
+  "physical_device_photos_present": false,
+  "board_validation_pending": true,
+  "artifact_sizes_bytes": {
+    "01_技术文档.pdf": 543013,
+    "02_全部代码包.rar": 28814713,
+    "03_参赛作品承诺及使用授权书_待签名扫描.pdf": 92686,
+    "04_作品海报.pdf": 177989
+  },
+  "code_archive_sha256": "40a4146733aa1f145c8a0504c2778267f7ac6f23b0e6abd887db5a4ee8ffd849"
+}

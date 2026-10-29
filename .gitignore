@@ -78,3 +78,6 @@ pc/scoreboard.csv
 !/Tetris.sim/**/
 !/Tetris.sim/**/*tb.v
 !/Tetris.sim/**/*tb.sv
+
+# 比赛成品、个人授权信息和RAR仅在本机提交项目录保存。
+/提交项/
