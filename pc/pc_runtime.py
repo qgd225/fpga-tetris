@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import traceback
 
-VERSION = "2026.10.29.1"
+VERSION = "2026.10.31.1"
 
 
 def log_directory():

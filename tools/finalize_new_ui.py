@@ -1,5 +1,6 @@
 """Publish only the fully bound routed candidate plus the matching tested PC executable."""
 from pathlib import Path
+from publish_bitstream import publish, bit_payload
 import argparse,hashlib,json,re,shutil,datetime,subprocess,sys
 ROOT=Path(__file__).resolve().parents[1];TASK=ROOT/'temporary/ui_polish_20261029';ROUTED=TASK/'routed';REPORT=ROOT/'docs/reports/ui_polish_20261029'
 PREVIEW=ROOT/'docs/参考图/预览图/RTL生成/20261029_导管背景与船板细化'
@@ -41,8 +42,8 @@ def main():
   target=ROOT/'bit/Tetris.bit';old=sha(target)
   assert old in {read(TASK/'before.json')['bit_sha256'],sha(candidate)},'published bit changed outside this task'
   stamp=datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-  if old!=sha(candidate):shutil.copyfile(target,target.with_name(f'Tetris_{stamp}_{old[:12]}.bit'))
-  staged=target.with_suffix('.bit.new');shutil.copyfile(candidate,staged);staged.replace(target);assert sha(target)==result['bit_sha256']
+  pair=publish(candidate,ROOT);assert pair['bit_sha256']==result['bit_sha256']
+  result['bin_sha256']=pair['bin_sha256']
   exe_target=ROOT/'TetrisPC.exe';archive=TASK/'delivered_previous';archive.mkdir(exist_ok=True)
   if sha(exe_target)!=sha(exe):
    shutil.copyfile(exe_target,archive/f'TetrisPC_{stamp}_{sha(exe_target)[:12]}.exe')

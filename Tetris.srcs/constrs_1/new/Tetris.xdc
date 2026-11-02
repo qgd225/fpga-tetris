@@ -86,3 +86,20 @@ create_generated_clock -name rgmii_tx_clk -source [get_pins net_screen_tx_inst/e
 # ===== 两个异步时钟域：像素/游戏时钟(74.219M) 与 PHY RXC 恢复的 125M =====
 # 跨域全部走 FIFO(BRAM) 或 2~3 级同步器（tog_line/tog_pal/pll_locked），按异步处理
 set_clock_groups -asynchronous -group [get_clocks -include_generated_clocks hdmi_inst/hdmi_pll_inst/inst/clk_in1] -group [get_clocks -include_generated_clocks rgmii_rx_clk_i]
+
+# P2 buttons: GPIO1/P2 header pins 2,4,6,8,10; active low.
+set_property PACKAGE_PIN F14 [get_ports left2]
+set_property IOSTANDARD LVCMOS33 [get_ports left2]
+set_property PULLUP true [get_ports left2]
+set_property PACKAGE_PIN E14 [get_ports right2]
+set_property IOSTANDARD LVCMOS33 [get_ports right2]
+set_property PULLUP true [get_ports right2]
+set_property PACKAGE_PIN D15 [get_ports drop2]
+set_property IOSTANDARD LVCMOS33 [get_ports drop2]
+set_property PULLUP true [get_ports drop2]
+set_property PACKAGE_PIN E17 [get_ports rotate2]
+set_property IOSTANDARD LVCMOS33 [get_ports rotate2]
+set_property PULLUP true [get_ports rotate2]
+set_property PACKAGE_PIN D16 [get_ports hold2]
+set_property IOSTANDARD LVCMOS33 [get_ports hold2]
+set_property PULLUP true [get_ports hold2]

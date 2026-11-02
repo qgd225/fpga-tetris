@@ -1,0 +1,10 @@
+
+****** Vivado v2018.3 (64-bit)
+  **** SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+  **** IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+source tcl_entry.tcl -notrace
+BIT_BIN_PUBLISH_PASS {"pass": true, "bit_sha256": "f08c8fe343a9b092cc8ff35f0699042dfd74994542b7354a8cddb072375e2dae", "bin_sha256": "8dc346ddef4f45571946267f1bc85454cd01cfe0e7491a765f609c9dde06c2d2", "bit_bytes": 2192114, "bin_bytes": 2192012, "part": "7a35tfgg484", "format": "Raw SPI configuration bytes, unswapped, .bit header removed", "start_address": "0x00000000", "archives": [], "changed": []}
+TCL_PAIRED_PUBLISH_PASS
+INFO: [Common 17-206] Exiting Vivado at Fri Oct 30 13:11:10 2026...

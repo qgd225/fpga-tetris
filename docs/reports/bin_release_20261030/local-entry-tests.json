@@ -1,0 +1,6 @@
+{
+  "pass": true,
+  "valid_pair_accepted": true,
+  "mismatched_pair_rejected": true,
+  "real_build_executed": false
+}

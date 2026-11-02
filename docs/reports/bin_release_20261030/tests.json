@@ -1,0 +1,16 @@
+{
+  "pass": true,
+  "checks": [
+    "byte-exact match to Vivado write_cfgmem SPIx1",
+    "reject malformed/truncated/trailing payloads",
+    "first paired publish",
+    "identical pair preserves timestamps/no archive",
+    "different pair archives each exact previous file",
+    "unchanged latest bit repairs absent bin",
+    "second replacement failure rolls back pair and cleans staging",
+    "invalid candidate leaves published pair intact"
+  ],
+  "bit_sha256": "f08c8fe343a9b092cc8ff35f0699042dfd74994542b7354a8cddb072375e2dae",
+  "bin_sha256": "8dc346ddef4f45571946267f1bc85454cd01cfe0e7491a765f609c9dde06c2d2",
+  "bin_bytes": 2192012
+}

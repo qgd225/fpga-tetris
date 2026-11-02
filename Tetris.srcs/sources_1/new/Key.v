@@ -29,7 +29,8 @@ module Key(
     output rotate_p_flag,
     output rst_key_en,
     output hold_p_flag,
-    output hold_held
+    output hold_held,
+    output rotate_held
     );
 
     key_filter key_filter_inst0(
@@ -37,7 +38,7 @@ module Key(
     .Reset_n(Reset_n),
     .key(left),
     .key_p_flag(left_p_flag),
-    .key_held(left_held)
+    .key_en(left_held)
     );
 
     key_filter key_filter_inst1(
@@ -45,7 +46,7 @@ module Key(
     .Reset_n(Reset_n),
     .key(right),
     .key_p_flag(right_p_flag),
-    .key_held(right_held)
+    .key_en(right_held)
     );
 
     key_filter key_filter_inst2(
@@ -60,7 +61,8 @@ module Key(
     .Clk(Clk),
     .Reset_n(Reset_n),
     .key(rotate),
-    .key_p_flag(rotate_p_flag)
+    .key_p_flag(rotate_p_flag),
+    .key_en(rotate_held)
     );
 
     key_filter key_filter_inst4(
@@ -87,7 +89,7 @@ module Key(
     .Reset_n(Reset_n),
     .key(hold),
     .key_r_flag(hold_p_flag),
-    .key_held(hold_held)
+    .key_en(hold_held)
     );
 
 endmodule

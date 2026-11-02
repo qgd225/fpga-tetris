@@ -92,6 +92,7 @@ sound #(
 Game_state_machine #(
     .MCNT(64)
 ) gsm(
+.back_p(1'b0),.cancel_switch(1'b0),
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
     .left_p(1'b0),

@@ -1,0 +1,21 @@
+{
+  "datagrams": 9,
+  "bytes": 10312,
+  "line_packets": 8,
+  "palette_packets": 1,
+  "invalid_packets": 0,
+  "sources": [
+    "127.0.0.1"
+  ],
+  "protocol_sources": [
+    "127.0.0.1"
+  ],
+  "passed": true,
+  "mode": "loopback",
+  "bind": "127.0.0.1",
+  "port": 57543,
+  "version": "2026.10.31.1",
+  "errors": [],
+  "physical_network_verified": false,
+  "conclusion": "本机 UDP 发送、接收与 Tetris 协议解析通过；不代表网线、物理网口或防火墙入站已验证。"
+}

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "palette_entries": 56,
+  "palette_sha256": "bf90ef220473f5a05c241ccdb2088c40a108192d0a6045b472abb11363322bfe",
+  "tk_version": "8.6.12",
+  "keyboard_backend": "tkinter",
+  "keyboard_protocol": 5,
+  "network_configuration_changed": false
+}

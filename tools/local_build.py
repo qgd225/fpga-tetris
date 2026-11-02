@@ -1,4 +1,4 @@
-"""本机构建入口：详细输出写日志，控制台只显示三项结果。"""
+"""本机构建入口：详细输出写日志，控制台显示通过状态、时序及bit/bin保存路径。"""
 import datetime
 import os
 from pathlib import Path
@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+from publish_bitstream import bit_payload
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -62,7 +63,10 @@ def main():
                 transcript = (output / "console.log").read_text(encoding="utf-8", errors="replace")
                 passed = (result.returncode == 0
                           and f"STORY_BUILD_PASS {round_name}" in transcript
-                          and (ROOT / "bit/Tetris.bit").is_file())
+                          and (ROOT / "bit/Tetris.bit").is_file()
+                          and (ROOT / "bit/Tetris.bin").is_file())
+                if passed:
+                    passed = bit_payload((ROOT / "bit/Tetris.bit").read_bytes())[0] == (ROOT / "bit/Tetris.bin").read_bytes()
                 if not passed:
                     raise RuntimeError(f"构建或验证未通过，退出码 {result.returncode}")
             except Exception as exc:
@@ -72,6 +76,7 @@ def main():
     print("是否通过：" + ("通过" if passed else "未通过"))
     print("时序指标：" + timing_text(output / "timing.rpt"))
     print("bit 保存路径：" + (str(ROOT / "bit/Tetris.bit") if passed else "本次未保存"))
+    print("bin 保存路径：" + (str(ROOT / "bit/Tetris.bin") if passed else "本次未保存"))
     return 0 if passed else 1
 
 

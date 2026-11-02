@@ -1,0 +1,24 @@
+{
+  "pass": true,
+  "unconstrained_internal_endpoints": 93,
+  "previous_internal_endpoints": 93,
+  "no_input_delay_ports": 17,
+  "previous_no_input_delay_ports": 12,
+  "new_async_gpio_ports": [
+    "left2",
+    "right2",
+    "drop2",
+    "rotate2",
+    "hold2"
+  ],
+  "bus_skew_checks": 6,
+  "bus_skew_slack_ns": [
+    6.356,
+    6.398,
+    6.283,
+    6.315,
+    6.218,
+    6.333
+  ],
+  "explanation": "新增5路是异步机械按键，通过双级同步和消抖进入像素时钟域；未添加输入时序例外，17个无输入延迟端口较前版增加5个。内部未约束端点数量保持93，既有复位／HDMI跨域告警沿用；锁存器总数3未增加。"
+}

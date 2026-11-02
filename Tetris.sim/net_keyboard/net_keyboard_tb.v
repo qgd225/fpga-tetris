@@ -7,6 +7,7 @@ module net_keyboard_tb;
     reg [7:0] rx_byte = 8'd0;
     reg rx_empty = 1'b1;
     wire kb_rd_en;
+    wire [4:0] p1,p2;wire cancel,back;
     wire kb_left_p, kb_right_p, kb_left_held, kb_right_held;
     wire kb_drop_r, kb_drop_en, kb_rotate_p;
     wire kb_switch_r, kb_switch_en, kb_hold_p, kb_hold_en;
@@ -27,6 +28,7 @@ module net_keyboard_tb;
         .kb_rotate_p(kb_rotate_p), .kb_switch_r(kb_switch_r),
         .kb_switch_en(kb_switch_en), .kb_hold_p(kb_hold_p),
         .kb_hold_en(kb_hold_en), .kb_reset_en(kb_reset_en),
+        .kb_p1_keys(p1),.kb_p2_keys(p2),.kb_cancel(cancel),.kb_back_en(back),
         .kb_activity(kb_activity)
     );
 
@@ -87,6 +89,21 @@ module net_keyboard_tb;
         check(kb_reset_en, "reset request starts timed reset");
         repeat (7) @(negedge clk);
         check(!kb_reset_en, "timed reset request ends");
+
+        send_byte(8'hA5);send_byte(8'h5A);send_byte(8'd5);send_byte(8'h09);
+        check(p1==0 && p2==0,"partial dual frame is not committed");
+        send_byte(8'h16);
+        check(p1==9 && p2==22 && !cancel,"dual frame atomic independent players");
+        send_byte(8'hA5);send_byte(8'h5A);send_byte(8'd5);send_byte(8'h80);send_byte(0);
+        check(p1==0 && p2==0 && cancel && !kb_drop_r,"cancel releases without drop event");
+        send_byte(8'hA5);send_byte(8'h5A);send_byte(8'd5);send_byte(8'h04);send_byte(8'h24);
+        check(p1==4 && p2==4 && back,"P1 P2 drop and shared back");
+        repeat(14) @(negedge clk);
+        check(p1==0 && p2==0 && cancel && !back && !kb_drop_r,"timeout cancels both players safely");
+        send_byte(8'hA5);send_byte(8'h5A);send_byte(8'd5);send_byte(8'h1f);
+        repeat(8) @(negedge clk);
+        send_frame(8'h01);
+        check(p1==0 && p2==1,"truncated v2 recovers to legacy P2 frame");
 
         if (failures == 0)
             $display("=== ALL PASS: NET KEYBOARD ===");

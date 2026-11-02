@@ -6,6 +6,7 @@
 // 测试目标：Hold 短按换块与长按智能提示手势回归。
 //============================================================
 module hold_gesture_tb;
+reg cancel=0;
 reg Clk=0, Rst=0;
 reg board_hold=0, pc_hold=0, legacy_hold=0, duo=0;
 wire held = board_hold | pc_hold;
@@ -16,6 +17,7 @@ integer bad=0;
 always #5 Clk=~Clk;
 
 hold_gesture #(.HOLD_LONG_CNT(25'd300)) dut(
+.cancel(cancel),
 .Clk_74M(Clk), .Reset_n(Rst), .held(held),
 .short_pulse(short_pulse), .long_level(long_level)
 );
@@ -142,6 +144,13 @@ initial begin
   legacy_hold=0; board_hold=0; @(posedge Clk); #1;
   chk("duo legacy hold release", routed_hold, 0);
 
+  reset_dut;
+  pc_hold=1;hold_cycles(12);
+  @(negedge Clk);pc_hold=0;cancel=1;@(posedge Clk);#1;
+  chk("cancel does not emit short HOLD",short_pulse,0);
+  chk("cancel clears long state",long_level,0);
+  @(negedge Clk);cancel=0;repeat(2)@(posedge Clk);#1;
+  chk("cancel does not replay HOLD",short_pulse,0);
   if(bad==0)$display("=== ALL PASS ==="); else $display("=== FAILED %0d ===",bad);
   $finish;
 end

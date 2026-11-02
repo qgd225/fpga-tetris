@@ -1,0 +1,27 @@
+
+****** Vivado v2018.3 (64-bit)
+  **** SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+  **** IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+source convert.tcl -notrace
+Command: write_cfgmem -force -format bin -size 4 -interface SPIx1 -loadbit {up 0x0 D:/vivado_project/Tetris/bit/Tetris.bit} reference_spi.bin
+Creating config memory files...
+Creating bitstream load up from address 0x00000000
+Loading bitfile D:/vivado_project/Tetris/bit/Tetris.bit
+Writing file ./reference_spi.bin
+Writing log file ./reference_spi.prm
+===================================
+Configuration Memory information
+===================================
+File Format        BIN
+Interface          SPIX1
+Size               4M
+Start Address      0x00000000
+End Address        0x003FFFFF
+
+Addr1         Addr2         Date                    File(s)
+0x00000000    0x0021728B    Oct 29 19:41:37 2026    D:/vivado_project/Tetris/bit/Tetris.bit
+0 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+write_cfgmem completed successfully
+INFO: [Common 17-206] Exiting Vivado at Fri Oct 30 13:06:30 2026...

@@ -10,15 +10,15 @@ FPGA 发来的包：
   行包   : A5 5A 01 | 帧号2B | 行号2B | 1280 个颜色标号(每像素 1B)   共 1287 字节
   调色板 : A5 5A 02 | N | N*(标号,R,G,B)                            共 4+4N 字节
 本程序发给 FPGA 的按键包：
-  A5 5A 03 | 位图1B
-    位图: bit0=左  bit1=右  bit2=下  bit3=旋转(上)
-          bit4=小键盘0(保持)  bit5=小键盘5(开始/暂停)  bit6=小键盘9(复位)
-  按下/松开立刻发一包，另外每 20ms 无条件重发一包（丢包 20ms 自愈）
+  A5 5A 05 | P1及公共位图1B | P2及返回位图1B
+  P1: WASD + Q；P2: 方向键 + 小键盘0；Enter开始暂停，Esc返回，F12复位。
+  仅窗口获得焦点时处理按键；失焦/退出发取消包。每20ms重发完整快照。
 
 注意：FPGA 不回 ARP，所以第一次用（或重启后）请运行根目录 TetrisPC.exe，
       它会自动把静态 ARP 绑到正确的网卡，然后启动本程序。
 """
 import os, socket, sys, threading, time
+from keyboard_controls import KeyState, BIT_NAMES, encode_keys
 from pc_protocol import decode_packet, LinePacket, RGBChunkPacket, create_receiver
 
 # ======== 默认参数（要改就改这里）========
@@ -109,76 +109,49 @@ kb_lock = threading.Lock()
 kb_bits = 0
 kb_ev = threading.Event()
 
-VK_BITS = {37:0, 39:1, 40:2, 38:3, 96:4, 101:5, 105:6}
-BIT_NAME = ["左", "右", "下", "旋转(上)", "小键盘0 保持", "小键盘5 开始/暂停", "小键盘9 复位", "-"]
+key_state = KeyState()
 
 
-def kb_packet(bits):
-    return bytes(bytearray([0xA5, 0x5A, 0x03, bits & 0xFF]))
+def kb_packet(bits, cancelled=False):
+    return encode_keys(bits, cancelled)
 
 
 def kb_text():
     with kb_lock:
-        b = kb_bits
-    s = [BIT_NAME[i] for i in range(7) if (b >> i) & 1]
-    return ("+".join(s)) if s else "无"
+        bits = key_state.bits
+    return "+".join(name for bit, name in BIT_NAMES.items() if bits & (1 << bit)) or "无"
 
 
-def kb_set(bit, down):
-    global kb_bits
+def release_keyboard():
     with kb_lock:
-        if down:
-            kb_bits |= (1 << bit)
-        else:
-            kb_bits &= ~(1 << bit)
+        key_state.clear()
     kb_ev.set()
 
 
-def key_vk(key):
-    # 方向键回来的是 Key 枚举成员, 它没有 .vk (vk 在 key.value.vk 里)
-    vk = getattr(key, "vk", None)
-    if vk is None:
-        vk = getattr(getattr(key, "value", None), "vk", None)
-    return vk
-
-
-def start_listener():
-    try:
-        from pynput import keyboard
-    except Exception as e:
-        print("[提示] 没有 pynput，键盘发送功能关闭（画面照常显示）。原因: %s" % e)
-        return
-    keymap = {
-        keyboard.Key.left : 0,
-        keyboard.Key.right: 1,
-        keyboard.Key.down : 2,
-        keyboard.Key.up   : 3,
-    }
-    seen = set()
-
-    def one_key(key, down):
-        b = None
-        if key in keymap:
-            b = keymap[key]
-        else:
-            vk = key_vk(key)
-            if vk in VK_BITS:
-                b = VK_BITS[vk]
-            elif vk is not None and vk not in seen:
-                seen.add(vk)
-                print("[未识别] %r  vk=%s  (要用它就把 vk 加进脚本顶部的 VK_BITS)" % (key, vk))
-        if b is not None:
-            kb_set(b, down)
-
-    def on_press(key):
-        one_key(key, True)
-    def on_release(key):
-        one_key(key, False)
-    lis = keyboard.Listener(on_press=on_press, on_release=on_release)
-    lis.daemon = True
-    lis.start()
-    print("键盘已接管: 方向键=左/右/下/上(上=旋转), 小键盘 5=开始暂停 0=保持 9=复位 (请打开 NumLock)")
-    return lis
+def start_listener(root):
+    # Tk delivers only this window's keyboard events; no global interception.
+    focused = [False]
+    def one_key(event, down):
+        if focused[0]:
+            with kb_lock:
+                changed = key_state.update(event.keycode, down)
+            if changed:
+                kb_ev.set()
+        return "break"
+    def focus_in(event):
+        focused[0] = True
+    def check_focus():
+        if root.focus_get() is None:
+            focused[0] = False
+            release_keyboard()
+    def focus_out(event):
+        root.after_idle(check_focus)
+    root.bind("<KeyPress>", lambda e: one_key(e, True))
+    root.bind("<KeyRelease>", lambda e: one_key(e, False))
+    root.bind("<FocusIn>", focus_in)
+    root.bind("<FocusOut>", focus_out)
+    print("操作：P1 WASD+Q；P2 方向键+小键盘0；Enter 开始/暂停，Esc 返回，F12 复位。请让游戏窗口保持焦点。")
+    return None
 
 
 
@@ -212,16 +185,16 @@ def tx_loop(local_source=None):
                 kb_ev.wait(RESEND_S)
                 kb_ev.clear()
                 with kb_lock:
-                    bits = kb_bits
+                    packet = key_state.packet()
                 try:
-                    sender.sendto(kb_packet(bits), (FPGA_IP, FPGA_PORT))
+                    sender.sendto(packet, (FPGA_IP, FPGA_PORT))
                     stat["kb"] += 1
                 except OSError as exc:
                     print("[按键] 发送失败：" + str(exc))
                     stop_event.wait(0.5)
         finally:
             try:
-                sender.sendto(kb_packet(0), (FPGA_IP, FPGA_PORT))
+                sender.sendto(kb_packet(0, cancelled=True), (FPGA_IP, FPGA_PORT))
             except OSError:
                 pass
 
@@ -301,9 +274,7 @@ def main(local_source=None, smoke_test=False, smoke_report=None):
     workers = []
     stop_event.clear()
     def close():
-        global kb_bits
-        with kb_lock:
-            kb_bits = 0
+        release_keyboard()
         stop_event.set()
         kb_ev.set()
         root.destroy()
@@ -311,7 +282,7 @@ def main(local_source=None, smoke_test=False, smoke_report=None):
         if not smoke_test:
             # 在创建后台线程前占用端口；冲突会明确报错，不留下无数据的假窗口。
             receiver = create_receiver("0.0.0.0", LISTEN_PORT)
-            listener = start_listener()
+            listener = start_listener(root)
             for target, args in [(rx_loop, (receiver,)), (tx_loop, (local_source,))]:
                 worker = threading.Thread(target=target, args=args, daemon=True)
                 worker.start()
@@ -344,11 +315,12 @@ def main(local_source=None, smoke_test=False, smoke_report=None):
         root.geometry("+0+0")
         if not smoke_test:
             root.deiconify()
+            canvas.focus_set()
         tick()
         if smoke_test:
-            from pynput import keyboard
+            import keyboard_controls
             result = dict(passed=True, palette_entries=len(DEFAULT_PAL), palette_sha256=hashlib.sha256(pal_bytes()).hexdigest(),
-                          tk_version=str(root.tk.call("info", "patchlevel")), keyboard_backend=keyboard.__name__,
+                          tk_version=str(root.tk.call("info", "patchlevel")), keyboard_backend="tkinter", keyboard_protocol=5,
                           network_configuration_changed=False)
             if smoke_report:
                 from pathlib import Path
@@ -393,7 +365,7 @@ try:
     from PIL import Image, ImageTk
 except Exception as _e:
     print("启动失败: 缺少图形依赖（%s）" % _e)
-    print("请使用根目录 TetrisPC.exe；源码开发模式需先安装 pillow 和 pynput")
+    print("请使用根目录 TetrisPC.exe；源码开发模式需先安装 pillow")
     report_startup_error("Tetris PC 启动失败", "缺少图形依赖：%s" % _e)
     sys.exit(1)
 

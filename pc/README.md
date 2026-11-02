@@ -1,6 +1,6 @@
 # 电脑端显示、控制与无板网口自测
 
-更新：2026-10-29。便携程序目标为 Windows 10／11 x64，根目录 `TetrisPC.exe` 自带 Python、Pillow、Tk 和键盘支持；运行该 EXE 无须另装 Python。当前版本2026.10.29.1；本轮实际验证范围见[当前硬件发布报告](../docs/reports/rom_optimization_20261029/README.md)，原[PC便携化验证](../docs/reports/pc_portable_20261027/build-summary.md)保留为历史证据。
+更新：2026-10-31。便携程序目标为 Windows 10／11 x64，根目录 `TetrisPC.exe` 自带 Python、Pillow、Tk 和键盘支持；运行该 EXE 无须另装 Python。当前版本2026.10.31.1；本轮实际验证范围见[双来源控制发布报告](../docs/reports/dual_input_20261031/README.md)，原[PC便携化验证](../docs/reports/pc_portable_20261027/build-summary.md)保留为历史证据。
 
 ## 正常使用
 
@@ -10,7 +10,9 @@
 
 多块有线网卡均未配置 FPGA 网段时，会要求选择连接 FPGA 的网卡，不自动猜第一块。也可以通过 `TetrisPC.exe --interface <网卡索引>` 指定，索引可用 Windows `Get-NetAdapter` 查看。
 
-方向键对应左／右／下／旋转，小键盘 0 为 HOLD、5 为开始／暂停、9 为复位；打开 NumLock。正常退出会停止后台线程并尝试发送按键全释放包。接收端口已被占用时会明确报错，不显示一个无法收流的假窗口。
+P1 可使用引脚第一组或 PC 的 WASD＋Q；P2 可使用引脚第二组或 PC 的方向键＋小键盘0。同一玩家的两种来源先合并电平再生成边沿，支持同一台电脑双人、双引脚按键双人及两种混合组合，无需选择输入设备。单人仍兼容方向键＋小键盘0操作P1，第二组引脚不参与单人游戏。Enter／小键盘5开始或暂停，Esc直接返回，F12／小键盘9复位；引脚switch与复位仍共用。
+
+小键盘请打开 NumLock。仅游戏窗口获得焦点时接收键盘输入；切到其他窗口、最小化或退出时发送取消包，清除两名玩家的PC按键，避免卡键及误触下落、HOLD、确认。约200ms未收到完整按键包时，FPGA也会取消两组PC输入，引脚控制仍可使用。普通键盘可能存在多键冲突，实际双人组合需要实测。接收端口已被占用时会明确报错，不显示一个无法收流的假窗口。
 
 ## 无须上板的自测
 
@@ -65,7 +67,7 @@
 | `Python备用启动_需要Python.bat` | 优先现有 EXE；设置 `TETRIS_PC_SOURCE=1` 后改用源码 |
 | `TetrisPC.spec`、`requirements-build.txt`、`build_pc_exe.py` | 构建依赖和可重复的便携打包入口 |
 
-正常用户只需 EXE；将 EXE 单独复制到其他目录也可使用内置自测。源码显示模式需要 Python、Pillow、pynput 和 tkinter；源码自测仅需 Python。便携 EXE 面向 Windows x64，不是 macOS、Linux 或 32 位 Windows 的程序。
+正常用户只需 EXE；将 EXE 单独复制到其他目录也可使用内置自测。源码显示模式需要 Python、Pillow 和 tkinter；源码自测仅需 Python。便携 EXE 面向 Windows x64，不是 macOS、Linux 或 32 位 Windows 的程序。
 
 开发机重打包：在安装 `requirements-build.txt` 对应依赖的 Python 3.11 x64 下运行 `python pc/build_pc_exe.py`。候选 EXE、日志和输入摘要直接保存到 `temporary/pc_package_时间戳/`，不自动替换正在使用的正式程序。完成自测、图形依赖与干净目录验证后再发布，不能只修改源码而继续交付旧 EXE。
 
@@ -76,6 +78,6 @@
 
 ## 新UI扩色链路
 
-新UI bit使用类型4的RGB888游程包，PC版本为2026.10.29.1。请配套使用本轮`TetrisPC.exe`；旧程序不识别新画面包。新程序继续兼容旧bit的行包和调色板，不再用56色限制新画面。
+新UI bit使用类型4的RGB888游程包，PC版本为2026.10.31.1。请配套使用本轮`TetrisPC.exe`；旧程序不识别新画面包。新程序继续兼容旧bit的行包和调色板，不再用56色限制新画面。
 
 每个UDP包最多1292字节，一行按最多320段游程分包；按实际区间累计覆盖，支持帧号回绕和旧帧拒收。协议实现见`pc_protocol.py`，硬件与PC绑定及本机测试记录见最终新UI报告。软件自测和图形依赖检查不代替板上物理网口验证。

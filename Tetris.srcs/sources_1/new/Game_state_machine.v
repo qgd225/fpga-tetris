@@ -4,7 +4,8 @@ module Game_state_machine(
  input success,run_ready,
  output wire Choose,Idle,Playing,Stop,Finalize,sw_short,sw_long,
  output reg [3:0] choose_cnt,output wire ship_select,
- output reg [1:0] level_id,output wire campaign,output wire [1:0] result_option,output wire [1:0] menu_window
+ output reg [1:0] level_id,output wire campaign,output wire [1:0] result_option,output wire [1:0] menu_window,
+ input back_p, cancel_switch
 );
  parameter MCNT = 74_250_000;
  parameter [3:0]CHOOSE_MAX = 4'd3;
@@ -13,8 +14,8 @@ module Game_state_machine(
  reg menu_start,ship_start;
  assign menu_window=ship_select?{1'b0,ship_start}:{1'b0,menu_start};
  reg [1:0] option;reg [6:0] init_wait;
- wire hold_pulse=(counter==MCNT)&&short_press_ok;
- wire short_press=short_press_ok && switch_r_flag;
+ wire hold_pulse=((counter==MCNT)&&short_press_ok) || back_p;
+ wire short_press=short_press_ok && switch_r_flag && !back_p && !cancel_switch;
  assign sw_short=short_press;assign sw_long=hold_pulse;
  assign Choose=state==MENU || state==SELECT;
  assign ship_select=state==SELECT;assign Idle=state==INIT;
@@ -25,7 +26,7 @@ module Game_state_machine(
   if(!Reset_n)begin counter<=0;short_press_ok<=1;end
   else begin
    if(!switch_en)counter<=0;else if(counter<MCNT)counter<=counter+1'b1;
-   if(hold_pulse)short_press_ok<=0;else if(switch_r_flag)short_press_ok<=1;
+   if(back_p)short_press_ok<=!switch_en;else if(cancel_switch)short_press_ok<=1;else if(hold_pulse)short_press_ok<=0;else if(switch_r_flag)short_press_ok<=1;
   end
  end
  always @(posedge Clk_74M or negedge Reset_n)begin

@@ -13,6 +13,7 @@ module Tetris(
     input rotate,
     input switch,
     input hold,
+    input left2, right2, drop2, rotate2, hold2,
 
     output hdmi_clk_p,
     output hdmi_clk_n,
@@ -57,6 +58,8 @@ module Tetris(
     wire kb_hold_en;
     wire kb_reset_en;
     wire kb_activity;
+    wire [4:0] kb_p1_keys,kb_p2_keys;
+    wire kb_cancel,kb_back_en;
 
     wire Reset_n = (por_n) && (!rst_key_en) && (!kb_reset_en);
 
@@ -116,7 +119,16 @@ module Tetris(
     wire rotate_p_flag;
     wire hold_p_flag;
     wire hold_held;
+    wire rotate_held;
+    wire [4:0] btn1_keys={hold_held,rotate_held,drop_en,right_held,left_held};
+    wire [4:0] btn2_keys;
+    wire p1_hold_held;
 
+    key_filter p2_left_filter(.Clk(Clk_74M),.Reset_n(Reset_n),.key(left2),.key_en(btn2_keys[0]));
+    key_filter p2_right_filter(.Clk(Clk_74M),.Reset_n(Reset_n),.key(right2),.key_en(btn2_keys[1]));
+    key_filter p2_drop_filter(.Clk(Clk_74M),.Reset_n(Reset_n),.key(drop2),.key_en(btn2_keys[2]));
+    key_filter p2_rotate_filter(.Clk(Clk_74M),.Reset_n(Reset_n),.key(rotate2),.key_en(btn2_keys[3]));
+    key_filter p2_hold_filter(.Clk(Clk_74M),.Reset_n(Reset_n),.key(hold2),.key_en(btn2_keys[4]));
     Key Key_inst(
     .Clk(Clk_74M),
     .Clk_50M(Clk),
@@ -141,7 +153,8 @@ module Tetris(
     .rotate_p_flag(rotate_p_flag),
     .rst_key_en(rst_key_en),
     .hold_p_flag(hold_p_flag),
-    .hold_held(hold_held)
+    .hold_held(hold_held),
+    .rotate_held(rotate_held)
     );
 
 wire p1_left, p1_right, p1_drop_r, p1_drop_en, p1_rotate, p1_hold;
@@ -153,13 +166,24 @@ wire left_p;
 wire right_p;
 wire p2_left_move;
 wire p2_right_move;
-wire left_p_menu  = left_p_flag | kb_left_p;
-wire right_p_menu = right_p_flag | kb_right_p;
+wire [1:0] menu_keys=btn1_keys[1:0] | btn2_keys[1:0] | kb_p1_keys[1:0] | kb_p2_keys[1:0];
+reg [1:0] menu_keys_d;
+always @(posedge Clk_74M or negedge Reset_n) begin
+    if(!Reset_n)menu_keys_d<=0;else menu_keys_d<=menu_keys;
+end
+wire left_p_menu=menu_keys[0] && !menu_keys_d[0];
+wire right_p_menu=menu_keys[1] && !menu_keys_d[1];
 wire drop_r_f   = p1_drop_r;
 wire drop_e     = p1_drop_en;
 wire rotate_p   = p1_rotate;
-wire switch_r_f = switch_r_flag | kb_switch_r;
-wire switch_e   = switch_en     | kb_switch_en;
+wire switch_e = switch_en | kb_switch_en;
+reg switch_d, back_d, switch_local_d, hold_local_d;
+always @(posedge Clk_74M or negedge Reset_n) begin
+    if(!Reset_n) begin switch_d<=0;back_d<=0;switch_local_d<=0;hold_local_d<=0;end
+    else begin switch_d<=switch_e;back_d<=kb_back_en;switch_local_d<=switch_en;hold_local_d<=hold_held;end
+end
+wire switch_r_f = switch_d && !switch_e && (!kb_cancel || switch_local_d);
+wire back_p = kb_back_en && !back_d;
 wire hold_route = p1_hold;
 wire solo_hold_short;
 wire solo_hold_long;
@@ -180,7 +204,8 @@ wire solo_hold_long;
 hold_gesture hold_gesture_inst(
 .Clk_74M(Clk_74M),
 .Reset_n(Reset_n),
-.held(hold_held | kb_hold_en),
+.cancel(kb_cancel && !hold_held && !hold_local_d),
+.held(p1_hold_held),
 .short_pulse(solo_hold_short),
 .long_level(solo_hold_long)
 );
@@ -188,40 +213,10 @@ wire hold_p = duo ? hold_route : solo_hold_short;
 
 //    单人: PC + 板载键都控制 P1; 双人: 板载 P1, PC P2
 control_route control_route_inst(
-.duo(duo),
-.btn_left(left_p_flag),
-.btn_right(right_p_flag),
-.btn_drop_r(drop_r_flag),
-.btn_drop_en(drop_en),
-.btn_rotate(rotate_p_flag),
-.btn_hold(hold_p_flag),
-.btn_left_held(left_held),
-.btn_right_held(right_held),
-.pc_left(kb_left_p),
-.pc_right(kb_right_p),
-.pc_drop_r(kb_drop_r),
-.pc_drop_en(kb_drop_en),
-.pc_rotate(kb_rotate_p),
-.pc_hold(kb_hold_p),
-.pc_left_held(kb_left_held),
-.pc_right_held(kb_right_held),
-.p1_left(p1_left),
-.p1_right(p1_right),
-.p1_drop_r(p1_drop_r),
-.p1_drop_en(p1_drop_en),
-.p1_rotate(p1_rotate),
-.p1_hold(p1_hold),
-.p1_left_held(p1_left_held),
-.p1_right_held(p1_right_held),
-.p2_left(p2_left),
-.p2_right(p2_right),
-.p2_drop_r(p2_drop_r),
-.p2_drop_en(p2_drop_en),
-.p2_rotate(p2_rotate),
-.p2_hold(p2_hold),
-.p2_left_held(p2_left_held),
-.p2_right_held(p2_right_held)
-);
+    .Clk(Clk_74M),.Reset_n(Reset_n),.duo(duo),.pc_cancel(kb_cancel),
+    .btn1(btn1_keys),.btn2(btn2_keys),.pc1(kb_p1_keys),.pc2(kb_p2_keys),.p1_hold_held(p1_hold_held),
+    .p1_left(p1_left), .p1_right(p1_right), .p1_drop_r(p1_drop_r), .p1_drop_en(p1_drop_en), .p1_rotate(p1_rotate), .p1_hold(p1_hold), .p1_left_held(p1_left_held), .p1_right_held(p1_right_held),
+    .p2_left(p2_left), .p2_right(p2_right), .p2_drop_r(p2_drop_r), .p2_drop_en(p2_drop_en), .p2_rotate(p2_rotate), .p2_hold(p2_hold), .p2_left_held(p2_left_held), .p2_right_held(p2_right_held));
 
     wire mode_campaign,ship_select,run_ready;wire [1:0] menu_window;wire rhythm_reject,rhythm_expire,rhythm_recharge,rhythm_warning,rhythm_critical;
     wire [1:0] level_id,result_option;
@@ -230,6 +225,8 @@ control_route control_route_inst(
     wire sw_long;
 
     Game_state_machine Game_state_machine_inst(
+    .back_p(back_p),
+    .cancel_switch(kb_cancel && !switch_en && !switch_local_d),
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
     .left_p(left_p_menu),
@@ -499,6 +496,8 @@ wire solo_hint_show = !duo && solo_hint_latched;
     .kb_hold_p(kb_hold_p),
     .kb_hold_en(kb_hold_en),
     .kb_reset_en(kb_reset_en),
+    .kb_p1_keys(kb_p1_keys),.kb_p2_keys(kb_p2_keys),
+    .kb_cancel(kb_cancel),.kb_back_en(kb_back_en),
     .kb_activity(kb_activity)
     );
 

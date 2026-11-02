@@ -1,0 +1,24 @@
+{
+  "pass": true,
+  "unit_tests": 4,
+  "focus_callbacks": true,
+  "inactive_keys_ignored": true,
+  "udp_dual_snapshot": true,
+  "exit_cancel_packet": true,
+  "pc_source_inputs": {
+    "build_pc_exe.py": "ae668954c907fa25eed7fb12fdab6e3fb882c8ebc4281810055b2220c5980907",
+    "keyboard_controls.py": "a03e85e02a9b8ea9d3297fd1fb85f09522e3ef27dd1fd11dae878550a37790b4",
+    "network_selftest.py": "40ac46c0c704d4cdf92574ffecb029d6eedac3a55fab107ecf9ab47a0b9ed530",
+    "net_screen_view.py": "308acd10794c018d7445b13ec1a2e494a82e6f2930c6bf1de9143a29cbdcb439",
+    "pc_protocol.py": "3374b4bca67e0b7d41252716878ee5715d8b26b2344916cb2d8f474a3c513d65",
+    "pc_runtime.py": "2381c416f9bac3abec02627b28373199cc3478e3e6ca6dff37021974666fdcd6",
+    "Python\u5907\u7528\u542f\u52a8_\u9700\u8981Python.bat": "d876a363c1e76998094fadebff7e81ed8c90614af41b758b8515d75c6a533f44",
+    "requirements-build.txt": "edc1c28335bc1a22a65eec0e011025d6924fdfde6db004966ef1a81c2f99b330",
+    "set_static_arp.py": "a4c4127cf0c016f14a0895c3008371a1cd19bc2935ccc1562808570bbba3ee46",
+    "test_keyboard_controls.py": "821a5569fc0b2dff33126d7dc659818e60ced5d5b09e157ec855cdcfb27eef71",
+    "TetrisPC.spec": "380f93c701f5608d17bb240ded427812d0b5edcfa3e4a126e63da17b11284242",
+    "tetris_pc_launcher.py": "d39e8fdc30542248fcce08d7c2da1e5ed1c17f2713a90ec5781e119c8461a41d",
+    "\u7f51\u53e3\u81ea\u6d4b.bat": "70dd0ee08456c5af6a84199f472bda038193a6da8483d96449924ec64f2282a3"
+  },
+  "exe_sha256": "2e168e45081c7e75daa28712615a816c266d3ada07f71bd11ade5d18b2fae479"
+}

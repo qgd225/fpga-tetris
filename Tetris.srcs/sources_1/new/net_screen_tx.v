@@ -40,6 +40,8 @@ module net_screen_tx(
   output        kb_hold_p,
   output        kb_hold_en,
   output        kb_reset_en,
+  output [4:0]  kb_p1_keys, kb_p2_keys,
+  output        kb_cancel, kb_back_en,
   output        kb_activity
 );
 parameter DST_MAC    = 48'hFF_FF_FF_FF_FF_FF;  // 默认广播，PC 端不用先知道也行
@@ -111,6 +113,8 @@ eth_udp_loopback_rgmii #(.WORD_TX(1)) eth_udp_loopback_rgmii_inst(
         .kb_rotate_p(kb_rotate_p), .kb_switch_r(kb_switch_r),
         .kb_switch_en(kb_switch_en), .kb_hold_p(kb_hold_p),
         .kb_hold_en(kb_hold_en), .kb_reset_en(kb_reset_en),
+        .kb_p1_keys(kb_p1_keys), .kb_p2_keys(kb_p2_keys),
+        .kb_cancel(kb_cancel), .kb_back_en(kb_back_en),
         .kb_activity(kb_activity)
     );
 endmodule

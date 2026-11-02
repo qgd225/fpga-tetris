@@ -1,0 +1,42 @@
+{
+  "pass": true,
+  "bit_sha256": "f08c8fe343a9b092cc8ff35f0699042dfd74994542b7354a8cddb072375e2dae",
+  "bin_sha256": "8dc346ddef4f45571946267f1bc85454cd01cfe0e7491a765f609c9dde06c2d2",
+  "bit_bytes": 2192114,
+  "bin_bytes": 2192012,
+  "part": "7a35tfgg484",
+  "format": "Raw SPI configuration bytes, unswapped, .bit header removed",
+  "start_address": "0x00000000",
+  "archives": [],
+  "changed": [
+    "Tetris.bin"
+  ],
+  "date": "2026-10-30",
+  "hardware_rebuilt": false,
+  "hardware_inputs_unchanged": true,
+  "baseline": "docs/reports/rom_optimization_20261029",
+  "unchanged_hardware_timing": {
+    "WNS": 0.335,
+    "WHS": 0.036,
+    "TNS": 0,
+    "THS": 0
+  },
+  "changed_build_or_policy_inputs": [
+    "docs/AGENTS.md",
+    "tools/finalize_new_ui.py",
+    "tools/local_build.py",
+    "tools/publish_bitstream.py",
+    "tools/publish_bitstream.tcl",
+    "tools/test_publish_bitstream.py",
+    "tools/生成bin.bat",
+    "tools/生成bit.bat"
+  ],
+  "head_unchanged": "c4782a6639f66ddb5636c855cb1b2f93df64158e",
+  "git_commit": false,
+  "git_push": false,
+  "git_binary_and_ignore_checks": true,
+  "flash_programmed": false,
+  "vendor_reference_sha256": "8dc346ddef4f45571946267f1bc85454cd01cfe0e7491a765f609c9dde06c2d2",
+  "vendor_command": "write_cfgmem -force -format bin -size 4 -interface SPIx1 -loadbit {up 0x0 bit/Tetris.bit}",
+  "capacity_note": "4MB conversion limit only; Flash model and actual boot mode not inferred"
+}

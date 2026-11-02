@@ -9,7 +9,8 @@ module hold_gesture(
     input Reset_n,
     input held,
     output reg short_pulse,
-    output reg long_level
+    output reg long_level,
+    input cancel
     );
     parameter [24:0] HOLD_LONG_CNT = 25'd22_275_000;
     reg held_d;
@@ -18,6 +19,13 @@ module hold_gesture(
 
     always@(posedge Clk_74M or negedge Reset_n)begin
     if(!Reset_n)begin
+    held_d <= 1'b0;
+    long_seen <= 1'b0;
+    hold_cnt <= 25'd0;
+    short_pulse <= 1'b0;
+    long_level <= 1'b0;
+    end
+    else if(cancel)begin
     held_d <= 1'b0;
     long_seen <= 1'b0;
     hold_cnt <= 25'd0;
