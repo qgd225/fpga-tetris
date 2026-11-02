@@ -1,0 +1,69 @@
+{
+  "pass": true,
+  "published": true,
+  "baseline_commit": "2e4b545",
+  "git_commit_after_implementation": false,
+  "git_push": false,
+  "resources": {
+    "LUT": 19384.0,
+    "REGISTERS": 7874.0,
+    "BRAM": 48.5,
+    "DSP": 13.0,
+    "LATCHES": 3.0
+  },
+  "timing_ns": {
+    "WNS": 0.015,
+    "WHS": 0.066,
+    "TNS": 0.0,
+    "THS": 0.0
+  },
+  "firmware": {
+    "pass": true,
+    "bit_sha256": "793c38e16a332efe3132600c5c5666bdd4d1e6c190d94755f1001cc90d213cd4",
+    "bin_sha256": "df6c618d690a4bd7141d5e2ab620aff8621a0280d9ad765566393bc1b167b92f",
+    "bit_bytes": 2192114,
+    "bin_bytes": 2192012,
+    "part": "7a35tfgg484",
+    "format": "Raw SPI configuration bytes, unswapped, .bit header removed",
+    "start_address": "0x00000000",
+    "archives": [
+      "Tetris_20261102_135909_1e0c44bf6662.bit",
+      "Tetris_20261102_135909_06965cc2953f.bin"
+    ],
+    "changed": [
+      "Tetris.bit",
+      "Tetris.bin"
+    ]
+  },
+  "pc_version": "2026.11.02.1",
+  "pc_exe_sha256": "965d50f8b31cbe9b8d9d2102431224de44e72ae718930729b53bc826cbcc9645",
+  "test_sources": {
+    "Tetris.sim/net_audio/av_stream_tb.v": "b637abf89e50df1cce452f941bd7d3bb972e16adc113da2518b4cca2d7c552a3",
+    "Tetris.sim/net_audio/net_audio_tb.v": "34010ebc37cc11b3d55f75209bee91427f0f1eb6a3da6f52c11d72aac1e5649c",
+    "pc/test_keyboard_controls.py": "b7436c863fe5117f57f447be100ea1ee506b2016871b28ef19b1d789253f93c2",
+    "pc/test_pc_audio.py": "47a732fa522a234383501115ee628fe8f6a7ddc0f1369d367807bfce6fc16da7"
+  },
+  "functional_groups": 15,
+  "stream": {
+    "pass": true,
+    "video_frames": 2,
+    "video_packets": 1440,
+    "audio_packets": 6,
+    "audio_samples_exact": 1440,
+    "Ethernet_CRC_IP_UDP": true,
+    "real_localhost_receiver": true,
+    "source_inputs": {
+      "Tetris.srcs\\sources_1\\new\\net_audio_packetizer.v": "897729a782db40a7ef13fe0241f2d18f76939201611c387479adf0e9017a1ff3",
+      "Tetris.srcs\\sources_1\\new\\net_screen_tx.v": "b3631778d031071ee38412d04c1105d83619fec063cf6331ffb393fdf8b3bc38",
+      "Tetris.srcs\\sources_1\\new\\ui_rgb_packetizer.v": "f293de7a5f8932207e8daafa48fdea32e2f36cf0f38ad059f9152c6965b867bc",
+      "Tetris.srcs\\sources_1\\new\\ui_async_fifo.v": "30bc17ff5904f8761083e8318d74c87ba9e4f8221a98135b579115eaf6d5efed"
+    }
+  },
+  "pending": [
+    "物理网口同时收音视频",
+    "音频实际听感及长时间时钟漂移",
+    "HDMI声音保持及PC声卡热拔插",
+    "画面与声音主观同步",
+    "按键失焦及发送恢复实机核对"
+  ]
+}

@@ -4,7 +4,7 @@
 module ui_rgb_packetizer(input clk,reset_n,enable,de,input [10:0] line,
  input [23:0] rgb,input word_full,descriptor_full,
  output reg [31:0] word_data,output word_write,
- output [15:0] packet_length,output packet_ready,output reg overflow);
+ output [15:0] packet_length,output packet_ready,output reg overflow,output idle);
  reg previous_de,active_line;
  reg [10:0] line_q;reg [15:0] frame;
  reg [10:0] start_x;
@@ -50,6 +50,7 @@ module ui_rgb_packetizer(input clk,reset_n,enable,de,input [10:0] line,
   end
  end
  reg [2:0] state;
+ assign idle=state==0;
  reg [15:0] frame_send;reg [10:0] line_send;
  reg [10:0] x_send,width_send;reg [8:0] count_send,remaining;
  assign chunk_pop=state==0 && chunk_valid && !descriptor_full;

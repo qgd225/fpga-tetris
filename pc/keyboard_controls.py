@@ -21,6 +21,8 @@ class KeyState:
     def __init__(self):
         self.pressed = set()
         self.cancelled = True
+        self.cancel_generation=0
+        self.pending_cancel=False
 
     def update(self, vk, down):
         if vk not in VK_BITS:
@@ -33,6 +35,8 @@ class KeyState:
         return True
 
     def clear(self):
+        self.cancel_generation+=1
+        self.pending_cancel=True
         self.pressed.clear()
         self.cancelled = True
 
@@ -44,4 +48,14 @@ class KeyState:
         return bits
 
     def packet(self):
-        return encode_keys(self.bits, self.cancelled)
+        return encode_keys(self.bits, self.cancelled or self.pending_cancel)
+
+    def snapshot(self):
+        return self.cancel_generation,self.packet()
+
+    def acknowledge(self,generation,packet):
+        if packet==encode_keys(0,True) and generation==self.cancel_generation:
+            pending=self.pending_cancel
+            self.pending_cancel=False
+            return pending and not self.cancelled
+        return False

@@ -1,0 +1,16 @@
+{
+  "pass": true,
+  "source_inputs": {
+    "pc\\build_pc_exe.py": "ae668954c907fa25eed7fb12fdab6e3fb882c8ebc4281810055b2220c5980907",
+    "pc\\keyboard_controls.py": "0e4baa3855967c8337f7e1d11b77e0acde855fe4b7991291ca80fdf0bbbb98b6",
+    "pc\\network_selftest.py": "ec72d5f7b6417066c906851425a4d85dd2b5561bf813d948b609a86fce7f47b6",
+    "pc\\net_screen_view.py": "7537de6aeeb710bd5e0dc539c71f12b21f0252c450883fabec76b41da57d3d40",
+    "pc\\pc_audio.py": "8ed5080359a0cc9acc4c0d6a5a49957b577cf40022687fc2f8bb0976063bbffa",
+    "pc\\pc_protocol.py": "ecdfd39498eef713c61baf9e942d4f7d344a8191288a8f56e1dcb319cdfc2506",
+    "pc\\pc_runtime.py": "b22868b2aa01004243d6a05f9798ba6c69c4adfbdcf81780c48617f8cb745b0b",
+    "pc\\set_static_arp.py": "a4c4127cf0c016f14a0895c3008371a1cd19bc2935ccc1562808570bbba3ee46",
+    "pc\\test_keyboard_controls.py": "b7436c863fe5117f57f447be100ea1ee506b2016871b28ef19b1d789253f93c2",
+    "pc\\test_pc_audio.py": "47a732fa522a234383501115ee628fe8f6a7ddc0f1369d367807bfce6fc16da7",
+    "pc\\tetris_pc_launcher.py": "d39e8fdc30542248fcce08d7c2da1e5ed1c17f2713a90ec5781e119c8461a41d"
+  }
+}

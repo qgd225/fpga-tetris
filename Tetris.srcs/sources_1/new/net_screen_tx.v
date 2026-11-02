@@ -9,6 +9,7 @@ module net_screen_tx(
   input         Clk_74M,
   input         Reset_n,
   input         por_n,
+  input audio_sample_ce,input [15:0] audio_pcm,
 
 //-------- 画面输入（来自 hdmi / frame）--------
   input         de,  // 1 = 当前像素在有效区(1280x720)
@@ -69,9 +70,27 @@ end
 always @(posedge Clk_74M)begin rgb0<=rgb;rgb1<=rgb0;y0<=vcounter;y1<=y0;end
 wire [31:0] word_data;wire word_write,packet_ready,descriptor_full,codec_overflow;
 wire [15:0] packet_length;
+wire [31:0] video_data,audio_data;
+wire video_write,video_ready,video_idle,audio_request,audio_write,audio_ready,audio_fault;
+wire [15:0] video_length,audio_length;
+reg audio_grant;
+always @(posedge Clk_74M or negedge Reset_n)begin
+ if(!Reset_n)audio_grant<=0;
+ else if(audio_ready)audio_grant<=0;
+ else if(!audio_grant && video_idle && audio_request)audio_grant<=1;
+end
+wire audio_reserve=audio_grant || (video_idle && audio_request);
+assign word_data=audio_grant ? audio_data : video_data;
+assign word_write=audio_grant ? audio_write : video_write;
+assign packet_ready=audio_grant ? audio_ready : video_ready;
+assign packet_length=audio_grant ? audio_length : video_length;
+net_audio_packetizer audio_packets(.clk(Clk_74M),.reset_n(Reset_n),.por_n(por_n),
+ .sample_ce(audio_sample_ce),.pcm(audio_pcm),.grant(audio_grant),.word_full(tx_full),
+ .descriptor_full(descriptor_full),.request(audio_request),.word_data(audio_data),.word_write(audio_write),
+ .packet_ready(audio_ready),.packet_length(audio_length),.overflow(audio_fault));
 ui_rgb_packetizer packetizer(.clk(Clk_74M),.reset_n(Reset_n),.enable(link_sync[1]),
- .de(de_pipe[1]),.line(y1),.rgb(rgb1),.word_full(tx_full),.descriptor_full(descriptor_full),
- .word_data(word_data),.word_write(word_write),.packet_length(packet_length),.packet_ready(packet_ready),.overflow(codec_overflow));
+ .de(de_pipe[1]),.line(y1),.rgb(rgb1),.word_full(tx_full || audio_reserve),.descriptor_full(descriptor_full || audio_reserve),
+ .word_data(video_data),.word_write(video_write),.packet_length(video_length),.packet_ready(video_ready),.overflow(codec_overflow),.idle(video_idle));
 wire [15:0] descriptor_head;wire descriptor_valid;
 wire descriptor_pop;
 ui_async_fifo #(.WIDTH(16),.ADDR_BITS(5),.STYLE("distributed")) packets(

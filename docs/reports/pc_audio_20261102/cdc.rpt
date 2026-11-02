@@ -1,0 +1,19 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Mon Nov  2 13:58:25 2026
+| Host         : qiguidei running 64-bit major release  (build 9200)
+| Command      : report_cdc -file D:/vivado_project/Tetris/temporary/pc_audio_20261102/routed/cdc.rpt
+| Design       : Tetris
+| Device       : 7a35t-fgg484
+| Speed File   : -2  PRODUCTION 1.23 2018-06-13
+------------------------------------------------------------------------------------------------------
+
+CDC Report
+
+Severity  Source Clock        Destination Clock   CDC Type                 Exceptions           Endpoints  Safe  Unsafe  Unknown  No ASYNC_REG  
+--------  ------------------  ------------------  -----------------------  -------------------  ---------  ----  ------  -------  ------------  
+Critical  clk_out1_hdmi_pll   clk_out1_clk_wiz_0  No Common Primary Clock  Asynch Clock Groups        593   444      14      135             0  
+Critical  clk_out1_hdmi_pll   clk_out2_hdmi_pll   User Ignored             False Path                  30     0       0       30             0  
+Warning   clk_out1_clk_wiz_0  clk_out1_hdmi_pll   No Common Primary Clock  Asynch Clock Groups         17    17       0        0             0  
+

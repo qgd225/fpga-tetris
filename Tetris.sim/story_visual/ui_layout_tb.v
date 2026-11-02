@@ -6,7 +6,7 @@ module ui_layout_tb;
  wire [23:0] rgb,grgb,panel,gpanel;wire hit,ghit;
  integer px,py,state,checks=0;reg [10:0] cy;
  always #5 clk=~clk;
- ui_mission_layer dut(.clk(clk),.reset_n(rst),.enable(1'b1),.duo(1'b1),.campaign(campaign),.blocked(blocked),.choose(choose),.x(x),.y(y),.locked(locked),.reserve_alarm(2'd0),.reserve_pulse(1'b0),.reserve_fill(8'd104),.animation(8'd0),.charge_left(5'd0),.charge_percent(7'd42),.debris_percent(7'd37),.lit_top(10'd440),.panel_rgb(panel),.rgb(rgb),.hit(hit));
+ ui_mission_layer dut(.clk(clk),.reset_n(rst),.enable(1'b1),.duo(1'b1),.campaign(campaign),.blocked(blocked),.chain_present(blocked),.choose(choose),.x(x),.y(y),.locked(locked),.reserve_alarm(2'd0),.reserve_pulse(1'b0),.reserve_fill(8'd104),.animation(8'd0),.charge_left(5'd0),.charge_percent(7'd42),.debris_percent(7'd37),.lit_top(10'd440),.panel_rgb(panel),.rgb(rgb),.hit(hit));
  ui_mission_layer_before golden(.clk(clk),.reset_n(rst),.enable(1'b1),.duo(1'b0),.campaign(campaign),.blocked(blocked),.choose(1'b0),.x(gx),.y(gy),.locked(locked),.reserve_alarm(2'd0),.reserve_pulse(1'b0),.reserve_fill(8'd104),.animation(8'd0),.charge_left(5'd0),.charge_percent(7'd42),.debris_percent(7'd37),.lit_top(10'd440),.panel_rgb(gpanel),.rgb(grgb),.hit(ghit));
  task compare;begin
   repeat(5)@(negedge clk);

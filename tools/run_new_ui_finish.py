@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse,shutil,subprocess,sys,json
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[1];SRC=ROOT/'Tetris.srcs/sources_1/new';OUT=ROOT/'temporary/ui_polish_20261029'
-MODULES=['ui_font_5x7','ui_text_raster','ui_text_compact','ui_material_atlas','ui_mission_layer','ui_basic_layer','ui_hull_background','reference_ui_renderer','story_ui']
+MODULES=['ui_font_5x7','ui_text_raster','ui_text_compact','ui_material_atlas','ui_mission_layer','ui_basic_layer','ui_hull_background','ui_core_feedback','reference_ui_renderer','story_ui']
 def setup():
     return ('@echo off\nset "TEMP='+str(OUT/'os_tmp')+'"\nset "TMP='+str(OUT/'os_tmp')+'"\nset "HOMEDRIVE=C:"\nset "HOMEPATH=\\Users\\qiguidie"\ncall D:\\xilinx\\Vivado\\2018.3\\settings64.bat >nul 2>&1\n')
 def main():

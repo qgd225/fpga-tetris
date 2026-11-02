@@ -29,6 +29,9 @@ class KeyboardTests(unittest.TestCase):
         self.assertEqual(state.packet(), bytes.fromhex('a55a058000'))
         self.assertEqual(state.bits, 0)
         state.update(68, True)
+        token,packet=state.snapshot()
+        self.assertEqual(packet, bytes.fromhex('a55a058000'))
+        state.acknowledge(token,packet)
         self.assertEqual(state.packet(), bytes.fromhex('a55a050200'))
 
     def test_repeat_and_shared_commands(self):

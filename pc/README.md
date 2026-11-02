@@ -1,6 +1,6 @@
 # 电脑端显示、控制与无板网口自测
 
-更新：2026-10-31。便携程序目标为 Windows 10／11 x64，根目录 `TetrisPC.exe` 自带 Python、Pillow、Tk 和键盘支持；运行该 EXE 无须另装 Python。当前版本2026.10.31.1；本轮实际验证范围见[双来源控制发布报告](../docs/reports/dual_input_20261031/README.md)，原[PC便携化验证](../docs/reports/pc_portable_20261027/build-summary.md)保留为历史证据。
+更新：2026-11-02。便携程序目标为 Windows 10／11 x64，根目录 `TetrisPC.exe` 自带 Python、Pillow、Tk、NumPy 和键盘支持；运行该 EXE 无须另装 Python。当前版本2026.11.02.3；本轮性能验证见[PC性能报告](../docs/reports/pc_opt_20261102/README.md)，硬件验证范围见[PC音频发布报告](../docs/reports/pc_audio_20261102/README.md)，原[PC便携化验证](../docs/reports/pc_portable_20261027/build-summary.md)保留为历史证据。
 
 ## 正常使用
 
@@ -60,6 +60,7 @@ P1 可使用引脚第一组或 PC 的 WASD＋Q；P2 可使用引脚第二组或 
 | `tetris_pc_launcher.py` | 启动、诊断、自测命令分流与错误报告 |
 | `net_screen_view.py` | 画面、键盘与接收线程；接收RGB888游程，兼容旧版56色索引与调色板包 |
 | `set_static_arp.py` | 有线网卡选择、只读诊断、原生 PowerShell 配置与复核 |
+| `video_receiver.py` | 接收线程组帧、覆盖统计及最新完整帧发布 |
 | `pc_protocol.py` | 画面接收和自测共同使用的数据格式与长度校验 |
 | `network_selftest.py` | 回环、外部监听和对端发送 |
 | `pc_runtime.py` | 版本与用户可写的日志目录 |
@@ -67,7 +68,7 @@ P1 可使用引脚第一组或 PC 的 WASD＋Q；P2 可使用引脚第二组或 
 | `Python备用启动_需要Python.bat` | 优先现有 EXE；设置 `TETRIS_PC_SOURCE=1` 后改用源码 |
 | `TetrisPC.spec`、`requirements-build.txt`、`build_pc_exe.py` | 构建依赖和可重复的便携打包入口 |
 
-正常用户只需 EXE；将 EXE 单独复制到其他目录也可使用内置自测。源码显示模式需要 Python、Pillow 和 tkinter；源码自测仅需 Python。便携 EXE 面向 Windows x64，不是 macOS、Linux 或 32 位 Windows 的程序。
+正常用户只需 EXE；将 EXE 单独复制到其他目录也可使用内置自测。源码显示模式需要 Python、Pillow 和 tkinter，建议按 requirements-build.txt 安装 NumPy 加速；缺少 NumPy 时协议解析回退至 Python。源码自测仅需 Python。便携 EXE 面向 Windows x64，不是 macOS、Linux 或 32 位 Windows 的程序。
 
 开发机重打包：在安装 `requirements-build.txt` 对应依赖的 Python 3.11 x64 下运行 `python pc/build_pc_exe.py`。候选 EXE、日志和输入摘要直接保存到 `temporary/pc_package_时间戳/`，不自动替换正在使用的正式程序。完成自测、图形依赖与干净目录验证后再发布，不能只修改源码而继续交付旧 EXE。
 
@@ -78,6 +79,23 @@ P1 可使用引脚第一组或 PC 的 WASD＋Q；P2 可使用引脚第二组或 
 
 ## 新UI扩色链路
 
-新UI bit使用类型4的RGB888游程包，PC版本为2026.10.31.1。请配套使用本轮`TetrisPC.exe`；旧程序不识别新画面包。新程序继续兼容旧bit的行包和调色板，不再用56色限制新画面。
+新UI bit使用类型4的RGB888游程包，PC版本为2026.11.02.3。请配套使用本轮`TetrisPC.exe`；旧程序不识别新画面包。新程序继续兼容旧bit的行包和调色板，不再用56色限制新画面。
 
 每个UDP包最多1292字节，一行按最多320段游程分包；按实际区间累计覆盖，支持帧号回绕和旧帧拒收。协议实现见`pc_protocol.py`，硬件与PC绑定及本机测试记录见最终新UI报告。软件自测和图形依赖检查不代替板上物理网口验证。
+
+## PC音频接入（2026-11-02）
+
+48 kHz／16位单声道PCM经同一网口与画面共传，PC自动通过Windows默认音频设备播放。协议、播放缓冲及验证边界见[音频说明](../docs/技术说明/PC音频传输.md)。已发布；物理收流、实际听感与长时间同步待用户验证。
+
+2026-11-02 PC补充修复：加入×32播放增益与限幅，并将“本帧待收”与上一帧完整性统计分开。固件未变；PC验证见[音量与统计修复报告](../docs/reports/pc_sound_fix_20261102/README.md)。
+
+
+## PC视频性能优化（2026.11.02.3）
+
+RGB游程使用NumPy展开，短游程保留直接复制；仅发布最新完整帧，界面不再与收包线程争抢整帧锁。显示按60 Hz目标时刻调度，落后时跳过过期显示，不积压旧帧；状态文字每200 ms更新。仅在收到新完整帧时刷新图片，真实丢包仍计入不完整帧，等待下一完整帧。无数据时保持最后完整画面，不会凭空生成新帧。
+
+窗口显示实际显示FPS及解码后端。60 Hz是调度目标，受收流、系统负载和Tk显示能力影响，不保证每秒60次。音量×32、按键与失焦取消规则保留，固件无须重烧。[实现说明](../docs/技术说明/PC视频性能优化.md) · [验证结果](../docs/reports/pc_opt_20261102/README.md)。
+
+## 当前上板验收
+
+用户于2026-11-02反馈当前配套固件及2026.11.02.3 PC程序成功上板验证。画面、网络音频和双来源控制的现行说明见本文及[验收记录](../docs/reports/board_acceptance_20261102/README.md)。既有短时性能样本不代表全部场景稳定帧率，未新增长期或端到端延迟测量。

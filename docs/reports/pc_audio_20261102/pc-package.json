@@ -1,0 +1,22 @@
+{
+  "source_inputs": {
+    "build_pc_exe.py": "ae668954c907fa25eed7fb12fdab6e3fb882c8ebc4281810055b2220c5980907",
+    "keyboard_controls.py": "0e4baa3855967c8337f7e1d11b77e0acde855fe4b7991291ca80fdf0bbbb98b6",
+    "network_selftest.py": "ec72d5f7b6417066c906851425a4d85dd2b5561bf813d948b609a86fce7f47b6",
+    "net_screen_view.py": "7537de6aeeb710bd5e0dc539c71f12b21f0252c450883fabec76b41da57d3d40",
+    "pc_audio.py": "8ed5080359a0cc9acc4c0d6a5a49957b577cf40022687fc2f8bb0976063bbffa",
+    "pc_protocol.py": "ecdfd39498eef713c61baf9e942d4f7d344a8191288a8f56e1dcb319cdfc2506",
+    "pc_runtime.py": "b22868b2aa01004243d6a05f9798ba6c69c4adfbdcf81780c48617f8cb745b0b",
+    "Python备用启动_需要Python.bat": "d876a363c1e76998094fadebff7e81ed8c90614af41b758b8515d75c6a533f44",
+    "requirements-build.txt": "edc1c28335bc1a22a65eec0e011025d6924fdfde6db004966ef1a81c2f99b330",
+    "set_static_arp.py": "a4c4127cf0c016f14a0895c3008371a1cd19bc2935ccc1562808570bbba3ee46",
+    "test_keyboard_controls.py": "b7436c863fe5117f57f447be100ea1ee506b2016871b28ef19b1d789253f93c2",
+    "test_pc_audio.py": "47a732fa522a234383501115ee628fe8f6a7ddc0f1369d367807bfce6fc16da7",
+    "TetrisPC.spec": "380f93c701f5608d17bb240ded427812d0b5edcfa3e4a126e63da17b11284242",
+    "tetris_pc_launcher.py": "d39e8fdc30542248fcce08d7c2da1e5ed1c17f2713a90ec5781e119c8461a41d",
+    "网口自测.bat": "70dd0ee08456c5af6a84199f472bda038193a6da8483d96449924ec64f2282a3"
+  },
+  "exe_sha256": "965d50f8b31cbe9b8d9d2102431224de44e72ae718930729b53bc826cbcc9645",
+  "platform": "win32",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]"
+}

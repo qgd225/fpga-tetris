@@ -19,7 +19,10 @@ FPGA 发来的包：
 """
 import os, socket, sys, threading, time
 from keyboard_controls import KeyState, BIT_NAMES, encode_keys
-from pc_protocol import decode_packet, LinePacket, RGBChunkPacket, create_receiver
+from pc_audio import AudioBuffer, play, PCM_GAIN
+from video_receiver import VideoReceiver
+from pc_protocol import DECODER_BACKEND
+from pc_protocol import AudioPacket, decode_packet, LinePacket, RGBChunkPacket, create_receiver
 
 # ======== 默认参数（要改就改这里）========
 FPGA_IP     = "192.168.0.2"     # FPGA 的 IP（和 net_screen_tx 里 LOCAL_IP 一致）
@@ -110,6 +113,11 @@ kb_bits = 0
 kb_ev = threading.Event()
 
 key_state = KeyState()
+audio_buffer = AudioBuffer()
+video_receiver = VideoReceiver(DEFAULT_PAL)
+frame_stats = video_receiver.frame_stats
+rgb_buf = video_receiver.rgb
+line_ok = video_receiver.line_ok
 
 
 def kb_packet(bits, cancelled=False):
@@ -185,12 +193,16 @@ def tx_loop(local_source=None):
                 kb_ev.wait(RESEND_S)
                 kb_ev.clear()
                 with kb_lock:
-                    packet = key_state.packet()
+                    cancel_token, packet = key_state.snapshot()
                 try:
                     sender.sendto(packet, (FPGA_IP, FPGA_PORT))
+                    with kb_lock:
+                        if key_state.acknowledge(cancel_token,packet):
+                            kb_ev.set()
                     stat["kb"] += 1
                 except OSError as exc:
                     print("[按键] 发送失败：" + str(exc))
+                    release_keyboard()
                     stop_event.wait(0.5)
         finally:
             try:
@@ -221,31 +233,21 @@ def rx_loop(receiver):
             except ValueError:
                 stat["invalid"] += 1
                 continue
-            with lock:
-                if isinstance(packet, (LinePacket, RGBChunkPacket)):
-                    old_frame = stat["last_frame"]
-                    if packet.frame != old_frame:
-                        # 活跃流拒绝迟到旧帧；超过250ms未接纳像素时重新同步FPGA复位后的帧号。
-                        if old_frame >= 0 and ((packet.frame-old_frame)&65535) >= 32768 and time.monotonic()-last_accepted < 0.25:
-                            continue
-                        line_ok[:] = [0] * H
-                        chunk_masks[:] = [0] * H
-                    if isinstance(packet, RGBChunkPacket):
-                        rgb_mode = True
-                        offset=(packet.line*W+packet.x)*3
-                        rgb_buf[offset:offset+len(packet.pixels)] = packet.pixels
-                        chunk_masks[packet.line] |= ((1 << (len(packet.pixels)//3)) - 1) << packet.x
-                        line_ok[packet.line] = chunk_masks[packet.line] == (1 << W) - 1
-                    else:
-                        rgb_mode = False
-                        buf[packet.line * W:(packet.line + 1) * W] = packet.pixels
-                        line_ok[packet.line] = 1
-                    stat["line"] += 1
-                    stat["last_frame"] = packet.frame
-                    last_accepted = time.monotonic()
-                else:
+            if isinstance(packet,AudioPacket):
+                audio_buffer.push(packet)
+                stat['audio']=stat.get('audio',0)+1
+                continue
+            if isinstance(packet,(LinePacket,RGBChunkPacket)):
+                if not video_receiver.accept(packet):
+                    continue
+                rgb_mode=isinstance(packet,RGBChunkPacket)
+                stat["line"]+=1
+                stat["last_frame"]=video_receiver.frame
+            else:
+                video_receiver.update_palette(packet.entries)
+                with lock:
                     pal.update(dict(packet.entries))
-                    stat["pal"] += 1
+                stat["pal"]+=1
             now = time.monotonic()
             if now - t0 >= 1:
                 stat["fps"] = (stat["pkt"] - n0) / (now - t0)
@@ -273,6 +275,7 @@ def main(local_source=None, smoke_test=False, smoke_report=None):
     listener = None
     workers = []
     stop_event.clear()
+    release_keyboard()  # 新窗口先取消旧会话，再允许发送新按键。
     def close():
         release_keyboard()
         stop_event.set()
@@ -283,34 +286,46 @@ def main(local_source=None, smoke_test=False, smoke_report=None):
             # 在创建后台线程前占用端口；冲突会明确报错，不留下无数据的假窗口。
             receiver = create_receiver("0.0.0.0", LISTEN_PORT)
             listener = start_listener(root)
-            for target, args in [(rx_loop, (receiver,)), (tx_loop, (local_source,))]:
+            for target, args in [(rx_loop, (receiver,)), (tx_loop, (local_source,)), (play,(audio_buffer,stop_event,stat))]:
                 worker = threading.Thread(target=target, args=args, daemon=True)
                 worker.start()
                 workers.append(worker)
         root.title("Tetris  (画面 udp:%d  ->  按键 %s:%d)" % (LISTEN_PORT, FPGA_IP, FPGA_PORT))
         root.protocol("WM_DELETE_WINDOW", close)
-        label = tk.Label(root, text="等待画面...", fg="white", bg="black", font=("Consolas", 12), anchor="w")
+        label = tk.Label(root, text="等待画面...", fg="white", bg="black", font=("Consolas", 12), anchor="w", justify="left")
         label.pack(fill="x")
         canvas = tk.Canvas(root, width=W, height=H, highlightthickness=0, bg="black")
         canvas.pack()
-        image = Image.new("P", (W, H), 0)
-        image.putpalette(pal_bytes())
+        image = Image.new("RGB", (W, H), 0)
         photo = ImageTk.PhotoImage(image)
         item = canvas.create_image(0, 0, anchor="nw", image=photo)
+        last_serial=0
+        next_tick=time.monotonic()
+        next_status=0
+        displayed=0
+        display_start=time.monotonic()
+        display_fps=0.0
         def tick():
-            with lock:
-                direct_rgb = rgb_mode
-                pixels = bytes(rgb_buf if direct_rgb else buf)
-                missing = line_ok.count(0)
-            im = Image.frombytes("RGB" if direct_rgb else "P", (W, H), pixels)
-            if not direct_rgb:
-                im.putpalette(pal_bytes())
-            photo.paste(im)
-            canvas.itemconfigure(item, image=photo)
-            label.config(text="行包=%d 调色板=%d 帧号=%d 本帧缺行=%d | 按键:%s 已发=%d | %s" %
-                         (stat["line"], stat["pal"], stat["last_frame"], missing, kb_text(), stat["kb"], stat.get("error", "")))
+            nonlocal last_serial,next_tick,next_status,displayed,display_start,display_fps
+            frame=video_receiver.newest(last_serial)
+            if frame is not None:
+                photo.paste(Image.frombytes("RGB",(W,H),frame.pixels))
+                last_serial=frame.serial
+                displayed+=1
+            now=time.monotonic()
+            if now-display_start>=1:
+                display_fps=displayed/(now-display_start)
+                displayed=0;display_start=now
+            if now>=next_status:
+                previous="—" if frame_stats.last_missing is None else str(frame_stats.last_missing)
+                label.config(text="帧号=%d 本帧待收=%d 上帧缺行=%s 完整帧=%d 不完整帧=%d 跳帧=%d 显示=%.1f FPS | %s\n音频包=%d 输入峰值=%d/32767 播放增益×%d 按键:%s | %s" %
+                    (stat["last_frame"],video_receiver.missing,previous,frame_stats.complete,frame_stats.incomplete,frame_stats.skipped,display_fps,DECODER_BACKEND,stat.get("audio",0),audio_buffer.input_peak,PCM_GAIN,kb_text(),stat.get("error","") or stat.get("audio_error","")))
+                next_status=now+.2
             if not stop_event.is_set():
-                root.after(33, tick)
+                next_tick+=1/60
+                if next_tick<now:
+                    next_tick=now+1/60
+                root.after(max(1,round((next_tick-time.monotonic())*1000)),tick)
         root.update_idletasks()
         root.geometry("+0+0")
         if not smoke_test:

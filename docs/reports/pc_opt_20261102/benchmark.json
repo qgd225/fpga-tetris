@@ -1,0 +1,23 @@
+{
+  "pass": true,
+  "backend": "NumPy",
+  "video_seconds": 0.4,
+  "packets_per_trial": 17352,
+  "decode_seconds": {
+    "before": [
+      0.6655225999984395,
+      0.6392894000000524,
+      0.6402760000000853
+    ],
+    "after": [
+      0.25621010000031674,
+      0.25508780000018305,
+      0.2693340999994689
+    ]
+  },
+  "decode_speedup": 2.5061543515589286,
+  "decode_and_complete_frame_publish_seconds": 0.34345699999903445,
+  "all_packets_semantically_identical": true,
+  "old_exe_sha256": "8060b789564ef2ebe5546867d01322a70890a899802b12658dd478c7ea883f9b",
+  "old_live_CPU_one_core_100": 120.8
+}

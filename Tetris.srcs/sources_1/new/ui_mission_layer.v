@@ -1,7 +1,7 @@
 // A3 common material port and mission hardware shader, three clocks.
 // Static rails, joints, chain, grooves and clamps are sampled without warping.
 module ui_mission_layer(
- input clk,reset_n,enable,duo,campaign,blocked,choose,
+ input clk,reset_n,enable,duo,campaign,blocked,chain_present,choose,
  input [10:0] x,y,input [3:0] locked,input [1:0] reserve_alarm,
  input reserve_pulse,input [7:0] reserve_fill,animation,input [4:0] charge_left,
  input [6:0] charge_percent,debris_percent,input [9:0] lit_top,
@@ -78,7 +78,7 @@ module ui_mission_layer(
    end
   end
   else if(box(core_x,y,1124,214,90,356))begin
-   selected=1;base=campaign?(blocked?MAT_CORE_LOCKED_BASE:MAT_CORE_CAMPAIGN_BASE):MAT_CORE_ENDLESS_BASE;
+   selected=1;base=campaign?(chain_present?MAT_CORE_LOCKED_BASE:MAT_CORE_CAMPAIGN_BASE):MAT_CORE_ENDLESS_BASE;
    stride=12;sx=core_x-1124;sy=y-214;
   end
   else if(box(x,y,972,314,140,42))begin selected=1;base=campaign?MAT_SPEED_BASE:MAT_SPEED_ENDLESS_BASE;stride=18;sx=x-972;sy=y-314;end
@@ -144,10 +144,12 @@ module ui_mission_layer(
    native=1;ink=reserve_alarm==2?24'hd8442e:24'hffc23a;
   end
   // A charged segment launches a single bottom-to-top scan, clipped to glass.
-  if(campaign && !blocked && charge_left!=0 && box(core_x,y,1159,260,22,288) && y>=sweep_y && y<sweep_y+2)begin
-   native=1;ink=24'hb5fbff;
+  if(campaign && charge_left!=0 && box(core_x,y,1159,260,22,288) && y>=sweep_y && y<sweep_y+2)begin
+   native=1;ink=blocked?24'hd8442e:(chain_present?24'hffc23a:24'hb5fbff);
   end
-  if(campaign && blocked && box(core_x,y,1150,238,40,6))begin native=1;ink=24'hd8442e;end
+  if(campaign && chain_present && box(core_x,y,1150,238,40,6))begin
+   native=1;ink=blocked?(charge_left!=0 && animation[3]?24'hff8d75:24'hd8442e):24'hffc23a;
+  end
   if(campaign && box(x,y,978,370,124,236))begin
    row=y<426?0:y<480?1:y<534?2:3;
    case(row)

@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-02",
+  "source": "用户在本对话明确反馈：已经成功上板验证",
+  "status": "当前发布版整体上板验证成功",
+  "firmware": {
+    "bit/Tetris.bit": "784a8ad5c598378134138124d28898db2c1b7e06401992f3d5ab8422184930cc",
+    "bit/Tetris.bin": "4c9bb24cdb1152f0be99747cdf25c95952b2b672c3166825933ca4cfcbd5b946",
+    "TetrisPC.exe": "a654c48a9afddc2feed80f45d491b272109a937f69eeb236ec4a930517b701a7"
+  },
+  "pc_version": "2026.11.02.3",
+  "hardware_report": "docs/reports/core_chain_20261102",
+  "pc_report": "docs/reports/pc_opt_20261102",
+  "bin_report": "docs/reports/bin_release_20261030",
+  "measurement_note": "无新增帧率、音画延迟、长期漂移或Flash器件型号数据；不将整体反馈扩写为这些项目的量化测量。"
+}

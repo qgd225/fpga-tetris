@@ -1,0 +1,223 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.sim/optimization/playfield_equivalence_tb.v" into library work
+INFO: [VRFC 10-311] analyzing module Tetromino
+INFO: [VRFC 10-311] analyzing module weiyibiao
+INFO: [VRFC 10-311] analyzing module playfield_equivalence_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/temporary/sim/optimization/build/Playfield_reference.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_reference
+INFO: [VRFC 10-311] analyzing module board_row_replica_reference
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/temporary/sim/optimization/build/Candidate.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield
+INFO: [VRFC 10-311] analyzing module board_row_replica
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield_pixel_mapper.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_pixel_mapper
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield_speed_control.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_speed_control
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield_hold_controller.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_hold_controller
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield_ghost_scanner.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_ghost_scanner
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/solo_hint.v" into library work
+INFO: [VRFC 10-311] analyzing module solo_hint
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/run_clock.v" into library work
+INFO: [VRFC 10-311] analyzing module run_clock
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/reserve_timer.v" into library work
+INFO: [VRFC 10-311] analyzing module reserve_timer
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/hint_budget.v" into library work
+INFO: [VRFC 10-311] analyzing module hint_budget
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/hold_limits.v" into library work
+INFO: [VRFC 10-311] analyzing module hold_limits
+Vivado Simulator 2018.3
+Copyright 1986-1999, 2001-2018 Xilinx, Inc. All Rights Reserved.
+Running: D:/xilinx/Vivado/2018.3/bin/unwrapped/win64.o/xelab.exe playfield_equivalence_tb -s playfield_equivalence --timescale 1ns/1ps --nolog 
+Multi-threading is on. Using 26 slave threads.
+Starting static elaboration
+WARNING: [VRFC 10-3645] port 'hold_valid' remains unconnected for this instance [D:/vivado_project/Tetris/Tetris.sim/optimization/playfield_equivalence_tb.v:25]
+WARNING: [VRFC 10-3645] port 'lock_commit1' remains unconnected for this instance [D:/vivado_project/Tetris/Tetris.sim/optimization/playfield_equivalence_tb.v:35]
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module work.board_row_replica
+Compiling module work.Playfield_pixel_mapper
+Compiling module work.Playfield_speed_control(MCNT_Dro...
+Compiling module work.hold_limits
+Compiling module work.Playfield_hold_controller
+Compiling module work.Playfield_ghost_scanner
+Compiling module work.Tetromino
+Compiling module work.weiyibiao
+Compiling module work.solo_hint
+Compiling module work.Playfield_default
+Compiling module work.board_row_replica_reference
+Compiling module work.Playfield_reference_default
+Compiling module work.playfield_equivalence_tb
+Built simulation snapshot playfield_equivalence
+
+****** xsim v2018.3 (64-bit)
+  **** SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+  **** IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/playfield_equivalence/xsim_script.tcl
+# xsim {playfield_equivalence} -autoloadwcfg -runall
+Vivado Simulator 2018.3
+Time resolution is 1 ps
+run -all
+Equivalence checks: 112707
+=== ALL PASS: PLAYFIELD EQUIVALENCE ===
+$finish called at time : 257400416 ps : File "D:/vivado_project/Tetris/Tetris.sim/optimization/playfield_equivalence_tb.v" Line 167
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Nov  2 15:12:46 2026...
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.sim/optimization/hint_equivalence_tb.v" into library work
+INFO: [VRFC 10-311] analyzing module hint_equivalence_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.sim/solo_hint/solo_hint_tb.v" into library work
+INFO: [VRFC 10-311] analyzing module Tetromino
+INFO: [VRFC 10-311] analyzing module solo_hint_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/temporary/sim/optimization/build/hint/reference.v" into library work
+INFO: [VRFC 10-311] analyzing module solo_hint_reference
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/temporary/sim/optimization/build/hint/Candidate.v" into library work
+INFO: [VRFC 10-311] analyzing module solo_hint
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/run_clock.v" into library work
+INFO: [VRFC 10-311] analyzing module run_clock
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/reserve_timer.v" into library work
+INFO: [VRFC 10-311] analyzing module reserve_timer
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/hint_budget.v" into library work
+INFO: [VRFC 10-311] analyzing module hint_budget
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/hold_limits.v" into library work
+INFO: [VRFC 10-311] analyzing module hold_limits
+Vivado Simulator 2018.3
+Copyright 1986-1999, 2001-2018 Xilinx, Inc. All Rights Reserved.
+Running: D:/xilinx/Vivado/2018.3/bin/unwrapped/win64.o/xelab.exe hint_equivalence_tb -s hint_equivalence --timescale 1ns/1ps --nolog 
+Multi-threading is on. Using 26 slave threads.
+Starting static elaboration
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module work.Tetromino
+Compiling module work.solo_hint(HINT_SETTLE_CYCLES=23'...
+Compiling module work.solo_hint_reference(HINT_SETTLE_...
+Compiling module work.hint_equivalence_tb
+Built simulation snapshot hint_equivalence
+
+****** xsim v2018.3 (64-bit)
+  **** SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+  **** IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/hint_equivalence/xsim_script.tcl
+# xsim {hint_equivalence} -autoloadwcfg -runall
+Vivado Simulator 2018.3
+Time resolution is 1 ps
+run -all
+Hint equivalence checks: 1399517
+=== ALL PASS: HINT EQUIVALENCE ===
+$finish called at time : 13995451 ns : File "D:/vivado_project/Tetris/Tetris.sim/optimization/hint_equivalence_tb.v" Line 65
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Nov  2 15:12:55 2026...
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/ui_font_5x7.v" into library work
+INFO: [VRFC 10-311] analyzing module ui_font_5x7
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/ui_text_raster.v" into library work
+INFO: [VRFC 10-311] analyzing module ui_text_raster
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/ui_text_compact.v" into library work
+INFO: [VRFC 10-311] analyzing module ui_text_compact
+INFO: [VRFC 10-311] analyzing module ui_text_template_rom
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/ui_material_atlas.v" into library work
+INFO: [VRFC 10-311] analyzing module ui_material_atlas
+INFO: [VRFC 10-311] analyzing module ui_material_bank
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/ui_mission_layer.v" into library work
+INFO: [VRFC 10-311] analyzing module ui_mission_layer
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/ui_basic_layer.v" into library work
+INFO: [VRFC 10-311] analyzing module ui_basic_layer
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/ui_hull_background.v" into library work
+INFO: [VRFC 10-311] analyzing module ui_hull_background
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/reference_ui_renderer.v" into library work
+INFO: [VRFC 10-311] analyzing module reference_ui_renderer
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.sim/optimization/metadata_tb.v" into library work
+INFO: [VRFC 10-311] analyzing module Tetromino
+INFO: [VRFC 10-311] analyzing module weiyibiao
+INFO: [VRFC 10-311] analyzing module number
+INFO: [VRFC 10-311] analyzing module letter
+INFO: [VRFC 10-311] analyzing module metadata_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/temporary/sim/optimization/build/metadata/Candidate.v" into library work
+INFO: [VRFC 10-311] analyzing module frame
+INFO: [VRFC 10-311] analyzing module cell_metadata_bank
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/frame_background.v" into library work
+INFO: [VRFC 10-311] analyzing module frame_background
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_pixel_mapper.v" into library work
+INFO: [VRFC 10-311] analyzing module story_pixel_mapper
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_pixel_frontend.v" into library work
+INFO: [VRFC 10-311] analyzing module story_pixel_frontend
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/hud_font_rom.v" into library work
+INFO: [VRFC 10-311] analyzing module hud_font_rom
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/hud_text.v" into library work
+INFO: [VRFC 10-311] analyzing module hud_text
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/scene_sprite_rom.v" into library work
+INFO: [VRFC 10-311] analyzing module scene_sprite_rom
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_scene.v" into library work
+INFO: [VRFC 10-311] analyzing module story_scene
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/core_renderer.v" into library work
+INFO: [VRFC 10-311] analyzing module core_renderer
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_presentation.v" into library work
+INFO: [VRFC 10-311] analyzing module story_presentation
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_feedback.v" into library work
+INFO: [VRFC 10-311] analyzing module story_feedback
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_ui.v" into library work
+INFO: [VRFC 10-311] analyzing module story_ui
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_debris.v" into library work
+INFO: [VRFC 10-311] analyzing module story_debris
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/story_controller.v" into library work
+INFO: [VRFC 10-311] analyzing module story_controller
+INFO: [VRFC 10-311] analyzing module mission_rank
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/bin_to_bcd.v" into library work
+INFO: [VRFC 10-311] analyzing module bin_to_bcd
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield
+INFO: [VRFC 10-311] analyzing module board_row_replica
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield_pixel_mapper.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_pixel_mapper
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield_speed_control.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_speed_control
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield_hold_controller.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_hold_controller
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield_ghost_scanner.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_ghost_scanner
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Playfield_edge.v" into library work
+INFO: [VRFC 10-311] analyzing module Playfield_margin
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/solo_hint.v" into library work
+INFO: [VRFC 10-311] analyzing module solo_hint
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/Next_piece.v" into library work
+INFO: [VRFC 10-311] analyzing module Next_piece
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/hold_piece.v" into library work
+INFO: [VRFC 10-311] analyzing module hold_piece
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/timer.v" into library work
+INFO: [VRFC 10-311] analyzing module timer
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/scoring.v" into library work
+INFO: [VRFC 10-311] analyzing module scoring
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/level.v" into library work
+INFO: [VRFC 10-311] analyzing module level
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/game_over.v" into library work
+INFO: [VRFC 10-311] analyzing module game_over
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/choose_menu.v" into library work
+INFO: [VRFC 10-311] analyzing module choose_menu
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/run_clock.v" into library work
+INFO: [VRFC 10-311] analyzing module run_clock
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/reserve_timer.v" into library work
+INFO: [VRFC 10-311] analyzing module reserve_timer
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/hint_budget.v" into library work
+INFO: [VRFC 10-311] analyzing module hint_budget
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/hold_limits.v" into library work
+INFO: [VRFC 10-311] analyzing module hold_limits
+Vivado Simulator 2018.3
+Copyright 1986-1999, 2001-2018 Xilinx, Inc. All Rights Reserved.
+Running: D:/xilinx/Vivado/2018.3/bin/unwrapped/win64.o/xelab.exe metadata_tb -L unisims_ver -s metadata --timescale 1ns/1ps --nolog 
+Multi-threading is on. Using 26 slave threads.
+Starting static elaboration
+ERROR: [VRFC 10-2063] Module <ui_core_feedback> not found while processing module instance <debris_observer> [D:/vivado_project/Tetris/Tetris.srcs/sources_1/new/reference_ui_renderer.v:120]
+ERROR: [XSIM 43-3322] Static elaboration of top level Verilog design unit(s) in library work failed.
+Metadata rtl simulation failed to run
+At D:\vivado_project\Tetris\temporary\sim\optimization\run_metadata.ps1:17 char:33
++ ... LASTEXITCODE -ne 0){throw "Metadata $model simulation failed to run"}
++                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Metadata rtl simulation failed to run:String) [], RuntimeException
+    + FullyQualifiedErrorId : Metadata rtl simulation failed to run
+ 

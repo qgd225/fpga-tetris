@@ -8,6 +8,7 @@ import sys
 
 
 def main():
+    import numpy  # 成品必须包含加速后端，禁止意外打包为慢速回退版。
     pc = Path(__file__).resolve().parent
     task = pc.parent / "temporary" / ("pc_package_" + datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
     task.mkdir(parents=True)

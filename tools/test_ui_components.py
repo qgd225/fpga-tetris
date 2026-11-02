@@ -1,8 +1,9 @@
 """Current UI font/template/atlas roundtrips against independent scalar contracts."""
 from pathlib import Path
-import subprocess,shutil,re,json,hashlib
-ROOT=Path(__file__).resolve().parents[1];SRC=ROOT/'Tetris.srcs/sources_1/new';OUT=ROOT/'temporary/ui_polish_20261029/components'
+import subprocess,shutil,re,json,hashlib,argparse
+ROOT=Path(__file__).resolve().parents[1];SRC=ROOT/'Tetris.srcs/sources_1/new';OUT=ROOT/'temporary/core_chain_20261102/components'
 def main():
+ parser=argparse.ArgumentParser();parser.add_argument("--groups",default="");args=parser.parse_args()
  OUT.mkdir(parents=True,exist_ok=True)
  geometry=(SRC/'ui_material_geometry.vh').read_text('ascii')
  pb=int(re.search(r'MAT_PAL_BITS=(\d+)',geometry)[1]);ib=int(re.search(r'MAT_PATTERN_BITS=(\d+)',geometry)[1])
@@ -16,13 +17,24 @@ def main():
     code=0 if k==0 else patterns[k][pid*64+q]
     f.write(f'{rgb[code if k==5 else pal[base+code]]:07x}\n')
  for f in SRC.glob('ui_*.mem'):shutil.copyfile(f,OUT/f.name)
- groups={'ui_font_5x7':['ui_font_5x7'],'ui_text_compact':['ui_font_5x7','ui_text_raster','ui_text_compact'],'ui_material_atlas':['ui_material_atlas'],'ui_mission_dynamic':['ui_material_atlas','ui_mission_layer'],'ui_layout':['ui_material_atlas','ui_mission_layer'],'ui_audio_observer':['sound'],'ui_renderer_equivalence':['ui_font_5x7','ui_text_raster','ui_text_compact','ui_material_atlas','ui_mission_layer','ui_basic_layer','ui_hull_background','reference_ui_renderer','story_ui'],'ui_basic_equivalence':['ui_font_5x7','ui_text_raster','ui_text_compact','ui_material_atlas','ui_mission_layer','ui_basic_layer','ui_hull_background','reference_ui_renderer','story_ui']}
+ groups={'ui_font_5x7':['ui_font_5x7'],'ui_text_compact':['ui_font_5x7','ui_text_raster','ui_text_compact'],'ui_material_atlas':['ui_material_atlas'],'ui_mission_dynamic':['ui_material_atlas','ui_mission_layer'],'ui_layout':['ui_material_atlas','ui_mission_layer'],'ui_audio_observer':['sound'],'ui_renderer_equivalence':['ui_font_5x7','ui_text_raster','ui_text_compact','ui_material_atlas','ui_mission_layer','ui_basic_layer','ui_hull_background','ui_core_feedback','reference_ui_renderer','story_ui'],'ui_basic_equivalence':['ui_font_5x7','ui_text_raster','ui_text_compact','ui_material_atlas','ui_mission_layer','ui_basic_layer','ui_hull_background','ui_core_feedback','reference_ui_renderer','story_ui']}
+ if args.groups:
+  selected=args.groups.split(",");assert set(selected)<=set(groups);groups={n:groups[n] for n in selected}
  results=[]
  for group,modules in groups.items():
   files=[SRC/(n+'.v') for n in modules]+[ROOT/'Tetris.sim/story_visual'/(group+'_tb.v')]
   if group=='ui_renderer_equivalence':
    for name in ['reference_ui_renderer','story_ui']:
     raw=(ROOT/'assets/new_ui/verification/background_before'/(name+'.v.snapshot')).read_bytes().decode('gbk')
+    if name=='reference_ui_renderer':
+     # Equalize the intentional debris/chain behavior in the timing oracle;
+     # its original color/background pipeline remains the independent baseline.
+     current=(ROOT/'assets/new_ui/renderer_source.v.in').read_bytes().decode('gbk')
+     begin=current.index(' wire [4:0] debris_flash;');end=current.index(' ui_mission_layer mission(',begin)
+     before=raw.index(' wire [4:0] mission_flash=');after=raw.index(' ui_mission_layer mission(',before)
+     raw=raw[:before]+current[begin:end]+raw[after:]
+     raw=raw.replace('.blocked(debris_left>mode_half(duo,level_id)),.choose(choose)',
+      '.blocked(debris_left>mode_half(duo,level_id)),.chain_present(debris_left!=0),.choose(choose)')
     raw=raw.replace('module '+name+'(','module '+name+'_bg_before(').replace('reference_ui_renderer reference_layer(','reference_ui_renderer_bg_before reference_layer(')
     p=OUT/(name+'_bg_before.v');p.write_bytes(raw.encode('gbk'));files += [p]
    scenes=(ROOT/'Tetris.sim/story_visual/ui_scenes_tb.v').read_bytes().decode('gbk')

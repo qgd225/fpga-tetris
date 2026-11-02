@@ -10,7 +10,7 @@ import sys
 import threading
 import time
 from pathlib import Path
-from pc_protocol import decode_packet, line_packet, palette_packet, LinePacket, PalettePacket, RGBChunkPacket
+from pc_protocol import decode_packet, line_packet, palette_packet, LinePacket, PalettePacket, RGBChunkPacket, AudioPacket
 from pc_runtime import VERSION
 
 
@@ -29,7 +29,7 @@ def local_addresses():
 
 
 def receive(sock, seconds, source_ip=None, expected=None):
-    stats = dict(datagrams=0, bytes=0, line_packets=0, palette_packets=0, invalid_packets=0, sources=[])
+    stats = dict(datagrams=0, bytes=0, line_packets=0, palette_packets=0, audio_packets=0, invalid_packets=0, sources=[])
     sources = set()
     protocol_sources = set()
     deadline = time.monotonic() + seconds
@@ -49,6 +49,8 @@ def receive(sock, seconds, source_ip=None, expected=None):
             protocol_sources.add(peer[0])
             if isinstance(packet, (LinePacket, RGBChunkPacket)):
                 stats["line_packets"] += 1
+            elif isinstance(packet, AudioPacket):
+                stats["audio_packets"] += 1
             elif isinstance(packet, PalettePacket):
                 stats["palette_packets"] += 1
         except ValueError:
@@ -57,7 +59,7 @@ def receive(sock, seconds, source_ip=None, expected=None):
             break
     stats["sources"] = sorted(sources)
     stats["protocol_sources"] = sorted(protocol_sources)
-    stats["passed"] = stats["line_packets"] + stats["palette_packets"] > 0
+    stats["passed"] = stats["line_packets"] + stats["palette_packets"] + stats["audio_packets"] > 0
     return stats
 
 
@@ -79,7 +81,7 @@ def run_loopback(timeout=3, count=8):
         worker.start()
         stats = receive(receiver, timeout, expected=(count, 1))
         worker.join(timeout)
-    stats["passed"] = stats["line_packets"] == count and stats["palette_packets"] == 1 and not failures and not worker.is_alive()
+    stats["passed"] = stats["line_packets"] == count and stats["palette_packets"] == 1 and stats["audio_packets"] == 1 and not failures and not worker.is_alive()
     stats.update(mode="loopback", bind=address[0], port=address[1], version=VERSION,
                  errors=failures, physical_network_verified=False,
                  conclusion="本机 UDP 发送、接收与 Tetris 协议解析通过；不代表网线、物理网口或防火墙入站已验证。" if stats["passed"] else "本机 UDP 自测未通过。")
@@ -91,10 +93,12 @@ def send_packets(target, port, count=8, bind=None):
         if bind:
             sender.bind((bind, 0))
         sender.sendto(palette_packet(), (target, port))
+        audio=bytes.fromhex('a55a0600')+bytes.fromhex('000000010000000000000000bb8000f0')+bytes(480)
+        sender.sendto(audio,(target,port))
         for i in range(count):
             sender.sendto(line_packet(frame=1 + i // 720, line=i % 720), (target, port))
             time.sleep(0.01)
-    return dict(mode="send", passed=True, target=target, port=port, sent_datagrams=count + 1,
+    return dict(mode="send", passed=True, target=target, port=port, sent_datagrams=count + 2,
                 version=VERSION, receiver_verified=False,
                 conclusion="测试包已交给系统发送；接收是否成功以另一台电脑的监听结果为准。")
 

@@ -466,6 +466,7 @@ wire solo_hint_show = !duo && solo_hint_latched;
 
 //    以太网：UDP 画面/调色板与 PC 键盘输入
     net_screen_tx net_screen_tx_inst(
+    .audio_sample_ce(audio_sample_ce),.audio_pcm(audio_pcm),
     .Clk_74M(Clk_74M),
     .Reset_n(Reset_n),
     .por_n(por_n),

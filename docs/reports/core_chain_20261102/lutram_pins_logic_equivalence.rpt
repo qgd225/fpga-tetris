@@ -1,0 +1,3 @@
+Only LUT truth tables with recursively identical input functions, constants and LUT1 identity buffers are normalized. Every sequential/memory/input leaf retains its exact identity.
+LUT_EQ_225 SOURCES=frame_inst/Playfield_inst/Playfield_LUT1_14/O frame_inst/Playfield_inst/Playfield_LUT1_14_replica/O frame_inst/Playfield_inst/Playfield_LUT1_14_replica_1/O EXPRESSION=LUT1 O 2'h1 I0 LUT_EQ_224
+LUT_EQ_226 SOURCES={frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].current1_i_36/O} {frame_inst/Playfield_inst/ghost_scanner1_inst/board_reads[0].current1_i_36_replica/O} EXPRESSION=LUT4 O 16'hFFFE I0 LUT_EQ_21 I1 LUT_EQ_160 I2 LUT_EQ_180 I3 LUT_EQ_25

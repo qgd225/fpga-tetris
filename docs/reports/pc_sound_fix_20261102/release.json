@@ -1,0 +1,15 @@
+{
+  "pass": true,
+  "pc_version": "2026.11.02.2",
+  "pc_exe_sha256": "8060b789564ef2ebe5546867d01322a70890a899802b12658dd478c7ea883f9b",
+  "previous_exe_sha256": "965d50f8b31cbe9b8d9d2102431224de44e72ae718930729b53bc826cbcc9645",
+  "PCM_gain": 32,
+  "tests": 11,
+  "FPGA_unchanged": true,
+  "bit_sha256": "793c38e16a332efe3132600c5c5666bdd4d1e6c190d94755f1001cc90d213cd4",
+  "bin_sha256": "df6c618d690a4bd7141d5e2ab620aff8621a0280d9ad765566393bc1b167b92f",
+  "hardware_evidence": "docs/reports/pc_audio_20261102",
+  "git_commit": false,
+  "git_push": false,
+  "user_feedback": "放大采样音未听见，中频测试音可听，使用Realtek扬声器；新版游戏音效待确认"
+}

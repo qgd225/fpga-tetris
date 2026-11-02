@@ -1,0 +1,15 @@
+{
+  "pass": true,
+  "video_frames": 2,
+  "video_packets": 1440,
+  "audio_packets": 6,
+  "audio_samples_exact": 1440,
+  "Ethernet_CRC_IP_UDP": true,
+  "real_localhost_receiver": true,
+  "source_inputs": {
+    "Tetris.srcs\\sources_1\\new\\net_audio_packetizer.v": "897729a782db40a7ef13fe0241f2d18f76939201611c387479adf0e9017a1ff3",
+    "Tetris.srcs\\sources_1\\new\\net_screen_tx.v": "b3631778d031071ee38412d04c1105d83619fec063cf6331ffb393fdf8b3bc38",
+    "Tetris.srcs\\sources_1\\new\\ui_rgb_packetizer.v": "f293de7a5f8932207e8daafa48fdea32e2f36cf0f38ad059f9152c6965b867bc",
+    "Tetris.srcs\\sources_1\\new\\ui_async_fifo.v": "30bc17ff5904f8761083e8318d74c87ba9e4f8221a98135b579115eaf6d5efed"
+  }
+}

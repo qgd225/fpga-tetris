@@ -1,0 +1,8 @@
+{
+  "pass": true,
+  "internal_unconstrained_endpoints": 93,
+  "names_match_previous_ui_release": true,
+  "no_multiple_clock_or_loops": true,
+  "bus_skew_no_violations": true,
+  "no_new_clock_or_constraint": true
+}

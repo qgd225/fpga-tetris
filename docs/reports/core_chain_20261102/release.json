@@ -1,0 +1,56 @@
+{
+  "pass": true,
+  "published": true,
+  "date": "2026-11-02T17:40:10.585864",
+  "firmware": {
+    "pass": true,
+    "bit_sha256": "784a8ad5c598378134138124d28898db2c1b7e06401992f3d5ab8422184930cc",
+    "bin_sha256": "4c9bb24cdb1152f0be99747cdf25c95952b2b672c3166825933ca4cfcbd5b946",
+    "bit_bytes": 2192114,
+    "bin_bytes": 2192012,
+    "part": "7a35tfgg484",
+    "format": "Raw SPI configuration bytes, unswapped, .bit header removed",
+    "start_address": "0x00000000",
+    "archives": [
+      "Tetris_20261102_174010_793c38e16a33.bit",
+      "Tetris_20261102_174010_df6c618d690a.bin"
+    ],
+    "changed": [
+      "Tetris.bit",
+      "Tetris.bin"
+    ]
+  },
+  "resources": {
+    "LUT": 19382.0,
+    "REGISTERS": 7887.0,
+    "BRAM": 48.5,
+    "DSP": 13.0,
+    "LATCHES": 3.0
+  },
+  "free_LUT": 1418,
+  "timing_ns": {
+    "WNS": 0.097,
+    "WHS": 0.032,
+    "TNS": 0.0,
+    "THS": 0.0
+  },
+  "core_chain_checks": 134,
+  "functional_groups": 15,
+  "component_groups": [
+    "ui_mission_dynamic",
+    "ui_layout",
+    "ui_renderer_equivalence"
+  ],
+  "RTL_crops": 4,
+  "verification_only_followup_delta": [
+    "tools/test_ui_components.py"
+  ],
+  "PC_EXE_unchanged": "a654c48a9afddc2feed80f45d491b272109a937f69eeb236ec4a930517b701a7",
+  "gameplay_audio_network_unchanged": true,
+  "git_commit": false,
+  "git_push": false,
+  "board_pending": [
+    "实际核心/锁链与清骸反馈",
+    "物理音视频收流、操作和试听"
+  ]
+}

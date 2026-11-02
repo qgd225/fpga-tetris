@@ -1,6 +1,11 @@
 """PC 显示与自测共用的 UDP 协议，不依赖图形库。"""
 from dataclasses import dataclass
 from struct import iter_unpack
+try:
+    import numpy as _np
+except ImportError:
+    _np=None
+DECODER_BACKEND="NumPy" if _np is not None else "Python"
 
 WIDTH, HEIGHT = 1280, 720
 MAGIC = b"\xa5\x5a"
@@ -26,9 +31,25 @@ class RGBChunkPacket:
     pixels: bytes
 
 
+@dataclass(frozen=True)
+class AudioPacket:
+    session: int
+    sequence: int
+    index: int
+    pcm: bytes
+
+
 def decode_packet(data):
     if len(data) < 3 or data[:2] != MAGIC:
         raise ValueError("不是 Tetris 数据包")
+    if data[2] == 6:
+        if len(data)<22 or data[3]!=0:
+            raise ValueError("音频包长度或版本错误")
+        session,sequence,index=(int.from_bytes(data[i:i+4],"big") for i in (4,8,12))
+        rate=int.from_bytes(data[16:18],"big");count=int.from_bytes(data[18:20],"big")
+        if rate!=48000 or count!=240 or len(data)!=20+2*count:
+            raise ValueError("音频格式或样本数错误")
+        return AudioPacket(session,sequence,index,bytes(data[20:]))
     if data[2] == 4:
         if len(data) < 16 or len(data) > 1292 or (len(data) - 12) % 4 or data[3] != 0:
             raise ValueError("RGB游程包长度或版本错误")
@@ -38,7 +59,12 @@ def decode_packet(data):
         counts = data[12::4]
         if 0 in counts or sum(counts) != width:
             raise ValueError("RGB游程长度或像素数错误")
-        pixels = b"".join(color * count for count, color in iter_unpack("B3s", data[12:]))
+        if _np is not None and len(counts)>=16:
+            runs=_np.frombuffer(data,dtype=_np.uint8,offset=12).reshape(-1,4)
+            pixels=(runs[:,1:].tobytes() if counts.count(1)==len(counts) else
+                    _np.repeat(runs[:,1:],runs[:,0],axis=0).tobytes())
+        else:
+            pixels=b"".join(color*count for count,color in iter_unpack("B3s",data[12:]))
         return RGBChunkPacket(frame, line, x, bytes(pixels))
     if data[2] == 1:
         if len(data) != 7 + WIDTH:

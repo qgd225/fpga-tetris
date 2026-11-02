@@ -1,0 +1,8 @@
+{
+  "pass": true,
+  "internal_unconstrained_endpoints": 93,
+  "no_clock_sources_unchanged": true,
+  "bus_skew_checks": 6,
+  "minimum_bus_skew_slack_ns": 6.132,
+  "published_bit_bin_exe_match": true
+}

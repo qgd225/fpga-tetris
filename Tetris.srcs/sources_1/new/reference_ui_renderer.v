@@ -116,9 +116,13 @@ module reference_ui_renderer(
  wire terminal_panel=Finalize && result_ready && x>=416 && x<864 && y>=232 && y<592;
  wire pause_panel=Stop && x>=560 && x<720 && y>=276 && y<340;
  wire basic_enable=!choose && !terminal_panel && !pause_panel && !(comms_visible && x>=(duo?UI_DIALOG_DUO_X:UI_DIALOG_SOLO_X) && x<(duo?UI_DIALOG_DUO_X+360:UI_DIALOG_SOLO_X+360) && y>=160 && y<264);
- wire [4:0] mission_flash=campaign?charge_left:(!recharge_no_gain && recharge_age>30?recharge_age-6'd30:6'd0);
+ wire [4:0] debris_flash;
+ ui_core_feedback debris_observer(.clk(clk),.reset_n(reset_n),.frame_tick(x==0 && y==0),
+  .active(campaign && !choose),.paused(Stop),.ship_key({duo,level_id}),
+  .debris_left(debris_left),.flash_age(debris_flash));
+ wire [4:0] mission_flash=campaign?(debris_flash!=0?debris_flash:charge_left):(!recharge_no_gain && recharge_age>30?recharge_age-6'd30:6'd0);
  ui_mission_layer mission(.clk(clk),.reset_n(reset_n),.enable(choose || basic_enable),.duo(duo),.campaign(campaign),
-  .blocked(debris_left>mode_half(duo,level_id)),.choose(choose),.x(x),.y(y),.locked(locked),.reserve_alarm(reserve_alarm),
+  .blocked(debris_left>mode_half(duo,level_id)),.chain_present(debris_left!=0),.choose(choose),.x(x),.y(y),.locked(locked),.reserve_alarm(reserve_alarm),
   .reserve_fill(reserve_fill),.animation(animation),.charge_left(mission_flash),.reserve_pulse(reserve_pulse),
   .charge_percent(charge_percent[6:0]),.debris_percent(debris_percent[6:0]),.lit_top(lit_top[9:0]),
   .panel_rgb(panel_rgb),.rgb(mission_rgb),.hit(mission_hit));

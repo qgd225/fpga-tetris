@@ -1,0 +1,26 @@
+{
+  "source_inputs": {
+    "build_pc_exe.py": "2319582d0762e745c57e69627cb4a11e8483aee671bd53919461fcc29c9fccf9",
+    "keyboard_controls.py": "0e4baa3855967c8337f7e1d11b77e0acde855fe4b7991291ca80fdf0bbbb98b6",
+    "network_selftest.py": "ec72d5f7b6417066c906851425a4d85dd2b5561bf813d948b609a86fce7f47b6",
+    "net_screen_view.py": "b593332054faf6f7535eda76464a835739a64f4e83e5d865810e16ae1636be02",
+    "pc_audio.py": "08b806f109fbd40016fcc149ee9fe85c442870158cd730537079e4f0d8b8d308",
+    "pc_protocol.py": "a8dbc92fe791ce04ab9259f4236af353c2d80a2a2717ab3b1f18f04f5f8c2f48",
+    "pc_runtime.py": "90980a71cc043b2e5dbca5864f6bde789e6882dcbdd82b569c905d2c0d299a37",
+    "Python备用启动_需要Python.bat": "d876a363c1e76998094fadebff7e81ed8c90614af41b758b8515d75c6a533f44",
+    "reception_stats.py": "386cf38df5bc769d686e15e7a04a6c0fa766f8d752a398cbc336cf8d4cbf919d",
+    "requirements-build.txt": "f8c63d3432f60aed08dc0ccc3a51b14ff0b5b88b7048ed51290242640c9f6d2c",
+    "set_static_arp.py": "a4c4127cf0c016f14a0895c3008371a1cd19bc2935ccc1562808570bbba3ee46",
+    "test_keyboard_controls.py": "b7436c863fe5117f57f447be100ea1ee506b2016871b28ef19b1d789253f93c2",
+    "test_pc_audio.py": "47a732fa522a234383501115ee628fe8f6a7ddc0f1369d367807bfce6fc16da7",
+    "test_sound_fix.py": "c8ffcb293df4988e308bff566c2970998da012e3bcfc84168ab9f74d9dd0537d",
+    "test_video_receiver.py": "21ea75a4d41da72ea5652f6c38780c1105b8626a7abaf18095f06c37bec746ca",
+    "TetrisPC.spec": "2e6091056a61266470fb21d0fa1d6884f492a735ad39a5947cc5cbea80fa1cc6",
+    "tetris_pc_launcher.py": "d39e8fdc30542248fcce08d7c2da1e5ed1c17f2713a90ec5781e119c8461a41d",
+    "video_receiver.py": "a4ab383379ea8ca18776b7f9842c3126bed940a403edd28d517b1152744fa376",
+    "网口自测.bat": "70dd0ee08456c5af6a84199f472bda038193a6da8483d96449924ec64f2282a3"
+  },
+  "exe_sha256": "a654c48a9afddc2feed80f45d491b272109a937f69eeb236ec4a930517b701a7",
+  "platform": "win32",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]"
+}
